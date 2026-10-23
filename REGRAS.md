@@ -42,6 +42,8 @@ Correção mais nova vence a mais velha. G22 e G23 vêm primeiro porque mandam n
 | G29 | Não encher o disco do dono durante o trabalho. | 2026-10-13 13:11 |
 | G30 | Produzir no estúdio 2D, não na Máquina de Conteúdo/VK Studio (salvo pedido). | 2026-10-09 15:36; 2026-10-13 15:56 |
 | G31 | Nome/@ na tela só os reais de quem fala; nunca nome de exemplo. | 2026-10-13 16:43; 2026-10-12 10:33 |
+| G32 | Criar um modelo é aprender uma forma de execução, não copiar a referência. O modelo tem que funcionar com o que o vídeo tiver: só a gravação da pessoa, sem B-roll, sem imagem, sem várias cenas, e seguir as instruções do dono. | 2026-10-22 ("criar um modelo não é copiar, é aprender uma forma de execução. Nem sempre vou ter um B-ROLL ou uma imagem ou várias cenas, e daí faz com o que tiver e as instruções mesmo") |
+| G33 | Nenhum tratamento de cor na gravação da pessoa: isso o usuário faz à mão, antes. As cores dos elementos do tema (cartões, texto, destaques) também são gosto e ajuste do usuário; o modelo traz paletas prontas como opção, não como regra. | 2026-10-22 ("Esquece esse trem de tratamento de adjustment de cores na gravação, pois isso o usuário faz manualmente, e as cores das coisas em si do tema é de acordo com o gosto e ajuste do usuário também") |
 
 Como se confere G23: `tools/parece.py` (luz, cor, enquadramento e ritmo contra `modelos/<m>/assinatura.json`) e a
 folha lado a lado que ele grava. Os conferidores de regra dos moldes não provam G23.

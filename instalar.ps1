@@ -1,4 +1,4 @@
-# Instala o Estúdio 2D dentro desta pasta (Windows, PowerShell 7).
+# Instala o EditOS dentro desta pasta (Windows, PowerShell 7).
 # Precisa ter: Python 3.11 ou 3.12, Node.js 20+ e ffmpeg no PATH.
 # Uso: pwsh -File instalar.ps1  (descobre sozinho a placa NVIDIA; -Gpu força)
 param([switch]$Gpu)

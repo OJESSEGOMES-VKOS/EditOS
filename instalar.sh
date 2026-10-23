@@ -1,5 +1,5 @@
 #!/bin/sh
-# Instala o Estúdio 2D dentro desta pasta (macOS/Linux). Precisa: Python 3.11+, Node.js 20+, ffmpeg.
+# Instala o EditOS dentro desta pasta (macOS/Linux). Precisa: Python 3.11+, Node.js 20+, ffmpeg.
 # Uso: sh instalar.sh [--gpu]
 set -e
 RAIZ="$(cd "$(dirname "$0")" && pwd)"

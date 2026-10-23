@@ -1,8 +1,8 @@
-# Preparar o Estúdio 2D
+# Preparar o EditOS
 
 **Para você, aluno:** abra o Claude Code numa pasta vazia (por exemplo `Documentos\estudio-claude`) e escreva:
 
-> Instale o Estúdio 2D seguindo https://github.com/OJESSEGOMES-VKOS/estudio-2d/blob/main/PREPARAR.md
+> Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/estudio-2d/blob/main/PREPARAR.md
 
 Não precisa baixar nem copiar nada. O Claude lê estas instruções e faz o resto, pedindo a sua licença antes de instalar
 cada programa. Leva de 20 a 40 minutos, conforme a internet, e você só faz isso uma vez.

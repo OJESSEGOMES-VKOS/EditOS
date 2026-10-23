@@ -19,9 +19,30 @@ qps = float(sys.argv[3]) if len(sys.argv) > 3 else 2.0
 TOOLS = Path(__file__).resolve().parent
 dur = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', str(video)], capture_output=True, text=True).stdout)
 
-# cortes
-log = subprocess.run(['ffmpeg', '-hide_banner', '-i', str(video), '-vf', "select='gt(scene,0.30)',showinfo", '-an', '-f', 'null', '-'], capture_output=True, text=True).stderr
-c = [0.0] + [float(m) for m in re.findall(r'pts_time:([\d.]+)', log)] + [dur]
+# quadros e cortes pelo OpenCV (o ffmpeg do Remotion não tem os filtros fps/select): um passe só pelo vídeo
+tmp = Path(tempfile.mkdtemp(dir=os.environ.get('TEMP')))
+cap = cv2.VideoCapture(str(video))
+fv = cap.get(cv2.CAP_PROP_FPS) or 30.0
+c, ant, k, prox, qs = [0.0], None, 0, 0.0, []
+while True:
+    ok, im = cap.read()
+    if not ok:
+        break
+    t = k / fv
+    # cena nova: diferença de histograma de cor (equivale ao scene > 0,30 do ffmpeg, aproximado)
+    h = cv2.calcHist([cv2.cvtColor(cv2.resize(im, (160, 90)), cv2.COLOR_BGR2HSV)], [0, 1], None, [32, 32], [0, 180, 0, 256])
+    cv2.normalize(h, h)
+    if ant is not None and cv2.compareHist(ant, h, cv2.HISTCMP_BHATTACHARYYA) > 0.30:
+        c.append(t)
+    ant = h
+    if t + 1e-6 >= prox:  # um quadro a cada 1/qps s
+        q = tmp / f'{len(qs) + 1:04d}.jpg'
+        cv2.imwrite(str(q), im, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        qs.append(q)
+        prox += 1 / qps
+    k += 1
+cap.release()
+c.append(dur)
 cenas = [(a, b) for a, b in zip(c, c[1:]) if b - a > 0.08]
 dd = [b - a for a, b in cenas]
 with open(f'{pref}_cortes.txt', 'w', encoding='utf-8') as f:
@@ -29,10 +50,6 @@ with open(f'{pref}_cortes.txt', 'w', encoding='utf-8') as f:
     for i, (a, b) in enumerate(cenas):
         f.write(f'{i:03d} {a:6.2f} {b - a:5.2f}\n')
 
-# quadros
-tmp = Path(tempfile.mkdtemp(dir=os.environ.get('TEMP')))
-subprocess.run(['ffmpeg', '-loglevel', 'error', '-i', str(video), '-vf', f'fps={qps}', '-q:v', '3', str(tmp / '%04d.jpg')], check=True)
-qs = sorted(tmp.glob('*.jpg'))
 im0 = cv2.imread(str(qs[0]))
 H0, W0 = im0.shape[:2]
 det = cv2.FaceDetectorYN.create(str(TOOLS / 'modelos/face_detection_yunet_2023mar.onnx'), '', (W0, H0), 0.7)
@@ -73,8 +90,10 @@ for q in qs:
     q.unlink()
 
 # som
-raw = subprocess.run(['ffmpeg', '-loglevel', 'error', '-i', str(video), '-ac', '1', '-ar', '16000', '-f', 's16le', '-'], capture_output=True).stdout
-a = np.frombuffer(raw, np.int16).astype(np.float32) / 32768
+raw = subprocess.run(['ffmpeg', '-loglevel', 'error', '-i', str(video), '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', '-f', 'wav', '-'], capture_output=True).stdout
+i0 = raw.find(b'data')
+raw = raw[i0 + 8:] if i0 != -1 else b''
+a = np.frombuffer(raw[:len(raw) // 2 * 2], np.int16).astype(np.float32) / 32768
 if len(a):
     j = 800
     db = 20 * np.log10(np.sqrt((a[:len(a) // j * j].reshape(-1, j) ** 2).mean(1)) + 1e-9)

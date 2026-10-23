@@ -1,6 +1,6 @@
-# Estúdio 2D
+# EditOS
 
-Você grava, o Claude edita. O Estúdio 2D traz 14 **modelos de edição** prontos: você escolhe um, entrega a sua
+Você grava, o Claude edita. O EditOS traz 14 **modelos de edição** prontos: você escolhe um, entrega a sua
 gravação e o Claude Code edita o vídeo no estilo daquele modelo, com legenda, telas, cortes e som.
 
 Criado por **Jessé Gomes ([@OJESSEGOMES](https://instagram.com/ojessegomes))**.
@@ -8,7 +8,7 @@ Criado por **Jessé Gomes ([@OJESSEGOMES](https://instagram.com/ojessegomes))**.
 ## 1. Instalar (uma vez só)
 Abra o Claude Code numa pasta vazia e cole:
 
-> Instale o Estúdio 2D seguindo https://github.com/OJESSEGOMES-VKOS/estudio-2d/blob/main/PREPARAR.md
+> Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/estudio-2d/blob/main/PREPARAR.md
 
 O Claude cuida de tudo e pede a sua licença antes de instalar cada programa. Leva de 20 a 40 minutos e ocupa uns
 10 GB no computador.
@@ -47,7 +47,7 @@ ambiente Python, Remotion, modelos de IA, caches e temporários.
 
 ## Licença e créditos
 Licença **Apache 2.0** (`LICENSE`). Você pode usar, modificar e redistribuir, inclusive comercialmente, **desde que
-mantenha o `NOTICE` e o crédito "Estúdio 2D por Jessé Gomes (@OJESSEGOMES)"** (veja `NOTICE`).
+mantenha o `NOTICE` e o crédito "EditOS por Jessé Gomes (@OJESSEGOMES)"** (veja `NOTICE`).
 
 Ferramentas de terceiros usadas (cada uma com a licença dela, instaladas pelo instalador, não incluídas aqui):
 - **Remotion**: licença própria. Gratuita para pessoas físicas e empresas pequenas; empresas maiores precisam de uma

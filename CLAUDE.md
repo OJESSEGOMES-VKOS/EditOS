@@ -1,4 +1,8 @@
-# Estúdio 2D: instruções para o Claude
+# EditOS: instruções para o Claude
+
+Esta pasta é o EditOS, a máquina de conteúdo em vídeo: o Agente Orquestrador de Conteúdo (da ideia ao roteiro, à voz
+e à direção), os Modelos de Edição e o Sistema de Edição com Claude. Pedido que começa numa ideia ou tema segue a skill
+`orquestrador-conteudo`; pedido que chega com a gravação e o modelo segue o passo a passo abaixo. O `LEIA.md` tem o mapa.
 
 Você edita vídeos em modelos de edição, com Remotion, dentro desta pasta.
 
@@ -31,7 +35,7 @@ sonoros, ritmo de câmera) vem ligado; só fica desligado o que o `<modelo>.md` 
 5. Tudo confinado: use `.venv/`, `node_modules/`, `tools/`, `kit/` e `.tmp/` desta pasta; render com
    `QUEM=<nome> sh tools/com-trava.sh ...` e `--concurrency=2`. Nada fora da pasta.
 6. Nunca invente prova, número, fala, marca ou nome. Nome e @ na tela são os reais de quem fala, ou nenhum.
-7. Correção do dono sobre um modelo entra no `<modelo>.md` daquele modelo, como regra (e, no estúdio local, também no
+7. Correção do dono sobre um modelo entra no `<modelo>.md` daquele modelo, como regra (e, no EditOS local, também no
    `CORRECOES.md` dele, com data e as palavras do dono). Regra que vale para todos vai para `REGRAS.md` §0 e para o
    `<modelo>.md` de cada modelo em que se aplica. Mudou o vídeo aprovado de um modelo? Rode `tools/assinatura.py
-   <modelo>` e, no estúdio local, `tools/referencia.py <modelo>`.
+   <modelo>` e, no EditOS local, `tools/referencia.py <modelo>`.
