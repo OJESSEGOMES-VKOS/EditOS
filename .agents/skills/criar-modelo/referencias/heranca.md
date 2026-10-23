@@ -50,7 +50,7 @@ acima de tudo isto.
 - Telas criadas mantêm o texto da fala e ganham animação ou ilustração minimalista (PR4).
 - Nenhum elemento fora do enquadramento; nada aparece ou some do nada (E1-6, E2-2).
 - Movimento fluido e suave, sem padrão mecânico de "sobe e desce" (E2-2, AC3).
-- Tela de produto ou interface o mais real possível, como gravação de tela (A3).
+- Tela de produto ou interface **fiel como um print**: proporção, fonte, ícones, cores, estados e aparelho reais, recriados em código a partir de um print real com origem; nunca o celular 3D ou o cartão genérico repetido de modelo em modelo (G34, A3). Procedimento em `interface-fiel.md`.
 
 ## 7. Material
 - B-roll só com arquivo do usuário; sem ele, as telas da casa (PR10). O modelo pede ao usuário o que não consegue preencher, com plano B honesto; nunca fabrica prova (Y1, G24).

@@ -29,7 +29,7 @@ Re-gancho no meio do vídeo é uma F1 marcada `regancho`.
 | F2 problema | rosto (empatia) ou o documento real da dor | número gigante sem fonte |
 | F3 número | o número sozinho, grande, com a conta acontecendo enquanto é dita | imagem genérica competindo |
 | F3 documento | o print real com o trecho marcado e a fonte pequena | título no lugar do documento |
-| F3 demonstração | a tela do produto agindo, zoom que segue a ação | texto dizendo o que devia mostrar |
+| F3 demonstração | a tela do produto agindo, recriada fiel como um print (G34: aparelho, fonte, ícones e estados reais, a partir de print com origem), zoom que segue a ação | texto dizendo o que devia mostrar; mockup genérico de celular ou cartão com ícone |
 | F3 comparação | antes e depois com os mesmos elementos | listas soltas |
 | F4 passo | organização visível (lista que se monta, tela real, quadro que se desenha) | manchete, tela preta |
 | F5 virada | respiro e um foco: uma palavra, o rosto, silêncio curto antes | qualquer coisa que precise ser lida em detalhe |

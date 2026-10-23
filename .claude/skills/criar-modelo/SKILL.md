@@ -19,8 +19,9 @@ forma entrega uma capacidade que funciona com qualquer gravação. É isso que o
 com o que tiver."*
 
 Leia antes: `CLAUDE.md`, `REGRAS.md` inteiro (G1 a G33), `moldes/CONTRATO.md`, `tools/PROTOCOLO-decupagem-curto.md`,
-e as duas referências desta skill: `referencias/heranca.md` (o que todo modelo nasce sabendo) e
-`referencias/como-pensar-um-modelo.md` (os testes que separam modelo de template).
+e as três referências desta skill: `referencias/heranca.md` (o que todo modelo nasce sabendo),
+`referencias/como-pensar-um-modelo.md` (os testes que separam modelo de template) e `referencias/interface-fiel.md`
+(toda interface recriada é fiel como um print, nunca o mockup genérico repetido).
 
 ## Os portões
 Nada passa de uma etapa pra outra sem o que ela entrega escrito. E **nada chega ao dono sem a revisão de diretor da

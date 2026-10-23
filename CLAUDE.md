@@ -36,6 +36,8 @@ sonoros, ritmo de câmera) vem ligado; só fica desligado o que o `<modelo>.md` 
 5. Tudo confinado: use `.venv/`, `node_modules/`, `tools/`, `kit/` e `.tmp/` desta pasta; render com
    `QUEM=<nome> sh tools/com-trava.sh ...` e `--concurrency=2`. Nada fora da pasta.
 6. Nunca invente prova, número, fala, marca ou nome. Nome e @ na tela são os reais de quem fala, ou nenhum.
+   Interface, app ou aparelho na tela são recriados fiéis como um print, a partir de um print real com origem (G34,
+   procedimento em `.claude/skills/criar-modelo/referencias/interface-fiel.md`); nunca o mockup genérico.
 7. Correção do dono sobre um modelo entra no `<modelo>.md` daquele modelo, como regra (e, no EditOS local, também no
    `CORRECOES.md` dele, com data e as palavras do dono). Regra que vale para todos vai para `REGRAS.md` §0 e para o
    `<modelo>.md` de cada modelo em que se aplica. Mudou o vídeo aprovado de um modelo? Rode `tools/assinatura.py
