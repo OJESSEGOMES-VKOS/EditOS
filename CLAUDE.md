@@ -2,7 +2,8 @@
 
 Esta pasta é o EditOS, a máquina de conteúdo em vídeo: o Agente Orquestrador de Conteúdo (da ideia ao roteiro, à voz
 e à direção), os Modelos de Edição e o Sistema de Edição com Claude. Pedido que começa numa ideia ou tema segue a skill
-`orquestrador-conteudo`; pedido que chega com a gravação e o modelo segue o passo a passo abaixo. O `LEIA.md` tem o mapa.
+`orquestrador-conteudo`; pedido de modelo novo, fusão ou refino de modelo segue a skill `criar-modelo`; pedido que chega
+com a gravação e o modelo segue o passo a passo abaixo. O `LEIA.md` tem o mapa.
 
 Você edita vídeos em modelos de edição, com Remotion, dentro desta pasta.
 

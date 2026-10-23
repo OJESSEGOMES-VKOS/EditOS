@@ -43,7 +43,9 @@ def ignorar(pasta, nomes):
     # da raiz do molde não vêm o plano, as props e o manual do vídeo aprovado (o plano do vídeo novo nasce do zero, e as
     # props da vitrine trazem o nome e o @ de quem gravou o aprovado)
     do_aprovado = {'plano.md', 'props-vitrine.json', 'LEIA.md'} if p == molde else set()
-    return [n for n in nomes if n in fora or n in do_aprovado or (p.name == 'public' and n in MIDIA_ORIGEM)]
+    # pessoa.webm (recorte da pessoa) e maos.json (onde as mãos ficam) são da gravação de origem: no vídeo novo nascem de novo
+    da_gravacao = {'pessoa.webm'} if p.name == 'public' else ({'maos.json'} if p.name == 'src' else set())
+    return [n for n in nomes if n in fora or n in do_aprovado or n in da_gravacao or (p.name == 'public' and n in MIDIA_ORIGEM)]
 
 
 print('1/4 copiando o molde', a.modelo)
