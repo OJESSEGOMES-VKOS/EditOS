@@ -37,4 +37,4 @@ export HF_HOME="$PWD/tools/.cache/huggingface"
 W=medium; [ -n "$GPU" ] && W=large-v3   # sem placa, a transcrição usa o medium
 .venv/bin/python -c "from faster_whisper import download_model; download_model('$W')"
 rm -rf .tmp/pip-cache   # só servia para instalar
-echo 'Pronto. Para editar, peça ao Claude: edite meu vídeo <gravacao.mp4> no <modelo>.'
+echo 'Pronto. Para editar, peça ao assistente: edite meu vídeo <gravacao.mp4> no <modelo>.'

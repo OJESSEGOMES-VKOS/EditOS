@@ -53,4 +53,4 @@ $env:HF_HOME = "$raiz\tools\.cache\huggingface"
 $whisper = if ($Gpu) { 'large-v3' } else { 'medium' }   # sem placa, a transcrição usa o medium
 & "$raiz\.venv\Scripts\python.exe" -c "from faster_whisper import download_model; download_model('$whisper')"
 Remove-Item -Recurse -Force "$raiz\.tmp\pip-cache" -ErrorAction SilentlyContinue   # só servia para instalar
-Write-Host 'Pronto. Para editar, peça ao Claude: edite meu vídeo <gravacao.mp4> no <modelo>.'
+Write-Host 'Pronto. Para editar, peça ao assistente: edite meu vídeo <gravacao.mp4> no <modelo>.'

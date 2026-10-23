@@ -1,15 +1,18 @@
 # Preparar o EditOS
 
-**Para você, aluno:** abra o Claude Code numa pasta vazia (por exemplo `Documentos\estudio-claude`) e escreva:
+**Para você, aluno:** abra o Claude Code **ou o Codex** numa pasta vazia (por exemplo `Documentos\estudio-claude`) e escreva:
 
 > Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/estudio-2d/blob/main/PREPARAR.md
 
-Não precisa baixar nem copiar nada. O Claude lê estas instruções e faz o resto, pedindo a sua licença antes de instalar
+Não precisa baixar nem copiar nada. O assistente lê estas instruções e faz o resto, pedindo a sua licença antes de instalar
 cada programa. Leva de 20 a 40 minutos, conforme a internet, e você só faz isso uma vez.
+
+Precisa ser o Codex (o aplicativo ou a linha de comando, entrando com a conta do ChatGPT), não o ChatGPT no navegador: o
+assistente precisa rodar programas no seu computador.
 
 ---
 
-## Para o Claude: o que fazer
+## Para o assistente (Claude Code ou Codex): o que fazer
 
 Quem pediu isto não é programador. Fale em português simples, um passo por vez, e diga o que está fazendo antes de cada
 passo. Peça licença antes de instalar qualquer programa no computador. Se algo falhar, explique em uma frase o que
@@ -28,11 +31,12 @@ faltar, com a licença da pessoa:
 - **Linux:** o gerenciador da distribuição (`apt install python3 python3-venv nodejs npm ffmpeg`).
 
 Depois de instalar, o terminal atual pode não enxergar os programas novos. Se for o caso, peça para a pessoa fechar e
-abrir o Claude Code de novo na mesma pasta e repetir o pedido; você continua de onde parou.
+abrir o Claude Code ou o Codex de novo na mesma pasta e repetir o pedido; você continua de onde parou.
 
 ### 3. Baixar o estúdio
 Baixe `https://github.com/OJESSEGOMES-VKOS/estudio-2d/archive/refs/heads/main.zip` e extraia nesta pasta, de modo que o
-`CLAUDE.md` do estúdio fique na pasta atual (não numa subpasta `estudio-2d-main`). Não precisa de git nem de conta no
+`CLAUDE.md` e o `AGENTS.md` do estúdio fiquem na pasta atual (não numa subpasta `estudio-2d-main`). O Claude Code lê o
+`CLAUDE.md`, o Codex lê o `AGENTS.md`; têm o mesmo texto. Confira que os dois estão na pasta raiz. Não precisa de git nem de conta no
 GitHub.
 
 ### 4. Instalar

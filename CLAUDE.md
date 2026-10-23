@@ -1,4 +1,4 @@
-# EditOS: instruções para o Claude
+# EditOS: instruções para o assistente
 
 Esta pasta é o EditOS, a máquina de conteúdo em vídeo: o Agente Orquestrador de Conteúdo (da ideia ao roteiro, à voz
 e à direção), os Modelos de Edição e o Sistema de Edição com Claude. Pedido que começa numa ideia ou tema segue a skill

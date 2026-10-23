@@ -5,11 +5,11 @@ já corrigiu.
 
 | Arquivo | O que guarda | Quem escreve |
 |---|---|---|
-| `PERFIL.md` | Seu nicho, público, promessa, voz, CTA, o que nunca dizer, onde pesquisar | Você, com o Claude, na primeira vez |
-| `GOSTO.md` | As regras que nasceram das suas correções, com data e as suas palavras | O Claude, depois de cada correção |
-| `REGISTRO.md` | Uma linha por conteúdo feito, com o gancho e o número de 48 h | O Claude na entrega; você traz o número |
+| `PERFIL.md` | Seu nicho, público, promessa, voz, CTA, o que nunca dizer, onde pesquisar | Você, com o assistente, na primeira vez |
+| `GOSTO.md` | As regras que nasceram das suas correções, com data e as suas palavras | O assistente, depois de cada correção |
+| `REGISTRO.md` | Uma linha por conteúdo feito, com o gancho e o número de 48 h | O assistente na entrega; você traz o número |
 
-Na primeira vez, o `PERFIL.md` ainda não existe: o Claude copia o `PERFIL-modelo.md` e faz as perguntas abaixo, uma
+Na primeira vez, o `PERFIL.md` ainda não existe: o assistente copia o `PERFIL-modelo.md` e faz as perguntas abaixo, uma
 por vez.
 
 1. O que você faz, em uma frase?

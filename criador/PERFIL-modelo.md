@@ -1,7 +1,7 @@
 # Perfil do criador
 
-> Copie para `PERFIL.md` e preencha com o Claude (as perguntas estão no `LEIA.md`). Nada inventado: o que você não
-> souber fica em branco e o Claude pergunta quando precisar.
+> Copie para `PERFIL.md` e preencha com o assistente (as perguntas estão no `LEIA.md`). Nada inventado: o que você não
+> souber fica em branco e o assistente pergunta quando precisar.
 
 ## O que eu faço (uma frase)
 
