@@ -44,6 +44,10 @@ Copie `modelos/roteiro.md`. Uma linha por frase funcional:
 |---|---|---|---|---|---|
 
 - **Fala** exatamente como vai ser dita, na fala do criador (ver PERFIL): corrida, natural, sem frase picada.
+  **Escreva o texto inteiro corrido antes**, como se falasse em voz alta ("mas", "porque", "e aí", "a gente"), e só
+  depois divida em linhas. Roteiro nascido picado sai robótico.
+- **Toda afirmação pede uma tela que a prove.** "Fica mais rápido" exige o antes e o depois com relógio. Frase sem
+  tela possível é opinião: ganha prova ou sai. Dado verdadeiro que não empurra a história também sai.
 - **Tela** em uma ação concreta ("o print do comentário entra grande e devagar"), nunca "algo visual".
 - **Texto na tela** é curto e não repete a fala inteira: no máximo uma ideia de apoio além da legenda.
 - **Som** só onde há motivo (contato, mudança de bloco, silêncio antes da virada).
@@ -52,6 +56,9 @@ Copie `modelos/roteiro.md`. Uma linha por frase funcional:
 ## 5. O gancho
 - **Ponto principal + emoção.** O fato concreto na frente e uma pergunta ou tensão que puxe pra pessoa ("você",
   "hoje"). Nunca entregar a conclusão de graça; nunca slogan de formato ("vem comigo", "você sabia que").
+- **A pessoa se vê na cena.** Segunda pessoa, situação concreta que ela viveu, detalhe sensorial, e só então a
+  pergunta. Gancho que só anuncia o tema é notícia. O procedimento e os exemplos fraco × forte estão em
+  `0-como-pensar.md` §4.
 - **Escrito grande na tela desde o quadro 0.** Metade das pessoas está sem som; o gancho tem que funcionar mudo e com
   som. Nada de tela vazia ou texto pequeno crescendo nos primeiros segundos.
 - **Os 3 primeiros segundos não podem servir pra outro vídeo.** Se servem, são genéricos.

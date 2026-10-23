@@ -33,14 +33,23 @@ um portão: só avança com o "ok" da pessoa, registrado com data no `ANDAMENTO.
 4. Leia `LEIA.md` e `REGRAS.md` do EditOS uma vez por sessão. As referências desta skill (`referencias/`) são lidas
    só na etapa que pede cada uma.
 
+## O padrão de pensamento (antes das etapas 1, 3 e 4)
+
+Leia `referencias/0-como-pensar.md` e siga como procedimento. É o que separa um conteúdo forte de um enrustido: a
+ideia nasce de **uma cena que a pessoa viveu**, passa pelos sete movimentos de idealização, sobrevive aos testes
+(mediana, cena, 3 segundos, envio, surpresa verdadeira, verbo, cardápio) e chega como **uma recomendação assumida**,
+com o porquê, o risco e no máximo duas reservas. Antes de mostrar ângulo, gancho ou roteiro, o checklist de saída
+da §8 está respondido por escrito. Pergunta só o que muda o vídeo inteiro; o resto você decide e escreve como
+suposição.
+
 ## As etapas
 
 | # | Etapa | Lê | Sai | Portão |
 |---|---|---|---|---|
-| 1 | Pesquisa e ângulo | `referencias/1-pesquisa-e-angulo.md` | `pesquisa.md` com fonte e data; até 3 ângulos | A pessoa escolhe **um** ângulo |
+| 1 | Pesquisa e ângulo | `referencias/0-como-pensar.md`, `referencias/1-pesquisa-e-angulo.md` | `pesquisa.md` com fonte e data; **um ângulo recomendado** e até 2 reservas | A pessoa confirma ou troca o ângulo |
 | 2 | Briefing | `modelos/briefing.md` | `briefing.md` com a UMA coisa, formato, CTA e suposições | Bloqueantes respondidos |
-| 3 | Roteiro em fala e tela | `referencias/2-roteiro.md` | `roteiro.md` em duas colunas, gancho A e B | **Roteiro aprovado** |
-| 4 | Modelo e direção | `referencias/3-seletor-de-modelos.md` | modelo escolhido + o segundo colocado, com o porquê | **Direção aprovada** |
+| 3 | Roteiro em fala e tela | `referencias/0-como-pensar.md` §4–5, `referencias/2-roteiro.md` | `roteiro.md` em duas colunas, gancho A e B | **Roteiro aprovado** |
+| 4 | Modelo e direção | `referencias/0-como-pensar.md` §6, `referencias/3-seletor-de-modelos.md` | modelo escolhido + o segundo colocado, com o porquê | **Direção aprovada** |
 | 5 | Material e voz | `referencias/2-roteiro.md` §7 | `PEDIDO.md` do que gravar ou capturar, frase a frase | Voz final conferida contra o roteiro |
 | 6 | Produção no modelo | `modelos/<m>/<m>.md` | vídeo pelo `tools/novo-video.py` e plano frase a frase | (segue) |
 | 7 | Som | `referencias/4-som.md` | tabela de cues no mesmo tempo da imagem | (entra na prévia) |
@@ -54,8 +63,10 @@ Carrossel animado segue as mesmas etapas, com a etapa 6 trocada pela receita de 
 ### Etapa 1: pesquisa e ângulo
 Siga `referencias/1-pesquisa-e-angulo.md`. O método é **modelar o que já provou**, nunca pedir ideia do nada: achar o
 que está funcionando no tema, entender por que funcionou e recriar com o repertório do criador. Tudo com fonte e
-data; o que não tiver fonte é marcado "não verificado". Entregue no máximo 3 ângulos, cada um com gancho, a UMA coisa
-e por que tem chance. Se o PERFIL indicar um agente ou base de pesquisa própria, delegue a ele com o briefing inteiro.
+data; o que não tiver fonte é marcado "não verificado". Antes de escrever qualquer ângulo, nomeie a cena da pessoa
+(`0-como-pensar.md` §1) e passe pelos sete movimentos (§2). Entregue **um ângulo recomendado** (cena, surpresa
+verdadeira, gancho A e B, a UMA coisa, por que tem chance, risco) e até duas reservas de uma linha. Se o PERFIL
+indicar um agente ou base de pesquisa própria, delegue a ele com o briefing inteiro.
 
 ### Etapa 2: briefing
 Copie `modelos/briefing.md` para a pasta do conteúdo e preencha. Pergunte só os bloqueantes que faltarem, no máximo
@@ -64,9 +75,11 @@ uma frase o que entendeu, aponte a lacuna mais cara e proponha padrão pro resto
 
 ### Etapa 3: roteiro
 Siga `referencias/2-roteiro.md`: uma linha por frase com função (F1 a F6), fala e tela lado a lado, o gancho escrito
-grande na tela desde o quadro 0, tempo de leitura conferido, prova só real. Entregue o gancho A e o B. Todo texto
-público passa pelo `/humanizer` (se existir no sistema) antes de ir pra aprovação. **Nada de produção antes do
-roteiro aprovado.**
+grande na tela desde o quadro 0, tempo de leitura conferido, prova só real. **Escreva o texto corrido primeiro**, em
+voz alta, e só depois divida em linhas; toda afirmação ganha uma tela que a prova ou sai (`0-como-pensar.md` §5).
+O gancho segue o procedimento da §4 (fato + pessoa + tensão; A e B por movimentos diferentes). Todo texto público
+passa pelo `/humanizer` (se existir no sistema) antes de ir pra aprovação. **Nada de produção antes do roteiro
+aprovado.**
 
 ### Etapa 4: modelo e direção
 Use `referencias/3-seletor-de-modelos.md`: formato, rosto ou não, tom e material decidem. Diga o modelo, o porquê em
@@ -124,3 +137,6 @@ anotar o gancho que venceu"). Pendência que depende da pessoa vem listada fora 
    arquivo, log ou conversa.
 7. **Honestidade sobre a conferência:** medido é medido, olhado é olhado, não conferido é dito.
 8. **O que a pessoa corrige vira regra**, e a regra vale no próximo conteúdo sem ela precisar repetir.
+9. **Recomende e assuma.** Uma ideia forte com o porquê e o risco vale mais que cinco mornas. Cardápio é medo
+   disfarçado de opção; "depende" sem dizer do quê não é resposta.
+10. **A ideia nasce da cena, não do tema.** Sem o momento concreto que a pessoa viveu, não há gancho, só assunto.
