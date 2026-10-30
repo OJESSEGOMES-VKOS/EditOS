@@ -31,7 +31,7 @@ baixa face_detection_yunet_2023mar.onnx https://github.com/opencv/opencv_zoo/raw
 baixa rvm_mobilenetv3_fp32.onnx https://github.com/PeterL1n/RobustVideoMatting/releases/download/v1.0.0/rvm_mobilenetv3_fp32.onnx
 baixa lama_fp32.onnx https://huggingface.co/Carve/LaMa-ONNX/resolve/main/lama_fp32.onnx
 
-for d in moldes/*/; do [ -e "$d/node_modules" ] || ln -s ../../node_modules "$d/node_modules"; done
+for d in moldes/*/; do [ -d "$d" ] || continue; [ -e "$d/node_modules" ] || ln -s ../../node_modules "$d/node_modules"; done
 echo '5/5 Modelo de transcrição (tools/.cache)'
 export HF_HOME="$PWD/tools/.cache/huggingface"
 W=medium; [ -n "$GPU" ] && W=large-v3   # sem placa, a transcrição usa o medium

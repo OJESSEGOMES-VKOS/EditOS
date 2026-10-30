@@ -87,7 +87,7 @@ precisa renderizar algo. Crie `CORRECOES.md` e `CORRECOES-origem.md` vazios com 
 `.md` foi medido; "aproximadamente" só com a medida ao lado.
 
 ### Etapa 5: o molde
-`sistema/moldes/<m>/` nascido do molde mais parecido do catálogo (CONTRATO: `node_modules` como junção, caminhos relativos,
+`sistema/moldes/<m>/` nascido do molde mais parecido do catálogo (no EditOS cru, sem catálogo, nasce do zero seguindo o `sistema/moldes/CONTRATO.md`) (CONTRATO: `node_modules` como junção, caminhos relativos,
 `scripts/` com som, mixagem, quadros de conferência). O checador cobre, no mínimo: tempo de leitura, nada atravessa
 corte, zona segura, texto fora do rosto (e das mãos, quando a pessoa gesticula no peito), máximo de zooms por tela,
 máximo de tempo contínuo em cartão, legenda em no máximo 2 posições, nada pisca. O que a herança proíbe, o checador

@@ -11,9 +11,22 @@ Criado por **Jessé Gomes ([@OJESSEGOMES](https://instagram.com/ojessegomes))**.
 ## Como funciona, em 4 passos
 
 ### 1. Instale (só na primeira vez)
-Abra o **Claude Code** ou o **Codex** numa pasta vazia do seu computador e cole esta frase:
+O EditOS vem em duas versões. O motor é o mesmo; muda só se vem com os modelos de edição prontos:
 
+| | 🎬 **Completo** | 🧱 **Cru** |
+|---|---|---|
+| O que vem | o sistema + os 14 modelos prontos | só o sistema, sem nenhum modelo |
+| Para quem | quer editar já, nos estilos prontos | quer criar os próprios estilos do zero (`/criar-modelo`) |
+
+Abra o **Claude Code** ou o **Codex** numa pasta vazia do seu computador e cole a frase da versão que você quer:
+
+**Completo:**
 > Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/EditOS/blob/main/PREPARAR.md
+
+**Cru:**
+> Instale o EditOS na versão cru seguindo https://github.com/OJESSEGOMES-VKOS/EditOS/blob/main/PREPARAR.md
+
+Prefere baixar na mão? Os dois estão em [Releases](https://github.com/OJESSEGOMES-VKOS/EditOS/releases/latest): `EditOS-completo.zip` e `EditOS-cru.zip`.
 
 Pronto. O assistente instala tudo sozinho e pede a sua permissão antes de cada programa.
 ⏱️ Leva de 20 a 40 minutos · 💾 ocupa uns 10 GB
@@ -55,7 +68,7 @@ Você só usa as duas pastas com o seu nome. O resto é com o assistente.
 
 ---
 
-## Os 14 estilos
+## Os 14 estilos (versão completa)
 
 | 🙋 Com você aparecendo | 🎨 Sem ninguém na tela (só voz) |
 |---|---|

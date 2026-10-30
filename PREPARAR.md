@@ -4,6 +4,8 @@
 
 > Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/EditOS/blob/main/PREPARAR.md
 
+Quer a versão **cru**, sem os modelos prontos, para criar os seus? Escreva no fim da frase: *"na versão cru"*.
+
 Não precisa baixar nem copiar nada. O assistente lê estas instruções e faz o resto, pedindo a sua licença antes de instalar
 cada programa. Leva de 20 a 40 minutos, conforme a internet, e você só faz isso uma vez.
 
@@ -34,8 +36,14 @@ Depois de instalar, o terminal atual pode não enxergar os programas novos. Se f
 abrir o Claude Code ou o Codex de novo na mesma pasta e repetir o pedido; você continua de onde parou.
 
 ### 3. Baixar o estúdio
-Baixe `https://github.com/OJESSEGOMES-VKOS/EditOS/archive/refs/heads/main.zip` e extraia nesta pasta, de modo que o
-`CLAUDE.md` e o `AGENTS.md` do estúdio fiquem na pasta atual (não numa subpasta `EditOS-main`). O Claude Code lê o
+Há duas versões, iguais no motor:
+- **Completo** (padrão): com os 14 modelos de edição prontos.
+  `https://github.com/OJESSEGOMES-VKOS/EditOS/releases/latest/download/EditOS-completo.zip`
+- **Cru**: sem nenhum modelo de edição, para quem quer criar os próprios (`/criar-modelo`).
+  `https://github.com/OJESSEGOMES-VKOS/EditOS/releases/latest/download/EditOS-cru.zip`
+
+Use o cru só se a pessoa pediu "cru" ou "sem modelos"; na dúvida, o completo. Baixe o zip e extraia nesta pasta, de
+modo que o `CLAUDE.md` e o `AGENTS.md` do estúdio fiquem na pasta atual (não numa subpasta). O Claude Code lê o
 `CLAUDE.md`, o Codex lê o `AGENTS.md`; têm o mesmo texto. Confira que os dois estão na pasta raiz. Não precisa de git nem de conta no
 GitHub.
 
