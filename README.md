@@ -1,85 +1,111 @@
 # EditOS
 
-Você grava, o assistente edita. O EditOS traz 14 **modelos de edição** prontos: você escolhe um, entrega a sua
-gravação e o Claude Code ou o Codex edita o vídeo no estilo daquele modelo, com legenda, telas, cortes e som.
+**Você grava. O assistente edita.**
+
+Você grava um vídeo no celular, escolhe um dos 14 estilos de edição e pede. O assistente (Claude Code ou Codex) entrega o vídeo pronto, com legenda, cortes, telas animadas e som. Você não precisa saber editar.
 
 Criado por **Jessé Gomes ([@OJESSEGOMES](https://instagram.com/ojessegomes))**.
 
-## 1. Instalar (uma vez só)
-Abra o Claude Code **ou o Codex** numa pasta vazia e cole (a mesma frase vale para os dois):
+---
+
+## Como funciona, em 4 passos
+
+### 1. Instale (só na primeira vez)
+Abra o **Claude Code** ou o **Codex** numa pasta vazia do seu computador e cole esta frase:
 
 > Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/EditOS/blob/main/PREPARAR.md
 
-O assistente cuida de tudo e pede a sua licença antes de instalar cada programa. Leva de 20 a 40 minutos e ocupa uns
-10 GB no computador.
+Pronto. O assistente instala tudo sozinho e pede a sua permissão antes de cada programa.
+⏱️ Leva de 20 a 40 minutos · 💾 ocupa uns 10 GB
 
-O Codex tem que ser o aplicativo ou a linha de comando, com a conta do ChatGPT; o ChatGPT no navegador não serve, porque
-o assistente precisa rodar programas no seu computador.
+> Precisa ser o aplicativo ou a linha de comando (o ChatGPT no navegador não serve, porque ele não consegue rodar nada no seu computador).
 
-## 2. Gravar
-- Celular em pé, rosto de frente, boa luz e sem música ao fundo.
-- Deixe 1 segundo de silêncio depois da última frase.
-- Nos modelos sem pessoa na tela, basta a narração em áudio.
+### 2. Apresente-se
+Na primeira conversa, digite **`/comecar`**. O assistente faz três perguntas rápidas: seu nome, seu @ e se você tem logo ou cores. Aí ele cria a **sua pasta**.
 
-## 3. Começar: a sua pasta
-Na primeira conversa digite `/comecar` (ou só diga "quero começar"). O assistente te faz três perguntas, uma de cada
-vez: o seu nome, o seu @ e se você tem logo, cores ou prints pra usar. Com isso ele cria a sua pasta:
+### 3. Grave
+- Celular em pé, rosto de frente, boa luz.
+- Sem música de fundo.
+- No final, fique 1 segundo em silêncio.
 
-```
-EditOS/
-├── <Seu nome>/
-│   ├── materiais/   ← o que é oficial seu: logo, paleta, prints de resultado e as gravações
-│   └── conteudo/    ← os vídeos prontos: uma pasta por vídeo, só com as versões v1.mp4, v2.mp4...
-└── sistema/         ← o motor (modelos, ferramentas). Quem mexe aqui é o assistente, não você
-```
+Coloque o vídeo na pasta **`materiais`**, dentro da sua pasta.
 
-Tem outra página, outro cliente ou outra pessoa usando o mesmo EditOS? Digite `/novoperfil` e dê o nome que quiser
-(ex.: "Ana2", "Loja da Ana"): nasce outra pasta igual, com os materiais e os vídeos dela separados. Para trocar de
-perfil, diga "usar o perfil X".
-
-## 4. Editar
-Coloque a gravação em `<Seu nome>/materiais/` e peça ao assistente, por exemplo:
+### 4. Peça
+Escreva do seu jeito, por exemplo:
 
 > Edite meu vídeo gravacao.mp4 no storypodcast01
 
-Ele faz o resto e o vídeo pronto chega em `<Seu nome>/conteudo/<nome-do-video>-DD-MM-AA/v1.mp4`. Se quiser mudar algo,
-é só pedir com as suas palavras: cada ajuste vira uma versão nova (`v2.mp4`, `v3.mp4`...) na mesma pasta. Editou 10
-vezes o mesmo vídeo? Continua sendo uma pasta só, com as 10 versões dentro. O assistente usa o logo, as cores e os
-prints da sua pasta `materiais/`, nunca os de outro perfil.
+O vídeo pronto aparece na pasta **`conteudo`**. Não gostou de algo? Peça com as suas palavras ("deixa a legenda maior", "tira essa parte"). Cada ajuste vira uma nova versão (`v1`, `v2`, `v3`...), todas guardadas juntas.
 
-## 5. Deixar com a sua cara
-Cada modelo tem um arquivo em `sistema/modelos/<modelo>/<modelo>.md`. No topo dele fica a seção **"Do seu jeito"**: escreva
-ali o seu nome e @, a sua foto, a chamada do fim e o que você gosta ou não quer. O assistente lê isso antes de cada vídeo.
-Quando você corrigir algo, ele oferece anotar ali para os próximos.
+---
 
-## Os modelos
-Para ver como cada um fica, abra `sistema/modelos/<modelo>/referencia/original.mp4`.
+## Onde fica cada coisa
 
-| Com você na tela | Sem pessoa na tela |
+```
+EditOS/
+├── Seu Nome/
+│   ├── materiais/   📥 você coloca aqui: gravações, logo, cores, prints
+│   └── conteudo/    📤 o vídeo pronto chega aqui
+└── sistema/         ⚙️ o motor. Não precisa mexer
+```
+
+Você só usa as duas pastas com o seu nome. O resto é com o assistente.
+
+**Tem mais de uma página ou cliente?** Digite **`/novoperfil`** e cada um ganha a própria pasta, com os materiais separados. Para trocar, diga "usar o perfil Fulano".
+
+---
+
+## Os 14 estilos
+
+| 🙋 Com você aparecendo | 🎨 Sem ninguém na tela (só voz) |
 |---|---|
-| modelodinamico01, modelopadrao01, modelodinamico03, pregacaodinamica01, profissional01, storypodcast01, superpodcast01, youtubeedition01 | modelodinamico02, ilustrations01, sofistmotion01, anunciomotion01, anunciocanvas01, youtubedark01 |
+| modelodinamico01 · modelopadrao01 · modelodinamico03 · pregacaodinamica01 · profissional01 · storypodcast01 · superpodcast01 · youtubeedition01 | modelodinamico02 · ilustrations01 · sofistmotion01 · anunciomotion01 · anunciocanvas01 · youtubedark01 |
 
-O vídeo sai no estilo do modelo, não uma cópia do exemplo: as telas e os textos nascem da sua fala. Como a gravação é
-outra, o resultado fica parecido com o exemplo, não idêntico.
+**Quer ver como cada um fica?** Peça: *"me mostra o exemplo do storypodcast01"*.
 
-## Para quem é técnico
-O Claude Code segue o `CLAUDE.md` da raiz e o Codex o `AGENTS.md` (mesmo texto, gerado da mesma fonte); a skill do orquestrador fica em `.claude/skills/` e `.agents/skills/`; os dois seguem também o arquivo de cada modelo. O motor fica em `sistema/`: os moldes Remotion
-em `sistema/moldes/` (`sistema/moldes/CONTRATO.md`), as ferramentas em `sistema/tools/` e os vídeos em trabalho em
-`sistema/oficina/`; as regras gerais em `REGRAS.md`. Perfis: qualquer pasta da raiz com `perfil.md`; o ativo fica em
-`sistema/perfil-ativo` (`sistema/tools/perfil.py`). A entrega de cada versão é feita por `sistema/tools/entregar.py`,
-chamado no fim de cada molde (`SEM_ENTREGA=1` pula um rascunho). Tudo fica dentro da pasta:
-ambiente Python, Remotion, modelos de IA, caches e temporários.
+O seu vídeo sai **no estilo** do modelo, não uma cópia do exemplo. Telas e textos nascem do que você fala.
+
+---
+
+## Deixe com a sua cara
+
+Corrigiu algo de que não gostou? O assistente pergunta se pode anotar, e a correção vale para os próximos vídeos. Seu nome, @, foto e a chamada do final também ficam salvos. Com o tempo, ele aprende o seu jeito.
+
+---
+
+## Dúvidas comuns
+
+**Preciso saber programar?** Não. Você conversa em português normal.
+
+**Preciso pagar o EditOS?** Não, ele é gratuito. Você só precisa de uma assinatura do Claude ou do ChatGPT para usar o assistente.
+
+**Meu computador aguenta?** Precisa de uns 10 GB livres. Um computador mais fraco funciona também, só demora mais para gerar o vídeo.
+
+**Deu erro, e agora?** Conte ao assistente o que aconteceu, com as suas palavras. Ele resolve.
+
+---
+
+<details>
+<summary><b>Para quem é técnico</b></summary>
+
+O Claude Code segue o `CLAUDE.md` da raiz e o Codex segue o `AGENTS.md` (mesmo texto, gerado da mesma fonte). A skill do orquestrador fica em `.claude/skills/` e em `.agents/skills/`. Os dois também seguem o arquivo de cada modelo, em `sistema/modelos/<modelo>/<modelo>.md`.
+
+- Moldes Remotion: `sistema/moldes/` (veja `sistema/moldes/CONTRATO.md`)
+- Ferramentas: `sistema/tools/`
+- Vídeos em trabalho: `sistema/oficina/`
+- Regras gerais: `REGRAS.md`
+- Perfis: qualquer pasta da raiz com `perfil.md`. O ativo fica em `sistema/perfil-ativo` (`sistema/tools/perfil.py`).
+- Entrega: `sistema/tools/entregar.py`, chamado no fim de cada molde. `SEM_ENTREGA=1` pula um rascunho.
+
+Tudo fica dentro da pasta: ambiente Python, Remotion, modelos de IA, caches e arquivos temporários.
+</details>
 
 ## Licença e créditos
-Licença **Apache 2.0** (`LICENSE`). Você pode usar, modificar e redistribuir, inclusive comercialmente, **desde que
-mantenha o `NOTICE` e o crédito "EditOS por Jessé Gomes (@OJESSEGOMES)"** (veja `NOTICE`).
+Licença **Apache 2.0** (`LICENSE`). Você pode usar, modificar e redistribuir, inclusive comercialmente, **desde que mantenha o `NOTICE` e o crédito "EditOS por Jessé Gomes (@OJESSEGOMES)"** (veja `NOTICE`).
 
-Ferramentas de terceiros usadas (cada uma com a licença dela, instaladas pelo instalador, não incluídas aqui):
-- **Remotion**: licença própria. Gratuita para pessoas físicas e empresas pequenas; empresas maiores precisam de uma
-  licença da Remotion. Confira em remotion.dev/license antes de usar comercialmente.
-- faster-whisper e os pesos do Whisper (MIT), OpenCV e o detector de rosto YuNet (Apache 2.0/MIT), LaMa (Apache 2.0),
-  Robust Video Matting (GPL-3.0, baixado à parte e usado como arquivo de modelo), rembg (MIT).
+Ferramentas de terceiros, cada uma com a sua licença. O instalador baixa todas; nenhuma vem incluída aqui:
+- **Remotion**: licença própria. É gratuita para pessoas físicas e empresas pequenas; empresas maiores precisam de uma licença da Remotion. Confira em remotion.dev/license antes de usar comercialmente.
+- faster-whisper e os pesos do Whisper (MIT), OpenCV e o detector de rosto YuNet (Apache 2.0/MIT), LaMa (Apache 2.0), Robust Video Matting (GPL-3.0, baixado à parte e usado como arquivo de modelo), rembg (MIT).
 - Fontes do Google Fonts (OFL), carregadas pelo `@remotion/google-fonts`.
 
-Nenhum vídeo de terceiro vem aqui. A referência de cada modelo é o vídeo aprovado dele, feito pelo criador do estúdio
-com a própria gravação.
+Nenhum vídeo de terceiro vem aqui. A referência de cada modelo é o vídeo aprovado dele, feito pelo criador do estúdio com a própria gravação.
