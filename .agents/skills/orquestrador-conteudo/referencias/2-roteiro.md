@@ -84,10 +84,10 @@ print, foto, objeto, depoimento real. Vire isso no `PEDIDO.md`:
 | # | Frase | Precisa de | Quem consegue | Plano B |
 |---|---|---|---|---|
 
-O estúdio busca, recorta e gera o que dá (`kit/`: foto licenciada, recorte, imagem gerada). Só pede ao criador o que
+O estúdio busca, recorta e gera o que dá (`sistema/kit/`: foto licenciada, recorte, imagem gerada). Só pede ao criador o que
 só ele tem. Plano B nunca fabrica prova: sem o print real, a frase muda ou sai.
 
-**Voz:** gravada pelo criador ou gerada (`kit/voz.py`). Com a voz pronta, transcreva e compare com o roteiro
+**Voz:** gravada pelo criador ou gerada (`sistema/kit/voz.py`). Com a voz pronta, transcreva e compare com o roteiro
 aprovado, frase a frase. Palavra trocada, faltando ou pronúncia ruim: regrava a linha antes de montar qualquer cena.
 
 ## 8. Antes de mandar pra aprovação

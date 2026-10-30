@@ -41,12 +41,12 @@ A receita:
 6. **Última página: o CTA**, uma ação, escrito grande.
 7. Produção: um vídeo do estúdio com uma composição por página, todas em 1080×1350 a 30 fps, renderizadas uma por
    vez (`com-trava.sh`, `--concurrency=2`). Cada página sai como `pagina-01.mp4`, `pagina-02.mp4`...
-8. Conferência por página: `tools/medir_entrega.py pagina-NN.mp4 --tamanho 1080x1350 --fps 30 --max-s 60` e a folha
+8. Conferência por página: `sistema/tools/medir_entrega.py pagina-NN.mp4 --tamanho 1080x1350 --fps 30 --max-s 60` e a folha
    de quadros de cada uma. Página sem som passa (é proposital).
 
 ## A prévia (o loop rápido)
 - **Depois de cada mudança**, confira só o trecho mexido:
-  `python tools/folha.py <video.mp4> --ini <s> --fim <s> --fps 4` e olhe a folha. Ela mostra o que acontece entre
+  `python sistema/tools/folha.py <video.mp4> --ini <s> --fim <s> --fps 4` e olhe a folha. Ela mostra o que acontece entre
   dois quadros soltos: elemento cortado, texto passando por trás, salto, piscada, texto que some antes de ser lido.
 - Render de prévia em resolução menor, só do trecho, quando o molde permitir (`--scale=0.5`, `--frames=ini-fim` no
   Remotion). Mire em menos de um minuto por ciclo.

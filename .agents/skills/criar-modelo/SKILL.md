@@ -6,7 +6,7 @@ description: >
   <modelo>.md com a herança da casa, constrói o molde Remotion com checador, prova com a gravação comum, faz a
   revisão de diretor e só então leva ao dono. Use quando a pessoa disser /criar-modelo, "cria um modelo com essas
   referências", "transforma esses vídeos em modelo", "junta esses modelos", "refina o modelo X" ou deixar uma pasta
-  nova com vídeos em modelos/.
+  nova com vídeos em sistema/modelos/.
 ---
 
 # /criar-modelo: de vídeos de referência a um modelo que ensina uma forma de execução
@@ -18,7 +18,7 @@ forma entrega uma capacidade que funciona com qualquer gravação. É isso que o
 é copiar, é aprender uma forma de execução. Nem sempre vou ter um B-roll ou uma imagem ou várias cenas, e daí faz
 com o que tiver."*
 
-Leia antes: `CLAUDE.md`, `REGRAS.md` inteiro (G1 a G33), `moldes/CONTRATO.md`, `tools/PROTOCOLO-decupagem-curto.md`,
+Leia antes: `CLAUDE.md`, `REGRAS.md` inteiro (G1 a G33), `sistema/moldes/CONTRATO.md`, `sistema/tools/PROTOCOLO-decupagem-curto.md`,
 e as três referências desta skill: `referencias/heranca.md` (o que todo modelo nasce sabendo),
 `referencias/como-pensar-um-modelo.md` (os testes que separam modelo de template) e `referencias/interface-fiel.md`
 (toda interface recriada é fiel como um print, nunca o mockup genérico repetido).
@@ -29,13 +29,13 @@ etapa 7**: ele não revisa quadro a quadro, e cada defeito que chega nele custa 
 
 | # | Etapa | Sai | Portão |
 |---|---|---|---|
-| 0 | Triagem | `modelos/<m>/TRIAGEM.md`: novo, variação ou fusão, e por quê | decisão escrita |
+| 0 | Triagem | `sistema/modelos/<m>/TRIAGEM.md`: novo, variação ou fusão, e por quê | decisão escrita |
 | 1 | Referências | `referencias/ref1..N.mp4` + `ORIGEM.txt` | formatos e durações anotados |
 | 2 | Decupagem | `analise/refN_decupagem.md` por referência, medida | receita visual + gatilhos completos |
 | 3 | A forma de execução | a frase de uma linha + a gramática fala→tela + "com o que o vídeo tiver" | passa nos testes de `como-pensar-um-modelo.md` |
 | 4 | O `<modelo>.md` | arquivo único, com herança declarada e sobrescritas justificadas | checklist §10 da herança |
-| 5 | O molde | `moldes/<m>/` com checador | checador zerado no próprio molde |
-| 6 | A vitrine | `videos/AAAA-MM-DD-<m>-vitrine/out/final.mp4` + folhas | checador zerado, -14 LUFS |
+| 5 | O molde | `sistema/moldes/<m>/` com checador | checador zerado no próprio molde |
+| 6 | A vitrine | `sistema/oficina/AAAA-MM-DD-<m>-vitrine/out/final.mp4` + folhas | checador zerado, -14 LUFS |
 | 7 | Revisão de diretor | relatório honesto com a folha lado a lado | o que pede o olho do dono está nomeado |
 | 8 | Aprovação | `exemplos/`, `assinatura.json`, `referencia/`, catálogo | só com o "ok" do dono |
 
@@ -54,13 +54,13 @@ Mostre a triagem ao dono só se a resposta for "variação" ou "fusão" e isso m
 siga.
 
 ### Etapa 1: referências
-`modelos/<m>/referencias/ref1.mp4 … refN.mp4`, com `ORIGEM.txt` (de onde veio cada uma, data, quem baixou). Anote
+`sistema/modelos/<m>/referencias/ref1.mp4 … refN.mp4`, com `ORIGEM.txt` (de onde veio cada uma, data, quem baixou). Anote
 formato, duração e qps de cada uma (`ffprobe`). Referência é **medida, nunca material**: nenhum quadro, texto ou
 som dela entra em vídeo nosso.
 
 ### Etapa 2: decupagem medida
-Para cada referência: `.venv/Scripts/python.exe tools/medir_curto.py modelos/<m>/referencias/refN.mp4
-modelos/<m>/analise/refN`. Depois o `PROTOCOLO-decupagem-curto.md` à risca, com as duas metades no mesmo peso:
+Para cada referência: `sistema/.venv/Scripts/python.exe sistema/tools/medir_curto.py sistema/modelos/<m>/referencias/refN.mp4
+sistema/modelos/<m>/analise/refN`. Depois o `PROTOCOLO-decupagem-curto.md` à risca, com as duas metades no mesmo peso:
 a **receita visual medida** (hex de quadro cheio, tamanho da letra em % da altura, posição em %, ritmo em
 trocas/min, maior trecho parado) e os **gatilhos** (quando a fala faz X, a tela faz Y, com hora de prova). Regra de
 honestidade: só o que você viu e mediu; "não deu pra ver" é uma seção, não uma vergonha.
@@ -87,7 +87,7 @@ precisa renderizar algo. Crie `CORRECOES.md` e `CORRECOES-origem.md` vazios com 
 `.md` foi medido; "aproximadamente" só com a medida ao lado.
 
 ### Etapa 5: o molde
-`moldes/<m>/` nascido do molde mais parecido do catálogo (CONTRATO: `node_modules` como junção, caminhos relativos,
+`sistema/moldes/<m>/` nascido do molde mais parecido do catálogo (CONTRATO: `node_modules` como junção, caminhos relativos,
 `scripts/` com som, mixagem, quadros de conferência). O checador cobre, no mínimo: tempo de leitura, nada atravessa
 corte, zona segura, texto fora do rosto (e das mãos, quando a pessoa gesticula no peito), máximo de zooms por tela,
 máximo de tempo contínuo em cartão, legenda em no máximo 2 posições, nada pisca. O que a herança proíbe, o checador
@@ -95,10 +95,10 @@ acusa. Nenhum tratamento de cor na gravação, nem como opção (G33). Sem `publ
 vídeo de origem (o `novo-video.py` já os ignora).
 
 ### Etapa 6: a vitrine
-A gravação comum é `teste-comum/gravacao.mp4` (base em `teste-comum/base/`), porque a prova é **parecer o modelo com
-outra gravação**, não com a da referência. `tools/novo-video.py <m> teste-comum/gravacao.mp4 AAAA-MM-DD-<m>-vitrine
+A gravação comum é `sistema/teste-comum/gravacao.mp4` (base em `sistema/teste-comum/base/`), porque a prova é **parecer o modelo com
+outra gravação**, não com a da referência. `sistema/tools/novo-video.py <m> sistema/teste-comum/gravacao.mp4 AAAA-MM-DD-<m>-vitrine
 --sem-adaptar` (antes da aprovação ainda não existe `assinatura.json`; anote no `.md` que o `--sem-adaptar` cai
-depois). Plano frase a frase, render com `QUEM=<m> sh tools/com-trava.sh … --concurrency=2`, mix -14 LUFS. Folhas em
+depois). Plano frase a frase, render com `QUEM=<m> sh sistema/tools/com-trava.sh … --concurrency=2`, mix -14 LUFS (a vitrine é prova do sistema, não conteúdo de ninguém: pasta terminada em `-vitrine` não cai no `<perfil>/conteudo/`). Folhas em
 `conferencia/`: 1 quadro por segundo e a **lado a lado** (referência em cima, vitrine embaixo, um par por recurso).
 Um render por vez; apague quadros intermediários sem valor de prova (G29).
 
@@ -114,9 +114,9 @@ números medidos; os caminhos (`.md`, molde, vitrine, folhas, checador); as medi
 das referências e por quê; e o que pede o olho dele. Sem enfeite e sem "ficou ótimo": ele decide.
 
 ### Etapa 8: aprovação
-Com o "ok": a vitrine vai pra `modelos/<m>/exemplos/vitrine-<m>.mp4`; `tools/assinatura.py <m>`;
-`tools/referencia.py <m>`; o `--sem-adaptar` sai do `.md`; o modelo entra na contagem do `LEIA.md` e, se for do
-catálogo, deixa de ser excluído no `tools/gerar-aberto.py`. Correção do dono na aprovação entra no `CORRECOES.md`
+Com o "ok": a vitrine vai pra `sistema/modelos/<m>/exemplos/vitrine-<m>.mp4`; `sistema/tools/assinatura.py <m>`;
+`sistema/tools/referencia.py <m>`; o `--sem-adaptar` sai do `.md`; o modelo entra na contagem do `LEIA.md` e, se for do
+catálogo, deixa de ser excluído no `sistema/tools/gerar-aberto.py`. Correção do dono na aprovação entra no `CORRECOES.md`
 com data e as palavras dele, e no `<m>.md` como regra. Se a correção vale pra todo modelo, vai pra `REGRAS.md` §0 e
 pra `heranca.md`. Commit e aberto só com ordem.
 

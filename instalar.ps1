@@ -1,11 +1,11 @@
-# Instala o EditOS dentro desta pasta (Windows, PowerShell 7).
+# Instala o EditOS dentro desta pasta (Windows, PowerShell 7): o motor fica em sistema\.
 # Precisa ter: Python 3.11 ou 3.12, Node.js 20+ e ffmpeg no PATH.
 # Uso: pwsh -File instalar.ps1  (descobre sozinho a placa NVIDIA; -Gpu força)
 param([switch]$Gpu)
 $ErrorActionPreference = 'Stop'
-$raiz = $PSScriptRoot
+$raiz = Join-Path $PSScriptRoot 'sistema'
 Set-Location $raiz
-New-Item -ItemType Directory -Force "$raiz\.tmp", "$raiz\tools\modelos", "$raiz\videos" | Out-Null
+New-Item -ItemType Directory -Force "$raiz\.tmp", "$raiz\tools\modelos", "$raiz\oficina" | Out-Null
 # Caches dentro da pasta, nada espalhado pelo computador
 $env:PIP_CACHE_DIR = "$raiz\.tmp\pip-cache"
 $env:npm_config_cache = "$raiz\.tmp\npm-cache"

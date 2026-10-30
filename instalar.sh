@@ -1,10 +1,10 @@
 #!/bin/sh
-# Instala o EditOS dentro desta pasta (macOS/Linux). Precisa: Python 3.11+, Node.js 20+, ffmpeg.
+# Instala o EditOS dentro desta pasta (macOS/Linux): o motor fica em sistema/. Precisa: Python 3.11+, Node.js 20+, ffmpeg.
 # Uso: sh instalar.sh [--gpu]
 set -e
-RAIZ="$(cd "$(dirname "$0")" && pwd)"
+RAIZ="$(cd "$(dirname "$0")/sistema" && pwd)"
 cd "$RAIZ"
-mkdir -p .tmp tools/modelos videos
+mkdir -p .tmp tools/modelos oficina
 export PIP_CACHE_DIR="$RAIZ/.tmp/pip-cache" npm_config_cache="$RAIZ/.tmp/npm-cache" TMPDIR="$RAIZ/.tmp"
 for c in python3 node npm ffmpeg ffprobe; do command -v $c >/dev/null || { echo "Falta instalar: $c"; exit 1; }; done
 

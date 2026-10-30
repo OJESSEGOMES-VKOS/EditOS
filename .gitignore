@@ -1,24 +1,32 @@
-.venv/
-kit/.venv/
+sistema/.venv/
+sistema/kit/.venv/
 node_modules/
 **/node_modules
 .tmp/
-tools/.cache/
-kit/.cache/
-tools/modelos/*.onnx
-videos/*
-!videos/LEIA.md
+**/.tmp/
+sistema/tools/.cache/
+sistema/kit/.cache/
+sistema/tools/modelos/*.onnx
+sistema/oficina/*
+!sistema/oficina/LEIA.md
+sistema/perfil-ativo
 out/
 **/out/
 conferencia/
 **/conferencia/
 __pycache__/
-kit/.env
+sistema/kit/.env
 .env
 *.mp4
 *.mov
 *.wav
 *.mp3
 
+# a pasta de cada perfil (os vídeos e os materiais de quem usa) é dela, não vai pro Git do estúdio
+/*/
+!/sistema/
+!/.claude/
+!/.agents/
+
 # a referencia propria de cada modelo vai junto
-!modelos/*/referencia/*.mp4
+!sistema/modelos/*/referencia/*.mp4

@@ -1,12 +1,12 @@
 # Regras de ofício (valem para todo modelo)
 
-O estilo (cor, fonte, layout, ritmo) é de cada modelo e mora no `modelos/<modelo>/<modelo>.md`, o arquivo único do
+O estilo (cor, fonte, layout, ritmo) é de cada modelo e mora no `sistema/modelos/<modelo>/<modelo>.md`, o arquivo único do
 modelo, que já traz escritas as regras abaixo que valem para ele. Estas regras servem para criar modelo novo e para
 conferir: valem para todos, e um modelo só as quebra se o `<modelo>.md` disser por quê. Todas nasceram de vídeos
 reprovados e corrigidos.
 
 ## 0. Correções do dono que valem para todos (acima de tudo)
-Ficam acima das regras abaixo e do código. As de um modelo só estão escritas como regra no `modelos/<m>/<m>.md`.
+Ficam acima das regras abaixo e do código. As de um modelo só estão escritas como regra no `sistema/modelos/<m>/<m>.md`.
 Correção mais nova vence a mais velha. G22 e G23 vêm primeiro porque mandam no resto:
 
 | # | Regra | Data |
@@ -44,13 +44,16 @@ Correção mais nova vence a mais velha. G22 e G23 vêm primeiro porque mandam n
 | G31 | Nome/@ na tela só os reais de quem fala; nunca nome de exemplo. | 2026-10-13 16:43; 2026-10-12 10:33 |
 | G32 | Criar um modelo é aprender uma forma de execução, não copiar a referência. O modelo tem que funcionar com o que o vídeo tiver: só a gravação da pessoa, sem B-roll, sem imagem, sem várias cenas, e seguir as instruções do dono. | 2026-10-22 ("criar um modelo não é copiar, é aprender uma forma de execução. Nem sempre vou ter um B-ROLL ou uma imagem ou várias cenas, e daí faz com o que tiver e as instruções mesmo") |
 | G33 | Nenhum tratamento de cor na gravação da pessoa: isso o usuário faz à mão, antes. As cores dos elementos do tema (cartões, texto, destaques) também são gosto e ajuste do usuário; o modelo traz paletas prontas como opção, não como regra. | 2026-10-22 ("Esquece esse trem de tratamento de adjustment de cores na gravação, pois isso o usuário faz manualmente, e as cores das coisas em si do tema é de acordo com o gosto e ajuste do usuário também") |
+| G37 | Texto nunca leva contorno, sombra justa ou brilho (glow) colado na letra: isso faz a palavra parecer recortada e colada, não em cima da imagem. Sobre fundo borrado ou chapado, o texto entra limpo. Se a leitura sobre a gravação realmente pedir ajuda, use só uma sombra larga e bem suave (desfoque grande, pouca opacidade, sem desenhar a borda da letra), nunca da mesma cor do fundo. | 2026-10-30 (no "vídeos" do hook: "tem uma borda/sombra preta ao redor justa, aí ficou esquisito e desconexo, parecendo que foi recortado. Já vi isso outras vezes, corrija isso (retire) em todos"; na tela de papel: "uma sensação de recorte na letra e não que ela está em cima … ali não precisa de glow ou coisa do tipo, pois o fundo já está borrado") |
+| G36 | O trabalho do estúdio nunca trava o computador do dono. Todo processo pesado roda com contenção (prioridade ociosa no processador e na placa, núcleos livres pro dono, um pesado por vez, sem começar outro com pouca RAM; e o Blender limitado a 40% do tempo de placa enquanto o dono mexe no computador, no máximo 90% quando ele sai por 1 min, nunca 100%), pelo `sistema/tools/com-trava.sh` ou com o vigia `sistema/tools/contencao.ps1`. | 2026-10-29 ("Tá travando o PC todo, você precisa colocar contenções no nosso sistema EditOS para não travar o computador quando estivermos fazendo algo, se não é impossível trabalhar assim"; e, sobre a placa: "precisamos de uma forma de limitar a placa, pois isso causou vários problemas") |
+| G35 | Um bloco de legenda é um trecho só: nunca junta o fim de uma frase com o começo de outra. Passou de ponto, vírgula, interrogação, exclamação ou dois-pontos, o bloco acaba, some, e o próximo trecho entra num bloco novo. No máximo 2 linhas por bloco; trecho longo vira blocos menores do mesmo trecho. | 2026-10-29 ("Eu não quero um final de uma frase com o começo de outra, isso é ridículo … Não quero 3 linhas de legenda, principalmente em partes diferentes do texto. Só faz sentido se for do mesmo trecho, e claramente se passou do ponto ou vírgula não são do mesmo trecho") |
 | G34 | Interface, tela de app, site ou aparelho recriados na tela são **fiéis como um print**: proporção, tipografia, ícones, cores, estados e conteúdo reais daquela interface, de ponta a ponta. Nunca a versão simplificada e genérica que se repete de modelo em modelo (o mesmo celular 3D, o mesmo cartão branco com ícone). O procedimento está em `.claude/skills/criar-modelo/referencias/interface-fiel.md`. | 2026-10-23 ("quando for para criar alguma interface, a intenção é que seja o máximo parecido possível, como se fosse um print … não tem por que ficar copiando esses mesmos modelinhos 3D de telas, de frames, tudo simplesmente igual quando você poderia estar fazendo algo muito mais detalhista e voltado mais parecido com a realidade") |
 
-Como se confere G23: `tools/parece.py` (luz, cor, enquadramento e ritmo contra `modelos/<m>/assinatura.json`) e a
+Como se confere G23: `sistema/tools/parece.py` (luz, cor, enquadramento e ritmo contra `sistema/modelos/<m>/assinatura.json`) e a
 folha lado a lado que ele grava. Os conferidores de regra dos moldes não provam G23.
 
 ## 1. O vídeo parece as referências do modelo
-- Antes de editar, ler o `<modelo>.md` inteiro e estudar a referência própria do modelo em `modelos/<m>/referencia/`:
+- Antes de editar, ler o `<modelo>.md` inteiro e estudar a referência própria do modelo em `sistema/modelos/<m>/referencia/`:
   o vídeo aprovado, a folha de 1 quadro por segundo e o mapa medido.
 - A receita visual é medida (posição e tamanho em % do quadro, fonte, hex, movimento); seguir a medida, não o gosto.
 - Comparar quadro a quadro com as referências antes de entregar (folha lado a lado em `conferencia/`).
@@ -100,8 +103,8 @@ efeitos sonoros do próprio modelo ficam ligados.
   fala segue na legenda.
 
 ## 7. Material
-- Fazer sozinho tudo o que dá: buscar foto com licença aberta (`kit/buscar.py`), recortar (`kit/recortar.py`),
-  gerar objeto/cenário (`kit/gerar.py`). Pessoa real só com foto real licenciada, nunca rosto gerado.
+- Fazer sozinho tudo o que dá: buscar foto com licença aberta (`sistema/kit/buscar.py`), recortar (`sistema/kit/recortar.py`),
+  gerar objeto/cenário (`sistema/kit/gerar.py`). Pessoa real só com foto real licenciada, nunca rosto gerado.
 - O que só o criador tem (print específico, gravação de tela) vira um pedido numerado, com a hora, a frase e um plano
   B honesto. O resto do vídeo segue enquanto isso.
 - Licença anotada sempre (`ORIGEM.md`); crédito na descrição quando a licença pede.
@@ -113,5 +116,5 @@ efeitos sonoros do próprio modelo ficam ligados.
 - Áudio final: voz na frente, trilha ~16 dB abaixo, -14 LUFS, pico ≤ -1 dBTP.
 
 ## 9. Confinado
-- Tudo o que o estúdio usa e gera mora dentro dele: `.venv/`, `node_modules/`, `tools/.cache/`, `.tmp/`, `videos/`.
-- Render com a trava (`tools/com-trava.sh`), `--concurrency=2`, um render pesado por vez.
+- Tudo o que o estúdio usa e gera mora dentro dele: `sistema/.venv/`, `sistema/node_modules/`, `sistema/tools/.cache/`, `sistema/.tmp/`, `sistema/oficina/`.
+- Render com a trava (`sistema/tools/com-trava.sh`), `--concurrency=2`, um render pesado por vez.

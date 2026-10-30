@@ -34,14 +34,14 @@ Evite por padrão: whoosh longo em toda transição, riser de trailer, "boom" de
 - Música, quando houver (é escolha do criador), entra bem abaixo da voz e abaixa quando a voz fala (ducking suave,
   sem bombear). O número de dB é ponto de partida, não regra: ajuste até a palavra ficar clara e a música natural.
 - **Entrega: -14 LUFS integrado, pico real até -1 dBTP**, AAC 48 kHz. Os scripts de mixagem dos moldes já fazem isso
-  em duas passadas. Confira com `tools/medir_entrega.py`.
+  em duas passadas. Confira com `sistema/tools/medir_entrega.py`.
 - **LUFS não prova que o efeito é audível.** Ouça o trecho mixado em volume baixo, de preferência no celular, olhando
   a imagem. Seja honesto no relatório: "medido" (número), "ouvido" (alguém ouviu), "não conferido".
 
 ## 4. De onde vem o som
-1. **O som do molde** (`moldes/<m>/scripts/som.py` ou `trilha.py`): sintetizado por código, sem licença de terceiro,
+1. **O som do molde** (`sistema/moldes/<m>/scripts/som.py` ou `trilha.py`): sintetizado por código, sem licença de terceiro,
    preso aos eventos do plano. É o padrão de cada modelo e vem ligado quando o aprovado tem.
-2. **Efeito novo pela ElevenLabs** (`kit/audio_ia.py`), quando o molde não cobre:
+2. **Efeito novo pela ElevenLabs** (`sistema/kit/audio_ia.py`), quando o molde não cobre:
    - **Aprovação antes de gastar:** diga o prompt, a duração e quantas variações; espere o "ok".
    - **Uma chamada por vez, sem nova tentativa automática** (uma falha pode ter cobrado).
    - Gere o mínimo (0,5 s) pra som curto e recorte o ataque aqui; som curto não sai mais barato.

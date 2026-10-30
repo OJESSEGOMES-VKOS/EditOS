@@ -2,7 +2,7 @@
 
 **Para você, aluno:** abra o Claude Code **ou o Codex** numa pasta vazia (por exemplo `Documentos\estudio-claude`) e escreva:
 
-> Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/estudio-2d/blob/main/PREPARAR.md
+> Instale o EditOS seguindo https://github.com/OJESSEGOMES-VKOS/EditOS/blob/main/PREPARAR.md
 
 Não precisa baixar nem copiar nada. O assistente lê estas instruções e faz o resto, pedindo a sua licença antes de instalar
 cada programa. Leva de 20 a 40 minutos, conforme a internet, e você só faz isso uma vez.
@@ -34,8 +34,8 @@ Depois de instalar, o terminal atual pode não enxergar os programas novos. Se f
 abrir o Claude Code ou o Codex de novo na mesma pasta e repetir o pedido; você continua de onde parou.
 
 ### 3. Baixar o estúdio
-Baixe `https://github.com/OJESSEGOMES-VKOS/estudio-2d/archive/refs/heads/main.zip` e extraia nesta pasta, de modo que o
-`CLAUDE.md` e o `AGENTS.md` do estúdio fiquem na pasta atual (não numa subpasta `estudio-2d-main`). O Claude Code lê o
+Baixe `https://github.com/OJESSEGOMES-VKOS/EditOS/archive/refs/heads/main.zip` e extraia nesta pasta, de modo que o
+`CLAUDE.md` e o `AGENTS.md` do estúdio fiquem na pasta atual (não numa subpasta `EditOS-main`). O Claude Code lê o
 `CLAUDE.md`, o Codex lê o `AGENTS.md`; têm o mesmo texto. Confira que os dois estão na pasta raiz. Não precisa de git nem de conta no
 GitHub.
 
@@ -49,8 +49,8 @@ maior com placa, o médio sem). No fim, ele mesmo apaga o que só servia para in
 
 ### 5. Conferir que funciona
 Confira as três partes, sem precisar de vídeo:
-- Python: `.venv/Scripts/python.exe -c "import faster_whisper, cv2, numpy"` (no macOS/Linux, `.venv/bin/python`);
-- Remotion: `npx remotion versions`;
+- Python: `sistema/.venv/Scripts/python.exe -c "import faster_whisper, cv2, numpy"` (no macOS/Linux, `sistema/.venv/bin/python`);
+- Remotion: `npx remotion versions` (de dentro de `sistema/`);
 - ffmpeg: `ffmpeg -version`.
 
 Se as três responderem sem erro, está pronto. O primeiro vídeo de verdade da pessoa é o teste completo.
@@ -58,8 +58,9 @@ Se as três responderem sem erro, está pronto. O primeiro vídeo de verdade da 
 ### 6. Avisar a pessoa
 Diga, em poucas linhas:
 - que o estúdio está pronto e em que pasta;
-- que, para editar, ela grava o vídeo (celular em pé, rosto de frente, boa luz, sem música ao fundo), coloca o arquivo
-  nesta pasta e escreve, por exemplo: *"Leia `modelos/modelopadrao01/modelopadrao01.md` e edite o meu vídeo
-  `gravacao.mp4` nesse modelo"*;
-- que os modelos disponíveis estão em `modelos/`, cada um com o vídeo de exemplo em `referencia/referencia.mp4`;
+- que, para editar, ela grava o vídeo (celular em pé, rosto de frente, boa luz, sem música ao fundo), na primeira
+  conversa responde três perguntas (nome, @ e materiais) que criam a pasta dela, coloca a gravação em
+  `<Nome>/materiais/` e escreve, por exemplo: *"Edite o meu vídeo `gravacao.mp4` no modelopadrao01"*; o vídeo pronto
+  chega em `<Nome>/conteudo/<nome-do-video>-DD-MM-AA/`;
+- que os modelos disponíveis estão em `sistema/modelos/`, cada um com o vídeo de exemplo em `referencia/referencia.mp4`;
 - que ela pode deixar o modelo mais com a cara dela preenchendo a seção "Do seu jeito", no topo do arquivo do modelo.

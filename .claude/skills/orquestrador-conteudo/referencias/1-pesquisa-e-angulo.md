@@ -5,8 +5,8 @@ já viu, e a média não para ninguém no feed. O que funciona é achar o que j�
 que funcionou e recriar com o repertório e a voz do criador.
 
 ## O que ler antes
-- `criador/PERFIL.md`: nicho, público, promessa, o que nunca dizer, onde pesquisar, referências.
-- `criador/REGISTRO.md`: o que já foi feito (não repetir tema, aprender com o gancho que venceu).
+- `sistema/criador/PERFIL.md`: nicho, público, promessa, o que nunca dizer, onde pesquisar, referências.
+- `sistema/criador/REGISTRO.md`: o que já foi feito (não repetir tema, aprender com o gancho que venceu).
 - Se o PERFIL indicar um agente ou uma base de pesquisa própria, delegue a pesquisa a ele com o briefing inteiro numa
   mensagem só e use o que ele devolver.
 

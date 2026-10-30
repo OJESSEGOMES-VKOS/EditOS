@@ -10,7 +10,7 @@ acima de tudo isto.
 ## 1. Legenda (a legenda conta a história)
 - Todas as falas aparecem, em ordem, cada trecho uma vez só; o destaque não engole a fala seguinte (M3-1, M3-7, PR12).
 - Tempo de leitura sempre: 1 s + 1 s a cada 3 palavras; nenhuma palavra solta por 2 quadros, nada pisca (M3-6, PR5, S2, PF4).
-- No máximo 4 linhas por bloco; texto de tela, no máximo 3 (M3-6, PR12, PF12).
+- Um bloco de legenda é um trecho só: nunca junta fim de uma frase com começo de outra; passou de ponto, vírgula, interrogação, exclamação ou dois-pontos, o bloco acaba e o próximo entra novo. **No máximo 2 linhas por bloco de legenda**; texto de tela, no máximo 3 (G35, PF12). O checador do molde acusa as duas coisas.
 - No máximo 2 posições de legenda padrão no vídeo inteiro, na altura de leitura (peito), nunca "lá embaixo" (M3-10, M3-11, S3, PR17).
 - Dentro das margens das redes no 9:16 (PR17); no 16:9 com protagonista focado, legenda em lugar fixo, não persegue o enquadramento (PR2).
 - Surgimento suave e sutil; pedaços curtos entram juntos, lado a lado, mesmo tamanho e fonte (PR9, PR5).
@@ -29,6 +29,7 @@ acima de tudo isto.
 ## 3. Tipografia
 - 1 fonte principal e no máximo 2 alternativas; 1 variação de peso; tamanho varia pouco (PF10, S6).
 - Entradas de texto suaves; palavras não "teleportam" (PF10, PF4).
+- Texto sem contorno, sombra justa ou glow colado na letra (parece recortado); sobre fundo borrado ou chapado, limpo; sobre a gravação, no máximo uma sombra larga e bem suave que não desenha a borda da letra (G37).
 
 ## 4. Câmera e corte
 - Sem corte seco de zoom toda hora: aproximação e afastamento leves, no máximo ~3 cortes de zoom no vídeo, só na ênfase; zoom contínuo bem lento (PF5, PF13).

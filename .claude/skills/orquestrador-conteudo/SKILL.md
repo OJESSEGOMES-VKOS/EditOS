@@ -18,16 +18,18 @@ um portão: só avança com o "ok" da pessoa, registrado com data no `ANDAMENTO.
 
 ## Antes de tudo
 
-1. **Quem é o criador.** Leia `criador/PERFIL.md` (nicho, público, voz, promessa, destino do CTA, o que nunca dizer,
-   referências que ama e odeia, onde pesquisar). Não existe? Copie `criador/PERFIL-modelo.md` para `PERFIL.md` e
-   monte com a pessoa antes de qualquer coisa, seguindo `criador/LEIA.md` (10 perguntas, uma por vez). O PERFIL pode
+0. **De quem é o vídeo.** O perfil ativo (o `CLAUDE.md` diz como achar; sem perfil, a skill `comecar` primeiro). Leia
+   `<perfil>/perfil.md` e olhe `<perfil>/materiais/` (logo, cores, prints): é o material oficial que o vídeo pode usar.
+1. **Quem é o criador.** Leia `sistema/criador/PERFIL.md` (nicho, público, voz, promessa, destino do CTA, o que nunca dizer,
+   referências que ama e odeia, onde pesquisar). Não existe? Copie `sistema/criador/PERFIL-modelo.md` para `PERFIL.md` e
+   monte com a pessoa antes de qualquer coisa, seguindo `sistema/criador/LEIA.md` (10 perguntas, uma por vez). O PERFIL pode
    apontar para documentos maiores do criador (identidade, direção, agentes de pesquisa): siga o que ele mandar ler.
-2. **O gosto acumulado.** Leia `criador/GOSTO.md` (se ainda não existe, nasce na primeira correção): as regras que
+2. **O gosto acumulado.** Leia `sistema/criador/GOSTO.md` (se ainda não existe, nasce na primeira correção): as regras que
    vieram de correções em conteúdos anteriores. Elas valem acima das referências desta skill.
 
-**Onde cada coisa mora.** O planejamento de cada conteúdo fica em `criador/conteudos/AAAA-MM-DD-tema/` (`pesquisa.md`,
-`briefing.md`, `roteiro.md`, `PEDIDO.md`, `ANDAMENTO.md`). O vídeo nasce em `videos/AAAA-MM-DD-tema/` pelo
-`tools/novo-video.py`, com o mesmo nome, e o `ANDAMENTO.md` aponta pra ele.
+**Onde cada coisa mora.** O planejamento de cada conteúdo fica em `sistema/criador/conteudos/AAAA-MM-DD-tema/` (`pesquisa.md`,
+`briefing.md`, `roteiro.md`, `PEDIDO.md`, `ANDAMENTO.md`). O vídeo nasce em `sistema/oficina/AAAA-MM-DD-tema/` pelo
+`sistema/tools/novo-video.py`, com o mesmo nome, e o `ANDAMENTO.md` aponta pra ele.
 3. **Retomar, não recriar.** Se o pedido é sobre um conteúdo que já existe, leia o `ANDAMENTO.md` dele e continue do
    próximo passo escrito lá. Pedido pequeno ("muda o título da página 3") não reabre o briefing: mexe só no trecho.
 4. Leia `LEIA.md` e `REGRAS.md` do EditOS uma vez por sessão. As referências desta skill (`referencias/`) são lidas
@@ -51,11 +53,11 @@ suposição.
 | 3 | Roteiro em fala e tela | `referencias/0-como-pensar.md` §4–5, `referencias/2-roteiro.md` | `roteiro.md` em duas colunas, gancho A e B | **Roteiro aprovado** |
 | 4 | Modelo e direção | `referencias/0-como-pensar.md` §6, `referencias/3-seletor-de-modelos.md` | modelo escolhido + o segundo colocado, com o porquê | **Direção aprovada** |
 | 5 | Material e voz | `referencias/2-roteiro.md` §7 | `PEDIDO.md` do que gravar ou capturar, frase a frase | Voz final conferida contra o roteiro |
-| 6 | Produção no modelo | `modelos/<m>/<m>.md` | vídeo pelo `tools/novo-video.py` e plano frase a frase | (segue) |
+| 6 | Produção no modelo | `sistema/modelos/<m>/<m>.md` | vídeo pelo `sistema/tools/novo-video.py` e plano frase a frase | (segue) |
 | 7 | Som | `referencias/4-som.md` | tabela de cues no mesmo tempo da imagem | (entra na prévia) |
 | 8 | Prévia | `referencias/5-formatos.md` §prévia | folha de quadros por trecho + prévia leve com som | **Prévia aprovada** |
 | 9 | Conferência e entrega | `referencias/6-conferencia.md` | checador, `parece.py`, rubrica de conteúdo, áudio medido | Tudo passa |
-| 10 | Registro | `modelos/andamento.md` | linha no `criador/REGISTRO.md`, legenda do post | — |
+| 10 | Registro | `modelos/andamento.md` | linha no `sistema/criador/REGISTRO.md`, legenda do post | — |
 
 Carrossel animado segue as mesmas etapas, com a etapa 6 trocada pela receita de `referencias/5-formatos.md`
 (carrossel animado). Vídeo sem voz usa a regra de leitura como relógio.
@@ -83,22 +85,22 @@ aprovado.**
 
 ### Etapa 4: modelo e direção
 Use `referencias/3-seletor-de-modelos.md`: formato, rosto ou não, tom e material decidem. Diga o modelo, o porquê em
-duas linhas e o segundo colocado. Depois leia o `modelos/<m>/<m>.md` inteiro e a referência dele: **o vídeo tem que
+duas linhas e o segundo colocado. Depois leia o `sistema/modelos/<m>/<m>.md` inteiro e a referência dele: **o vídeo tem que
 parecer o modelo desde o 1º segundo**, e a cor é a do modelo, não a da marca do criador.
 Peça nova que só usa os modelos como capacidade (conceito próprio) **também** lê as referências originais deles:
-folha de quadros e `tools/ritmo.py` nos vídeos de `modelos/<m>/referencias/`. A densidade medida ali (quantas coisas
+folha de quadros e `sistema/tools/ritmo.py` nos vídeos de `sistema/modelos/<m>/referencias/`. A densidade medida ali (quantas coisas
 acontecem por segundo, quanto do tempo a tela fica parada) vira a meta da decupagem, plano a plano.
 
 ### Etapa 5: material e voz
 Antes de gravar, entregue o `PEDIDO.md`: por frase, o que gravar, printar ou capturar, e o plano B se não houver. O
-estúdio busca, recorta e gera o que dá (`kit/`); só pede o que só o criador tem. Com a voz gravada ou gerada,
+estúdio busca, recorta e gera o que dá (`sistema/kit/`); só pede o que só o criador tem. Com a voz gravada ou gerada,
 transcreva e compare com o roteiro aprovado: palavra trocada, faltando ou pronúncia ruim volta pra regravação da linha.
 **Nenhuma cena é montada antes da voz final** (voz provisória só com ok, marcada como provisória no ANDAMENTO).
 
 ### Etapa 6: produção
-Siga o passo a passo do `<m>.md`: `tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>`, plano frase a frase
+Siga o passo a passo do `<m>.md`: `sistema/tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>`, plano frase a frase
 sobre `src/palavras.json`, a gramática do modelo decidindo a tela de cada função. Render sempre confinado, com
-`tools/com-trava.sh` e `--concurrency=2`.
+`sistema/tools/com-trava.sh` e `--concurrency=2`.
 
 ### Etapa 7: som
 Siga `referencias/4-som.md`: o som sai do mesmo arquivo de tempo da imagem, marca mudança e não palavra, cai no quadro
@@ -112,15 +114,16 @@ com som e espere o "ok". Render que terminou sem erro não é aprovação de gos
 ### Etapa 9: conferência
 Siga `referencias/6-conferencia.md`: o checador do molde zerado, o `parece.py`, a folha lado a lado olhada, a rubrica
 de conteúdo (gancho, promessa cumprida, prova real, CTA), o teste de cara de template, **o ritmo**
-(`tools/ritmo.py` lado a lado com a referência: movimento médio e % de quadros parados no mesmo patamar; motion bem
+(`sistema/tools/ritmo.py` lado a lado com a referência: movimento médio e % de quadros parados no mesmo patamar; motion bem
 abaixo da referência volta pra bancada antes de ser mostrado) e o áudio medido (-14 LUFS,
 pico real até -1,5 dBTP). Diga numa linha o que foi medido, o que foi olhado e o que não deu pra conferir.
 
 ### Etapa 10: entrega e registro
-Versão nova com nome claro, nunca sobrescreve a aprovada. Escreva a legenda do post (com `/legenda` se existir),
-uma linha no `criador/REGISTRO.md` (data, tema, formato, modelo, caminho, gancho usado) e deixe o campo de métrica
+Cada versão final sai sozinha em `<perfil>/conteudo/<tema>-DD-MM-AA/vN.mp4` (o final do molde chama o
+`sistema/tools/entregar.py`); nunca sobrescreve uma versão já entregue. Escreva a legenda do post (com `/legenda` se existir),
+uma linha no `sistema/criador/REGISTRO.md` (data, tema, formato, modelo, caminho, gancho usado) e deixe o campo de métrica
 vazio pra pessoa preencher depois de postar. Toda correção feita nesta rodada vira **regra geral** no
-`criador/GOSTO.md` ("todo título fica 1 s + 3 palavras/s", não "mudei a cena 3").
+`sistema/criador/GOSTO.md` ("todo título fica 1 s + 3 palavras/s", não "mudei a cena 3").
 
 ## Entregar
 Diga onde salvou, o que foi conferido e o próximo passo natural (ex.: "posta e me traz o número de 48 h pra gente

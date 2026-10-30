@@ -5,11 +5,11 @@ Três camadas, nesta ordem. Item que reprova volta pra bancada. No recado final,
 
 ## A. Técnica (medida)
 - [ ] O checador do molde zerado (falas cobertas, tempo de leitura, posições, zona segura, sincronia).
-- [ ] `tools/parece.py <video.mp4> <modelo>` aprovado, e a folha lado a lado olhada. Se a diferença salta aos olhos,
+- [ ] `sistema/tools/parece.py <video.mp4> <modelo>` aprovado, e a folha lado a lado olhada. Se a diferença salta aos olhos,
       não está pronto, mesmo com os números dentro.
-- [ ] `tools/medir_entrega.py <video.mp4> --tamanho <LxA> --fps 30`: H.264, AAC 48 kHz, -14 LUFS, pico real até
+- [ ] `sistema/tools/medir_entrega.py <video.mp4> --tamanho <LxA> --fps 30`: H.264, AAC 48 kHz, -14 LUFS, pico real até
       -1 dBTP, abre rápido. Página de carrossel: `--max-s 60`.
-- [ ] `tools/folha.py` do vídeo inteiro: nada cortado, nada piscando, nenhum texto sumindo antes de ser lido.
+- [ ] `sistema/tools/folha.py` do vídeo inteiro: nada cortado, nada piscando, nenhum texto sumindo antes de ser lido.
 
 ## B. Conteúdo (a rubrica)
 Cada item é sim ou não. Um "não" nos três primeiros reprova.
@@ -34,6 +34,6 @@ Responda sim ou não. **Três "sim" ou mais: refaça a partitura.**
 8. Algum tipo de tela passa de 40% do tempo?
 
 ## Depois de entregar
-- A correção que a pessoa fizer vira **regra geral** no `criador/GOSTO.md`, com data e as palavras dela.
-- O `criador/REGISTRO.md` ganha a linha do conteúdo; a métrica de 48 h entra quando a pessoa trouxer.
+- A correção que a pessoa fizer vira **regra geral** no `sistema/criador/GOSTO.md`, com data e as palavras dela.
+- O `sistema/criador/REGISTRO.md` ganha a linha do conteúdo; a métrica de 48 h entra quando a pessoa trouxer.
 - Gancho que venceu com número real vai pro topo do GOSTO como "ganchos que funcionaram".

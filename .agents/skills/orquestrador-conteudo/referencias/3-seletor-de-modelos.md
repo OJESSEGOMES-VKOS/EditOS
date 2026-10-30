@@ -46,5 +46,5 @@ Quatro perguntas decidem, nesta ordem:
 "**Ritmo** (`modelodinamico01`): você vai mostrar o app funcionando e falar olhando pra câmera, e ele encena cada
 frase com interface de verdade. Segundo colocado: **Creator**, se preferir prints em vez de interface animada."
 
-Depois da escolha: leia o `modelos/<m>/<m>.md` inteiro e estude a referência dele. O vídeo tem que parecer o modelo
+Depois da escolha: leia o `sistema/modelos/<m>/<m>.md` inteiro e estude a referência dele. O vídeo tem que parecer o modelo
 desde o 1º segundo; a cor é a do modelo, nunca a da marca do criador; nunca escreva o nome do modelo na tela.
