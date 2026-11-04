@@ -24,11 +24,38 @@ Você edita vídeos em modelos de edição, com Remotion, dentro desta pasta.
    `novoperfil`.
 2. Antes de editar, leia `<perfil>/perfil.md` e olhe `<perfil>/materiais/`: logo, cores e prints dali são os oficiais.
    Nunca use material de outro perfil.
+   **Só o material que o dono deu (regra absoluta):** o vídeo usa somente o que ele forneceu, em geral na pasta de
+   materiais indicada do vídeo. Gerar imagem (kie.ai, Codex, qualquer IA) ou buscar foto, vídeo ou som online só com
+   pedido explícito dele para aquele vídeo. Faltou? Efeito tipográfico, a pessoa ou reaproveitamento, e a falta vai
+   para o `PEDIDO.md`, fora da peça.
 3. Cada versão final vai sozinha para `<perfil>/conteudo/<tema>-DD-MM-AA/vN.mp4`: o final de cada molde
    (`scripts/mixar.sh`, `scripts/finalizar.sh`, `scripts/final.py`) chama `sistema/tools/entregar.py`, que copia o mp4
-   oficial com o próximo número. Um arquivo por versão, nunca cópia leve. Rascunho que ninguém vai ver: `SEM_ENTREGA=1`.
+   oficial com o próximo número. Um arquivo por versão, nunca cópia leve. O roteiro vai junto, como
+   `roteiro-vN.<ext>` ao lado do vídeo, sempre que mudou: por isso o roteiro de todo vídeo mora em `roteiro.md` na
+   pasta da oficina (sem roteiro, o `plano.md`). Rascunho que ninguém vai ver: `SEM_ENTREGA=1`.
    Vídeo fora desse caminho automático (o 3D e os vídeos com motor próprio): rode
    `sistema/tools/entregar.py <pasta-do-video> <video.mp4>` quando a versão estiver aprovada.
+
+## O fluxo de produção (EditOS online)
+O dono acompanha tudo no painel (`/abrir-editos-online`, http://127.0.0.1:4700), que lê as pastas e se atualiza
+sozinho. Cada vídeo é uma pasta `<perfil>/conteudo/<nome-do-video>-DD-MM-AA/`, com um `ficha.md`:
+```
+---
+status: roteiro
+link:
+insight:
+---
+notas livres
+```
+- **status:** `roteiro` → `produzindo` → `revisar` → `pronto` → `publicado`. Sem ficha, o painel deduz: só roteiro é
+  `roteiro`, com vídeo é `revisar`. `pronto` e `publicado` são decisão do dono.
+- **Roteiro em lote:** cada roteiro nasce como pasta própria no `conteudo/` do perfil, com `roteiro-v1.md` e a ficha
+  em `roteiro`. Ao produzir, a pasta da oficina aponta para ela (`tools/entregar.py ... --nome <a pasta>`, que grava
+  o `entrega.json`) e a ficha vai para `produzindo`. A entrega do vídeo passa a ficha para `revisar` sozinha.
+- **Operação Dark:** o painel busca o GitHub da `operacao-dark-nuvem` a cada minuto (todos os ramos, só leitura) e
+  traz cada roteiro de `roteiros/<AAAA-MM-DD-tema>/` para a pasta do tema no perfil que o roteiro cita no começo
+  (`origem: dark/<slug>` na ficha). Roteiro sem o nome da página no começo não entra.
+- **insight:** o que o vídeo ensinou e pode virar regra do sistema; leia os insights antes de mexer num modelo.
 
 ## Fazer um vídeo
 **Cada modelo tem um arquivo só que manda: `sistema/modelos/<modelo>/<modelo>.md`.** Ele traz a cara do modelo, os
@@ -37,8 +64,14 @@ vídeo novo. Quando o código, uma mensagem de erro ou outro arquivo citar `MODE
 `CORRECOES.md` ou `REGRAS.md`, a resposta está no `<modelo>.md`. O código do molde (`sistema/moldes/<modelo>/`) é o
 vídeo aprovado em código; ele não é a regra.
 
-**O padrão de cada modelo é o vídeo aprovado dele.** Tudo o que aparece no aprovado (tratamento de cor, palco, efeitos
-sonoros, ritmo de câmera) vem ligado; só fica desligado o que o `<modelo>.md` diz que é opção desligada.
+**O vídeo é uma composição de cenas, não o modelo copiado (G40, `sistema/cenas/METODO.md`).** O modelo escolhido é a
+casa: a identidade do vídeo inteiro (tratamento de cor, rosto, legenda, tipografia, cores, som, ritmo) vem do aprovado
+dele e fica ligada do começo ao fim. O que a tela faz em cada cena se decide cena a cena: rosto puro, uma resposta da
+casa, a resposta de outro modelo ou um estilo de cena (`animationstyleNN`, os 46 de `sistema/cenas/INDICE.md`). O
+pedido do dono para uma cena ("cena 3 no animationstyle07") manda nela. Só fica desligado de vez o que o `<modelo>.md`
+diz que é opção desligada.
+**3D Blender x 3D edição:** "3D Blender" é o `3d-explicativo` e o `/estudio-3d` (modelagem e render). "3D edição" são
+os estilos de cena com profundidade feitos no próprio Remotion, sem Blender (marcados no `INDICE.md`).
 
 1. Leia `README.md` e o `sistema/modelos/<modelo>/<modelo>.md` inteiro antes de qualquer edição.
 2. Estude o vídeo aprovado do modelo em `sistema/modelos/<modelo>/referencia/`: o `referencia.mp4` (com a voz), a
@@ -52,7 +85,9 @@ sonoros, ritmo de câmera) vem ligado; só fica desligado o que o `<modelo>.md` 
    transcrever de novo) e vive em `sistema/oficina/`. A gravação deixada em `<perfil>/materiais/` vai junto para a
    pasta do vídeo (`entrada/`). Ele já adapta a gravação ao ponto de partida do modelo (`tools/adaptar.py`: rosto no
    tamanho e na altura, luz de partida); não pule esse passo. Depois siga a seção do vídeo novo do `<modelo>.md`, com
-   um `plano.md` frase a frase sobre `src/palavras.json`.
+   um `plano.md` sobre `src/palavras.json` que abre com o **plano de cenas** (a decupagem: cena, tempo, fala, função,
+   resposta e por quê, `sistema/cenas/METODO.md` §5) e segue frase a frase. Mostre a tabela de cenas ao dono junto
+   com o vídeo, para ele trocar qualquer cena pelo nome.
 4. Confira com prova, nesta ordem (comandos de dentro de `sistema/`), e só chame de pronto quando tudo passar:
    - o checador do molde zerado;
    - `tools/parece.py <video.mp4> <modelo>`: luz, cor, enquadramento do rosto e ritmo contra o aprovado (vídeo curto é

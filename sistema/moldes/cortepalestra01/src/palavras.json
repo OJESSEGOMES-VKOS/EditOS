@@ -1,0 +1,527 @@
+[
+{
+"text": "Esse",
+"start": 0.08,
+"end": 0.54
+},
+{
+"text": "é",
+"start": 0.54,
+"end": 0.64
+},
+{
+"text": "mais",
+"start": 0.64,
+"end": 0.78
+},
+{
+"text": "um",
+"start": 0.78,
+"end": 0.9
+},
+{
+"text": "daqueles",
+"start": 0.9,
+"end": 1.18
+},
+{
+"text": "vídeos",
+"start": 1.18,
+"end": 1.5
+},
+{
+"text": "que",
+"start": 1.5,
+"end": 1.64
+},
+{
+"text": "você",
+"start": 1.64,
+"end": 1.8
+},
+{
+"text": "vê",
+"start": 1.8,
+"end": 2.04
+},
+{
+"text": "por",
+"start": 2.04,
+"end": 2.18
+},
+{
+"text": "aí",
+"start": 2.18,
+"end": 2.38
+},
+{
+"text": "totalmente",
+"start": 2.38,
+"end": 2.64
+},
+{
+"text": "editados",
+"start": 2.64,
+"end": 3.32
+},
+{
+"text": "pelo",
+"start": 3.32,
+"end": 3.52
+},
+{
+"text": "Claude",
+"start": 3.52,
+"end": 3.8
+},
+{
+"text": "Code.",
+"start": 3.8,
+"end": 4.1
+},
+{
+"text": "Mas",
+"start": 4.32,
+"end": 4.68
+},
+{
+"text": "talvez",
+"start": 4.68,
+"end": 4.98
+},
+{
+"text": "você",
+"start": 4.98,
+"end": 5.26
+},
+{
+"text": "esteja",
+"start": 5.26,
+"end": 5.7
+},
+{
+"text": "estranhando",
+"start": 5.7,
+"end": 6.16
+},
+{
+"text": "que",
+"start": 6.16,
+"end": 6.32
+},
+{
+"text": "ele",
+"start": 6.32,
+"end": 6.44
+},
+{
+"text": "não",
+"start": 6.44,
+"end": 6.56
+},
+{
+"text": "é",
+"start": 6.56,
+"end": 6.64
+},
+{
+"text": "exatamente",
+"start": 6.64,
+"end": 7.04
+},
+{
+"text": "como",
+"start": 7.04,
+"end": 7.54
+},
+{
+"text": "os",
+"start": 7.54,
+"end": 7.72
+},
+{
+"text": "outros,",
+"start": 7.72,
+"end": 8.08
+},
+{
+"text": "todos",
+"start": 8.22,
+"end": 8.44
+},
+{
+"text": "iguais.",
+"start": 8.44,
+"end": 8.98
+},
+{
+"text": "Isso",
+"start": 9.96,
+"end": 10.48
+},
+{
+"text": "porque",
+"start": 10.48,
+"end": 10.68
+},
+{
+"text": "eu",
+"start": 10.68,
+"end": 10.82
+},
+{
+"text": "criei",
+"start": 10.82,
+"end": 10.98
+},
+{
+"text": "um",
+"start": 10.98,
+"end": 11.06
+},
+{
+"text": "sistema",
+"start": 11.06,
+"end": 11.32
+},
+{
+"text": "de",
+"start": 11.32,
+"end": 11.5
+},
+{
+"text": "edição",
+"start": 11.5,
+"end": 11.84
+},
+{
+"text": "próprio",
+"start": 11.84,
+"end": 12.16
+},
+{
+"text": "que",
+"start": 12.16,
+"end": 12.6
+},
+{
+"text": "reúne",
+"start": 12.6,
+"end": 12.96
+},
+{
+"text": "vários",
+"start": 12.96,
+"end": 13.18
+},
+{
+"text": "modelos",
+"start": 13.18,
+"end": 13.88
+},
+{
+"text": "de",
+"start": 13.88,
+"end": 13.96
+},
+{
+"text": "edição",
+"start": 13.96,
+"end": 14.28
+},
+{
+"text": "que",
+"start": 14.28,
+"end": 14.5
+},
+{
+"text": "o",
+"start": 14.5,
+"end": 14.56
+},
+{
+"text": "Claude",
+"start": 14.56,
+"end": 14.76
+},
+{
+"text": "usa",
+"start": 14.76,
+"end": 15.12
+},
+{
+"text": "e",
+"start": 15.12,
+"end": 15.56
+},
+{
+"text": "foge",
+"start": 15.56,
+"end": 16.02
+},
+{
+"text": "do",
+"start": 16.02,
+"end": 16.16
+},
+{
+"text": "copia",
+"start": 16.16,
+"end": 16.54
+},
+{
+"text": "e",
+"start": 16.54,
+"end": 16.6
+},
+{
+"text": "cola",
+"start": 16.6,
+"end": 16.84
+},
+{
+"text": "que",
+"start": 16.84,
+"end": 17.0
+},
+{
+"text": "todos",
+"start": 17.0,
+"end": 17.32
+},
+{
+"text": "mostram.",
+"start": 17.32,
+"end": 17.94
+},
+{
+"text": "Mas",
+"start": 18.12,
+"end": 18.64
+},
+{
+"text": "o",
+"start": 18.64,
+"end": 18.78
+},
+{
+"text": "melhor",
+"start": 18.78,
+"end": 18.96
+},
+{
+"text": "disso",
+"start": 18.96,
+"end": 19.12
+},
+{
+"text": "tudo",
+"start": 19.12,
+"end": 19.34
+},
+{
+"text": "é",
+"start": 19.34,
+"end": 19.5
+},
+{
+"text": "que",
+"start": 19.5,
+"end": 19.6
+},
+{
+"text": "todos",
+"start": 19.6,
+"end": 19.94
+},
+{
+"text": "eles",
+"start": 19.94,
+"end": 20.28
+},
+{
+"text": "são",
+"start": 20.28,
+"end": 20.56
+},
+{
+"text": "editáveis",
+"start": 20.56,
+"end": 21.1
+},
+{
+"text": "e",
+"start": 21.1,
+"end": 21.44
+},
+{
+"text": "você",
+"start": 21.44,
+"end": 21.72
+},
+{
+"text": "também",
+"start": 21.72,
+"end": 22.02
+},
+{
+"text": "pode",
+"start": 22.02,
+"end": 22.34
+},
+{
+"text": "criar",
+"start": 22.34,
+"end": 22.66
+},
+{
+"text": "os",
+"start": 22.66,
+"end": 22.8
+},
+{
+"text": "seus",
+"start": 22.8,
+"end": 22.98
+},
+{
+"text": "próprios",
+"start": 22.98,
+"end": 23.44
+},
+{
+"text": "modelos.",
+"start": 23.44,
+"end": 24.02
+},
+{
+"text": "você",
+"start": 24.2,
+"end": 24.48
+},
+{
+"text": "pode",
+"start": 24.48,
+"end": 24.7
+},
+{
+"text": "usar",
+"start": 24.7,
+"end": 24.94
+},
+{
+"text": "os",
+"start": 24.94,
+"end": 25.08
+},
+{
+"text": "modelos",
+"start": 25.08,
+"end": 25.58
+},
+{
+"text": "ou",
+"start": 25.58,
+"end": 25.68
+},
+{
+"text": "criar",
+"start": 25.68,
+"end": 25.88
+},
+{
+"text": "modelos",
+"start": 25.88,
+"end": 26.42
+},
+{
+"text": "para",
+"start": 26.42,
+"end": 26.56
+},
+{
+"text": "editar",
+"start": 26.56,
+"end": 26.92
+},
+{
+"text": "os",
+"start": 26.92,
+"end": 27.06
+},
+{
+"text": "vídeos",
+"start": 27.06,
+"end": 27.3
+},
+{
+"text": "dos",
+"start": 27.3,
+"end": 27.48
+},
+{
+"text": "seus",
+"start": 27.48,
+"end": 27.66
+},
+{
+"text": "clientes",
+"start": 27.66,
+"end": 28.28
+},
+{
+"text": "ou",
+"start": 28.28,
+"end": 28.48
+},
+{
+"text": "até",
+"start": 28.48,
+"end": 28.7
+},
+{
+"text": "mesmo",
+"start": 28.7,
+"end": 28.98
+},
+{
+"text": "os",
+"start": 28.98,
+"end": 29.1
+},
+{
+"text": "seus",
+"start": 29.1,
+"end": 29.26
+},
+{
+"text": "próprios",
+"start": 29.26,
+"end": 29.7
+},
+{
+"text": "vídeos?",
+"start": 29.7,
+"end": 30.0
+},
+{
+"text": "quem",
+"start": 30.153,
+"end": 30.364
+},
+{
+"text": "decide",
+"start": 30.364,
+"end": 30.734
+},
+{
+"text": "é",
+"start": 30.734,
+"end": 31.086
+},
+{
+"text": "você.",
+"start": 31.086,
+"end": 31.403
+}
+]

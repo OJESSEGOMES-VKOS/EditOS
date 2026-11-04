@@ -20,6 +20,14 @@ from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
 RAIZ = AQUI.parent
+# o ffmpeg completo do estúdio vem antes de qualquer outro no PATH (o do Remotion não tem os filtros de voz do preparar.py)
+import os
+if (AQUI / '.cache' / 'ffmpeg' / 'ffmpeg.exe').exists() or (AQUI / '.cache' / 'ffmpeg' / 'ffmpeg').exists():
+    os.environ['PATH'] = str(AQUI / '.cache' / 'ffmpeg') + os.pathsep + os.environ.get('PATH', '')
+# o ffprobe só existe no pacote do Remotion: entra logo depois (o ffmpeg completo continua vencendo)
+_comp = RAIZ / 'node_modules' / '@remotion' / 'compositor-win32-x64-msvc'
+if _comp.is_dir():
+    os.environ['PATH'] = os.environ['PATH'].replace(os.pathsep, os.pathsep + str(_comp) + os.pathsep, 1)
 MIDIA_ORIGEM = {'fala.mp4', 'voz.wav', 'previa1.mp4', 'previa2.mp4', 'fala_grade.mp4'}
 
 ap = argparse.ArgumentParser()

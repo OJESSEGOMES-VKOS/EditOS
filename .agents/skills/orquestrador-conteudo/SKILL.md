@@ -84,7 +84,8 @@ passa pelo `/humanizer` (se existir no sistema) antes de ir pra aprovação. **N
 aprovado.**
 
 ### Etapa 4: modelo e direção
-Use `referencias/3-seletor-de-modelos.md`: formato, rosto ou não, tom e material decidem. Diga o modelo, o porquê em
+Use `referencias/3-seletor-de-modelos.md`: formato, rosto ou não, tom e material decidem. O modelo escolhido é a casa do vídeo
+(identidade); as cenas que pedem algo além dela ganham uma resposta de outro modelo ou um estilo de cena (`sistema/cenas/INDICE.md`). Diga o modelo, o porquê em
 duas linhas e o segundo colocado. Depois leia o `sistema/modelos/<m>/<m>.md` inteiro e a referência dele: **o vídeo tem que
 parecer o modelo desde o 1º segundo**, e a cor é a do modelo, não a da marca do criador.
 Peça nova que só usa os modelos como capacidade (conceito próprio) **também** lê as referências originais deles:
@@ -98,8 +99,10 @@ transcreva e compare com o roteiro aprovado: palavra trocada, faltando ou pronú
 **Nenhuma cena é montada antes da voz final** (voz provisória só com ok, marcada como provisória no ANDAMENTO).
 
 ### Etapa 6: produção
-Siga o passo a passo do `<m>.md`: `sistema/tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>`, plano frase a frase
-sobre `src/palavras.json`, a gramática do modelo decidindo a tela de cada função. Render sempre confinado, com
+Siga o passo a passo do `<m>.md`: `sistema/tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>`, decupagem em
+cenas e plano de cenas no topo do `plano.md` (G40, `sistema/cenas/METODO.md`: cada cena decide a própria edição entre
+rosto puro, a casa, outro modelo ou um estilo de cena `animationstyleNN`), depois o plano frase a frase sobre
+`src/palavras.json`. O roteiro em fala e tela já pode marcar o estilo de cena de um trecho quando ele for a ideia. Render sempre confinado, com
 `sistema/tools/com-trava.sh` e `--concurrency=2`.
 
 ### Etapa 7: som

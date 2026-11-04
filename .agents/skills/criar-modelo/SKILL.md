@@ -18,6 +18,13 @@ forma entrega uma capacidade que funciona com qualquer gravação. É isso que o
 é copiar, é aprender uma forma de execução. Nem sempre vou ter um B-roll ou uma imagem ou várias cenas, e daí faz
 com o que tiver."*
 
+**Desde 2026-11-03 (G40, `sistema/cenas/METODO.md`), o vídeo é uma composição de cenas.** Um modelo é a **casa** (a
+identidade que vale no vídeo inteiro: tratamento, rosto, legenda, tipografia, cores, som, ritmo) mais um **repertório**
+de respostas de cena, que qualquer vídeo de outra casa também pode usar. Escreva a gramática do `<modelo>.md` como
+repertório (cada resposta com a função de cena que resolve e o gatilho na fala), nunca como uma sequência a repetir, e
+diga quais estilos de cena (`sistema/cenas/INDICE.md`) completam o modelo. A vitrine prova o repertório numa
+composição decidida cena a cena.
+
 Leia antes: `CLAUDE.md`, `REGRAS.md` inteiro (G1 a G33), `sistema/moldes/CONTRATO.md`, `sistema/tools/PROTOCOLO-decupagem-curto.md`,
 e as três referências desta skill: `referencias/heranca.md` (o que todo modelo nasce sabendo),
 `referencias/como-pensar-um-modelo.md` (os testes que separam modelo de template) e `referencias/interface-fiel.md`

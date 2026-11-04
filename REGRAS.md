@@ -7,12 +7,13 @@ reprovados e corrigidos.
 
 ## 0. Correções do dono que valem para todos (acima de tudo)
 Ficam acima das regras abaixo e do código. As de um modelo só estão escritas como regra no `sistema/modelos/<m>/<m>.md`.
-Correção mais nova vence a mais velha. G22 e G23 vêm primeiro porque mandam no resto:
+Correção mais nova vence a mais velha. G22 e G23 vêm primeiro porque mandam no resto, e a G40 (2026-11-03) diz o
+alcance delas: valem para a identidade do vídeo; as cenas se decidem uma a uma (`sistema/cenas/METODO.md`):
 
 | # | Regra | Data |
 |---|---|---|
-| G22 | O padrão de cada modelo é tudo o que está no vídeo aprovado dele mais as correções do dono; as correções ficam acima das regras do modelo. | 2026-10-13 17:15 |
-| G23 | O vídeo novo num modelo tem que parecer o vídeo aprovado daquele modelo desde o 1º segundo. | 2026-10-10 16:13 e 2026-10-13 16:49 |
+| G22 | O padrão de cada modelo é tudo o que está no vídeo aprovado dele mais as correções do dono; as correções ficam acima das regras do modelo. Desde a G40, "padrão" é a identidade (tratamento, rosto, legenda, tipografia, cores, som, ritmo) e o repertório de respostas do modelo; quais respostas entram em cada cena se decide cena a cena. | 2026-10-13 17:15 |
+| G23 | O vídeo novo num modelo tem que parecer o vídeo aprovado daquele modelo desde o 1º segundo (na identidade: o que o `parece.py` mede; G40). | 2026-10-10 16:13 e 2026-10-13 16:49 |
 | G1 | Todo texto fica na tela o tempo de ser lido; nunca jogar texto rápido demais. | 2026-09-30 00:06; 2026-10-03 15:14; 2026-10-12 08:54 |
 | G2 | A tela mostra o que está sendo dito; nada de elemento com outro texto. | 2026-10-05 11:43 |
 | G3 | Representar o ato, não relatar. | 2026-10-05 11:43 |
@@ -48,6 +49,9 @@ Correção mais nova vence a mais velha. G22 e G23 vêm primeiro porque mandam n
 | G36 | O trabalho do estúdio nunca trava o computador do dono. Todo processo pesado roda com contenção (prioridade ociosa no processador e na placa, núcleos livres pro dono, um pesado por vez, sem começar outro com pouca RAM; e o Blender limitado a 40% do tempo de placa enquanto o dono mexe no computador, no máximo 90% quando ele sai por 1 min, nunca 100%), pelo `sistema/tools/com-trava.sh` ou com o vigia `sistema/tools/contencao.ps1`. | 2026-10-29 ("Tá travando o PC todo, você precisa colocar contenções no nosso sistema EditOS para não travar o computador quando estivermos fazendo algo, se não é impossível trabalhar assim"; e, sobre a placa: "precisamos de uma forma de limitar a placa, pois isso causou vários problemas") |
 | G35 | Um bloco de legenda é um trecho só: nunca junta o fim de uma frase com o começo de outra. Passou de ponto, vírgula, interrogação, exclamação ou dois-pontos, o bloco acaba, some, e o próximo trecho entra num bloco novo. No máximo 2 linhas por bloco; trecho longo vira blocos menores do mesmo trecho. | 2026-10-29 ("Eu não quero um final de uma frase com o começo de outra, isso é ridículo … Não quero 3 linhas de legenda, principalmente em partes diferentes do texto. Só faz sentido se for do mesmo trecho, e claramente se passou do ponto ou vírgula não são do mesmo trecho") |
 | G34 | Interface, tela de app, site ou aparelho recriados na tela são **fiéis como um print**: proporção, tipografia, ícones, cores, estados e conteúdo reais daquela interface, de ponta a ponta. Nunca a versão simplificada e genérica que se repete de modelo em modelo (o mesmo celular 3D, o mesmo cartão branco com ícone). O procedimento está em `.claude/skills/criar-modelo/referencias/interface-fiel.md`. | 2026-10-23 ("quando for para criar alguma interface, a intenção é que seja o máximo parecido possível, como se fosse um print … não tem por que ficar copiando esses mesmos modelinhos 3D de telas, de frames, tudo simplesmente igual quando você poderia estar fazendo algo muito mais detalhista e voltado mais parecido com a realidade") |
+| G38 | Um elemento por ideia na tela: a mesma informação nunca aparece em dois elementos ao mesmo tempo (título, selo, contador, comando e legenda dizendo o mesmo). A legenda não repete o que o texto grande já mostra. O checador de cada molde acusa repetição entre elementos simultâneos. | 2026-11-03 (provaferramenta01 PV4: "Esse frame é bizarro: a MESMA COISA sendo colocada 3x na tela de forma diferente, wtf. Já temos tantas regras do tipo e você cometeu algo tão besta.") |
+| G39 | Nada pendurado: selo, título ou texto de gancho some quando a fala dele passa; nenhum elemento fica na tela além do seu trecho (só o comando do fecho fica até o fim). | 2026-11-03 (provaferramenta01 PV5: "O '100% editado pelo Claude' ficou até o final do vídeo, totalmente desnecessário.") |
+| G40 | **O vídeo é uma composição de cenas, não o modelo copiado.** Decupar a fala em cenas (cada trecho até a vírgula ou o ponto, ou alguns cortes que contam uma coisa só) e decidir a edição de cada cena para deixá-la mais interessante e didática: rosto puro, uma resposta do modelo da casa, a resposta de outro modelo ou um estilo de cena (`animationstyleNN`). O modelo escolhido é a casa (identidade do vídeo inteiro); o plano de cenas abre o `plano.md`. Pedido do dono para uma cena ("cena 3 no animationstyle07") manda nela. Método inteiro: `sistema/cenas/METODO.md`. | 2026-11-03 (o dono, editor: "Você precisa enxergar um vídeo como uma composição, cada frase dentro de uma vírgula ou ponto [...] é considerado uma cena [...] e daí eu construo a edição daquela cena, e nesse caso eu decido se faz sentido ou não") |
 
 Como se confere G23: `sistema/tools/parece.py` (luz, cor, enquadramento e ritmo contra `sistema/modelos/<m>/assinatura.json`) e a
 folha lado a lado que ele grava. Os conferidores de regra dos moldes não provam G23.
@@ -58,6 +62,8 @@ folha lado a lado que ele grava. Os conferidores de regra dos moldes não provam
 - A receita visual é medida (posição e tamanho em % do quadro, fonte, hex, movimento); seguir a medida, não o gosto.
 - Comparar quadro a quadro com as referências antes de entregar (folha lado a lado em `conferencia/`).
 - A cor e a fonte são as do modelo. Nada da identidade pessoal de quem edita.
+- Exceção (G40): dentro da cena que usa um estilo de cena (`animationstyleNN`), o visual é o do estilo enquanto ele está
+  na tela; a legenda e o resto do vídeo seguem a casa (`sistema/cenas/METODO.md` §4).
 
 ## 2. A tela mostra o que está sendo dito
 - Texto na tela são as palavras ditas (ou nenhuma). Número e frase exatamente como foram falados.

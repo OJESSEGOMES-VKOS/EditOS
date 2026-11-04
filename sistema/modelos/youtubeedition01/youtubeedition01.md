@@ -96,6 +96,13 @@ faixas mudam pouco (temperatura de +2,7 a +3,6 em 10 s).
 
 Cada frase do plano recebe uma função, e a função escolhe a resposta.
 
+**Confirmado pelo treinamento talking-head 2026-11-03** (`../../../treinamento/talking-head-explicativo/manual.md`, 7 Reels
+de 2 criadores): esta tabela é o que os explicativos fortes fazem. Dêitico → a coisa (DejD 25 s); ferramenta citada →
+a interface dela (Nick, todo item); número com prova → contador parando no número **dito** na página (E8; nunca o
+número diferente que o Nick mostra); metáfora → desenhada literal (R7); conta → itens entrando; chamada de comentário
+→ a palavra grande em amarelo (E11). A "espinha" de lista (Nick "Tool Number One", Joseph "PRINCIPLE N") é a mesma
+ideia do título de capítulo da seção 5. Nada aqui muda a cara do modelo: só confirma o mapa.
+
 **Mostrar o que é dito**
 | Frase | A tela |
 |---|---|
@@ -198,9 +205,19 @@ entre 24 s e 1 min, chamada do meio só depois de entregar valor, fecho com reca
 - **Nada atravessa um corte seco** e nada aparece antes da sua entrada.
 - **Nunca escreva o nome do modelo na tela.** Quando a fala diz "um desses modelos", o título de capítulo é uma palavra
   dita, nunca o nome do modelo. O rótulo embaixo de cada vídeo da grade e das prévias pode dizer o que cada vídeo é.
-- **Legenda corrida:** o 16:9 de YouTube não tem. No 9:16 dinâmico, a legenda corrida é opcional e o padrão é oferecer
-  ao usuário: se ele quiser, entra discreta na altura do peito, dentro da zona segura, sem disputar com o texto grande.
-  O molde ainda não desenha essa legenda; ela precisa ser montada no mesmo estilo (Inter Tight 700, branca, sombra).
+- **Legenda corrida:** o 16:9 de YouTube não tem. No 9:16 dinâmico ela continua opcional (Y6) e o vertical aprovado
+  continua como está (Y7), mas agora ela **vem desenhada, pronta para ligar** (treinamento talking-head 2026-11-03: 7 de
+  7 explicativos verticais do lote usam legenda corrida), e a recomendação ao usuário no 9:16 é ligar. O desenho:
+  - Inter Tight 700, 66 px, branca `#FCFCFC`, caixa baixa, entreletra -0,02 em, só a sombra larga e suave do modelo
+    (`0 4px 24px rgba(0,0,0,.45)`, G37); a palavra-chave do trecho em 900 amarelo `#FCDC00` (um acento só, como no resto).
+  - **Um lugar só**, no peito: topo y 1180, caixa x 60 a 940 (centro x 500), até 2 linhas (G15, G35). Quando a chamada,
+    a frase na frente (topo y 1215) ou o título de capítulo (topo y 1150) estão na tela, a legenda some naquele trecho:
+    o texto grande já é a fala (sem repetir palavra).
+  - Um bloco = um trecho (G35), o pedaço inteiro nasce de uma vez com as palavras ainda não ditas apagadas (38%) e cada
+    uma acende quando é dita; tempo de leitura da casa (bloco >= 1,5 s quando a fala deixa, 1 s + 3 palavras/s).
+  - **Pendência de código:** o molde ainda não tem o componente; quem ligar a opção monta com este desenho (o
+    `src/Legenda.tsx` do molde provaferramenta01 é a implementação de referência do "apagada que acende" com G35) e
+    acrescenta ao checador cobertura, 2 linhas e zona segura.
 
 ## 6. Identidade "Gelo, tinta e amarelo"
 
@@ -256,7 +273,7 @@ quem edita.
 | @ na tela de reels | vazio (sem @ e sem foto) | `--props='{"arroba":"<arroba real de quem fala>"}'`; foto em `public/avatar.jpg` |
 | Palavra atrás, frase, título, grade, montagem, reels, contorno, prévias, chamada | ligados no plano do aprovado | Cada lista em `src/plano.ts` desliga com `[]` ou `null` |
 | Conta no gelo (`LISTA`) | desligada (`null`) no aprovado | `LISTA = {de, ate, itens}` (seção 5) |
-| Legenda corrida (9:16) | não existe no molde | Montar à parte, se o usuário quiser (seção 5) |
+| Legenda corrida (9:16) | desligada no aprovado (Y7); desenhada na seção 5, recomendada no 9:16 (treinamento talking-head 2026-11-03) | Montar com o desenho da seção 5 (o componente ainda não está no molde) |
 
 O aprovado saiu com prévias, os nomes delas e o @ real de quem fala (`props-vitrine.json`, que ele precisa para sair
 igual). O `referencia.mp4` guarda só a voz.

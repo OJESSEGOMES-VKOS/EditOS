@@ -1,0 +1,341 @@
+{
+ "o_que": "capítulos por livro da Bíblia (cânone de 66 livros)",
+ "unidade": "capítulos",
+ "fontes": [
+  "Almeida (texto em github.com/thiagobodruk/biblia, json/aa.json): 66 livros, 1.189 capítulos",
+  "King James (github.com/aruljohn/Bible-kjv): 66 livros, 1.189 capítulos, livro a livro igual à Almeida"
+ ],
+ "conferido": "2026-11-03, contagem por código nos dois arquivos (tudo igual, livro a livro)",
+ "itens": [
+  {
+   "nome": "Gênesis",
+   "valor": 50,
+   "grupo": 0
+  },
+  {
+   "nome": "Êxodo",
+   "valor": 40,
+   "grupo": 0
+  },
+  {
+   "nome": "Levítico",
+   "valor": 27,
+   "grupo": 0
+  },
+  {
+   "nome": "Números",
+   "valor": 36,
+   "grupo": 0
+  },
+  {
+   "nome": "Deuteronômio",
+   "valor": 34,
+   "grupo": 0
+  },
+  {
+   "nome": "Josué",
+   "valor": 24,
+   "grupo": 0
+  },
+  {
+   "nome": "Juízes",
+   "valor": 21,
+   "grupo": 0
+  },
+  {
+   "nome": "Rute",
+   "valor": 4,
+   "grupo": 0
+  },
+  {
+   "nome": "1 Samuel",
+   "valor": 31,
+   "grupo": 0
+  },
+  {
+   "nome": "2 Samuel",
+   "valor": 24,
+   "grupo": 0
+  },
+  {
+   "nome": "1 Reis",
+   "valor": 22,
+   "grupo": 0
+  },
+  {
+   "nome": "2 Reis",
+   "valor": 25,
+   "grupo": 0
+  },
+  {
+   "nome": "1 Crônicas",
+   "valor": 29,
+   "grupo": 0
+  },
+  {
+   "nome": "2 Crônicas",
+   "valor": 36,
+   "grupo": 0
+  },
+  {
+   "nome": "Esdras",
+   "valor": 10,
+   "grupo": 0
+  },
+  {
+   "nome": "Neemias",
+   "valor": 13,
+   "grupo": 0
+  },
+  {
+   "nome": "Ester",
+   "valor": 10,
+   "grupo": 0
+  },
+  {
+   "nome": "Jó",
+   "valor": 42,
+   "grupo": 0
+  },
+  {
+   "nome": "Salmos",
+   "valor": 150,
+   "grupo": 0
+  },
+  {
+   "nome": "Provérbios",
+   "valor": 31,
+   "grupo": 0
+  },
+  {
+   "nome": "Eclesiastes",
+   "valor": 12,
+   "grupo": 0
+  },
+  {
+   "nome": "Cânticos",
+   "valor": 8,
+   "grupo": 0
+  },
+  {
+   "nome": "Isaías",
+   "valor": 66,
+   "grupo": 0
+  },
+  {
+   "nome": "Jeremias",
+   "valor": 52,
+   "grupo": 0
+  },
+  {
+   "nome": "Lamentações",
+   "valor": 5,
+   "grupo": 0
+  },
+  {
+   "nome": "Ezequiel",
+   "valor": 48,
+   "grupo": 0
+  },
+  {
+   "nome": "Daniel",
+   "valor": 12,
+   "grupo": 0
+  },
+  {
+   "nome": "Oseias",
+   "valor": 14,
+   "grupo": 0
+  },
+  {
+   "nome": "Joel",
+   "valor": 3,
+   "grupo": 0
+  },
+  {
+   "nome": "Amós",
+   "valor": 9,
+   "grupo": 0
+  },
+  {
+   "nome": "Obadias",
+   "valor": 1,
+   "grupo": 0
+  },
+  {
+   "nome": "Jonas",
+   "valor": 4,
+   "grupo": 0
+  },
+  {
+   "nome": "Miqueias",
+   "valor": 7,
+   "grupo": 0
+  },
+  {
+   "nome": "Naum",
+   "valor": 3,
+   "grupo": 0
+  },
+  {
+   "nome": "Habacuque",
+   "valor": 3,
+   "grupo": 0
+  },
+  {
+   "nome": "Sofonias",
+   "valor": 3,
+   "grupo": 0
+  },
+  {
+   "nome": "Ageu",
+   "valor": 2,
+   "grupo": 0
+  },
+  {
+   "nome": "Zacarias",
+   "valor": 14,
+   "grupo": 0
+  },
+  {
+   "nome": "Malaquias",
+   "valor": 4,
+   "grupo": 0
+  },
+  {
+   "nome": "Mateus",
+   "valor": 28,
+   "grupo": 1
+  },
+  {
+   "nome": "o cliente",
+   "valor": 16,
+   "grupo": 1
+  },
+  {
+   "nome": "Lucas",
+   "valor": 24,
+   "grupo": 1
+  },
+  {
+   "nome": "João",
+   "valor": 21,
+   "grupo": 1
+  },
+  {
+   "nome": "Atos",
+   "valor": 28,
+   "grupo": 1
+  },
+  {
+   "nome": "Romanos",
+   "valor": 16,
+   "grupo": 1
+  },
+  {
+   "nome": "1 Coríntios",
+   "valor": 16,
+   "grupo": 1
+  },
+  {
+   "nome": "2 Coríntios",
+   "valor": 13,
+   "grupo": 1
+  },
+  {
+   "nome": "Gálatas",
+   "valor": 6,
+   "grupo": 1
+  },
+  {
+   "nome": "Efésios",
+   "valor": 6,
+   "grupo": 1
+  },
+  {
+   "nome": "Filipenses",
+   "valor": 4,
+   "grupo": 1
+  },
+  {
+   "nome": "Colossenses",
+   "valor": 4,
+   "grupo": 1
+  },
+  {
+   "nome": "1 Tessalonicenses",
+   "valor": 5,
+   "grupo": 1
+  },
+  {
+   "nome": "2 Tessalonicenses",
+   "valor": 3,
+   "grupo": 1
+  },
+  {
+   "nome": "1 Timóteo",
+   "valor": 6,
+   "grupo": 1
+  },
+  {
+   "nome": "2 Timóteo",
+   "valor": 4,
+   "grupo": 1
+  },
+  {
+   "nome": "Tito",
+   "valor": 3,
+   "grupo": 1
+  },
+  {
+   "nome": "Filemom",
+   "valor": 1,
+   "grupo": 1
+  },
+  {
+   "nome": "Hebreus",
+   "valor": 13,
+   "grupo": 1
+  },
+  {
+   "nome": "Tiago",
+   "valor": 5,
+   "grupo": 1
+  },
+  {
+   "nome": "1 Pedro",
+   "valor": 5,
+   "grupo": 1
+  },
+  {
+   "nome": "2 Pedro",
+   "valor": 3,
+   "grupo": 1
+  },
+  {
+   "nome": "1 João",
+   "valor": 5,
+   "grupo": 1
+  },
+  {
+   "nome": "2 João",
+   "valor": 1,
+   "grupo": 1
+  },
+  {
+   "nome": "3 João",
+   "valor": 1,
+   "grupo": 1
+  },
+  {
+   "nome": "Judas",
+   "valor": 1,
+   "grupo": 1
+  },
+  {
+   "nome": "Apocalipse",
+   "valor": 22,
+   "grupo": 1
+  }
+ ]
+}

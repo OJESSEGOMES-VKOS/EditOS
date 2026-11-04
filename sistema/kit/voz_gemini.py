@@ -51,10 +51,16 @@ def main():
                                           'Ritmo dinâmico, energia alta, sobe a voz no "Mas" de cada problema e fala o nome '
                                           'técnico com orgulho, como quem revela um segredo.')
     ap.add_argument('--temperatura', type=float, default=1.0)
+    ap.add_argument('--modelo', default=MODELO, help='ex.: google/gemini-3-8-flash-tts (a voz escolhida pelo Jessé pro '
+                                                    'mentedetransbordo em 2026-10-31: Puck, estilo no --contexto)')
     a = ap.parse_args()
     texto = Path(a.texto).read_text(encoding='utf-8').strip() if Path(a.texto).exists() else a.texto
     k = chave()
-    corpo = {'model': MODELO, 'input': {
+    corpo = {'model': a.modelo, 'input': {
+        'temperature': a.temperatura,
+        'speakers': [{'speaker_id': 'Speaker 1', 'voice_name': a.voz}],
+        'dialogue_turns': [{'speaker_id': 'Speaker 1', 'text': texto, 'style': a.contexto}],
+    }} if 'flash' in a.modelo else {'model': a.modelo, 'input': {
         'temperature': a.temperatura,
         'scene': 'Estúdio de gravação silencioso, microfone de perto, voz limpa e presente.',
         'sample_context': a.contexto,
@@ -72,7 +78,7 @@ def main():
     with log.open('a', encoding='utf-8') as f:
         if novo:
             f.write('# Vozes geradas (Gemini 2.5 Pro TTS via kie.ai)\n\n| Arquivo | Voz | Estilo | Ritmo | Créditos | Data |\n|---|---|---|---|---|---|\n')
-        f.write(f'| {saida.name} | {a.voz} | {a.estilo} | {a.ritmo} | {creditos} | {date.today()} |\n')
+        f.write(f'| {saida.name} | {a.voz} ({a.modelo}) | {a.estilo} | {a.ritmo} | {creditos} | {date.today()} |\n')
     print(f'{saida.name}: {saida.stat().st_size // 1024} KB, {creditos} créditos, {seg} s')
 
 

@@ -119,6 +119,19 @@ plano já com essa conta: some a duração de cada modo antes de gerar o `tempos
 - **A tela mostra o que está sendo dito.** Número e frase exatamente como foram falados. Imagem de prova grande e
   devagar.
 - **Nunca escreva o nome do modelo na tela** num vídeo novo.
+- **Reforço (origem: treinamento especialista 2026-11-03, `../../../treinamento/especialista-renomado/manual.md` E9,
+  E10 e R7; referência DewlyZSNcme, só o "depois"):**
+  - **Um objeto por frase:** cada tela encena uma frase com UM objeto que faz o que ela diz (a barra que enche no
+    "quitado", a lista que ganha ✓ item a item). Nunca dois objetos de frases diferentes na mesma tela.
+  - **O objeto entra no gesto (opção, seção 7):** quando a pessoa levanta ou abre as mãos até 0,3 s antes da palavra
+    do objeto, o objeto entra no gesto e não só na palavra; no rosto cheio, a etiqueta ao lado do rosto pode morar
+    entre as mãos levantadas (meça as mãos com o `scripts/maos.py` do molde renomado01 ou dynamic01, que grava `src/maos.json`; nunca sobre o rosto).
+  - **Fecho que volta ao gancho (opção, seção 7):** quando a fala fecha repetindo a palavra do gancho, a última tela
+    antes do fecho de comentário volta ao objeto do gancho, no estado final dele.
+  - **Não aplicado (contradiz o modelo):** o objeto "na cor da roupa" e a palavra-chave em dois andares (apoio pequeno
+    em cima, chave grande embaixo). A paleta marfim/menta e a Geist são a cara deste modelo (seção 4), e a legenda tem
+    as suas 2 posições e a palavra dita em menta (seção 5); o próprio manual do treinamento diz que isso não entra aqui.
+    O papel da palavra-chave já é do marca-texto menta do título.
 
 ## 5. A legenda (conta a história)
 
@@ -165,6 +178,8 @@ plano já com essa conta: some a duração de cada modo antes de gerar o `tempos
 | @ e "Seguir" no Reel e no fecho | vazio (escondido) | Prop `arroba: "seu.arroba"` (sem o @), só o real de quem fala |
 | Foto do perfil | vazia (escondida) | Prop `foto: "foto.jpg"` (arquivo em `public/`) |
 | Prévias | desligadas | Prop `previas: true`, `nomesPrevias: ["modeloA","modeloB"]` e `compor.py --previas` |
+| Objeto que entra no gesto (reforço 2026-11-03) | desligado | No plano, o tempo de entrada do painel/etiqueta vai para o gesto medido em `src/maos.json` (até 0,3 s antes da palavra) |
+| Fecho que volta ao gancho (reforço 2026-11-03) | desligado | Só quando a fala repete a palavra do gancho: a última tela antes do fecho repete o objeto do gancho no estado final |
 
 Os padrões vêm do `src/Root.tsx`: `{voz: true, previas: false, nomesPrevias: ['modelodinamico01', 'youtubeedition01'],
 arroba: '', foto: ''}`.

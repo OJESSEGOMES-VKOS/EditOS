@@ -1,0 +1,70 @@
+---
+// EditOS online: o fluxo de produção de todos os perfis numa tela. Lê as pastas e se atualiza sozinho.
+import '../estilos/app.css';
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EditOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <aside class="lado" aria-label="Perfis">
+      <div class="marca">
+        <span class="marca-icone" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 5h9M6 12h7M6 19h9M6 5v14"/></svg>
+        </span>
+        <span class="marca-nome">EditOS <span>online</span></span>
+      </div>
+      <div class="lado-sec"><div id="nav-todos"></div></div>
+      <div class="lado-sec">
+        <div class="lado-rotulo">Perfis</div>
+        <div id="nav-perfis"></div>
+      </div>
+      <div class="lado-pe" id="vivo"><span class="ponto-vivo"></span><span>Conectando…</span></div>
+    </aside>
+
+    <div class="principal">
+      <header class="topo">
+        <select class="seletor-perfil" id="seletor-perfil" aria-label="Perfil"></select>
+        <h1 id="titulo">Todos os perfis</h1>
+        <div class="numeros" id="numeros"></div>
+        <label class="busca">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4"/></svg>
+          <input id="busca" type="search" placeholder="Buscar vídeo   /" aria-label="Buscar vídeo" />
+        </label>
+      </header>
+
+      <main class="quadro" id="quadro" aria-label="Fluxo de produção"></main>
+
+      <aside class="ficha" id="ficha" aria-hidden="true" aria-label="Ficha do vídeo">
+        <div class="ficha-cab">
+          <div class="ficha-linha">
+            <div class="ficha-origem" id="ficha-origem"></div>
+            <button class="btn" id="abrir-pasta" title="Abrir a pasta do vídeo no computador">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              Abrir pasta
+            </button>
+            <button class="btn-icone" id="fechar" aria-label="Fechar (Esc)" title="Fechar (Esc)">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+          <h2 class="ficha-titulo" id="ficha-titulo"></h2>
+          <div class="estados" id="estados" role="group" aria-label="Status"></div>
+        </div>
+        <div class="ficha-corpo" id="ficha-corpo"></div>
+      </aside>
+    </div>
+  </div>
+  <div class="aviso" id="aviso" role="status" aria-live="polite"><span class="ponto"></span><span></span></div>
+
+  <script>
+    import '../scripts/app.ts';
+  </script>
+</body>
+</html>

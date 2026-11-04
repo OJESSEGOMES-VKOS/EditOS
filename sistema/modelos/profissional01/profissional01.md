@@ -128,6 +128,22 @@ alternativa. O tamanho varia pouco.
 - Celular com interface genérica de Reels e só o @ real de quem fala, ou nenhum (11 s a 14 s).
 - Tela simples demais vira tela dividida. Pouco texto por tela, bem enquadrado.
 
+**Espinha de princípios e analogia desenhada** (reforço do treinamento talking-head 2026-11-03, molde do Joseph,
+`../../../treinamento/talking-head-explicativo/manual.md` R7 e R8; vale quando a fala ensina 2 a 5 itens numerados):
+- **Mapa logo depois do gancho:** na primeira frase que anuncia os itens ("são três coisas", "três princípios"), a
+  tela dividida mostra o painel de lista com todos os itens já preenchidos, ligados por um fio de 4 px da cor de
+  destaque que se desenha em 0,3 s (DejD 2,5 s a 4,5 s). É o painel de lista de cima, com o vídeo sempre embaixo (PF14);
+  nunca cartela branca. Os nomes dos itens são os ditos; item que a fala ainda não nomeou não entra no mapa.
+- **Etiqueta "PRINCÍPIO N" a cada troca:** quando a fala passa ao item seguinte, a pílula branca do rótulo (Poppins 800,
+  34 px) entra no canto do vídeo com a palavra que a pessoa usa e o número dito ("PRINCÍPIO 2", "PASSO 2", "DICA 2";
+  G8: se ela não diz o número, a etiqueta não inventa) e fica 1,5 s (DejD 7 s, 23,5 s, 39,5 s). Se a fala diz o nome do
+  item na mesma frase, a pílula leva o nome numa segunda linha em Poppins 600.
+- **Recapitulação (opcional):** se a fala recapitula ("faça os três"), o mapa volta com os vistos acendendo um a um.
+- **Analogia desenhada:** no ponto mais abstrato, uma analogia por vídeo vira a **tela cheia com objeto herói** literal
+  (a mesa na garagem e no showroom, com o preço contando até o valor dito, DejD 25,5 s a 31,5 s), no fundo escuro ou de
+  cor do modelo. Só quando a fala faz a analogia; o modelo não cria analogia que não foi dita.
+- Nada disso muda a câmera calma, a legenda de 72 px no peito nem as cores: só acrescenta a espinha.
+
 **Sempre:** número e frase exatamente como foram ditos; painel entra já preenchido; nada atravessa um corte. Nunca
 escreva o nome do modelo na tela (a fala "um desses modelos" fica só na legenda, 13 s).
 

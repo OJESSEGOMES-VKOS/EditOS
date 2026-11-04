@@ -7,6 +7,10 @@ copiá-las: declara "herda `heranca.md`" na seção de regras e lista **só o qu
 a regra de zoom suave não vale nele), nunca por gosto de quem edita. As regras gerais G1 a G33 do `REGRAS.md` continuam
 acima de tudo isto.
 
+## 0. Material
+- **Material: só o que o dono deu (regra absoluta, 2026-11-03).** O vídeo usa somente o material fornecido pelo dono, em geral na pasta de materiais indicada do vídeo (`<perfil>/materiais/`, `entrada/`). Nada de gerar imagem (kie.ai, Codex ou qualquer IA) nem buscar foto, vídeo ou som online sem pedido explícito dele para aquele vídeo. Faltou material? O plano usa o efeito tipográfico, a pessoa ou reaproveita o que existe, e a falta vai para o `PEDIDO.md`, fora da peça.
+- Vale também na vitrine e no teste do modelo: a prova sai da gravação e dos arquivos do dono, nunca de imagem gerada.
+
 ## 1. Legenda (a legenda conta a história)
 - Todas as falas aparecem, em ordem, cada trecho uma vez só; o destaque não engole a fala seguinte (M3-1, M3-7, PR12).
 - Tempo de leitura sempre: 1 s + 1 s a cada 3 palavras; nenhuma palavra solta por 2 quadros, nada pisca (M3-6, PR5, S2, PF4).
@@ -25,6 +29,7 @@ acima de tudo isto.
 - Tela de destaque não carrega texto comum junto (M3-13).
 - Letreiro atrás mostra parte da frase sem repetir a palavra da legenda (PR8).
 - Fecho: fixo só o comando ("comenta X"); o resto da fala segue na legenda (M3-9).
+- **Um elemento por ideia na tela (G38, PV4):** a mesma informação nunca aparece em dois elementos ao mesmo tempo (título, selo, contador, comando, legenda). A palavra que um texto fixo já mostra sai da legenda enquanto ele está na tela; contador não leva rótulo que repete o título. O checador do molde acusa palavra repetida (número escrito ou falado conta igual) entre elementos simultâneos.
 
 ## 3. Tipografia
 - 1 fonte principal e no máximo 2 alternativas; 1 variação de peso; tamanho varia pouco (PF10, S6).
@@ -50,6 +55,7 @@ acima de tudo isto.
 - Tela dividida: B-roll ou ilustração em cima, o protagonista sempre embaixo e bem enquadrado (PF9, PF14).
 - Telas criadas mantêm o texto da fala e ganham animação ou ilustração minimalista (PR4).
 - Nenhum elemento fora do enquadramento; nada aparece ou some do nada (E1-6, E2-2).
+- **Nada pendurado (G39, PV5):** selo, título ou texto de gancho sai quando a fala dele passa (até ~1 s depois) e não atravessa a cena; só o comando do fecho fica até o fim. O checador do molde acusa elemento que fica na tela além do seu trecho.
 - Movimento fluido e suave, sem padrão mecânico de "sobe e desce" (E2-2, AC3).
 - Tela de produto ou interface **fiel como um print**: proporção, fonte, ícones, cores, estados e aparelho reais, recriados em código a partir de um print real com origem; nunca o celular 3D ou o cartão genérico repetido de modelo em modelo (G34, A3). Procedimento em `interface-fiel.md`.
 

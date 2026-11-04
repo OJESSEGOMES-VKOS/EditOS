@@ -1,0 +1,557 @@
+[
+ {
+  "text": "Isso",
+  "start": 0.25,
+  "end": 0.586
+ },
+ {
+  "text": "não",
+  "start": 0.586,
+  "end": 0.862
+ },
+ {
+  "text": "é",
+  "start": 0.862,
+  "end": 1.08
+ },
+ {
+  "text": "um",
+  "start": 1.08,
+  "end": 1.179
+ },
+ {
+  "text": "gráfico",
+  "start": 1.179,
+  "end": 1.751
+ },
+ {
+  "text": "qualquer,",
+  "start": 1.751,
+  "end": 2.008
+ },
+ {
+  "text": "é",
+  "start": 2.245,
+  "end": 2.66
+ },
+ {
+  "text": "a",
+  "start": 2.66,
+  "end": 2.818
+ },
+ {
+  "text": "Bíblia",
+  "start": 2.818,
+  "end": 3.174
+ },
+ {
+  "text": "inteira,",
+  "start": 3.174,
+  "end": 3.747
+ },
+ {
+  "text": "livro",
+  "start": 3.766,
+  "end": 4.28
+ },
+ {
+  "text": "por",
+  "start": 4.28,
+  "end": 4.715
+ },
+ {
+  "text": "livro.",
+  "start": 4.715,
+  "end": 5.031
+ },
+ {
+  "text": "Cada",
+  "start": 5.228,
+  "end": 5.782
+ },
+ {
+  "text": "barra",
+  "start": 5.782,
+  "end": 6.315
+ },
+ {
+  "text": "é",
+  "start": 6.315,
+  "end": 6.592
+ },
+ {
+  "text": "um",
+  "start": 6.592,
+  "end": 6.71
+ },
+ {
+  "text": "livro,",
+  "start": 6.71,
+  "end": 7.006
+ },
+ {
+  "text": "de",
+  "start": 7.145,
+  "end": 7.579
+ },
+ {
+  "text": "Gênesis",
+  "start": 7.579,
+  "end": 8.37
+ },
+ {
+  "text": "a",
+  "start": 8.37,
+  "end": 8.488
+ },
+ {
+  "text": "Apocalipse,",
+  "start": 8.488,
+  "end": 9.179
+ },
+ {
+  "text": "e",
+  "start": 9.318,
+  "end": 9.733
+ },
+ {
+  "text": "a",
+  "start": 9.733,
+  "end": 9.851
+ },
+ {
+  "text": "altura",
+  "start": 9.851,
+  "end": 10.167
+ },
+ {
+  "text": "é",
+  "start": 10.167,
+  "end": 10.76
+ },
+ {
+  "text": "quantos",
+  "start": 10.76,
+  "end": 11.116
+ },
+ {
+  "text": "capítulos",
+  "start": 11.116,
+  "end": 11.609
+ },
+ {
+  "text": "ele",
+  "start": 11.609,
+  "end": 11.748
+ },
+ {
+  "text": "tem.",
+  "start": 11.748,
+  "end": 11.965
+ },
+ {
+  "text": "Gênesis",
+  "start": 12.6,
+  "end": 13.28
+ },
+ {
+  "text": "tem",
+  "start": 13.28,
+  "end": 13.5
+ },
+ {
+  "text": "50,",
+  "start": 13.5,
+  "end": 13.84
+ },
+ {
+  "text": "Obadias,",
+  "start": 14.27,
+  "end": 14.735
+ },
+ {
+  "text": "um",
+  "start": 15.335,
+  "end": 15.775
+ },
+ {
+  "text": "só.",
+  "start": 15.775,
+  "end": 16.035
+ },
+ {
+  "text": "Somando",
+  "start": 16.44,
+  "end": 16.925
+ },
+ {
+  "text": "todas,",
+  "start": 16.925,
+  "end": 17.11
+ },
+ {
+  "text": "são",
+  "start": 17.22,
+  "end": 17.76
+ },
+ {
+  "text": "66",
+  "start": 17.76,
+  "end": 18.38
+ },
+ {
+  "text": "livros",
+  "start": 18.38,
+  "end": 19.14
+ },
+ {
+  "text": "e",
+  "start": 19.14,
+  "end": 19.6
+ },
+ {
+  "text": "1.189",
+  "start": 19.6,
+  "end": 21.06
+ },
+ {
+  "text": "capítulos.",
+  "start": 21.06,
+  "end": 21.74
+ },
+ {
+  "text": "929",
+  "start": 22.675,
+  "end": 23.355
+ },
+ {
+  "text": "no",
+  "start": 23.355,
+  "end": 23.895
+ },
+ {
+  "text": "Antigo",
+  "start": 23.895,
+  "end": 24.255
+ },
+ {
+  "text": "Testamento,",
+  "start": 24.255,
+  "end": 24.755
+ },
+ {
+  "text": "260",
+  "start": 25.08,
+  "end": 25.519
+ },
+ {
+  "text": "no",
+  "start": 25.519,
+  "end": 26.147
+ },
+ {
+  "text": "Novo.",
+  "start": 26.147,
+  "end": 26.445
+ },
+ {
+  "text": "Parece",
+  "start": 27.175,
+  "end": 27.414
+ },
+ {
+  "text": "muito?",
+  "start": 27.414,
+  "end": 27.67
+ },
+ {
+  "text": "Três",
+  "start": 27.88,
+  "end": 28.44
+ },
+ {
+  "text": "capítulos",
+  "start": 28.44,
+  "end": 28.96
+ },
+ {
+  "text": "por",
+  "start": 28.96,
+  "end": 29.14
+ },
+ {
+  "text": "dia",
+  "start": 29.14,
+  "end": 29.44
+ },
+ {
+  "text": "e",
+  "start": 29.44,
+  "end": 29.88
+ },
+ {
+  "text": "cinco",
+  "start": 29.88,
+  "end": 30.18
+ },
+ {
+  "text": "no",
+  "start": 30.18,
+  "end": 30.4
+ },
+ {
+  "text": "domingo",
+  "start": 30.4,
+  "end": 30.84
+ },
+ {
+  "text": "e",
+  "start": 30.84,
+  "end": 31.0
+ },
+ {
+  "text": "você",
+  "start": 31.0,
+  "end": 31.28
+ },
+ {
+  "text": "lê",
+  "start": 31.28,
+  "end": 31.54
+ },
+ {
+  "text": "tudo",
+  "start": 31.54,
+  "end": 31.8
+ },
+ {
+  "text": "em",
+  "start": 31.8,
+  "end": 32.08
+ },
+ {
+  "text": "um",
+  "start": 32.08,
+  "end": 32.26
+ },
+ {
+  "text": "ano.",
+  "start": 32.26,
+  "end": 32.54
+ },
+ {
+  "text": "E",
+  "start": 32.64,
+  "end": 33.2
+ },
+ {
+  "text": "o",
+  "start": 33.2,
+  "end": 33.34
+ },
+ {
+  "text": "livro",
+  "start": 33.34,
+  "end": 33.54
+ },
+ {
+  "text": "mais",
+  "start": 33.54,
+  "end": 33.72
+ },
+ {
+  "text": "longo",
+  "start": 33.72,
+  "end": 34.1
+ },
+ {
+  "text": "de",
+  "start": 34.1,
+  "end": 34.26
+ },
+ {
+  "text": "todos?",
+  "start": 34.26,
+  "end": 34.5
+ },
+ {
+  "text": "Salmos,",
+  "start": 35.06,
+  "end": 35.62
+ },
+ {
+  "text": "150",
+  "start": 35.74,
+  "end": 36.44
+ },
+ {
+  "text": "capítulos,",
+  "start": 36.44,
+  "end": 37.4
+ },
+ {
+  "text": "mais",
+  "start": 37.48,
+  "end": 38.18
+ },
+ {
+  "text": "que",
+  "start": 38.18,
+  "end": 38.4
+ },
+ {
+  "text": "os",
+  "start": 38.4,
+  "end": 38.48
+ },
+ {
+  "text": "quatro",
+  "start": 38.48,
+  "end": 38.8
+ },
+ {
+  "text": "evangelhos",
+  "start": 38.8,
+  "end": 39.46
+ },
+ {
+  "text": "juntos,",
+  "start": 39.46,
+  "end": 39.68
+ },
+ {
+  "text": "que",
+  "start": 39.94,
+  "end": 40.3
+ },
+ {
+  "text": "somam",
+  "start": 40.3,
+  "end": 40.64
+ },
+ {
+  "text": "89.",
+  "start": 40.64,
+  "end": 40.88
+ },
+ {
+  "text": "A",
+  "start": 42.04,
+  "end": 42.32
+ },
+ {
+  "text": "Bíblia",
+  "start": 42.32,
+  "end": 42.74
+ },
+ {
+  "text": "não",
+  "start": 42.74,
+  "end": 42.86
+ },
+ {
+  "text": "é",
+  "start": 42.86,
+  "end": 43.02
+ },
+ {
+  "text": "grande",
+  "start": 43.02,
+  "end": 43.38
+ },
+ {
+  "text": "demais",
+  "start": 43.38,
+  "end": 43.66
+ },
+ {
+  "text": "para",
+  "start": 43.66,
+  "end": 43.96
+ },
+ {
+  "text": "você.",
+  "start": 43.96,
+  "end": 44.24
+ },
+ {
+  "text": "É",
+  "start": 44.3,
+  "end": 44.78
+ },
+ {
+  "text": "um",
+  "start": 44.78,
+  "end": 44.96
+ },
+ {
+  "text": "ano,",
+  "start": 44.96,
+  "end": 45.22
+ },
+ {
+  "text": "três",
+  "start": 45.4,
+  "end": 45.86
+ },
+ {
+  "text": "capítulos",
+  "start": 45.86,
+  "end": 46.44
+ },
+ {
+  "text": "por",
+  "start": 46.44,
+  "end": 46.6
+ },
+ {
+  "text": "dia.",
+  "start": 46.6,
+  "end": 46.82
+ },
+ {
+  "text": "Salve",
+  "start": 46.86,
+  "end": 47.42
+ },
+ {
+  "text": "esse",
+  "start": 47.42,
+  "end": 47.54
+ },
+ {
+  "text": "vídeo",
+  "start": 47.54,
+  "end": 47.84
+ },
+ {
+  "text": "e",
+  "start": 47.84,
+  "end": 48.18
+ },
+ {
+  "text": "comece",
+  "start": 48.18,
+  "end": 48.56
+ },
+ {
+  "text": "amanhã",
+  "start": 48.56,
+  "end": 48.94
+ },
+ {
+  "text": "em",
+  "start": 48.94,
+  "end": 49.38
+ },
+ {
+  "text": "Gênesis",
+  "start": 49.38,
+  "end": 49.9
+ },
+ {
+  "text": "1.",
+  "start": 49.9,
+  "end": 50.0
+ }
+]

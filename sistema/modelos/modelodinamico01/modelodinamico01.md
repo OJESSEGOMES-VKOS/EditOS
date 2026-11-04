@@ -138,11 +138,36 @@ mistura):
 - **Campo de prompt do Claude** digitando o comando, o arquivo entrando e o botão virando verde `#2FB765` (24 s a 26 s).
 - **Interface do Instagram:** folha de comentários (raio 44 em cima, título "Comentários" Geist 700, 34 px), comentário
   fixado, campo "Adicione um comentário" e a DM chegando em banner no topo (27 s a 29 s). Botão azul `#0095F6`.
+- **Card de prova real com grifo e contador** (reforço do treinamento talking-head 2026-11-03,
+  `../../../treinamento/talking-head-explicativo/manual.md` E7 e E8). Quando a fala afirma algo que tem prova real (print
+  de página, avaliação, painel, post, do próprio criador ou pública), o card do palco (x 57 a 1023, y 453 a 1158) mostra
+  **o print real**, grande o bastante pra ler (letra do print >= 30 px na tela), com origem e data no `ORIGEM.md` do
+  vídeo (G34). Sobre ele:
+  - **grifo** da frase exata no instante em que ela é dita: marca-texto terracota `#D97757` a 30%, que se desenha da
+    esquerda pra direita em 0,35 s; problema em vermelho e a correção colada nele, quando a fala vira o argumento;
+  - **contador** quando a fala diz um número com prova: pílula escura `#161616`, raio 30, número em Geist 800 terracota
+    claro `#F3A585` subindo de 0 até **exatamente o número dito** (G8; nunca o número diferente da referência) em 0,75 s,
+    rótulo com as palavras ditas em Geist 700 branca; sem brilho na letra (G37); fica >= 1 s + 3 palavras/s.
+  - A câmera do card só viaja (subir ou aproximar o print, 0,6 s) depois da prova lida (2,5 a 3 s, `tempo-de-tela`).
+  - É mais um tipo de card, não troca a cara: interface encenada continua sendo o padrão; sem print real, o card não
+    existe e a frase volta pra interface encenada ou pro número dito grande (Y1, G24). O rosto continua no card de baixo.
 - **Só o @ e a foto reais de quem fala** aparecem nas telas de Instagram (props `arroba` e `foto`). Sem eles, o elemento
   some. Nunca nome de exemplo.
 - **Nunca escreva o nome do modelo na tela** num vídeo novo. A fala pode dizer "um desses modelos"; o nome escrito não
   entra.
 - O texto de tela mostra o que está sendo dito. Número e frase exatamente como foram falados.
+- **Reforço (origem: treinamento especialista 2026-11-03, `../../../treinamento/especialista-renomado/manual.md` E9,
+  E10 e R7; referência DewlyZSNcme, só o "depois"):**
+  - **Um objeto por frase:** confirma o "uma frase, um card": o card encena a frase com UM objeto que faz o que ela diz;
+    nunca dois objetos de frases diferentes no mesmo card.
+  - **O objeto entra no gesto (opção, seção 7):** no dividido e no rosto cheio, quando a pessoa levanta ou abre as mãos
+    até 0,3 s antes da palavra, o card ou o objeto entra no gesto (mãos medidas com o `scripts/maos.py` do molde
+    renomado01 ou dynamic01, que grava `src/maos.json`; nunca sobre o rosto).
+  - **Fecho que volta ao gancho (opção, seção 7):** quando a fala fecha repetindo a palavra do gancho, o último card antes
+    do fecho de comentário volta à interface do gancho, no estado final dela.
+  - **Não aplicado (contradiz o modelo):** o objeto "na cor da roupa" (a cor é o creme e o terracota do modelo, seção 1)
+    e a palavra-chave em dois andares, apoio pequeno em cima e chave ~2x embaixo (a chave aqui é Instrument Serif
+    itálica 1,25 a 1,3x, na mesma linha, seção 5).
 
 ## 5. A legenda (conta a história)
 
@@ -195,6 +220,8 @@ mistura):
 | @ nas telas de Instagram | vazio (escondido) | Prop `arroba: "seu.arroba"` (sem o @), só o real de quem fala |
 | Foto do perfil | vazia (escondida) | Prop `foto: "foto.jpg"` (arquivo em `public/`) |
 | Prévias | desligadas | Prop `previas: true`, `nomesPrevias: ["modeloA","modeloB"]` e `som.py --previas` |
+| Objeto que entra no gesto (reforço 2026-11-03) | desligado | No plano, a entrada do card/objeto vai para o gesto medido em `src/maos.json` (até 0,3 s antes da palavra) |
+| Fecho que volta ao gancho (reforço 2026-11-03) | desligado | Só quando a fala repete a palavra do gancho: o último card antes do fecho repete a interface do gancho no estado final |
 
 Os padrões vêm do `src/Root.tsx`: `{voz: true, previas: false, nomesPrevias: ['modelopadrao01', 'youtubeedition01'],
 arroba: '', foto: ''}`.

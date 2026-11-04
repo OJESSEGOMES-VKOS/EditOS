@@ -1,0 +1,12 @@
+{
+  "name": "editos-painel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1 --port 4700",
+    "build": "astro build"
+  },
+  "dependencies": {
+    "astro": "7.2.9"
+  }
+}
