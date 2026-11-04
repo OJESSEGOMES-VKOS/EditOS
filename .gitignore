@@ -30,3 +30,5 @@ sistema/kit/.env
 
 # a referencia propria de cada modelo vai junto
 !sistema/modelos/*/referencia/*.mp4
+# a demo de cada estilo de cena vai junto
+!sistema/cenas/estilos/*/demo.mp4
