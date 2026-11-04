@@ -37,9 +37,9 @@ abrir o Claude Code ou o Codex de novo na mesma pasta e repetir o pedido; você 
 
 ### 3. Baixar o estúdio
 Há duas versões, iguais no motor:
-- **Completo** (padrão): com os 14 modelos de edição prontos.
+- **Completo** (padrão): com os 19 modelos de edição prontos e os 46 estilos de cena.
   `https://github.com/OJESSEGOMES-VKOS/EditOS/releases/latest/download/EditOS-completo.zip`
-- **Cru**: sem nenhum modelo de edição, para quem quer criar os próprios (`/criar-modelo`).
+- **Cru**: sem nenhum modelo de edição (só os 46 estilos de cena), para quem quer criar os próprios (`/criar-modelo`).
   `https://github.com/OJESSEGOMES-VKOS/EditOS/releases/latest/download/EditOS-cru.zip`
 
 Use o cru só se a pessoa pediu "cru" ou "sem modelos"; na dúvida, o completo. Baixe o zip e extraia nesta pasta, de

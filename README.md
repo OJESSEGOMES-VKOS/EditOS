@@ -2,7 +2,7 @@
 
 **Você grava. O assistente edita.**
 
-Você grava um vídeo no celular, escolhe um dos 14 estilos de edição e pede. O assistente (Claude Code ou Codex) entrega o vídeo pronto, com legenda, cortes, telas animadas e som. Você não precisa saber editar.
+Você grava um vídeo no celular, escolhe um dos 19 modelos de edição e pede. O assistente (Claude Code ou Codex) entrega o vídeo pronto, com legenda, cortes, telas animadas e som. Você não precisa saber editar.
 
 Criado por **Jessé Gomes ([@OJESSEGOMES](https://instagram.com/ojessegomes))**.
 
@@ -15,7 +15,7 @@ O EditOS vem em duas versões. O motor é o mesmo; muda só se vem com os modelo
 
 | | 🎬 **Completo** | 🧱 **Cru** |
 |---|---|---|
-| O que vem | o sistema + os 14 modelos prontos | só o sistema, sem nenhum modelo |
+| O que vem | o sistema + os 19 modelos prontos + os 46 estilos de cena | o sistema + os 46 estilos de cena, sem nenhum modelo |
 | Para quem | quer editar já, nos estilos prontos | quer criar os próprios estilos do zero (`/criar-modelo`) |
 
 Abra o **Claude Code** ou o **Codex** numa pasta vazia do seu computador e cole a frase da versão que você quer:
@@ -68,11 +68,17 @@ Você só usa as duas pastas com o seu nome. O resto é com o assistente.
 
 ---
 
-## Os 14 estilos (versão completa)
+## Os 19 modelos (versão completa)
 
-| 🙋 Com você aparecendo | 🎨 Sem ninguém na tela (só voz) |
-|---|---|
-| interface-encenada · rosto-telas · trailer · pregacao · autoridade · pagina-de-livro · minidocumentario · youtube-didatico | texto-e-objeto · vetor-minimo · motion-ouro · anuncio-neon · anuncio-canvas · personagem |
+| 🙋 Com você aparecendo | 🎨 Sem ninguém na tela (só voz) | 📣 Anúncio |
+|---|---|---|
+| rosto-telas · youtube-didatico · autoridade · interface-encenada · trailer · prova-print · especialista · pregacao · pagina-de-livro · minidocumentario · imagem-por-palavra · corte-palestra | texto-e-objeto · motion-ouro · vetor-minimo · personagem · documental-dados | anuncio-canvas · anuncio-neon |
+
+Os modelos `especialista`, `imagem-por-palavra`, `corte-palestra` e `documental-dados` ainda estão em prova: funcionam, mas seguem sendo refinados.
+
+## Os 46 estilos de cena
+
+Além do modelo, que é a cara do vídeo inteiro, cada trecho pode ganhar um estilo de cena (`cena01` a `cena46`): orbe de luz, manchete grifada, rota no mapa 3D, número com gráfico e outros. A lista está em `sistema/cenas/INDICE.md`, e cada um tem uma demo de 5 segundos. Peça, por exemplo: *"na frase 2, usa a cena15"*.
 
 **Quer ver como cada um fica?** Peça: *"me mostra o exemplo do pagina-de-livro"*.
 
