@@ -28,7 +28,7 @@ Então dá uma olhada nos outros e vê qual tem mais a sua cara. ★
 
 ## O que cada trecho aciona
 
-| Trecho | ilustrations01 | sofistmotion01 | storypodcast01 | superpodcast01 | youtubeedition01 |
+| Trecho | vetor-minimo | motion-ouro | pagina-de-livro | minidocumentario | youtube-didatico |
 |---|---|---|---|---|---|
 | "gravei uma vez só" | um personagem sozinho no preto | "UMA VEZ" se montando | "UMA VEZ" grande | tese no palco escuro | punch-in no "uma vez" |
 | "vários modelos / é um deles" | o personagem se multiplica | nome do modelo como tese | nome do modelo no bloco | nome do modelo em serifa vermelha | nome do modelo no terço de baixo |
@@ -36,5 +36,5 @@ Então dá uma olhada nos outros e vê qual tem mais a sua cara. ★
 | "não é só o que você fala, é como chega" | duelo: a mesma frase dita por dois, só um prende (cor) | contraste de família de letra | "FALA" branco, "CHEGA" azul | palavra-chave vermelha gigante | rosto puro (opinião) |
 | "vê qual tem a sua cara" | moral parada, 3 s | assinatura | fim seco na palavra | fecho no palco | CTA |
 
-Os modelos com rosto que já existiam (modelodinamico01 a 03, modelopadrao01, profissional01) usam a mesma gravação,
+Os modelos com rosto que já existiam (interface-encenada a 03, rosto-telas, autoridade) usam a mesma gravação,
 cada um pelas regras do próprio `<modelo>.md`.

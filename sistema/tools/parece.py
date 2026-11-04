@@ -24,7 +24,7 @@ from assinatura import RAIZ, aprovado, enquadramento, luz_cor, medir_video, quad
 SO_AVISA = {'saturacao', 'cortes_min'}
 # modelos em que cada vídeo leva a cor da marca de quem anuncia: a cor não é a do aprovado, então brilho, contraste,
 # saturação e temperatura só avisam (o resto, como ritmo, continua cobrado)
-COR_PROPRIA = {'anunciomotion01', 'anunciocanvas01'}
+COR_PROPRIA = {'anuncio-neon', 'anuncio-canvas'}
 COR = {'brilho', 'contraste', 'saturacao', 'temperatura'}
 FAIXA = {
     'brilho': (14, False, 'a luz do vídeo está diferente da do modelo: confira o tratamento de cor do modelo (está ligado?) e a adaptação da gravação (tools/adaptar.py)'),
@@ -118,6 +118,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description='Confere se o vídeo parece o modelo.')
     ap.add_argument('video'); ap.add_argument('modelo'); ap.add_argument('--folha')
     a = ap.parse_args()
+    from nomes import resolver  # nome antigo continua valendo
+    a.modelo = resolver(a.modelo)
     sig_arq = RAIZ / 'modelos' / a.modelo / 'assinatura.json'
     if not sig_arq.exists():
         sys.exit(f'não achei {sig_arq}: rode tools/assinatura.py {a.modelo}')

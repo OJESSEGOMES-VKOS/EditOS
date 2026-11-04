@@ -137,7 +137,8 @@ def assinar(m: str) -> None:
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         sys.exit(__doc__)
-    alvo = sys.argv[1]
+    from nomes import resolver  # nome antigo continua valendo
+    alvo = resolver(sys.argv[1])
     nomes = sorted(p.parent.name for p in (RAIZ / 'modelos').glob('*/MODELO.md')) if alvo == 'todos' else [alvo]
     for m in nomes:
         if not m.startswith('_'):

@@ -1,0 +1,15 @@
+{
+ "modelo": "motion-ouro",
+ "gerado_de": "vitrine-motion-ouro.mp4",
+ "saida": {
+  "video": "vitrine-motion-ouro.mp4",
+  "segundos": 31.8,
+  "formato": "1080x1920",
+  "brilho": 22.61,
+  "contraste": 106.0,
+  "saturacao": 164.88,
+  "temperatura": 5.69,
+  "tom": 2.43,
+  "cortes_min": 34.0
+ }
+}

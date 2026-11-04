@@ -11,25 +11,25 @@ Quatro perguntas decidem, nesta ordem:
 
 | Modelo | Nome | Quando usar | Pede |
 |---|---|---|---|
-| `modelopadrao01` | Base | O Reel falado do dia a dia, que precisa sair rápido e bem cortado | só a gravação |
-| `modelodinamico01` | Ritmo | Reel de tecnologia, ferramenta ou app, mostrando a coisa funcionando com interface | gravação + o que a interface mostra |
-| `youtubeedition01` | Creator | A linguagem dos canais grandes do YouTube num vídeo curto: texto grande sobre o rosto, a coisa real na tela | gravação + prints/telas reais |
-| `profissional01` | Autoridade | Profissional explicando serviço, método ou passo a passo | gravação |
-| `storypodcast01` | Confissão | Opinião, reflexão, fala íntima de podcast | gravação em estúdio escuro funciona melhor |
-| `modelodinamico03` | Cinema | Corte de podcast ou entrevista que precisa parar quem rola | gravação de podcast |
-| `superpodcast01` | Dossiê | História, bastidor ou caso real contado com peso de documentário | gravação + imagens de apoio |
-| `pregacaodinamica01` | Púlpito | Pregação, palestra, aula gravada em palco | gravação de palco |
+| `rosto-telas` | Base | O Reel falado do dia a dia, que precisa sair rápido e bem cortado | só a gravação |
+| `interface-encenada` | Ritmo | Reel de tecnologia, ferramenta ou app, mostrando a coisa funcionando com interface | gravação + o que a interface mostra |
+| `youtube-didatico` | Creator | A linguagem dos canais grandes do YouTube num vídeo curto: texto grande sobre o rosto, a coisa real na tela | gravação + prints/telas reais |
+| `autoridade` | Autoridade | Profissional explicando serviço, método ou passo a passo | gravação |
+| `pagina-de-livro` | Confissão | Opinião, reflexão, fala íntima de podcast | gravação em estúdio escuro funciona melhor |
+| `trailer` | Cinema | Corte de podcast ou entrevista que precisa parar quem rola | gravação de podcast |
+| `minidocumentario` | Dossiê | História, bastidor ou caso real contado com peso de documentário | gravação + imagens de apoio |
+| `pregacao` | Púlpito | Pregação, palestra, aula gravada em palco | gravação de palco |
 
 ## Sem gravação de pessoa (voz narrada ou só texto)
 
 | Modelo | Nome | Quando usar | Pede |
 |---|---|---|---|
-| `modelodinamico02` | Letreiro | Dica rápida de ferramenta ou novidade, narrada | só a voz |
-| `ilustrations01` | Palito | Explicar uma ideia com metáfora simples | só a voz |
-| `youtubedark01` | Sombra | Canal sem rosto de curiosidade, história ou mistério | voz + ilustrações geradas |
-| `sofistmotion01` | Ouro | Marca premium, lançamento, apresentação elegante | voz |
-| `anunciomotion01` | Comercial | Anúncio de app, SaaS ou serviço digital; telas de produto em ritmo de comercial | voz + o que o produto faz |
-| `anunciocanvas01` | Canvas | Anúncio que conta uma sequência, câmera viajando de tela em tela | voz |
+| `texto-e-objeto` | Letreiro | Dica rápida de ferramenta ou novidade, narrada | só a voz |
+| `vetor-minimo` | Palito | Explicar uma ideia com metáfora simples | só a voz |
+| `personagem` | Sombra | Canal sem rosto de curiosidade, história ou mistério | voz + ilustrações geradas |
+| `motion-ouro` | Ouro | Marca premium, lançamento, apresentação elegante | voz |
+| `anuncio-neon` | Comercial | Anúncio de app, SaaS ou serviço digital; telas de produto em ritmo de comercial | voz + o que o produto faz |
+| `anuncio-canvas` | Canvas | Anúncio que conta uma sequência, câmera viajando de tela em tela | voz |
 
 ## Atalhos de decisão
 - Mostrar uma ferramenta funcionando, com rosto → **Ritmo** (ou **Creator** se o forte é print e tela real).
@@ -43,7 +43,7 @@ Quatro perguntas decidem, nesta ordem:
   9:16.
 
 ## Como entregar a escolha
-"**Ritmo** (`modelodinamico01`): você vai mostrar o app funcionando e falar olhando pra câmera, e ele encena cada
+"**Ritmo** (`interface-encenada`): você vai mostrar o app funcionando e falar olhando pra câmera, e ele encena cada
 frase com interface de verdade. Segundo colocado: **Creator**, se preferir prints em vez de interface animada."
 
 Depois da escolha: leia o `sistema/modelos/<m>/<m>.md` inteiro e estude a referência dele. O vídeo tem que parecer o modelo

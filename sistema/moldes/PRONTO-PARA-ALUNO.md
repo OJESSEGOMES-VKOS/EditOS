@@ -26,7 +26,7 @@ pixel a pixel.
    - Os `defaultProps` do molde e os exemplos de render do `<m>.md` são as props com que o vídeo aprovado foi feito
      (tratamento de cor, efeitos, música, efeito de fundo). Só vem desligado o que o `modelos/<m>/<m>.md` diz que é opção.
      Erro que este item corrige: na rodada de 2026-10-13 tudo nasceu desligado, e o vídeo do aluno saiu sem a cara do
-     modelo (o modelodinamico03 sem o tratamento quente).
+     modelo (o trailer sem o tratamento quente).
    - `scripts/mixar.sh` funciona com e sem trilha; com trilha, ela fica cerca de 16 dB abaixo da voz.
    - Nunca corta o fim do vídeo: a saída tem o tamanho do vídeo, e a voz é completada com silêncio.
 6. **Nenhum dado pessoal fixo.** Nome, @ e marca do Jessé ou de cliente viram prop. O padrão é vazio, e vazio esconde o

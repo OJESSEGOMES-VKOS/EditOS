@@ -1,4 +1,4 @@
-"""Faz os cards do superpodcast01 (a colagem, os celulares e os prints do papel) com o material do próprio usuário.
+"""Faz os cards do minidocumentario (a colagem, os celulares e os prints do papel) com o material do próprio usuário.
 
 uso (da raiz do estúdio, venv do estúdio):
   .venv/Scripts/python.exe tools/cards.py oficina/<AAAA-MM-DD-tema> [fonte@t1,t2 ...] [--fala N]

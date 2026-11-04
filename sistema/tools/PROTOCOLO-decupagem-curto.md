@@ -7,7 +7,7 @@ tire UM quadro em resolução cheia: `ffmpeg -loglevel error -ss S.SS -i ../refe
 
 ## A lição que este protocolo carrega
 
-No youtubeedition01 o dono disse: *"não senti que você usou o modelo que criamos, parece que você criou outro"*. O
+No youtube-didatico o dono disse: *"não senti que você usou o modelo que criamos, parece que você criou outro"*. O
 modelo tinha boas regras de *quando* cada recurso entra, mas descrevia pouco *como ele é na tela*, e a edição saiu
 com a cara do editor. Por isso a decupagem curta tem duas metades com o mesmo peso:
 

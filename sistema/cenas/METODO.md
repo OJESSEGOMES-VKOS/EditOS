@@ -9,7 +9,7 @@ EditOS, em qualquer modelo.
   ou vários cortes da gravação que contam uma coisa só. Quem decide o tamanho é o sentido, não o relógio.
 - **Decupar** é dividir a fala inteira em cenas antes de editar: cena 1, cena 2, cena 3... com o tempo de começo e fim
   de cada uma sobre o `src/palavras.json`.
-- Cada cena tem uma **função** (a gramática do youtubeedition01 §4 é o mapa geral): mostrar o que é dito, provar o que é
+- Cada cena tem uma **função** (a gramática do youtube-didatico §4 é o mapa geral): mostrar o que é dito, provar o que é
   afirmado, explicar o abstrato, listar, dar peso e respiro, chamar para a ação.
 
 ## 2. As três camadas
@@ -19,11 +19,11 @@ EditOS, em qualquer modelo.
 2. **O repertório (as respostas possíveis para uma cena).** Para cada cena, o assistente escolhe uma, e só uma:
    - **rosto puro** (respiro, opinião, emoção: muitas cenas são assim, e está certo);
    - **uma resposta da própria casa** (as telas, cartões e efeitos que o `<modelo>.md` descreve);
-   - **a resposta de outro modelo** (todo modelo é capacidade: a conta no gelo do youtubeedition01, o contador do
-     provaferramenta01, a palavra gigante do storypodcast01, o bonequinho do youtubedark01...), vestida com a identidade
+   - **a resposta de outro modelo** (todo modelo é capacidade: a conta no gelo do youtube-didatico, o contador do
+     prova-print, a palavra gigante do pagina-de-livro, o bonequinho do personagem...), vestida com a identidade
      da casa;
-   - **um estilo de cena** (`animationstyleNN`, os 46 de `INDICE.md`), que é uma cena inteira com linguagem própria.
-3. **As regras que nunca mudam**, em qualquer cena: só material do dono e prova verdadeira; números e nomes como foram
+   - **um estilo de cena** (`cenaNN`, os 46 de `INDICE.md`), que é uma cena inteira com linguagem própria.
+3. **As regras que nunca mudam**, em qualquer cena: o material que o modo do vídeo permite (G24: só materiais, livre ou indicado) e prova verdadeira; números e nomes como foram
    ditos; tempo de leitura; nada repetido na tela ao mesmo tempo (G38); nada pendurado depois da fala (G39); nada
    atravessa corte seco; zona segura; texto nunca sobre o rosto.
 
@@ -40,7 +40,7 @@ Para cada cena, nesta ordem:
    fala nem se acelera texto para caber o estilo.
 
 ## 4. Quem manda quando duas coisas batem
-1. **O pedido do dono** para aquela cena ("cena 3 no animationstyle07", "a parte do dinheiro no 30", "cena 5 sem nada").
+1. **O pedido do dono** para aquela cena ("cena 3 na cena07", "a parte do dinheiro no 30", "cena 5 sem nada").
 2. **As regras que nunca mudam** (§2.3). Um pedido que fere uma delas (ex.: estilo de prova sem o print real) volta como
    pergunta, com o plano B.
 3. **A identidade da casa.** A legenda continua a mesma no vídeo inteiro, inclusive em cima de um estilo de cena, no
@@ -50,34 +50,79 @@ Para cada cena, nesta ordem:
    enquanto está na tela: é isso que faz dele um estilo. Exceção: inserção pequena (estilo dentro de um cartão, com o rosto
    na tela) usa a cor de destaque da casa no lugar do acento do estilo. O dono pode pedir "no visual da casa" para
    recolorir uma cena inteira.
-- **Formato:** os GIFs de referência são 4:5. Recomponha para o formato do vídeo (9:16 ou 16:9) respeitando a zona
+- **Formato:** as demos são 4:5. Recomponha para o formato do vídeo (9:16 ou 16:9) respeitando a zona
   segura e a legenda; nunca estique nem corte o essencial.
 
 ## 5. Onde a decisão fica escrita e como o estilo vira código
-- **O plano de cenas é a primeira parte do `plano.md`** da pasta do vídeo (não há arquivo novo): uma linha por cena.
+- **O plano de cenas é a primeira parte do `plano.md`** da pasta do vídeo, gerado do `cenas.json` pelo
+  `tools/decupar.py <pasta> --plano` (§6): uma linha por cena ou subcena.
   ```
-  | Cena | Tempo | Fala | Função | Resposta | Por quê | Material |
-  | 1 | 0,0–1,4 s | Você está vendo | gancho | rosto, punch-in (casa) | abre no rosto | gravação |
-  | 2 | 1,4–3,6 s | lado a lado o resultado | comparação | animationstyle28 Versus | duas edições lado a lado | as duas edições (PEDIDO.md) |
+  | Cena | Tempo | Fala | Resposta | Por quê |
+  | 1.1 | 0,5–5,3 s | Você está vendo lado a lado o resultado... | cena28 Versus | comparação: duas edições lado a lado (material: as duas edições) |
+  | 1.2 | 5,3–6,7 s | e o GPT-Astra. | rosto, punch-in (casa) | o nome fecha a frase no rosto |
   ```
   Depois do plano de cenas vem o plano frase a frase que o `<modelo>.md` já pede, agora seguindo as cenas.
-- **Componente:** a primeira vez que um estilo é usado, o assistente constrói o componente Remotion dele, confere contra o
-  `referencia.gif` (quadros lado a lado) e guarda em `estilos/<id>/componente/` (o `.tsx` com as props: textos, tempos,
+- **Componente:** a primeira vez que um estilo é usado, o assistente constrói o componente Remotion dele, confere contra a ficha e a demo e guarda em `estilos/<id>/componente/` (o `.tsx` com as props: textos, tempos,
   cores, formato, e um `LEIA.md` de uma tela com as props e o que foi conferido). Nos vídeos seguintes, copia o
   componente para o `src/` do vídeo e só troca as props. Correção do dono num estilo vai para a ficha do estilo
   (seção "Correções do dono", com data) e para o componente.
 - **Prova:** o checador do molde continua valendo para o vídeo todo; a cena com estilo passa pelas mesmas regras de
   legenda, leitura e zona segura. Antes de entregar, olhe os quadros de cada cena com estilo.
 
-## 6. Como o dono pede
-- "Edita no youtubeedition01": a casa é o youtubeedition01; o assistente decupa, escolhe cena a cena e mostra a tabela de
-  cenas junto com o vídeo, para o dono trocar o que quiser.
-- "Cena 3 no animationstyle07" / "o trecho do dinheiro no animationstyle30": manda naquela cena.
+## 6. Os dois modos: semiautomático e automático (G41)
+**A demarcação é a mesma nos dois.** O `tools/decupar.py oficina/<pasta>` (o `novo-video.py` já roda no fim) divide a
+fala em **cenas** (até um ponto, ou uma pausa longa: o ponto imaginário) e **subcenas** (até uma vírgula, ou uma pausa
+média: a vírgula imaginária), numeradas `1`, `2.1`, `2.2`... Trecho longo demais sem marca ganha uma vírgula imaginária
+num lugar que respira (nunca entre artigo e nome nem no meio de um número). É a regra do dono: tela nenhuma fica pela
+metade de uma ideia, então ela só troca onde a fala fecha um pedaço. Tudo fica em `<pasta>/cenas.json`.
+
+**Modo semiautomático** (o dono diz "semi", "semiautomático", "me manda a decupagem" ou "mostra as cenas antes"):
+1. Mostre ao dono a lista do `decupar.py` como está (número, tempo, fala; "(imaginária)" onde a marca foi uma pausa),
+   e pare. Nenhuma tela é escolhida antes da resposta dele.
+2. Ele responde cena a cena, do jeito que quiser: "1 - cena04; 2.1 - prova-print contador; 3 a 5 -
+   rosto; 6 - tela da casa". Aceite número de cena (vale para todas as subcenas dela), subcena, intervalo ("3 a 5") e
+   nome solto ("hook dinâmico", "a tela do print"): traduza para o estilo ou a resposta de modelo mais perto
+   (`INDICE.md`, o repertório do `<modelo>.md`) e diga qual escolheu.
+3. Cena que ele não citou: a casa decide (como no automático) e a lista de volta marca "(escolha minha)", para ele
+   trocar. Se ele disser "o resto sem nada", é rosto puro.
+4. Antes de construir, devolva a lista com as respostas em uma mensagem (`decupar.py <pasta> --lista`) só se alguma
+   tradução de nome solto foi incerta; senão, siga direto.
+5. Pedido que fere as regras que nunca mudam (§2.3: estilo de prova sem o print real, por exemplo) volta como pergunta
+   com o plano B, antes de construir.
+
+**Modo automático** (o dono diz "automático", "decide você" ou só "edita no <modelo>"): o assistente decupa e escolhe
+cada cena pelo §3, constrói, e entrega o vídeo com a lista de cenas e respostas, para o dono trocar qualquer uma pelo
+número ("2.1 na cena12"). Na dúvida entre os dois modos, é o automático.
+
+**Nos dois:** as respostas e o porquê de cada uma são escritos no `cenas.json` (campos `resposta` e `por_que`, mais
+`modo`, `casa` e `legenda_base` no topo). Antes do render, `tools/decupar.py <pasta> --plano` confere (toda cena com
+resposta e porquê, todo nome de modelo e estilo existente, nenhum estilo cheio repetido em seguida sem motivo) e grava a
+tabela como `## Plano de cenas` no topo do `plano.md`. A troca de tela acontece no limite de cena ou subcena, nunca no
+meio dele. Correção depois do vídeo ("2.1 no 12") muda só aquela linha do `cenas.json` e aquela cena do código.
+
+**Outros pedidos que valem nos dois modos:**
+- "Cena 3 na cena07" / "o trecho do dinheiro na cena30": manda naquela cena.
 - "Cena 5 sem nada": rosto puro.
-- "Mostra a decupagem antes": o assistente para depois do plano de cenas e espera.
+- "Junta 4.1 e 4.2" / "separa a 6 em 'Isso me permitindo' e o resto": o assistente ajusta a demarcação no `cenas.json`
+  (no limite de palavra) e segue.
+
+### A legenda base ("legenda padrão consistente em <modelo>")
+Quando o dono pede a legenda de um modelo para o vídeo todo (`legenda_base` no `cenas.json`), ela é **a** legenda do
+vídeo: a fonte, o tamanho, a cor, o lugar, o pedaço de palavras e o tempo de leitura daquele modelo, do começo ao fim,
+mesmo que a casa seja outra (ex.: casa youtube-didatico, legenda minidocumentario). Ela só sai de cena dentro da **zona de
+atuação** de um modelo ou estilo que traz a fala como imagem (a palavra gigante do pagina-de-livro, a letra dinâmica do
+dynamiclyrics01, o texto que é a própria tela de um estilo): ali a fala aparece do jeito daquela zona. Para ficar
+harmônico, e não um Frankenstein:
+- uma legenda por vez: na zona, a base some; nunca as duas ao mesmo tempo (G38);
+- a troca é no limite da cena, junto com a troca de tela, e a base volta igual no pedaço seguinte, no mesmo lugar;
+- a zona usa a cor de destaque e a fonte de título da casa quando o estilo deixa (§4.4), para não chegar uma terceira
+  identidade;
+- zona que não mostra a fala (um gráfico, um print, um estilo sem texto falado) não tira a base: ela continua por cima,
+  trocando só a cor quando o fundo pede (branca no escuro, tinta no claro);
+- sem pedido de legenda base, a legenda é a da casa.
 
 ## 7. 3D: dois nomes, duas coisas
-- **3D Blender:** modelagem e render no Blender (o modelo `3d-explicativo` e o `/estudio-3d`). Para mecanismo físico com
+- **3D Blender:** modelagem e render no Blender (o modelo `3d-como-funciona` e o `/estudio-3d`). Para mecanismo físico com
   rigor e filme de produto em nível de produtora. Caro e lento (render).
 - **3D edição:** profundidade feita no próprio Remotion (perspectiva, CSS 3D, three.js), sem modelagem: os estilos de
   cena marcados "3D edição" no `INDICE.md`. Rápido, cabe dentro de qualquer vídeo.
@@ -85,8 +130,5 @@ Para cada cena, nesta ordem:
   profundidade, objeto girando ou câmera viajando é 3D edição.
 
 ## 8. Origem
-Os 46 estilos vêm da página "Animation styles" do Notion do dono (cópia fiel em
-`../../treinamento/animation-styles/notion-original.md`; cada GIF virou o `referencia.gif` da ficha do estilo, baixados
-em 2026-11-03). Os cartões citam os
-canais que inspiraram cada linguagem: o estilo é a linguagem visual, nunca a arte, o personagem, a marca ou o nome
-desses canais. Os estilos ficam fora do EditOS aberto até o dono decidir.
+Os 46 estilos são linguagens visuais desenhadas em código no EditOS; o estilo é a linguagem, nunca a arte, o
+personagem, a marca ou o nome de alguém.

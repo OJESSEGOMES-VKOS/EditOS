@@ -46,7 +46,7 @@ Coloque o vídeo na pasta **`materiais`**, dentro da sua pasta.
 ### 4. Peça
 Escreva do seu jeito, por exemplo:
 
-> Edite meu vídeo gravacao.mp4 no storypodcast01
+> Edite meu vídeo gravacao.mp4 no pagina-de-livro
 
 O vídeo pronto aparece na pasta **`conteudo`**. Não gostou de algo? Peça com as suas palavras ("deixa a legenda maior", "tira essa parte"). Cada ajuste vira uma nova versão (`v1`, `v2`, `v3`...), todas guardadas juntas.
 
@@ -72,9 +72,9 @@ Você só usa as duas pastas com o seu nome. O resto é com o assistente.
 
 | 🙋 Com você aparecendo | 🎨 Sem ninguém na tela (só voz) |
 |---|---|
-| modelodinamico01 · modelopadrao01 · modelodinamico03 · pregacaodinamica01 · profissional01 · storypodcast01 · superpodcast01 · youtubeedition01 | modelodinamico02 · ilustrations01 · sofistmotion01 · anunciomotion01 · anunciocanvas01 · youtubedark01 |
+| interface-encenada · rosto-telas · trailer · pregacao · autoridade · pagina-de-livro · minidocumentario · youtube-didatico | texto-e-objeto · vetor-minimo · motion-ouro · anuncio-neon · anuncio-canvas · personagem |
 
-**Quer ver como cada um fica?** Peça: *"me mostra o exemplo do storypodcast01"*.
+**Quer ver como cada um fica?** Peça: *"me mostra o exemplo do pagina-de-livro"*.
 
 O seu vídeo sai **no estilo** do modelo, não uma cópia do exemplo. Telas e textos nascem do que você fala.
 

@@ -24,7 +24,7 @@ refazendo o plano sobre a fala nova, seguindo `modelos/<modelo>/<modelo>.md`.
 | `src/rosto.json` | `[[t,cx,cy,h]]` a cada 0,25 s (vazio se não há rosto) | `tools/preparar.py` |
 | `public/previa1.mp4`, `public/previa2.mp4` | opcionais (prop `previas`) | à mão |
 
-Moldes de narração com imagens (anunciocanvas01, modelodinamico02 e afins) descrevem a própria entrada no
+Moldes de narração com imagens (anuncio-canvas, texto-e-objeto e afins) descrevem a própria entrada no
 `modelos/<modelo>/<modelo>.md`.
 
 ## O que cada molde tem

@@ -24,10 +24,12 @@ Você edita vídeos em modelos de edição, com Remotion, dentro desta pasta.
    `novoperfil`.
 2. Antes de editar, leia `<perfil>/perfil.md` e olhe `<perfil>/materiais/`: logo, cores e prints dali são os oficiais.
    Nunca use material de outro perfil.
-   **Só o material que o dono deu (regra absoluta):** o vídeo usa somente o que ele forneceu, em geral na pasta de
-   materiais indicada do vídeo. Gerar imagem (kie.ai, Codex, qualquer IA) ou buscar foto, vídeo ou som online só com
-   pedido explícito dele para aquele vídeo. Faltou? Efeito tipográfico, a pessoa ou reaproveitamento, e a falta vai
-   para o `PEDIDO.md`, fora da peça.
+   **Material, três modos (G24; o dono diz qual vale para o vídeo):** **só materiais** (o padrão, se ele não disse
+   nada): somente o que ele forneceu, em geral na pasta de materiais indicada do vídeo; gerar imagem (kie.ai, Codex,
+   qualquer IA) ou buscar foto, vídeo ou som online é proibido. **Livre** ("faz o que der com tudo"): os materiais mais
+   busca, recorte e geração, API incluída. **Indicado** ("materiais e API só"): os materiais mais exatamente o que ele
+   listou. Faltou? Efeito tipográfico, a pessoa ou reaproveitamento, e a falta vai para o `PEDIDO.md`, fora da peça. O
+   modo vai no `cenas.json` e, nos modos livre e indicado, o recado final lista o que foi gerado ou buscado.
 3. Cada versão final vai sozinha para `<perfil>/conteudo/<tema>-DD-MM-AA/vN.mp4`: o final de cada molde
    (`scripts/mixar.sh`, `scripts/finalizar.sh`, `scripts/final.py`) chama `sistema/tools/entregar.py`, que copia o mp4
    oficial com o próximo número. Um arquivo por versão, nunca cópia leve. O roteiro vai junto, como
@@ -64,13 +66,15 @@ vídeo novo. Quando o código, uma mensagem de erro ou outro arquivo citar `MODE
 `CORRECOES.md` ou `REGRAS.md`, a resposta está no `<modelo>.md`. O código do molde (`sistema/moldes/<modelo>/`) é o
 vídeo aprovado em código; ele não é a regra.
 
+**Nomes dos modelos (2026-11-03):** cada modelo tem o nome do que faz (`rosto-telas`, `youtube-didatico`, `prova-print`...; estilos de cena `cena01` a `cena46`). O nome antigo continua valendo como apelido (`sistema/tools/nomes-antigos.json`; os tools resolvem sozinhos): "edita no youtubeedition01" é o `youtube-didatico`.
+
 **O vídeo é uma composição de cenas, não o modelo copiado (G40, `sistema/cenas/METODO.md`).** O modelo escolhido é a
 casa: a identidade do vídeo inteiro (tratamento de cor, rosto, legenda, tipografia, cores, som, ritmo) vem do aprovado
 dele e fica ligada do começo ao fim. O que a tela faz em cada cena se decide cena a cena: rosto puro, uma resposta da
-casa, a resposta de outro modelo ou um estilo de cena (`animationstyleNN`, os 46 de `sistema/cenas/INDICE.md`). O
-pedido do dono para uma cena ("cena 3 no animationstyle07") manda nela. Só fica desligado de vez o que o `<modelo>.md`
+casa, a resposta de outro modelo ou um estilo de cena (`cenaNN`, os 46 de `sistema/cenas/INDICE.md`). O
+pedido do dono para uma cena ("cena 3 na cena07") manda nela. Só fica desligado de vez o que o `<modelo>.md`
 diz que é opção desligada.
-**3D Blender x 3D edição:** "3D Blender" é o `3d-explicativo` e o `/estudio-3d` (modelagem e render). "3D edição" são
+**3D Blender x 3D edição:** "3D Blender" é o `3d-como-funciona` e o `/estudio-3d` (modelagem e render). "3D edição" são
 os estilos de cena com profundidade feitos no próprio Remotion, sem Blender (marcados no `INDICE.md`).
 
 1. Leia `README.md` e o `sistema/modelos/<modelo>/<modelo>.md` inteiro antes de qualquer edição.
@@ -85,9 +89,14 @@ os estilos de cena com profundidade feitos no próprio Remotion, sem Blender (ma
    transcrever de novo) e vive em `sistema/oficina/`. A gravação deixada em `<perfil>/materiais/` vai junto para a
    pasta do vídeo (`entrada/`). Ele já adapta a gravação ao ponto de partida do modelo (`tools/adaptar.py`: rosto no
    tamanho e na altura, luz de partida); não pule esse passo. Depois siga a seção do vídeo novo do `<modelo>.md`, com
-   um `plano.md` sobre `src/palavras.json` que abre com o **plano de cenas** (a decupagem: cena, tempo, fala, função,
-   resposta e por quê, `sistema/cenas/METODO.md` §5) e segue frase a frase. Mostre a tabela de cenas ao dono junto
-   com o vídeo, para ele trocar qualquer cena pelo nome.
+   um `plano.md` sobre `src/palavras.json` que abre com o **plano de cenas** e segue frase a frase. A demarcação já
+   sai pronta no fim do `novo-video.py` (`tools/decupar.py`: cena até o ponto, subcena até a vírgula, reais ou
+   imaginários; G41). **Dois modos** (`sistema/cenas/METODO.md` §6): no **semiautomático** ("semi", "me manda as
+   cenas") você mostra a lista numerada e espera o dono responder cena a cena ("1 - cena04; 2 - tela da
+   casa"); no **automático** (o padrão, "edita no <modelo>") você escolhe cada cena. "Legenda padrão em <modelo>" é a
+   legenda do vídeo todo, menos na zona que mostra a fala como imagem (§6). As respostas vão para o `cenas.json`, e
+   `tools/decupar.py <pasta> --plano` confere e grava a tabela antes do render. Entregue o vídeo com a lista de cenas,
+   para ele trocar qualquer uma pelo número.
 4. Confira com prova, nesta ordem (comandos de dentro de `sistema/`), e só chame de pronto quando tudo passar:
    - o checador do molde zerado;
    - `tools/parece.py <video.mp4> <modelo>`: luz, cor, enquadramento do rosto e ritmo contra o aprovado (vídeo curto é

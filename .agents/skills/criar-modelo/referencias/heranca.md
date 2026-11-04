@@ -3,13 +3,13 @@
 Cada regra aqui veio de uma correção do dono num modelo específico (o código entre parênteses é o da `CORRECOES.md` de
 origem) e se repetiu em outros. Por isso todo modelo novo nasce com elas ligadas. O `<modelo>.md` novo não precisa
 copiá-las: declara "herda `heranca.md`" na seção de regras e lista **só o que sobrescreve**, com o motivo. Sobrescrever
-é permitido quando a regra bate de frente com a forma de execução do modelo (ex.: o dynamic01 vive de corte seco, então
+é permitido quando a regra bate de frente com a forma de execução do modelo (ex.: o fala-escrita vive de corte seco, então
 a regra de zoom suave não vale nele), nunca por gosto de quem edita. As regras gerais G1 a G33 do `REGRAS.md` continuam
 acima de tudo isto.
 
 ## 0. Material
-- **Material: só o que o dono deu (regra absoluta, 2026-11-03).** O vídeo usa somente o material fornecido pelo dono, em geral na pasta de materiais indicada do vídeo (`<perfil>/materiais/`, `entrada/`). Nada de gerar imagem (kie.ai, Codex ou qualquer IA) nem buscar foto, vídeo ou som online sem pedido explícito dele para aquele vídeo. Faltou material? O plano usa o efeito tipográfico, a pessoa ou reaproveita o que existe, e a falta vai para o `PEDIDO.md`, fora da peça.
-- Vale também na vitrine e no teste do modelo: a prova sai da gravação e dos arquivos do dono, nunca de imagem gerada.
+- **Material: três modos (G24, 2026-11-03); o dono diz qual vale para o vídeo.** **Só materiais** (o padrão se ele não disse nada): somente o que está na pasta de materiais indicada do vídeo (`<perfil>/materiais/`, `entrada/`); nada de gerar imagem (kie.ai, Codex ou qualquer IA) nem buscar foto, vídeo ou som online. **Livre:** os materiais mais tudo o que o sistema alcança (busca, recorte, geração, API). **Indicado:** os materiais mais exatamente o que ele listou ("materiais e API só"). Faltou material? O plano usa o efeito tipográfico, a pessoa ou reaproveita o que existe, e a falta vai para o `PEDIDO.md`, fora da peça. O modo fica em `cenas.json` (`material`, `material_permitido`).
+- Vale também na vitrine e no teste do modelo: sem o dono declarar outro modo, a prova sai da gravação e dos arquivos dele, nunca de imagem gerada.
 
 ## 1. Legenda (a legenda conta a história)
 - Todas as falas aparecem, em ordem, cada trecho uma vez só; o destaque não engole a fala seguinte (M3-1, M3-7, PR12).

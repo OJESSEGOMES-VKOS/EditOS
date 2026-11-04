@@ -100,8 +100,8 @@ transcreva e compare com o roteiro aprovado: palavra trocada, faltando ou pronú
 
 ### Etapa 6: produção
 Siga o passo a passo do `<m>.md`: `sistema/tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>`, decupagem em
-cenas e plano de cenas no topo do `plano.md` (G40, `sistema/cenas/METODO.md`: cada cena decide a própria edição entre
-rosto puro, a casa, outro modelo ou um estilo de cena `animationstyleNN`), depois o plano frase a frase sobre
+cenas e plano de cenas no topo do `plano.md` (demarcação do `tools/decupar.py` e os modos semiautomático e automático, G41; G40, `sistema/cenas/METODO.md`: cada cena decide a própria edição entre
+rosto puro, a casa, outro modelo ou um estilo de cena `cenaNN`), depois o plano frase a frase sobre
 `src/palavras.json`. O roteiro em fala e tela já pode marcar o estilo de cena de um trecho quando ele for a ideia. Render sempre confinado, com
 `sistema/tools/com-trava.sh` e `--concurrency=2`.
 

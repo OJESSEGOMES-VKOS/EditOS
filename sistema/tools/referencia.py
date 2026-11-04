@@ -106,7 +106,8 @@ def fazer(m: str) -> None:
 
 
 if __name__ == '__main__':
-    alvo = sys.argv[1] if len(sys.argv) > 1 else sys.exit(__doc__)
+    from nomes import resolver  # nome antigo continua valendo
+    alvo = resolver(sys.argv[1]) if len(sys.argv) > 1 else sys.exit(__doc__)
     ms = sorted(p.name for p in (RAIZ / 'modelos').iterdir() if p.is_dir() and not p.name.startswith('_')) if alvo == 'todos' else [alvo]
     for m in ms:
         fazer(m)

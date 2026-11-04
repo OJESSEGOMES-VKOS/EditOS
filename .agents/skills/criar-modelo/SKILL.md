@@ -53,7 +53,7 @@ Antes de medir qualquer coisa, assista às referências uma vez e responda por e
 2. **O teste do clone.** Leia a frase de uma linha de cada modelo do catálogo (está na seção 1 do `<m>.md` de cada
    um). Se a frase nova cabe em algum deles, não é modelo novo: é **variação** (entra como opção ou família naquele
    `<m>.md`) ou é **fusão** (as referências se juntam às dele). Dois modelos que saem parecidos custam o dobro e
-   confundem o aluno: foi o que aconteceu com dynamiclyrics01 e dynamiccuts01, que viraram o dynamic01.
+   confundem o aluno: foi o que aconteceu com dynamiclyrics01 e dynamiccuts01, que viraram o fala-escrita.
 3. **Quantas referências e de quantos criadores.** Uma referência só não dá modelo: dá exemplo. O que é comum a
    criadores diferentes vira regra; o que é de um só vira opção ou assinatura.
 4. **O nome**, no padrão da casa: minúsculo, sem espaço nem acento, terminando em `01`.

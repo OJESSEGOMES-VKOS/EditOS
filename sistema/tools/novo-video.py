@@ -39,6 +39,9 @@ ap.add_argument('--trocar', nargs='*', default=[])
 ap.add_argument('--sem-voz', action='store_true')
 ap.add_argument('--sem-adaptar', action='store_true')
 a = ap.parse_args()
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from nomes import resolver  # nome antigo continua valendo
+a.modelo = resolver(a.modelo)
 
 molde = RAIZ / 'moldes' / a.modelo
 if not molde.is_dir():
@@ -94,7 +97,7 @@ for nome, para in [('fala.mp4', 'public/fala.mp4'), ('voz.wav', 'public/voz.wav'
         continue
     if (base / nome).exists():
         shutil.copy2(base / nome, destino / para)
-SEM_TRATAMENTO = {'ojgstyle01'}  # modelos em que a gravação entra crua (ojgstyle01.md OJ1)
+SEM_TRATAMENTO = {'ojg'}  # modelos em que a gravação entra crua (ojg.md OJ1)
 if a.sem_adaptar or a.modelo in SEM_TRATAMENTO:
     print('4/4 adaptação pulada (--sem-adaptar ou modelo sem tratamento de imagem)')
 else:
@@ -105,6 +108,9 @@ if grav.parent.name == 'materiais' and (grav.parent.parent / 'perfil.md').exists
     (destino / 'entrada').mkdir(exist_ok=True)
     shutil.move(str(grav), str(destino / 'entrada' / grav.name))
     print('gravação levada para', destino / 'entrada' / grav.name)
+print('decupagem (cenas e subcenas, G41):')
+subprocess.run([sys.executable, str(AQUI / 'decupar.py'), str(destino)], check=False)
 print('pronto:', destino)
-print('próximo passo: ler modelos/%s/%s.md (o arquivo único do modelo) e seguir a seção "Como fazer um vídeo novo": '
-      'refazer o plano no código do vídeo (src/), conferir e renderizar.' % (a.modelo, a.modelo))
+print('próximo passo: no modo semiautomático, mostrar a lista acima ao dono e esperar a resposta dele cena a cena; no '
+      'automático, escolher cada cena (cenas/METODO.md §6). Depois ler modelos/%s/%s.md e seguir a seção "Como fazer um '
+      'vídeo novo", com tools/decupar.py <pasta> --plano antes do render.' % (a.modelo, a.modelo))

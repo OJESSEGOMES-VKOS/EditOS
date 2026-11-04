@@ -68,7 +68,7 @@ Diga, em poucas linhas:
 - que o estúdio está pronto e em que pasta;
 - que, para editar, ela grava o vídeo (celular em pé, rosto de frente, boa luz, sem música ao fundo), na primeira
   conversa responde três perguntas (nome, @ e materiais) que criam a pasta dela, coloca a gravação em
-  `<Nome>/materiais/` e escreve, por exemplo: *"Edite o meu vídeo `gravacao.mp4` no modelopadrao01"*; o vídeo pronto
+  `<Nome>/materiais/` e escreve, por exemplo: *"Edite o meu vídeo `gravacao.mp4` no rosto-telas"*; o vídeo pronto
   chega em `<Nome>/conteudo/<nome-do-video>-DD-MM-AA/`;
 - que os modelos disponíveis estão em `sistema/modelos/`, cada um com o vídeo de exemplo em `referencia/referencia.mp4`;
 - que ela pode deixar o modelo mais com a cara dela preenchendo a seção "Do seu jeito", no topo do arquivo do modelo.
