@@ -169,7 +169,7 @@ export const Modelos: React.FC = () => {
 	const editar = w('editar') - 0.08;
 	return (
 		<>
-			<Titulo serif="a diferença" sans="entre modelos" de={c.de} />
+			<Titulo serif="a diferença" de={c.de} />
 			<CardPalco de={c.de}>
 				<Troca de={c.de} ate={editar} primeira>
 					<ListaModelos />
@@ -577,7 +577,12 @@ export const Comenta: React.FC = () => {
 	);
 };
 
+/** as cenas pelo id. As de rosto cheio (abre, fala, ver) são o vídeo normal (G6); as outras são as telas de interface, que
+ * entram só onde o plano (base() em src/tema.ts) as chama */
 export const CENA_COMP: Record<string, React.FC> = {
+	abre: RostoCheio,
+	fala: RostoCheio,
+	ver: RostoCheio,
 	gancho: Gancho,
 	criado: Criado,
 	modelos: Modelos,

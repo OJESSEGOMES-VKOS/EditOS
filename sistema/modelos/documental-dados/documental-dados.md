@@ -3,6 +3,8 @@
 Este é o único arquivo que você precisa ler para editar neste modelo. Tudo o que está aqui é regra. Quando algo daqui
 bater com o código do molde, vale o que está aqui.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo. A G29 (começo na gravação original) não se aplica: este modelo não tem gravação de pessoa.
+
 **Ainda sem vídeo aprovado.** A vitrine (prova do modelo) está em
 `oficina/2026-11-03-documental-dados-vitrine/out/final.mp4` e espera o "ok" do dono. Depois da aprovação ela vira
 `referencia/referencia.mp4` (com `folha.jpg` e `mapa.json`) e os tempos entre parênteses, como (6 s), passam a apontar
@@ -12,7 +14,7 @@ para ela. Até lá, os tempos entre parênteses apontam para a vitrine; "ref1 12
 **A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas,
 os textos e os números do vídeo novo nascem da fala nova e do dado novo.
 
-Uso: vídeo dark, só narração, sem rosto, das páginas da Operação Dark: **jovemdapalavra** (bíblica), **umjovemprofessor**
+Uso: vídeo dark, só narração, sem rosto, das páginas da Operação Dark: **jovemdevirtude** (bíblica), **umjovemprofessor**
 (ensino) e **umjovemprospero** (finanças). Serve para qualquer narração que tenha uma prova real para mostrar.
 
 ---
@@ -66,11 +68,11 @@ Nenhum deles é a cor.
 | Crédito | dado: no fim | obra: embaixo de cada uma (autor, obra, ano) + lista no fim |
 
 ### Herança e o que este modelo sobrescreve
-**Herda `.claude/skills/criar-modelo/referencias/heranca.md`** (e as regras G1 a G37 do `REGRAS.md`, acima de tudo).
+**Herda `.claude/skills/criar-modelo/referencias/heranca.md`** (e as regras G1 a G35 do `REGRAS.md` §0, acima de tudo).
 Sobrescreve só isto, cada item pela forma de execução:
 | Regra da herança | Aqui | Por quê |
 |---|---|---|
-| §1 Legenda: tempo de leitura 1 s + 3 palavras/s por bloco; 2 posições | legenda de **uma palavra por vez** (até 3 curtas quando a fala corre), bloco >= 0,4 s (0,5 s com 3), nunca atravessa pontuação (G35); **uma** posição só (y 1270) | a legenda é a batida da voz, palavra a palavra (ref1, o padrão do dono); quem se lê com calma é o título, e ele cumpre 1 s + 3 palavras/s (o checador cobra os dois) |
+| §1 Legenda: tempo de leitura 1 s + 3 palavras/s por bloco; 2 posições | legenda de **uma palavra por vez** (até 3 curtas quando a fala corre), bloco >= 0,4 s (0,5 s com 3), nunca atravessa pontuação (G14); **uma** posição só (y 1270) | a legenda é a batida da voz, palavra a palavra (ref1, o padrão do dono); quem se lê com calma é o título, e ele cumpre 1 s + 3 palavras/s (o checador cobra os dois) |
 | §1 Legenda na altura do peito | y 1270 (66%), logo abaixo do eixo | não há pessoa; 66% é a medida da ref1 e fica dentro da zona segura |
 | §4 Hook leve: abre com a pessoa | abre com a **imagem-mãe** já na tela e o gancho escrito no quadro 0 | não há pessoa: a imagem é o protagonista |
 | §4 Zoom: no máximo ~3 cortes de zoom | zoom de câmera só para ler um detalhe, quantos o roteiro pedir (vitrine: 3 idas) | o zoom aqui é leitura do dado (ref1 3,7 s), nunca ênfase; o texto não entra nele |
@@ -152,7 +154,7 @@ plano), com sombra larga. Sobre ela: **pontos** que acendem no nome dito (círcu
 e **fios** que se desenham de um ponto a outro no tempo da fala (rota, ligação). A câmera viaja de um ponto ao outro
 em vez de cortar; o zoom fica preso no topo da obra (ela cresce para baixo e nunca cobre a frase em y 400–640). Obra de
 600 x 800 a partir de y 660 deixa o crédito dentro da zona segura. Crédito em itálico 22 px embaixo da obra, numa
-faixa da cor do papel; o nome de cada ponto também ganha a faixa (nunca contorno na letra, G37). Troca de capítulo: troca de fundo (pergaminho ↔ marrom)
+faixa da cor do papel; o nome de cada ponto também ganha a faixa (nunca contorno na letra, G16). Troca de capítulo: troca de fundo (pergaminho ↔ marrom)
 com a frase-chave nova.
 
 **Exemplos das referências (não são regra):** o leque de arcos da ref1 (obra de Harrison e Römhild, 2007), os
@@ -166,15 +168,15 @@ medalhões dourados e o vitral da ref2, as fotos de político e o carimbo da ref
   Diz o assunto da tela, nunca um número ainda não falado.
 - **Título:** Playfair 400, 96 px, creme `#F3E8D6`, topo em y 410, até 3 linhas (vitrine: 2), centrado em x 540 com
   largura máx. 800 (botões do Instagram à direita). **Uma palavra em itálico 600 na cor de destaque `#D6B38D`**.
-  É a frase-resumo da tela, com as palavras da fala (G2): nunca outra pergunta que não a da voz (DC2).
+  É a frase-resumo da tela, com as palavras da fala (G19): nunca outra pergunta que não a da voz (DC2).
 - **Número:** Playfair 600, 190 px (um número) ou 130 px (dois lado a lado, centros em x 330 e 730), creme, com sub
   em itálico 50 px (40 px com dois) na cor de destaque. Formato brasileiro (1.189).
-- **Número na tela é o número falado (DC1, G8).** O plano declara o "dito" de cada contador; o checador confere que a
+- **Número na tela é o número falado (DC1, G10).** O plano declara o "dito" de cada contador; o checador confere que a
   fala diz aquilo terminando na palavra onde o contador para e que vale exatamente o número mostrado. "Cinco vezes"
   falado nunca vira "5,4×" na tela; "63 mil" falado nunca vira "63.779".
 - **Contador:** começa 1 a 2,5 s antes e chega no valor no início da última palavra do número (ease de saída).
 - **Legenda:** Poppins 800, 78 px, caixa alta, branca, centro em y 1270 (66%), **uma palavra por vez** (até 3 curtas
-  juntas quando a fala corre), a palavra protagonista na cor de destaque. Sem sombra nem contorno (G37); o reflexo
+  juntas quando a fala corre), a palavra protagonista na cor de destaque. Sem sombra nem contorno (G16); o reflexo
   escuro embaixo do eixo garante a leitura.
 - **Troca de tela:** a tela velha sai nos 0,15 s antes da palavra da nova e a nova entra em 0,2 s nela (a ref1
   dissolve em ~0,3 s); as duas nunca se sobrepõem.
@@ -199,9 +201,9 @@ medalhões dourados e o vitral da ref2, as fotos de político e o carimbo da ref
 | Opção | Padrão | Como mudar |
 |---|---|---|
 | Família | A (gráfico vivo) | `"familia": "B"` + `"documento"` no plano |
-| Paleta | `ouro` (A) | `"paleta": "pergaminho"` ou `"marrom"` (B); cores são gosto do usuário (G33) |
+| Paleta | `ouro` (A) | `"paleta": "pergaminho"` ou `"marrom"` (B); cores são gosto do usuário (G31) |
 | Legenda de uma palavra | ligada na A, desligada na B | `"legenda": false/true` |
-| Cama e efeitos | ligados | mixar sem `public/trilha.wav` e/ou `public/efeitos.wav` |
+| Cama e efeitos | ligados (som: confirmar com o dono se continua padrão, G6) | mixar sem `public/trilha.wav` e/ou `public/efeitos.wav` |
 | Apagão | ligado | `"apagao": null` só se o vídeo não tem clímax (escrever o motivo no `plano.md`) |
 | Zoom para ler | quando há detalhe pequeno | `"camera"` no plano |
 
@@ -213,7 +215,7 @@ medalhões dourados e o vitral da ref2, as fotos de político e o carimbo da ref
   pelo dono no teste de vozes `oficina/2026-10-30-teste-vozes/`):
   | Página | Voz | Estilo (`--contexto`) |
   |---|---|---|
-  | jovemdapalavra | Sulafat | "Português do Brasil. Mulher, voz suave e reverente, narração de documentário serena e firme, ritmo natural sem arrastar." |
+  | jovemdevirtude | Sulafat | "Português do Brasil. Mulher, voz suave e reverente, narração de documentário serena e firme, ritmo natural sem arrastar." |
   | umjovemprospero | Orus (ou Alnilam) | "Português do Brasil. Homem jovem confiante, conselho de finanças direto, sem pressa." |
   | umjovemprofessor | ainda não escolhida (o `branding.md` da página manda escolher entre os testes): pergunte ao dono | |
   | mentedetransbordo | Puck | "Português do Brasil. Voz alegre e curiosa, como quem conta uma descoberta." |
@@ -282,7 +284,7 @@ prova nenhuma, este não é o modelo: use o vetor-minimo (tese de atitude) ou o 
 
 ## 10. O plano da vitrine (para comparar)
 
-Tema da página jovemdapalavra: **a Bíblia em capítulos** (52,6 s, voz Sulafat). Dado conferido em duas fontes,
+Tema da página jovemdevirtude: **a Bíblia em capítulos** (52,6 s, voz Sulafat). Dado conferido em duas fontes,
 contado por código livro a livro: Almeida (`github.com/thiagobodruk/biblia`, `json/aa.json`) e King James
 (`github.com/aruljohn/Bible-kjv`): 66 livros, 1.189 capítulos, 929 no Antigo e 260 no Novo, Gênesis 50, Obadias 1,
 Salmos 150, os quatro evangelhos 28 + 16 + 24 + 21 = 89; "3 por dia e 5 no domingo" = 23 por semana x 52 = 1.196 >=

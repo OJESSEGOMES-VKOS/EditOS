@@ -3,8 +3,8 @@
 ## Reel / Shorts (9:16, 1080×1920)
 - Duração: o assunto decide; teto não é alvo. Vídeo curto que performa costuma ficar entre 20 e 60 s.
 - Zona segura: texto entre x 60 e 940, y 250 e 1500 (fora do topo, do rodapé com legenda do app e da coluna de botões).
-- Legenda sempre ligada, contando a história inteira, na altura do peito, no máximo 2 posições no vídeo todo.
-- Gancho escrito grande desde o quadro 0; CTA dito e escrito, pelo menos 2 s na tela.
+- Legenda sempre ligada, contando a história inteira: a padrão em lugar fixo, até 2 linhas (G12); a de destaque em no máximo 3 posições (G13).
+- Gancho escrito desde o quadro 0 na legenda sobre a gravação (G29; sem gravação de pessoa, na tela do modelo); CTA dito e escrito, pelo menos 2 s na tela.
 
 ## YouTube (16:9, 1920×1080)
 - A primeira janela de decisão é maior (uns 30 s): diga o tema logo e mostre que vai cumprir.

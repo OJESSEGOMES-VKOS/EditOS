@@ -1,7 +1,9 @@
 # O método de cenas: o vídeo é uma composição, não uma cópia do modelo
 
-Regra do dono (2026-11-03): um vídeo não é o modelo copiado de ponta a ponta. É uma composição de cenas, e cada cena
-recebe a edição que a deixa mais interessante e mais didática, decidida ali, para aquela fala. Vale para todo vídeo do
+Regra do dono (G28, G30 do `REGRAS.md`): um vídeo não é o modelo copiado de ponta a ponta. O modelo é inspiração, não
+molde: ensina o porquê e o como de cada tela. O vídeo é uma composição dentro de um tema: cada trecho (até um ponto) e
+cada subtrecho (de vírgula a vírgula, G14) recebe a edição que nasce da fala nova e da relevância dela ao tema,
+decidida ali. Trecho totalmente ligado ao tema (conclusão, afirmação, informação) merece destaque. Vale para todo vídeo do
 EditOS, em qualquer modelo.
 
 ## 1. O que é uma cena
@@ -14,8 +16,10 @@ EditOS, em qualquer modelo.
 
 ## 2. As três camadas
 1. **A casa (o modelo escolhido para o vídeo).** Dá a identidade que vale do começo ao fim: o tratamento da gravação,
-   o enquadramento do rosto, a legenda (fonte, tamanho, cor, lugar), a fonte dos títulos, a cor de destaque, o som e o
-   ritmo geral. É isso que o `tools/parece.py` mede, e é isso que "parecer o modelo" quer dizer.
+   o enquadramento do rosto, a legenda (fonte, tamanho, cor, lugar), a fonte dos títulos e a cor de destaque. A
+   gravação fica na qualidade máxima do original: fundo, cor, efeito sonoro, música e recorte só com ordem explícita
+   (G6). O `tools/parece.py` é opcional e só confere essa identidade (fonte, cor, legenda); não reprova, e o vídeo não
+   precisa "parecer a referência" (G30).
 2. **O repertório (as respostas possíveis para uma cena).** Para cada cena, o assistente escolhe uma, e só uma:
    - **rosto puro** (respiro, opinião, emoção: muitas cenas são assim, e está certo);
    - **uma resposta da própria casa** (as telas, cartões e efeitos que o `<modelo>.md` descreve);
@@ -23,9 +27,9 @@ EditOS, em qualquer modelo.
      prova-print, a palavra gigante do pagina-de-livro, o bonequinho do personagem...), vestida com a identidade
      da casa;
    - **um estilo de cena** (`cenaNN`, os 46 de `INDICE.md`), que é uma cena inteira com linguagem própria.
-3. **As regras que nunca mudam**, em qualquer cena: o material que o modo do vídeo permite (G24: só materiais, livre ou indicado) e prova verdadeira; números e nomes como foram
-   ditos; tempo de leitura; nada repetido na tela ao mesmo tempo (G38); nada pendurado depois da fala (G39); nada
-   atravessa corte seco; zona segura; texto nunca sobre o rosto.
+3. **As regras que nunca mudam**, em qualquer cena: o material que o modo do vídeo permite (G7: só materiais, livre ou indicado) e prova verdadeira; números e nomes como foram
+   ditos (G10); tempo do texto (G9); nada repetido na tela ao mesmo tempo (G26); nada perdura depois da fala (G27);
+   tela cheia sai junto com o trecho (G23); zona segura (G15); texto limpo (G16) e nunca sobre o rosto (G18).
 
 ## 3. Como decidir cada cena
 Para cada cena, nesta ordem:
@@ -69,7 +73,7 @@ Para cada cena, nesta ordem:
 - **Prova:** o checador do molde continua valendo para o vídeo todo; a cena com estilo passa pelas mesmas regras de
   legenda, leitura e zona segura. Antes de entregar, olhe os quadros de cada cena com estilo.
 
-## 6. Os dois modos: semiautomático e automático (G41)
+## 6. Os dois modos: semiautomático e automático (G28, G14)
 **A demarcação é a mesma nos dois.** O `tools/decupar.py oficina/<pasta>` (o `novo-video.py` já roda no fim) divide a
 fala em **cenas** (até um ponto, ou uma pausa longa: o ponto imaginário) e **subcenas** (até uma vírgula, ou uma pausa
 média: a vírgula imaginária), numeradas `1`, `2.1`, `2.2`... Trecho longo demais sem marca ganha uma vírgula imaginária
@@ -113,7 +117,7 @@ mesmo que a casa seja outra (ex.: casa youtube-didatico, legenda minidocumentari
 atuação** de um modelo ou estilo que traz a fala como imagem (a palavra gigante do pagina-de-livro, a letra dinâmica do
 dynamiclyrics01, o texto que é a própria tela de um estilo): ali a fala aparece do jeito daquela zona. Para ficar
 harmônico, e não um Frankenstein:
-- uma legenda por vez: na zona, a base some; nunca as duas ao mesmo tempo (G38);
+- uma legenda por vez: na zona, a base some; nunca as duas ao mesmo tempo (G26);
 - a troca é no limite da cena, junto com a troca de tela, e a base volta igual no pedaço seguinte, no mesmo lugar;
 - a zona usa a cor de destaque e a fonte de título da casa quando o estilo deixa (§4.4), para não chegar uma terceira
   identidade;

@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Audio, staticFile} from 'remotion';
 import {C, DURACAO, E as EZ, P as PAL, SANS, existe, mola, pare, rnd, seq, tw, useT, w, wf} from './tema';
-import {Bolha, Celular, G, Glitch, IconeVidro, ImgOuTela, Linha, MarcaTexto, Notif, Pilula, Risco, Simbolo, Wordmark, brilho, hexA} from './ui';
+import {Bolha, Celular, G, Glitch, IconeVidro, ImgOuTela, Linha, MarcaTexto, Notif, Pilula, Risco, Simbolo, Wordmark, BRILHO_TEXTO, brilho, hexA} from './ui';
 
 /**
  * anuncio-canvas v5 (as regras: modelos/anuncio-canvas/anuncio-canvas.md); o tema é o do anúncio aprovado.
@@ -182,7 +182,7 @@ const Hora2347: React.FC = () => {
 	return (
 		<div style={{display: 'flex', alignItems: 'center', gap: 26, ...frente(t, o - 0.06)}}>
 			<div style={{filter: 'drop-shadow(0 0 26px rgba(120,140,255,0.7))'}}>{G.lua(120, '#C9D0FF')}</div>
-			<div style={{fontFamily: SANS, fontWeight: 300, fontSize: 210, letterSpacing: '-0.04em', color: '#EEF0FF', lineHeight: 1, textShadow: '0 0 30px rgba(110,130,255,0.8)'}}>23:47</div>
+			<div style={{fontFamily: SANS, fontWeight: 300, fontSize: 210, letterSpacing: '-0.04em', color: '#EEF0FF', lineHeight: 1, textShadow: BRILHO_TEXTO ? '0 0 30px rgba(110,130,255,0.8)' : undefined}}>23:47</div>
 		</div>
 	);
 };
@@ -292,7 +292,7 @@ const Neon: React.FC<{de: number; cor: string; ic: (s: number, c: string) => Rea
 		<div style={{...frente(t, de - 0.06), display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: t < de - 0.06 ? 0 : flick}}>
 			<div style={{filter: `drop-shadow(0 0 14px ${cor}) drop-shadow(0 0 36px ${cor})`}}>{ic(180, cor)}</div>
 			{sub && <div style={{fontFamily: SANS, fontWeight: 400, fontSize: 52, color: '#fff', textShadow: brilho(cor, 0.5)}}>{sub}</div>}
-			<div style={{fontFamily: SANS, fontWeight: 700, fontSize: 120, letterSpacing: '-0.04em', color: '#fff', lineHeight: 1, textShadow: `0 0 10px ${cor}, 0 0 30px ${cor}, 0 0 70px ${cor}`, WebkitTextStroke: `3px ${cor}`}}>{txt}</div>
+			<div style={{fontFamily: SANS, fontWeight: 700, fontSize: 120, letterSpacing: '-0.04em', color: '#fff', lineHeight: 1, ...(BRILHO_TEXTO ? {textShadow: `0 0 10px ${cor}, 0 0 30px ${cor}, 0 0 70px ${cor}`, WebkitTextStroke: `3px ${cor}`} : {})}}>{txt}</div>
 		</div>
 	);
 };

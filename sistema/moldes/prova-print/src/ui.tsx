@@ -1,24 +1,30 @@
 import React from 'react';
 import {Freeze, Img, OffthreadVideo, staticFile} from 'remotion';
-import {C, E, G, P, R, SANS, SERIF, SOMBRA, TITULO, mola, rostoX, tw, useT} from './tema';
+import {C, DESFOQUE_LEVE, E, G, P, Props, R, SANS, SERIF, SOMBRA, TITULO, mola, rostoX, tw, useT} from './tema';
 
 /** o vídeo pode acabar antes da fala: daí em diante segura o penúltimo quadro de public/fala.mp4 */
 const ULTIMO = R.quadros - 2;
 
-/** a fala da pessoa (muda: o som entra uma vez só); recorte: a pessoa recortada (public/pessoa.webm, scripts/recorte.py) */
+/** a fala da pessoa (muda: o som entra uma vez só); recorte: só a pessoa recortada (public/pessoa.webm, scripts/recorte.py).
+ * Padrão (G6): a gravação crua, com o fundo real. Com a prop fundo: 'desfoque', o fundo ganha um desfoque leve e a pessoa
+ * recortada fica nítida por cima. */
 export const Fala: React.FC<{s?: number; x?: number; y?: number; recorte?: boolean}> = ({s = 1, x = 0, y = 0, recorte}) => {
 	const {f} = useT();
-	const v = recorte ? (
-		<OffthreadVideo muted transparent src={staticFile('pessoa.webm')} style={{width: 1080, height: 1920}} />
-	) : (
-		<OffthreadVideo muted src={staticFile('fala.mp4')} style={{width: 1080, height: 1920}} />
-	);
+	const {fundo} = React.useContext(Props);
+	const borra = !recorte && fundo === 'desfoque';
+	const pessoa = <OffthreadVideo muted transparent src={staticFile('pessoa.webm')} style={{width: 1080, height: 1920}} />;
+	const gravacao = <OffthreadVideo muted src={staticFile('fala.mp4')} style={{width: 1080, height: 1920, filter: borra ? `blur(${DESFOQUE_LEVE}px)` : undefined, transform: borra ? 'scale(1.04)' : undefined}} />;
+	const camadas = recorte ? [pessoa] : borra ? [gravacao, pessoa] : [gravacao];
 	return (
 		<div style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920, transformOrigin: '0 0', transform: `translate(${x}px, ${y}px) scale(${s})`}}>
-			{f < ULTIMO ? v : <Freeze frame={ULTIMO}>{v}</Freeze>}
+			{camadas.map((v, k) => (
+				<React.Fragment key={k}>{f < ULTIMO ? v : <Freeze frame={ULTIMO}>{v}</Freeze>}</React.Fragment>
+			))}
 		</div>
 	);
 };
+/** a pessoa (G6): o vídeo normal, a gravação inteira como foi adaptada, sem zoom, sem recorte, sem camada. O modo padrão. */
+export const Pessoa: React.FC = () => <Fala />;
 /** onde a gravação fica para os olhos caírem em (cx, oy) da caixa, seguindo o rosto pelo caminho alisado (PV7) e sem
  * nunca deixar borda da gravação aparecer dentro da caixa (larg x alt) */
 export const enquadra = (t: number, s: number, cx: number, oy: number, larg: number, alt: number) => ({
@@ -36,14 +42,15 @@ export const FalaEm: React.FC<{s: number; cx: number; oy: number; larg?: number;
  * mesmo "apagada que acende" da legenda): as palavras do título não vão para a legenda (PV4). */
 export const Titulo: React.FC = () => {
 	const {t} = useT();
-	if (t < TITULO.de || t >= TITULO.ate) return null;
-	const de = TITULO.de;
+	const T0 = TITULO;
+	if (!T0 || t < T0.de || t >= T0.ate) return null;
+	const de = T0.de;
 	const a = tw(t, de, de + 0.2, 0, 1);
 	const caixa = tw(t, de + 0.08, de + 0.36, 0, 1);
 	const letra = tw(t, de + 0.2, de + 0.42, 0, 1);
-	const n1 = TITULO.linha1.split(' ').length;
+	const n1 = T0.linha1.split(' ').length;
 	const palavra = (txt: string, k: number) => {
-		const p = P.palavras[TITULO.ids[k]];
+		const p = P.palavras[T0.ids[k]];
 		return (
 			<span key={k} style={{opacity: tw(t, p.de - 0.03, p.de + 0.1, 0.38, 1)}}>
 				{k === 0 || k === n1 ? '' : ' '}
@@ -54,11 +61,11 @@ export const Titulo: React.FC = () => {
 	return (
 		<>
 			<div style={{position: 'absolute', left: 60, width: 880, top: G.titulo1, textAlign: 'center', fontFamily: SANS, fontWeight: 700, fontSize: 84, lineHeight: '96px', letterSpacing: '-0.03em', color: C.tinta, opacity: a, transform: `translateY(${(1 - a) * 18}px)`}}>
-				{TITULO.linha1.split(' ').map((x, k) => palavra(x, k))}
+				{T0.linha1.split(' ').map((x, k) => palavra(x, k))}
 			</div>
 			<div style={{position: 'absolute', left: 60, width: 880, top: G.titulo2, display: 'flex', justifyContent: 'center'}}>
 				<div style={{position: 'relative', background: C.azul, borderRadius: 10, padding: '4px 30px 14px', clipPath: `inset(0 ${(1 - caixa) * 100}% 0 0 round 10px)`}}>
-					<span style={{fontFamily: SERIF, fontSize: 108, lineHeight: '110px', color: C.branco, opacity: letra}}>{TITULO.linha2.split(' ').map((x, k) => palavra(x, n1 + k))}</span>
+					<span style={{fontFamily: SERIF, fontSize: 108, lineHeight: '110px', color: C.branco, opacity: letra}}>{T0.linha2.split(' ').map((x, k) => palavra(x, n1 + k))}</span>
 				</div>
 			</div>
 		</>
@@ -122,8 +129,8 @@ export const Prova: React.FC<{src: string; larg: number; caixaW: number; vistas:
 	);
 };
 
-/** contador sobre a prova (E8): pílula escura, o número sobe de 0 até EXATAMENTE o número dito (G8) e para. sem brilho na
- * letra (G37). formato: prefixo + número + sufixo, como foi falado ("100%", "3 vezes") */
+/** contador sobre a prova (E8): pílula escura, o número sobe de 0 até EXATAMENTE o número dito (G10) e para. sem brilho na
+ * letra (G16). formato: prefixo + número + sufixo, como foi falado ("100%", "3 vezes") */
 export const Contador: React.FC<{de: number; ate: number; valor: number; sufixo?: string; rotulo?: string; y: number}> = ({de, ate, valor, sufixo = '', rotulo, y}) => {
 	const {t} = useT();
 	if (t < de || t >= ate) return null;
@@ -184,14 +191,14 @@ export const RostoFechado: React.FC<{de: number; fecho?: boolean}> = ({de, fecho
 		<>
 			<FalaEm s={s} cx={540} oy={fecho ? 560 : 670} />
 			{/* faixa escura na base (ref Joseph DejD: desfoque e escurecimento na base): a legenda e o comando ficam legíveis sobre as mãos
-			    e o microfone no peito. É elemento de tela, não tratamento de cor da gravação (G33) */}
+			    e o microfone no peito. É elemento de tela, não tratamento de cor da gravação (G6) */}
 			<div style={{position: 'absolute', left: 0, right: 0, top: 900, bottom: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.6) 100%)'}} />
 		</>
 	);
 };
 
 /** capítulo de lista (E4): "Ferramenta número" + o número dito na caixa azul + o card do item. O nome do item não ganha
- * bloco próprio: vem na legenda, no lugar de sempre, como palavra-chave (um lugar de legenda só, G15). Só entra quando a
+ * bloco próprio: vem na legenda, no lugar de sempre, como palavra-chave (um lugar de legenda só, G12). Só entra quando a
  * fala enumera ("ferramenta número um"...); o texto é o dito. Nunca fica parado mais de 1,5 s sem o card entrar (E4). */
 export const Capitulo: React.FC<{de: number; rotulo: string; numero: string; children?: React.ReactNode}> = ({de, rotulo, numero, children}) => {
 	const {t} = useT();

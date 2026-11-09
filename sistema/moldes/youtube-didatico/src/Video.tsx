@@ -27,7 +27,11 @@ const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 const OUT = Easing.bezier(0.16, 1, 0.3, 1);
 const tw = (t: number, a: number, b: number, v0: number, v1: number, e = OUT) => interpolate(t, [a, b], [v0, v1], {...clamp, easing: e});
 
-export type Props = {previas: boolean; nomesPrevias: [string, string]; arroba?: string};
+/** fundo (G6, 2026-11-05): 'real' (padrão) = a gravação crua com o fundo real dela, sem recorte nem camada; 'desfoque' =
+ * desfoque leve só no fundo, a pessoa nítida por cima (precisa de public/pessoa.webm); 'recorte' = liga a palavra ATRÁS da
+ * pessoa (ATRAS em src/plano.ts), com a pessoa recortada passando na frente. Os dois últimos só com pedido. */
+export type Fundo = 'real' | 'desfoque' | 'recorte';
+export type Props = {previas: boolean; nomesPrevias: [string, string]; arroba?: string; fundo?: Fundo};
 
 /* ---------------------------------------------------------------- mídia que o plano pede (para logo ao carregar, dizendo como conseguir) */
 const ARQUIVOS = new Set(getStaticFiles().map((f) => f.name.replace(/\\/g, '/')));
@@ -36,7 +40,6 @@ const falta = (nome: string, como: string) => {
 	if (!existe(nome)) pare(`falta public/${nome}. ${como}`);
 };
 falta('fala.mp4', 'Rode tools/novo-video.py com a gravação (ele grava public/fala.mp4).');
-if (ATRAS.length) falta('pessoa.webm', 'O texto atrás da pessoa precisa dela recortada: QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py (ou ATRAS = [] em src/plano.ts).');
 if (GRADES.length) for (const n of GRADE) falta(`ex/${n}.mp4`, `A grade usa um vídeo seu pronto em cada modelo: ffmpeg -i <video>.mp4 -an -vf scale=540:960 public/ex/${n}.mp4 (ou tire "${n}" de GRADE, ou GRADES = [] em src/plano.ts).`);
 for (const [, , n] of MONTAGEM?.planos ?? []) falta(`ex/cheio_${n}.mp4`, `A montagem usa 2 s de um vídeo seu pronto: ffmpeg -ss ${MONTAGEM!.recorte} -t 2.0 -i <video>.mp4 -an public/ex/cheio_${n}.mp4 (ou MONTAGEM = null em src/plano.ts).`);
 
@@ -311,7 +314,9 @@ const Lista: React.FC<{t: number; l: {de: number; ate: number; itens: [string, n
 
 /* ---------------------------------------------------------------- o vídeo */
 const dentro = (t: number, j: {de: number; ate: number} | null) => !!j && t >= j.de && t < j.ate;
-export const VitrineYoutubeEdition01: React.FC<Props> = ({previas, nomesPrevias, arroba = ''}) => {
+export const VitrineYoutubeEdition01: React.FC<Props> = ({previas, nomesPrevias, arroba = '', fundo = 'real'}) => {
+	if (fundo !== 'real')
+		falta('pessoa.webm', `fundo: '${fundo}' precisa da pessoa recortada: QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py (ou fundo: 'real', o padrão, G6).`);
 	if (previas && PREVIAS && !(existe('previa1.mp4') && existe('previa2.mp4')))
 		pare('previas: true pede public/previa1.mp4 e public/previa2.mp4. Faça cada uma de um vídeo seu já pronto, da raiz do estúdio: .venv/Scripts/python.exe tools/previa.py <video.mp4> oficina/<pasta> 1 (e depois 2). Ou renderize com previas: false.');
 	if (previas && PREVIAS && !FALA_DO_APROVADO && nomesPrevias.some((n) => NOMES_DO_APROVADO.includes(n.toLowerCase())))
@@ -319,7 +324,8 @@ export const VitrineYoutubeEdition01: React.FC<Props> = ({previas, nomesPrevias,
 	const t = useCurrentFrame() / FPS;
 	const ch = chaves(previas);
 	let atras: React.ReactNode = null;
-	for (const a of ATRAS) if (dentro(t, a)) atras = <Atras t={t} t0={a.de} linhas={a.linhas} size={a.size} top={a.top} />;
+	// G6: a palavra atrás da pessoa é camada sobre recorte, então só existe com fundo: 'recorte'
+	if (fundo === 'recorte') for (const a of ATRAS) if (dentro(t, a)) atras = <Atras t={t} t0={a.de} linhas={a.linhas} size={a.size} top={a.top} />;
 	const telaGelo = GRADES.some((g) => dentro(t, g)) || dentro(t, REEL) || dentro(t, LISTA) || (previas && dentro(t, PREVIAS));
 	return (
 		<AbsoluteFill style={{background: telaGelo ? COR.gelo : '#000'}}>
@@ -328,7 +334,7 @@ export const VitrineYoutubeEdition01: React.FC<Props> = ({previas, nomesPrevias,
 			))}
 			{LISTA && <Lista t={t} l={LISTA} />}
 			{previas && PREVIAS && <PreviasEmCima t={t} p={PREVIAS} nomes={nomesPrevias} />}
-			<Camera chaves={ch} t={t} atras={atras} />
+			<Camera chaves={ch} t={t} atras={atras} desfoque={fundo === 'desfoque'} />
 			{REEL && <Reel t={t} r0={REEL} arroba={arroba} />}
 			{ESTE && <EsteModelo t={t} e={ESTE} />}
 			{FRASES.map((f, k) => (

@@ -1,4 +1,4 @@
-# Contenção: o trabalho pesado do estúdio nunca trava o computador do dono (G36).
+# Contenção: o trabalho pesado do estúdio nunca trava o computador do dono (G4).
 # Enquanto roda, a cada ciclo pega os processos pesados do estúdio (ffmpeg, ffprobe, blender, o navegador e o
 # compositor do Remotion, o Python do estúdio) e:
 #   PROCESSADOR: prioridade "Ociosa" e só os primeiros núcleos, deixando os últimos $Livres sempre livres pro dono.

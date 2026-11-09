@@ -30,7 +30,7 @@ const SANS = poppins.fontFamily;
 export const FONTES = [SERIFA, SANS];
 export const CORPO = {rotulo: 30, titulo: 96, numero: 190, numero2: 130, sub: 50, legenda: 78, credito: 19, frase: 100, ligacao: 46};
 
-/* paletas (opção do usuário, G33). "ouro" é a padrão da família A (preto + âmbar, medido na ref1); "pergaminho" e
+/* paletas (opção do usuário, G31). "ouro" é a padrão da família A (preto + âmbar, medido na ref1); "pergaminho" e
    "marrom" são as da família B (medidas na ref2). */
 export const PALETAS = {
 	ouro: {fundo: '#000000', fundo2: '#000000', texto: '#F3E8D6', acento: '#D6B38D', rotulo: '#D1B79B', legenda: '#FFFFFF', barra: '#C8985D', barraTopo: '#EBCB98', eixo: '#888166', credito: '#8C7C68', frase: '#D6B38D'},
@@ -110,7 +110,7 @@ export const SEM_APAGAO = PL.apagao === null; // desligado de propósito (vídeo
 export const CREDITO = {de: tempo(PL.credito.de, 'credito.de'), txt: PL.credito.txt};
 
 /* legenda (camada 3): uma palavra por vez, presa ao início dela. Palavra que ficaria menos de 0,4 s junta a vizinha do
-   mesmo trecho (a seguinte; se ela fecha o trecho, a anterior), nunca através de pontuação (G35), máx. 3 curtas numa linha só. */
+   mesmo trecho (a seguinte; se ela fecha o trecho, a anterior), nunca através de pontuação (G11, G14), máx. 3 curtas numa linha só. */
 // cada bloco fica >= 0,4 s (toda palavra >= 0,4 s depois de aparecer, REGRAS §3); 3 palavras curtas, >= 0,5 s. A legenda
 // aqui é a batida da voz, uma palavra por vez (ref1); quem se lê com calma é o título (1 s + 3 palavras/s, no checador).
 export const legMin = (n: number) => (n >= 3 ? 0.5 : 0.4);

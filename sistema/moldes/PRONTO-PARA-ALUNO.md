@@ -42,7 +42,7 @@ pixel a pixel.
    - O exemplo de render usa os padrões do modelo, nunca `previas: true` sem as prévias.
 9. **Prova.** Antes e depois da mudança, os mesmos quadros do plano aprovado, renderizados com a mídia do molde, dão o
    mesmo hash. Além disso, o molde carregado com uma fala diferente para com a mensagem clara do item 1.
-10. **Parece o modelo com outra gravação.** Um vídeo feito pelo caminho do aluno (`tools/novo-video.py`, que adapta a
-    gravação) com uma gravação diferente da do vídeo aprovado passa no `tools/parece.py` e, na folha lado a lado, não
-    tem diferença que salte aos olhos no 1º segundo nem nos momentos-chave. Os conferidores de regra (tempo de leitura,
-    zona segura) não provam isso: os três vídeos do teste de 2026-10-13 passaram neles e não pareciam o modelo.
+10. **Funciona com outra gravação.** Um vídeo feito pelo caminho do aluno (`tools/novo-video.py`, que adapta a
+    gravação) com uma gravação diferente da do vídeo aprovado mantém a identidade do modelo (fonte, cor, legenda) e tem a
+    edição de cada trecho decidida pela fala nova e pelo tema (G28, G30). O `tools/parece.py` é opcional, só de
+    identidade, e não reprova: o vídeo não precisa parecer a referência.

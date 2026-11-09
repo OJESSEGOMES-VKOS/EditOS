@@ -42,10 +42,10 @@ const COR = {
 const FS = 66; // pequena: corpo ~3,4% H (minidocumentario.md §4: 3,2–3,8% H)
 const KW_MAX = 220; // corpo máximo da palavra-chave (~11,5% H)
 const KW_ALVO = 0.74; // largura-alvo da palavra-chave (60–83% W)
-/* G37 / SP6 (dono, 2026-10-30): texto sem contorno, sombra justa ou glow colado na letra ("parecendo que foi recortado").
+/* G16 / SP6 (dono, 2026-10-30): texto sem contorno, sombra justa ou glow colado na letra ("parecendo que foi recortado").
  * Sobre a gravação, só uma sombra larga e bem suave, que não desenha a borda; no papel (fundo borrado/chapado), nada. */
 const SOMBRA = '0 4px 36px rgba(0,0,0,0.3)';
-const HALO_V = SOMBRA; // destaque sobre a gravação
+const HALO_V = '0 4px 30px rgba(0,0,0,0.6), 0 0 60px rgba(0,0,0,0.35)'; // G18 (2026-11-05): o vermelho sobre a gravação ganha sombra escura larga (sem contorno colado, G16)
 const HALO_B = SOMBRA; // texto branco sobre a gravação
 const HALO_P = 'none'; // texto no papel: limpo
 
@@ -55,7 +55,12 @@ const tw = (t: number, a: number, b: number, v0: number, v1: number, e = E.out) 
 const fr = (s: number) => Math.round(s * FPS);
 
 /* nome e @ do terço inferior (vazio esconde o terço) */
-export type Props = {previas: boolean; nomesPrevias: [string, string]; nome?: string; arroba?: string};
+/* fundo (G6, dono 2026-11-05): 'real' (o padrão) é o vídeo normal da pessoa, com o fundo e a cor da gravação; 'desfoque'
+ * põe a pessoa sobre o próprio fundo levemente desfocado (public/fala_desfoque.mp4, do scripts/grade.py --desfoque);
+ * 'recorte' põe a pessoa recortada no estúdio frio #131A1E com vinheta (public/fala_grade.mp4, do scripts/grade.py).
+ * Desfoque e recorte são opção desligada: só a pedido do dono. */
+export type Fundo = 'real' | 'desfoque' | 'recorte';
+export type Props = {previas: boolean; nomesPrevias: [string, string]; nome?: string; arroba?: string; fundo?: Fundo};
 
 type Pal = {texto: string; de: number; ate: number};
 const PS: Pal[] = (PB as {text: string; start: number; end: number}[]).map((p) => ({texto: p.text, de: p.start, ate: p.end}));
@@ -81,9 +86,9 @@ const de = (i: number, lista: string) => {
 type Mundo = 'palco' | 'rosto' | 'papel' | 'arquivo' | 'dividida';
 type Quadro = {s: number; ox: number; oy: number}; // escala e onde o centro do rosto cai na tela
 type PapelDef = {tipo: 'colagem'; entra: number; foco: number} | {tipo: 'celulares'; explode: number} | {tipo: 'prints'};
-type Plano = {id: string; de: number; ate: number; mundo: Mundo; q?: Quadro; img?: string; papel?: PapelDef};
+type Plano = {id: string; de: number; ate: number; mundo: Mundo; q?: Quadro; img?: string; papel?: PapelDef; camera?: string}; // camera: outro ângulo GRAVADO do set (M1)
 const PLANOS: Plano[] = [
-	{id: 'P1', de: 0, ate: 3.02, mundo: 'palco'},
+	{id: 'P1', de: 0, ate: 3.02, mundo: 'rosto', q: {s: 1.0, ox: 0.5, oy: 0.33}}, // G29 (2026-11-05): abre na gravação, nunca no palco (o aprovado abria no palco)
 	{id: 'P2', de: 3.02, ate: 5.18, mundo: 'rosto', q: {s: 1.1, ox: 0.55, oy: 0.33}},
 	{id: 'P3', de: 5.18, ate: 8.04, mundo: 'papel', papel: {tipo: 'colagem', entra: 18, foco: 22}}, // fotos a partir de "vários", câmera no "criei"
 	{id: 'P4', de: 8.04, ate: 9.52, mundo: 'arquivo', img: 'broll_edicao.png'},
@@ -134,7 +139,7 @@ const kwTam = (txt: string, alvo = KW_ALVO, max = KW_MAX) => {
 /* ---------------------------------------------------------------- texto */
 type Tema = 'escuro' | 'papel';
 type Linha =
-	| {tipo: 'p'; ids: number[]; y: number; al: 'kwL' | 'kwR' | 'c'; cor?: string; caixa?: number | number[]} // caixa: a palavra (índice) ou as palavras vizinhas ([6, 7], "Claude Code") que vão numa caixa branca só
+	| {tipo: 'p'; ids: number[]; y: number; al: 'kwL' | 'kwR' | 'c'; cor?: string; caixa?: number | number[]; verm?: number[]} // verm: palavras pequenas em vermelho dentro da frase (M3) // caixa: a palavra (índice) ou as palavras vizinhas ([6, 7], "Claude Code") que vão numa caixa branca só
 	| {tipo: 'k'; id: number; id2?: number; y: number; cor: string; alvo?: number; max?: number; texto?: string};
 /** as palavras da caixa branca de uma linha pequena (nenhuma, uma ou várias vizinhas) */
 const caixaDe = (l: Linha): number[] => (l.tipo === 'p' && l.caixa !== undefined ? (Array.isArray(l.caixa) ? l.caixa : [l.caixa]) : []);
@@ -147,7 +152,8 @@ type Bloco = {de: number; ate: number; tema: Tema; linhas: Linha[]; clipTop?: nu
  * do ataque na fala emendada, e a palavra só fica legível no meio do fade; assim ela está legível no ataque (dono,
  * 2026-10-29: "senti toda legenda entrando alguns milésimos depois da fala"). Nunca antes do bloco (bloco.de). */
 const ANTECIPA = 0.22;
-const aparece = (id: number, bloco: Bloco) => Math.max(PS[id].de - ANTECIPA, bloco.de);
+// G29 (2026-11-05): o bloco que abre o vídeo (de: 0) é o gancho, inteiro na legenda desde o quadro 0, sobre a gravação
+const aparece = (id: number, bloco: Bloco) => (bloco.de === 0 ? -0.5 : Math.max(PS[id].de - ANTECIPA, bloco.de));
 
 const PalavraP: React.FC<{txt: string; t: number; t0: number; cor: string; halo: string; caixa?: boolean; pad?: string; fs: number}> = ({txt, t, t0, cor, halo, caixa, pad, fs}) => {
 	const e = tw(t, t0, t0 + 0.15, 0, 1, E.io); // fade com desfoque de ~5 quadros (ref1)
@@ -163,6 +169,7 @@ const PalavraP: React.FC<{txt: string; t: number; t0: number; cor: string; halo:
 
 /* palavra-chave: letra por letra, da esquerda para a direita, cada uma do borrão vermelho para nítida em 3 quadros */
 const PalavraK: React.FC<{txt: string; t: number; t0: number; t1?: number; cor: string; px: number}> = ({txt, t, t0, t1, cor, px}) => {
+	txt = txt.replace(/[.,;:!?…"“”'‘’]+/g, '').trim(); // G18 (2026-11-05): pontuação e aspas fora da palavra destacada
 	const letras = Array.from(txt);
 	const dur = Math.min(0.47, Math.max(0.33, letras.length * 0.035));
 	const passo = letras.length > 1 ? (dur - 0.1) / (letras.length - 1) : 0;
@@ -224,7 +231,14 @@ const BlocoView: React.FC<{b: Bloco; t: number}> = ({b, t}) => {
 								<React.Fragment key={id}>
 									{k > 0 && !antes && ' '}
 									{t >= t0 ? (
-										<PalavraP txt={txt} t={t} t0={t0} cor={l.cor ?? corP} halo={haloP} caixa={naCaixa} pad={pad} fs={fs} />
+										l.verm?.includes(id) ? (
+											<>{/* G18: a pontuação fica fora do vermelho */}
+												<PalavraP txt={txt.replace(/[.,;:!?…]+$/, '')} t={t} t0={t0} cor={COR.sinal} halo={HALO_V} fs={fs} />
+												<PalavraP txt={(txt.match(/[.,;:!?…]+$/) ?? [''])[0]} t={t} t0={t0} cor={l.cor ?? corP} halo={haloP} fs={fs} />
+											</>
+										) : (
+											<PalavraP txt={txt} t={t} t0={t0} cor={l.cor ?? corP} halo={haloP} caixa={naCaixa} pad={pad} fs={fs} />
+										)
 									) : (
 										<span style={{display: 'inline-block', opacity: 0, padding: pad}}>{txt}</span>
 									)}
@@ -243,11 +257,10 @@ const blocos = (prev: boolean): Bloco[] => {
 	const dv = DIV(prev);
 	const yb = (v: number) => dv + v; // y dentro da metade de baixo da tela dividida
 	return [
-		// P1 palco: tese na parede escura acima da mesa (35–52% H)
+		// P1 rosto (G29): o gancho na legenda padrão do peito, sem palavra-chave (G17: o termo forte vem depois)
 		{de: 0, ate: 3.02, tema: 'escuro', linhas: [
-			{tipo: 'p', ids: rg(0, 4), y: 742, al: 'kwL'},
-			{tipo: 'k', id: 5, y: 868, cor: COR.sinal},
-			{tipo: 'p', ids: [6, 7], y: 1000, al: 'kwR', caixa: 7},
+			{tipo: 'p', ids: rg(0, 4), y: 1215, al: 'c'},
+			{tipo: 'p', ids: [5, 6, 7], y: 1298, al: 'c'},
 		]},
 		// P2 rosto: só pequenas no peito, abaixo do queixo
 		{de: 3.02, ate: 5.18, tema: 'escuro', aceito: 'vitrine', linhas: [
@@ -366,14 +379,19 @@ const tem = (arq: string) => {
 	const lista = getStaticFiles();
 	return !lista.length || lista.some((f) => f.name === arq);
 };
-const gravacao = () => (tem('fala_grade.mp4') ? 'fala_grade.mp4' : 'fala.mp4');
+const gravacao = (fundo: Fundo) => {
+	const arq = fundo === 'recorte' ? 'fala_grade.mp4' : fundo === 'desfoque' ? 'fala_desfoque.mp4' : 'fala.mp4';
+	if (arq !== 'fala.mp4' && !tem(arq))
+		throw new Error(`fundo '${fundo}' pede public/${arq}: rode scripts/grade.py${fundo === 'desfoque' ? ' --desfoque' : ''} pela trava (modelos/minidocumentario/minidocumentario.md, seção 8), ou renderize com o fundo real (o padrão).`);
+	return arq;
+};
 
 /* ---------------------------------------------------------------- mundos */
 const Vinheta: React.FC<{forte?: number}> = ({forte = 0.75}) => (
 	<AbsoluteFill style={{background: `radial-gradient(ellipse 75% 62% at 50% 46%, rgba(0,0,0,0) 45%, rgba(0,0,0,${forte}) 100%)`}} />
 );
 
-/* a gravação (fundo já trocado pelo estudio em scripts/grade.py), um só elemento de vídeo para a linha do tempo toda */
+/* a gravação (fundo real por padrão; trocado pelo estúdio só com fundo 'recorte'), um só elemento de vídeo para a linha do tempo toda */
 const transformRosto = (q: Quadro, r: {cx: number; cy: number}) => {
 	const s = q.s;
 	let left = q.ox * W - r.cx * W * s;
@@ -382,7 +400,7 @@ const transformRosto = (q: Quadro, r: {cx: number; cy: number}) => {
 	top = Math.min(0, Math.max(H - H * s, top));
 	return {left, top, s};
 };
-const Gravacao: React.FC<{t: number; prev: boolean}> = ({t, prev}) => {
+const Gravacao: React.FC<{t: number; prev: boolean; fundo: Fundo}> = ({t, prev, fundo}) => {
 	const p = planoEm(t);
 	if (p.mundo !== 'rosto' && p.mundo !== 'dividida') return null;
 	const r = rostoMed(p.de, p.ate);
@@ -399,8 +417,8 @@ const Gravacao: React.FC<{t: number; prev: boolean}> = ({t, prev}) => {
 	}
 	return (
 		<AbsoluteFill style={{clipPath: clip}}>
-			<OffthreadVideo muted src={staticFile(gravacao())} style={style} />
-			<Vinheta forte={0.7} />
+			<OffthreadVideo muted src={staticFile(gravacao(fundo))} style={style} />
+			{fundo === 'recorte' && <Vinheta forte={0.7} />}
 		</AbsoluteFill>
 	);
 };
@@ -448,15 +466,17 @@ const PalcoDesenhado: React.FC<{style: React.CSSProperties}> = ({style}) => (
 	</div>
 );
 
-const Arquivo: React.FC<{t: number; p: Plano}> = ({t, p}) => {
+const Arquivo: React.FC<{t: number; p: Plano; fundo: Fundo}> = ({t, p, fundo}) => {
 	const z = interpolate(t, [p.de, p.ate], [1.04, 1.13]);
 	const k = (t - p.de) * FPS;
 	const chicote = k < 2 ? 1 - k / 2 : 0; // 1º quadro borrado na horizontal (ref1 6,6)
 	const temImg = p.img !== undefined && tem(p.img);
+	// G6: sem B-roll e sem o fundo recortado, o arquivo é o vídeo normal (nada de tom frio, borda desfocada ou vinheta)
+	if (!temImg && fundo !== 'recorte') return <OffthreadVideo muted src={staticFile(gravacao(fundo))} style={{position: 'absolute', left: 0, top: 0, width: W, height: H, objectFit: 'cover'}} />;
 	const im = (dx: number, op: number, filtro: string, key: string) => {
 		const style: React.CSSProperties = {position: 'absolute', left: dx, top: 0, width: W, height: H, objectFit: 'cover', transform: `scale(${z})`, opacity: op, filter: filtro};
 		// sem a imagem de B-roll, o arquivo é a própria gravação, fria e com as bordas desfocadas
-		return temImg ? <Img key={key} src={staticFile(p.img as string)} style={style} /> : <OffthreadVideo key={key} muted src={staticFile(gravacao())} style={style} />;
+		return temImg ? <Img key={key} src={staticFile(p.img as string)} style={style} /> : <OffthreadVideo key={key} muted src={staticFile(gravacao(fundo))} style={style} />;
 	};
 	const frio = 'saturate(0.62) contrast(1.1) brightness(0.88) hue-rotate(-6deg)';
 	return (
@@ -696,7 +716,7 @@ const Vazamento: React.FC<{t: number}> = ({t}) => {
 };
 
 /* ---------------------------------------------------------------- composição */
-export const VitrineSuperPodcast01: React.FC<Props> = ({previas, nomesPrevias, nome = '', arroba = ''}) => {
+export const VitrineSuperPodcast01: React.FC<Props> = ({previas, nomesPrevias, nome = '', arroba = '', fundo = 'real'}) => {
 	const f = useCurrentFrame();
 	const t = f / FPS;
 	const [ok, setOk] = useState(false);
@@ -711,10 +731,10 @@ export const VitrineSuperPodcast01: React.FC<Props> = ({previas, nomesPrevias, n
 	const BL = blocos(previas);
 	return (
 		<AbsoluteFill style={{background: COR.breu}}>
-			<Gravacao t={t} prev={previas} />
+			<Gravacao t={t} prev={previas} fundo={fundo} />
 			{p.mundo === 'palco' && <Palco t={t} de={p.de} ate={p.ate} />}
 			{p.mundo === 'dividida' && <Dividida t={t} p={p} prev={previas} />}
-			{p.mundo === 'arquivo' && <Arquivo t={t} p={p} />}
+			{p.mundo === 'arquivo' && <Arquivo t={t} p={p} fundo={fundo} />}
 			{p.mundo === 'papel' && !p.papel && <Papel />}
 			{p.papel?.tipo === 'colagem' && <ColagemModelos t={t} entra={p.papel.entra} foco={p.papel.foco} />}
 			{p.papel?.tipo === 'celulares' && <RedeSocial t={t} p={p} explode={p.papel.explode} />}

@@ -2,7 +2,7 @@
 
 Mede o fundo de public/fala.mp4 (faixa de cima e as laterais, onde a pessoa não está) e a região da legenda, e sugere a
 COR do destaque colorido: a matiz oposta à do fundo, na luz e na saturação do azul medido na ref1 (#4562AF contra LED
-vermelho). Confere o contraste do branco e da cor sugerida com a região da legenda. A cor é opção do usuário (G33): isto
+vermelho). Confere o contraste do branco e da cor sugerida com a região da legenda. A cor é opção do usuário (G31): isto
 só sugere; quem decide escreve em COR no src/Corte.tsx.
 uso (na pasta do vídeo): ../../.venv/Scripts/python.exe scripts/cor.py
 """
@@ -64,6 +64,6 @@ while contraste(float(lum(np.array(cor))), lL) < 4.5 and 0.2 < l < 0.85:
 print(f'sugestão de COR: {hexd(cor)} (matiz {oposta:.0f}°, oposta ao fundo); contraste {contraste(float(lum(np.array(cor))), lL):.1f}:1')
 if contraste(1.0, lL) < 3:
     print('ATENÇÃO: o branco lê mal aqui (fundo claro atrás da legenda). Avise o usuário: a gravação pede outra posição'
-          ' (Y_CENTRO sobre a roupa escura) ou a cor do texto como opção dele (G33).')
+          ' (Y_CENTRO sobre a roupa escura) ou a cor do texto como opção dele (G31).')
 if 180 <= mh <= 260 and ms >= 0.12:
     print('fundo frio (azul): a ref2 deixa o destaque branco nesse caso; as duas saídas valem, a escolha é do usuário.')

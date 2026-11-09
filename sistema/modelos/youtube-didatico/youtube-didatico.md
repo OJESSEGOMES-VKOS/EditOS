@@ -7,7 +7,13 @@ bater com o código do molde, vale o que está aqui.
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo) e o `mapa.json`
 (rosto, luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4` e o `original-16x9.mp4`, a versão deitada, para ler letra pequena e detalhe de tela.
 
-**A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas, os textos e os cortes do vídeo novo nascem da fala nova. Não repita as cenas do aprovado só porque estão lá.
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
+
+**O modelo é inspiração, não molde (G30).** O aprovado mostra o porquê e o como de cada tela. Num vídeo novo, cada tela
+só entra onde a fala nova tiver o mesmo porquê; a ordem e os tempos do aprovado nunca se copiam. Padrão sem pedido: a
+gravação com o fundo real (prop `fundo: 'real'`); recorte, palavra atrás da pessoa e desfoque de fundo só com ordem
+explícita (G6). A maior parte do vídeo é a pessoa falando (cheio ou punch-in). O vídeo abre na gravação original,
+dinâmico, com ênfase no gancho (G29).
 
 O modelo nasceu para o vídeo longo de YouTube em 16:9. O aprovado é a adaptação vertical, que está validada como está.
 As regras valem para os dois formatos; onde muda, está escrito.
@@ -37,13 +43,19 @@ frase tem o seu tipo de resposta.
 - **A câmera vira uma janela:** dá punch-in, abre, encolhe girando até um cartão no canto e volta (0 s, 1 s, 5 s, 10 s).
 - **Explicação em tela de gelo** `#F8F8F8` com a coisa real em cima: grades de vídeos de verdade tocando, com o rosto
   no cartão do canto (6 s, 22 s). Sem vídeos do criador, a mesma tela vira a conta no gelo (seção 5).
-- **Tipografia grande sobre a pessoa**, em Inter Tight preta: a palavra atrás da cabeça, em tinta, com a pessoa
-  recortada passando na frente ("100%", 1 s a 3 s), e a frase na frente, sobre a camiseta (2 s a 3 s).
+- **Tipografia grande sobre a pessoa:** a frase na frente, sobre a camiseta (2 s a 3 s). A palavra atrás da cabeça, em
+  tinta, com a pessoa recortada passando na frente ("100%", 1 s a 3 s), é do aprovado e virou **opção desligada** (G6,
+  `fundo: 'recorte'`, só com ordem explícita).
 - **Um acento só, amarelo** `#FCDC00` ("CLAUDE", 3 s; "EDIÇÃO", 27 s).
 - **Sem legenda corrida.** Só palavra-chave, título e frase de efeito.
 - **O rosto quase nunca some:** quando a tela entra, ele vai para o cartão no canto (com rosto 97% do tempo).
+- **A maior parte é o vídeo normal (G6):** cheio ou punch-in, com o fundo real da gravação. A tela de gelo é a exceção que
+  a fala pede, não a base.
 
 ## 2. Os números do modelo (o `parece.py` confere)
+
+Estes números são conferência técnica da gravação (luz, enquadramento, cor natural sem filtro). Não são ordem de copiar a
+sequência do aprovado (G30).
 
 O vídeo inteiro mede como está na coluna "inteiro" (`assinatura.json`). Vídeo com menos de 70% do aprovado (menos de
 21 s) é comparado com os trechos do mesmo tamanho do aprovado: passa se cabe entre o menor e o maior valor que algum
@@ -73,7 +85,7 @@ faixas mudam pouco (temperatura de +2,7 a +3,6 em 10 s).
 | Pose | Como é | Uso |
 |---|---|---|
 | Cheio | a gravação inteira, rosto em y 35% | O plano aberto; recebe a palavra atrás da cabeça (1 s) |
-| Punch-in | zoom 1,12 a 1,2, rosto em y 30% a 36% | A frase-chave, a troca de ideia, esconder um corte (0 s, 3,5 s, 10,7 s, 20 s) |
+| Punch-in | zoom 1,12 a 1,2, rosto em y 30% a 36% | Só quando a fala tem motivo (G6): a frase-chave, a troca de ideia, esconder um corte (0 s, 3,5 s, 10,7 s, 20 s). Nunca aleatório, nunca com som de zoom |
 | Cartão | 370 x 500 px no canto de baixo à direita (x 652, y 1300), canto 34 px, sombra suave, zoom 1,5 | Rosto no canto sobre a tela de gelo (5 s a 8 s, 22 s a 24 s) |
 | Reels | 730 x 1298 px em x 175, y 200, canto 44 px, sombra | O próprio plano dentro de uma tela de reels genérica (12 s) |
 | Baixo | metade de baixo, a partir de y 880 | Com as prévias em cima (15 s a 19 s) |
@@ -81,20 +93,21 @@ faixas mudam pouco (temperatura de +2,7 a +3,6 em 10 s).
 - **Transições da janela:** corte seco (0) ou mistura suave de 0,32 a 0,4 s. A entrada do cartão gira até -14 graus e
   borra até 9 px no meio do caminho, e volta reto (5,2 s, 21,9 s).
 - A câmera segue o rosto suavizado (`src/tempos.ts`), sem mostrar borda.
-- **Ritmo:** no primeiro minuto, um visual novo a cada 3 a 5 s, de 8 a 9 recursos diferentes. No corpo, 7 a 16 trocas
-  por minuto, contando zoom interno. Tela longa nunca parada mais de 6 s. Rosto puro pode durar 14 a 36 s quando a fala
-  é opinião. O fim desacelera.
-- **Vídeo curto (10 a 15 s):** o ritmo é o de um trecho do aprovado, de 16 a 36 cortes por minuto, o que dá de 4 a 6
-  trocas de janela em 10 s (o aprovado faz 5 em 0 a 10 s: punch-in, cheio, punch-in, giro até o cartão, montagem). Não
-  precisa de título de capítulo nem de chamada: a espinha só existe com capítulo, e a chamada só entra se a fala pede
-  ("comenta", "link"). Sem elas, a estrutura é gancho com a palavra atrás e a frase na frente, uma tela de gelo (grade,
-  montagem ou conta) no meio e um punch-in na conclusão. O fim segura 0,7 s depois da última palavra, no rosto.
-- **Grave com folga:** plano médio com espaço acima da cabeça (o punch-in vai até 1,4x e a palavra atrás precisa de
-  parede livre). Microfone na frente do queixo estraga o recorte da palavra atrás.
+- **Ritmo:** nasce da fala nova, trecho a trecho (G28), não de uma cota de trocas. A referência mediu de 7 a 16 trocas
+  por minuto no corpo; serve de régua, não de meta. Tela longa nunca parada mais de 6 s. Rosto puro pode durar 14 a 36 s
+  quando a fala é opinião. O fim desacelera.
+- **Vídeo curto (10 a 15 s):** não precisa de título de capítulo nem de chamada: a espinha só existe com capítulo, e a
+  chamada só entra se a fala pede ("comenta", "link"). Cada tela entra só onde a fala tem o porquê dela (seção 4). O
+  fim segura 0,7 s depois da última palavra, no rosto.
+- **Grave com folga:** plano médio com espaço acima da cabeça (o punch-in vai até 1,4x).
 
 ## 4. O que a tela faz em cada frase (a gramática)
 
-Cada frase do plano recebe uma função, e a função escolhe a resposta.
+Cada frase do plano recebe uma função, e a função escolhe a resposta. **Mas a resposta padrão é o rosto (G6, G19):** a
+gramática abaixo diz o que a tela faz **quando** a fala pede de verdade, não obriga uma tela por frase. Tela de gelo,
+reels, montagem e prévias entram na frase que precisa da coisa para ser entendida; somadas, no máximo 1/3 do vídeo. O
+resto é cheio e punch-in. Cada linha das tabelas é uma tela com o seu porquê: usar só quando a fala nova tiver o mesmo
+porquê (G30).
 
 **Confirmado pelo treinamento talking-head 2026-11-03** (`../../../treinamento/talking-head-explicativo/manual.md`, 7 Reels
 de 2 criadores): esta tabela é o que os explicativos fortes fazem. Dêitico → a coisa (DejD 25 s); ferramenta citada →
@@ -172,7 +185,7 @@ entre 24 s e 1 min, chamada do meio só depois de entregar valor, fecho com reca
 
 | Peça | Medidas (1080x1920) | Cor | No aprovado |
 |---|---|---|---|
-| **Atrás da pessoa** | 900, 250 px, entrelinha 0,86, topo y 118, centrada | tinta `#0A0A0A` a 93%, a pessoa recortada passa na frente | "100%" (1,2 s a 3,5 s) |
+| **Atrás da pessoa** (opção desligada, `fundo: 'recorte'`, só com ordem explícita, G6) | 900, 250 px, entrelinha 0,86, topo y 118, centrada | tinta `#0A0A0A` a 93%, a pessoa recortada passa na frente | "100%" (1,2 s a 3,5 s) |
 | **Na frente, sobre a camiseta** | topo y 1215, centrada: linha 1 em 800, 88 px, branca; linha 2 em 900, 196 px, amarela | branco `#FCFCFC` e amarelo `#FCDC00`, sombra suave | "EDITADO PELO / CLAUDE" (1,7 s a 3,5 s) |
 | **Conta no gelo** | um cartão branco `#FFFFFF` por item, empilhados de x 55 a 1025 e de y 90 a 1248 (a área da grade), 20 px entre eles, canto 30 px, sombra suave; altura = (1158 - 20 x (itens - 1)) / itens (372 px com 3 itens); dentro, a 56 px da borda: ponto amarelo de 40 px, a palavra em 900, caixa alta, entreletra -0,045 em, e o número do item (01, 02...) em 800, 44 px, cinza, à direita; a fonte é a menor entre 172 px, metade da altura do cartão e o que faz a palavra mais longa caber (150 px para "LEGENDA") | fundo gelo, vagas `#EDEDED` antes de cada item entrar, palavra em tinta | não usada no aprovado |
 | **Título de capítulo** | 900, 176 px, entrelinha 0,88, caixa alta, topo y 1150, centrado; fio amarelo de 640 x 6 px embaixo, que se desenha em 0,35 s | branco com sombra | 13,2 s a 14,8 s |
@@ -196,7 +209,7 @@ entre 24 s e 1 min, chamada do meio só depois de entregar valor, fecho com reca
   Liga com `LISTA = {de, ate, itens: [['palavra', T.x], ...]}` e a chave `[de, POSE.cartao, 0.38, true]`; o rosto fica no
   cartão até `ate`. As vagas aparecem no giro e cada cartão entra na hora da palavra, com o borrão de movimento das
   miniaturas; a tela aproxima até 104% até sair.
-- **Só a palavra mais forte do trecho vai atrás da pessoa**, e no vertical só uma palavra curta, no plano aberto (a
+- **Com `fundo: 'recorte'` (só a pedido): só a palavra mais forte do trecho vai atrás da pessoa**, e no vertical só uma palavra curta, no plano aberto (a
   parede acima da cabeça tem uns 180 px). Nome comprido vai na frente.
 - **O texto confere com a fala:** número, nome e grafia exatamente como foram ditos.
 - **Tempo de leitura:** texto falado pelo menos 1,5 s e 1 s + 3 palavras/s, cada palavra pelo menos 0,4 s, títulos e
@@ -208,15 +221,16 @@ entre 24 s e 1 min, chamada do meio só depois de entregar valor, fecho com reca
 - **Legenda corrida:** o 16:9 de YouTube não tem. No 9:16 dinâmico ela continua opcional (Y6) e o vertical aprovado
   continua como está (Y7), mas agora ela **vem desenhada, pronta para ligar** (treinamento talking-head 2026-11-03: 7 de
   7 explicativos verticais do lote usam legenda corrida), e a recomendação ao usuário no 9:16 é ligar. O desenho:
-  - Inter Tight 700, 66 px, branca `#FCFCFC`, caixa baixa, entreletra -0,02 em, só a sombra larga e suave do modelo
-    (`0 4px 24px rgba(0,0,0,.45)`, G37); a palavra-chave do trecho em 900 amarelo `#FCDC00` (um acento só, como no resto).
-  - **Um lugar só**, no peito: topo y 1180, caixa x 60 a 940 (centro x 500), até 2 linhas (G15, G35). Quando a chamada,
-    a frase na frente (topo y 1215) ou o título de capítulo (topo y 1150) estão na tela, a legenda some naquele trecho:
-    o texto grande já é a fala (sem repetir palavra).
-  - Um bloco = um trecho (G35), o pedaço inteiro nasce de uma vez com as palavras ainda não ditas apagadas (38%) e cada
-    uma acende quando é dita; tempo de leitura da casa (bloco >= 1,5 s quando a fala deixa, 1 s + 3 palavras/s).
+  - Inter Tight 700, 66 px, branca `#FCFCFC`, caixa baixa, entreletra -0,02 em, sem contorno nem sombra colada (G16);
+    só a sombra larga e suave do modelo (`0 4px 24px rgba(0,0,0,.45)`). Destaque em 900 amarelo `#FCDC00` só no termo
+    que importa para o tema, nunca em todo bloco (G17); pontuação e aspas fora do destaque (G18).
+  - **Um lugar só**, a ~70% da altura: topo y 1290, caixa x 60 a 940 (centro x 500), até 2 linhas, de preferência 1
+    (G12, G15). Quando a chamada, a frase na frente ou o título de capítulo estão na tela, a legenda some naquele
+    trecho: o texto grande já é a fala (G26).
+  - Um bloco = um trecho (G14, G11), o pedaço inteiro nasce de uma vez com as palavras ainda não ditas apagadas (38%) e
+    cada uma acende quando é dita; o bloco fica o tempo da fala (G9).
   - **Pendência de código:** o molde ainda não tem o componente; quem ligar a opção monta com este desenho (o
-    `src/Legenda.tsx` do molde prova-print é a implementação de referência do "apagada que acende" com G35) e
+    `src/Legenda.tsx` do molde prova-print é a implementação de referência do "apagada que acende") e
     acrescenta ao checador cobertura, 2 linhas e zona segura.
 
 ## 6. Identidade "Gelo, tinta e amarelo"
@@ -243,7 +257,7 @@ quem edita.
 ## 7. Som
 
 - Voz sempre na frente. -14 LUFS, pico -1 dBTP.
-- **Música é opcional, desligada por padrão.** Quando ligada: piano elétrico macio em Fá maior a 96 bpm, baixo redondo,
+- **Música e efeito sonoro só com ordem explícita (G6).** Desligados por padrão. Quando o dono pedir: piano elétrico macio em Fá maior a 96 bpm, baixo redondo,
   bumbo leve, cerca de 16 dB abaixo da voz com ducking; um sopro em cada giro do cartão e na tela de reels, um toque curto
   em cada título e na palavra da chamada.
 
@@ -268,15 +282,17 @@ quem edita.
 
 | Opção | Padrão no código | Como mudar |
 |---|---|---|
+| Fundo (G6) | **`'real'`**: a gravação crua com o fundo real, sem recorte nem camada | `--props='{"fundo":"desfoque"}'` (desfoque leve de 8 px só no fundo, a pessoa nítida por cima) ou `{"fundo":"recorte"}` (liga a palavra ATRÁS da pessoa); os dois pedem `public/pessoa.webm` (`scripts/recorte.py`) e só com pedido |
 | Música | desligada | `scripts/trilha.py` com os sopros e toques e o 3º argumento `public/trilha.wav` no `mixar.sh` |
 | Prévias | desligadas (`previas: false`), sem nomes (`nomesPrevias: ["", ""]`) | `--props='{"previas":true,"nomesPrevias":["<nome real 1>","<nome real 2>"]}'` e a mídia das prévias |
 | @ na tela de reels | vazio (sem @ e sem foto) | `--props='{"arroba":"<arroba real de quem fala>"}'`; foto em `public/avatar.jpg` |
-| Palavra atrás, frase, título, grade, montagem, reels, contorno, prévias, chamada | ligados no plano do aprovado | Cada lista em `src/plano.ts` desliga com `[]` ou `null` |
+| Frase, título, grade, montagem, reels, contorno, prévias, chamada | no plano do aprovado (num vídeo novo, só onde a fala tem o mesmo porquê, G30) | Cada lista em `src/plano.ts` desliga com `[]` ou `null` |
+| Palavra atrás (`ATRAS`) | no plano do aprovado, mas **só aparece com `fundo: 'recorte'`** | `ATRAS` em `src/plano.ts` + a prop |
 | Conta no gelo (`LISTA`) | desligada (`null`) no aprovado | `LISTA = {de, ate, itens}` (seção 5) |
 | Legenda corrida (9:16) | desligada no aprovado (Y7); desenhada na seção 5, recomendada no 9:16 (treinamento talking-head 2026-11-03) | Montar com o desenho da seção 5 (o componente ainda não está no molde) |
 
-O aprovado saiu com prévias, os nomes delas e o @ real de quem fala (`props-vitrine.json`, que ele precisa para sair
-igual). O `referencia.mp4` guarda só a voz.
+O aprovado saiu com prévias, os nomes delas, o @ real de quem fala e a palavra atrás (`props-vitrine.json`, com
+`"fundo": "recorte"`, que ele precisa para sair igual). O `referencia.mp4` guarda só a voz.
 
 ## 10. Zona segura e rosto
 
@@ -313,7 +329,8 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    que o plano é desta fala, tempo de leitura com e sem prévias (a conta também), linhas, nada atravessando corte, o
    rosto no cartão durante a conta e a duração.
 5. **Mídia que o plano pedir** (na pasta do vídeo):
-   - pessoa recortada, para `ATRAS`: `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py`
+   - pessoa recortada, **só se o dono pediu** `fundo: 'recorte'` ou `'desfoque'` (G6):
+     `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py`
      (grava `public/pessoa.webm`; uns 4,5 min para 30 s na CPU);
    - grade e montagem, de vídeos seus prontos: `ffmpeg -i <video>.mp4 -an -vf scale=540:960 public/ex/<nome>.mp4` e
      `ffmpeg -ss <recorte> -t 2.0 -i <video>.mp4 -an public/ex/cheio_<nome>.mp4`.
@@ -327,18 +344,31 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    Com @ e prévias: `--props='{"arroba":"<arroba real>","previas":true,"nomesPrevias":["modeloA","modeloB"]}'`.
 9. **Mixe** (na pasta do vídeo): `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4` (só a voz). Com música:
    `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4 public/trilha.wav`.
-10. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 youtube-didatico`.
-    Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
-    em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
+10. **Confira os números técnicos:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 youtube-didatico`
+    (luz, enquadramento, cor natural). Corrija o que ele aponta. Ele não pede que o vídeo repita a sequência do aprovado
+    (G30): a pergunta final é se cada tela entrou onde a fala tem o porquê dela.
 
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e o mesmo com `2`).
 
-## 12. O plano do vídeo aprovado (para comparar)
+## 12. O plano do vídeo aprovado (repertório, não roteiro)
+
+Cada linha mostra uma tela e o porquê dela no aprovado (a função da seção 4). Num vídeo novo, a tela só entra onde a
+fala nova tiver o mesmo porquê; nunca se copia a ordem nem os tempos (G30).
+
+- Punch-in com rosto puro: usado na referência porque a frase é de peso ou troca de ideia; usar quando a fala nova tiver o mesmo porquê.
+- Frase grande na frente ("EDITADO PELO / CLAUDE"): usada porque é a frase de efeito do gancho; usar quando a fala nova tiver uma frase de efeito.
+- Giro até o cartão + grade no gelo: usado porque a fala aponta os próprios vídeos do criador (prova, dêitico); usar quando a fala nova mostrar algo real do criador.
+- Montagem de cortes secos: usada porque a fala lista exemplos curtos; usar quando a fala nova listar.
+- Tela de reels: usada porque a fala cita a rede ("no Instagram agora"); usar quando a fala nova citar a página ou a rede.
+- Título de capítulo com fio amarelo: usado porque a fala anuncia uma parte; usar quando a fala nova abrir capítulo.
+- Prévias na metade de cima: usadas porque a fala diz "posso colocar duas prévias aqui"; usar quando a fala nova pedir a coisa mostrada.
+- Grade de volta + contorno "este aqui": usada porque a fala faz callback e aponta um item; usar quando a fala nova fizer o mesmo.
+- Chamada com degradê e palavra amarela: usada porque a fala pede comentário; usar quando a fala nova pedir comentário.
 
 | Tempo | Fala | Câmera / transição | Na tela |
 |---|---|---|---|
 | 0 s | Esse vídeo está sendo | punch-in 1,15 | rosto puro |
-| 1,2 s | 100% editado pelo Claude. | corte seco, cheio | "100%" atrás da cabeça em tinta; "EDITADO PELO" branco e "CLAUDE" amarelo na camiseta |
+| 1,2 s | 100% editado pelo Claude. | corte seco, cheio | "100%" atrás da cabeça em tinta (no aprovado, `fundo: 'recorte'`; padrão hoje desligado, G6); "EDITADO PELO" branco e "CLAUDE" amarelo na camiseta |
 | 3,5 s | Ele foi criado justamente para te mostrar | corte seco, punch-in 1,12 | rosto puro |
 | 5,2 s | a diferença entre vários modelos que eu criei e melhorei | o plano gira até o cartão (0,38 s), gelo | dois vídeos lado a lado; em "vários" a grade de 6 com rótulos; aproxima em 6,3 s |
 | 8,3 s | para editar qualquer tipo de vídeo | corte seco, montagem | 4 vídeos cheios por corte seco, 0,3 s cada |

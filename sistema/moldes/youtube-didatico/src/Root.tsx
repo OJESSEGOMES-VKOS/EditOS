@@ -12,6 +12,6 @@ export const Root: React.FC = () => (
 		fps={FPS}
 		width={1080}
 		height={1920}
-		defaultProps={{previas: false, nomesPrevias: ['', ''] as [string, string], arroba: ''}}
+		defaultProps={{previas: false, nomesPrevias: ['', ''] as [string, string], arroba: '', fundo: 'real' as const}}
 	/>
 );

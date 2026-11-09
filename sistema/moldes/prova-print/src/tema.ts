@@ -8,6 +8,8 @@ import R from './rosto_med.json'; // scripts/rosto.py: mediana de olhos, largura
 
 /**
  * prova-print (../../modelos/prova-print/prova-print.md): a tela prova o que a pessoa diz.
+ * G6 (2026-11-05): a maior parte é a PESSOA, o vídeo normal com o fundo real dela; a prova (vitrine) entra quando a fala
+ * afirma algo que tem prova, fechando uma cena forte. O palco com a cabeça recortada é opção (prop fundo: 'recorte').
  * Palco claro (título-promessa só no gancho, cartão de câmera com a cabeça saindo da moldura) ↔ vitrine escura sem rosto (o card sobre o próprio conteúdo desfocado) ↔
  * rosto fechado só na emoção e no fecho. Prova real com grifo na frase dita e contador que para no número falado.
  * Nasceu do molde do interface-encenada (corte por palavra, legenda por pedaços, conferidor).
@@ -21,11 +23,9 @@ export const P = {duracao: DURACAO, palavras};
 const RM = R as typeof R & {fala?: {palavras: number; fim: number}; quadros?: number};
 if (!RM.fala || !RM.quadros || RM.fala.palavras !== palavras.length || RM.fala.fim !== palavras[palavras.length - 1].ate)
 	throw new Error('src/rosto_med.json é de outra gravação. Rode ../../.venv/Scripts/python.exe scripts/rosto.py e carregue de novo.');
-if (typeof (R as {topo?: number}).topo !== 'number')
-	throw new Error('src/rosto_med.json sem o topo da cabeça: o cartão de câmera precisa da pessoa recortada (PV8). Rode QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py e carregue de novo.');
 export {R};
 
-/** a paleta padrão (medida nas referências, prova-print.md §1); é opção do usuário (G33), troque aqui */
+/** a paleta padrão (medida nas referências, prova-print.md §1); é opção do usuário (G31), troque aqui */
 export const C = {
 	palco: '#E9ECEE', // fundo do palco (ref1 1,00 s, canto direito)
 	palcoFrio: '#D3E0EA', // o tom frio do canto de cima (ref1 1,00 s): o gradiente do palco
@@ -117,26 +117,35 @@ export const w = (texto: string, n = 1) => P.palavras[iw(texto, n)].de;
 /* ---------------------------------------------------------------- o plano: uma cena por frase (refazer num vídeo novo) */
 /** corte seco 2 quadros antes da palavra que abre a cena */
 const corte = (t: number) => t - 0.06;
-export type Modo = 'palco' | 'vitrine' | 'capitulo' | 'rosto';
+/** 'pessoa' = o vídeo normal (a gravação inteira, fundo real, sem zoom nem camada): o modo padrão, a maior parte do vídeo (G6).
+ * 'palco' (cartão de câmera com a cabeça recortada) só com a prop fundo: 'recorte' */
+export type Modo = 'pessoa' | 'palco' | 'vitrine' | 'capitulo' | 'rosto';
 export type Cena = {id: string; modo: Modo; de: number; ate: number; fecho?: boolean};
 /** [id, modo, início, fecho?] — o título-promessa é TITULO (abaixo), só na cena dele */
+/* G6: a maior parte é 'pessoa' (o vídeo normal); a vitrine (a prova) entra só onde a fala afirma algo que tem prova e
+ * fecha uma cena forte (a frase acaba no ponto). Nunca uma tela por frase. */
 const base = (): [string, Modo, number, boolean?][] => [
-	['gancho', 'palco', 0], // Esse vídeo está sendo 100% editado pelo Claude.
-	['criado', 'vitrine', corte(w('ele'))], // Ele foi criado justamente para te mostrar a
-	['modelos', 'palco', corte(w('diferença'))], // diferença entre vários modelos que eu criei e melhorei para editar
-	['editar', 'vitrine', corte(w('qualquer'))], // qualquer tipo de vídeo usando o Claude.
-	['vendo', 'vitrine', corte(w('inclusive'))], // Inclusive, se você estiver no Instagram agora, você está vendo apenas um desses modelos.
-	['previas', 'palco', corte(w('eu', 2))], // Eu posso até colocar duas prévias rápidas aqui em cima,
-	['tres', 'vitrine', corte(w('aceleradas'))], // aceleradas em três vezes.
-	['mas', 'rosto', corte(w('mas'))], // Mas se você quiser realmente ver
-	['outros', 'palco', corte(w('outros'))], // (ver) outros modelos de edição como esse
-	['aprender', 'vitrine', corte(w('e', 2))], // e aprender a como usar isso nos seus vídeos,
+	['abre', 'pessoa', 0], // Esse vídeo está sendo 100% editado pelo Claude. Ele foi criado justamente para te mostrar a diferença entre vários modelos que eu criei e melhorei para editar
+	['editar', 'vitrine', corte(w('qualquer'))], // qualquer tipo de vídeo usando o Claude.  (fim de cena forte, com a prova: o About)
+	['instagram', 'pessoa', corte(w('inclusive'))], // Inclusive, se você estiver no Instagram agora, você está vendo apenas um desses modelos. Eu posso até colocar duas prévias rápidas aqui em cima,
+	['tres', 'vitrine', corte(w('aceleradas'))], // aceleradas em três vezes.  (fim de cena forte, o número: contador)
+	['mas', 'rosto', corte(w('mas'))], // Mas se você quiser realmente ver  (a virada: rosto fechado, a mesma gravação)
+	['ver', 'pessoa', corte(w('outros'))], // outros modelos de edição como esse e aprender a como usar isso nos seus vídeos,
 	['comenta', 'rosto', corte(w('comenta')), true], // comenta edição aqui embaixo que eu vou te mandar na sua DM agora.
 ];
+/* O plano da vitrine aprovada em 2026-11-03 (antes da G6), para refazê-la: troque o corpo de base() por este, faça titulo()
+ * devolver {cena: 'gancho', linha1: '100% editado', linha2: 'pelo Claude', de: 0.25} e renderize com fundo: 'recorte'.
+ *	['gancho', 'palco', 0], ['criado', 'vitrine', corte(w('ele'))], ['modelos', 'palco', corte(w('diferença'))],
+ *	['editar', 'vitrine', corte(w('qualquer'))], ['vendo', 'vitrine', corte(w('inclusive'))], ['previas', 'palco', corte(w('eu', 2))],
+ *	['tres', 'vitrine', corte(w('aceleradas'))], ['mas', 'rosto', corte(w('mas'))], ['outros', 'palco', corte(w('outros'))],
+ *	['aprender', 'vitrine', corte(w('e', 2))], ['comenta', 'rosto', corte(w('comenta')), true],
+ */
 /** o título-promessa (uma linha preta + uma linha em itálico na caixa azul): palavras ditas, até 16 letras cada. Só na cena
- * do gancho e some no corte dela (PV5); enquanto ele está na tela, as palavras dele não vão para a legenda (PV4) */
-const titulo = () => ({cena: 'gancho', linha1: '100% editado', linha2: 'pelo Claude', de: 0.25});
-/** contadores (PV1, G8): o número dito sobe até ele e fica até o corte; as palavras dele não vão para a legenda (PV4).
+ * do gancho, e só num palco (opção, fundo: 'recorte'); some no corte dela (PV5); enquanto ele está na tela, as palavras
+ * dele não vão para a legenda (PV4). Padrão (G12): null, o gancho vai na legenda, num bloco só. */
+type Titulo = {cena: string; linha1: string; linha2: string; de: number};
+const titulo = (): Titulo | null => null;
+/** contadores (PV1, G10): o número dito sobe até ele e fica até o corte; as palavras dele não vão para a legenda (PV4).
  * [cena, palavras do número como foram ditas (a 1ª é o número), início, valor, sufixo, y] */
 const contadores = (): [string, string[], number, number, string, number][] => [
 	['tres', ['três', 'vezes'], w('três') - 0.64, 3, ' vezes', 560], // chega no 3 junto com "três"
@@ -150,6 +159,8 @@ export const montaCenas = (): Cena[] => {
 	return b.map(([id, modo, de, fecho], i) => ({id, modo, de: i ? de : 0, ate: i + 1 < b.length ? b[i + 1][2] : DURACAO, fecho}));
 };
 export const CENAS = montaCenas();
+if (CENAS.some((c) => c.modo === 'palco') && typeof (R as {topo?: number}).topo !== 'number')
+	throw new Error("src/rosto_med.json sem o topo da cabeça: o palco (cartão de câmera, opção fundo: 'recorte') precisa da pessoa recortada (PV8). Rode QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py e carregue de novo, ou troque o palco por 'pessoa' (G6).");
 export const cenaEm = (t: number) => CENAS.find((c) => t >= c.de && t < c.ate) ?? CENAS[CENAS.length - 1];
 export const cenaAnterior = (c: Cena) => CENAS[CENAS.indexOf(c) - 1];
 const cenaId = (id: string) => {
@@ -168,8 +179,8 @@ const iwNa = (texto: string, c: Cena) => {
  * A legenda não repete essas palavras (PV4) e nenhum fica pendurado depois da fala dele (PV5): scripts/cobertura.mjs */
 export type Fixo = {nome: string; texto: string; ids: number[]; de: number; ate: number; fecho?: boolean};
 const _t = titulo();
-const _tc = cenaId(_t.cena);
-export const TITULO = {..._t, ate: _tc.ate, ids: `${_t.linha1} ${_t.linha2}`.split(' ').map((p) => iwNa(p, _tc))};
+const _tc = _t ? cenaId(_t.cena) : null;
+export const TITULO = _t && _tc ? {..._t, ate: _tc.ate, ids: `${_t.linha1} ${_t.linha2}`.split(' ').map((p) => iwNa(p, _tc))} : null;
 export const CONTADORES = contadores().map(([cena, pal, de, valor, sufixo, y]) => {
 	const c = cenaId(cena);
 	return {cena, de, ate: c.ate, valor, sufixo, y, ids: pal.map((p) => iwNa(p, c))};
@@ -178,13 +189,18 @@ const _c = comando();
 const _cc = cenaId(_c.cena);
 export const COMANDO = {..._c, ids: _c.palavras.map((p) => iwNa(p, _cc))};
 export const FIXOS: Fixo[] = [
-	{nome: 'título', texto: `${TITULO.linha1} ${TITULO.linha2}`, ids: TITULO.ids, de: TITULO.de, ate: TITULO.ate},
+	...(TITULO ? [{nome: 'título', texto: `${TITULO.linha1} ${TITULO.linha2}`, ids: TITULO.ids, de: TITULO.de, ate: TITULO.ate}] : []),
 	...CONTADORES.map((k) => ({nome: `contador ${k.valor}${k.sufixo}`, texto: `${k.valor}${k.sufixo}`, ids: k.ids, de: k.de, ate: k.ate})),
 	{nome: 'comando do fecho', texto: COMANDO.texto, ids: COMANDO.ids, de: P.palavras[COMANDO.ids[0]].de, ate: DURACAO, fecho: true},
 ];
 
-/** a pessoa escolhe as prévias (props); chega a todo lugar por contexto */
-export const Props = React.createContext<{previas: boolean}>({previas: false});
+/** fundo (G6, 2026-11-05): 'real' (padrão) = a gravação crua com o fundo real; 'desfoque' = desfoque leve só no fundo, a
+ * pessoa nítida por cima; 'recorte' = libera o palco (cartão de câmera com a cabeça recortada saindo da moldura). Os dois
+ * últimos pedem public/pessoa.webm (scripts/recorte.py) e só ligam a pedido. */
+export type Fundo = 'real' | 'desfoque' | 'recorte';
+export const DESFOQUE_LEVE = 8; // px: "um desfoque leve basta"
+/** a pessoa escolhe as prévias e o fundo (props); chega a todo lugar por contexto */
+export const Props = React.createContext<{previas: boolean; fundo: Fundo}>({previas: false, fundo: 'real'});
 
 /* ---------------------------------------------------------------- a geometria (1080x1920; prova-print.md §3) */
 export const G = {
@@ -196,7 +212,7 @@ export const G = {
 	cardPalco: {x: 100, y: 250, w: 880, h: 666},
 	cardVitrine: {x: 80, y: 250, w: 880, h: 890}, // card grande da vitrine
 	legenda: 1180, // a legenda na vitrine, no capítulo e no rosto fechado
-	legendaPalco: 940, // a legenda no palco: entre o card da prova e a cabeça (ref4 1,5 s: "AI plugins" y ~1010-1090). 2 lugares (G15)
+	legendaPalco: 940, // a legenda no palco: entre o card da prova e a cabeça (ref4 1,5 s: "AI plugins" y ~1010-1090). 2 lugares (G12)
 	// o cartão de câmera do palco (PV8, medido na ref4 DfPuiYyP4Hy 0 a 4 s, 1080x1920): x 52-1039 (91,5% da largura), topo
 	// y 1305 (68%), sangra pela base, raio ~55, sem contorno, o fundo da gravação dentro dele; a cabeça recortada passa da
 	// borda de cima (ref: topo da cabeça ~165 px acima da borda, olhos ~125 px abaixo dela, rosto ~300 px de largura).

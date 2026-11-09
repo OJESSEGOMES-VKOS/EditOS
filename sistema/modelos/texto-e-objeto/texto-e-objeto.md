@@ -3,6 +3,8 @@
 Este é o único arquivo que você precisa ler para editar neste modelo. Tudo o que está aqui é regra. Quando algo daqui
 bater com o código do molde, vale o que está aqui.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo. A G29 (começo na gravação original) não se aplica: este modelo não tem gravação de pessoa.
+
 **A referência é o `referencia/referencia.mp4`**, o vídeo aprovado do modelo (45 s, com a voz). Os tempos entre
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo) e o `mapa.json`
 (luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
@@ -72,7 +74,10 @@ diz. Aqui **o texto é o design**: grande, em tamanhos misturados, e não uma le
 - **Fontes:** Inter (500, 700, 800, 900) para quase tudo; Pinyon Script para a palavra de efeito cursiva; Instrument
   Serif itálica para a palavra de peso elegante; Geist Mono 500 para rótulos, números de régua e o @.
 - **O bloco de texto** mora numa caixa a partir de x 80, com 920 de largura, centrado (ou alinhado à esquerda, como em
-  "Cada corte, cada legenda", 6 s). O topo de cada bloco é escolhido por tela (de y 220 a y 800).
+  "Cada corte, cada legenda", 6 s). O topo do bloco tem **dois lugares padrão** (G12, nunca sorteado): com herói, em cima (y 220 a 300) e o herói
+  embaixo; sem herói, no meio (y 700 a 800, conforme as linhas). Outra altura só quando o herói precisa do espaço de cima
+  ("vendo aqui", 7 s) ou a palavra vira imagem ("frame", 20 s), com o motivo no `plano.md`. Um bloco por tela, nunca o
+  da tela anterior junto.
 - **Tamanhos:** ligação de 56 a 90 px, em Inter 700, letras apertadas (-0,025 em), entrelinha 1,15. Palavra grande de
   110 a 330 px, em Inter 900, bem apertada (-0,055 em), entrelinha 0,95, 14 px abaixo dela. Cursiva e serifa em peso 400.
 - **Entrada da palavra:** nasce 0,04 s antes de ser dita, com desfoque de 18 px, 40 px à direita e transparente, e fica
@@ -138,7 +143,7 @@ diz. Aqui **o texto é o design**: grande, em tamanhos misturados, e não uma le
 | Opção | Padrão | Como mudar |
 |---|---|---|
 | Voz no render | desligada no `Root.tsx` | Sempre renderize com a prop `voz: true` (o vídeo aprovado tem a voz) |
-| Efeitos sonoros nas trocas de tela | **ligados** | Sem o 3º argumento no `mixar.sh` sai só a voz |
+| Efeitos sonoros nas trocas de tela | **ligados** (som: confirmar com o dono se continua padrão, G6) | Sem o 3º argumento no `mixar.sh` sai só a voz |
 | Música (cama de acordes) | desligada | `som.py --cama` |
 | @ no fecho | vazio (escondido) | Prop `arroba: "seu.arroba"` (sem o @), só o real de quem fala |
 | Foto no fecho | vazia (escondida) | Prop `foto: "foto.jpg"` (arquivo em `public/`) |
@@ -190,7 +195,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts Dinamico02 out/so-voz.mp4 --codec=h264 --crf=16 --concurrency=2 --props='{"voz":true,"arroba":"seu.arroba","foto":"foto.jpg"}'`
    (tire `arroba` e `foto` se a pessoa não deu os dela).
 8. **Mixe:** `sh scripts/mixar.sh out/so-voz.mp4 out/final.mp4 public/trilha.wav` (na pasta do vídeo). Sai em -14 LUFS.
-9. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 texto-e-objeto`.
+9. **Confira a identidade do modelo (cor, luz, ritmo; nunca a sequência de telas, G30):** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 texto-e-objeto`.
    Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
    em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
 

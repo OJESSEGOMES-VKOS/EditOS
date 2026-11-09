@@ -399,6 +399,8 @@ export const N4: React.FC<P> = ({f}) => {
 export const CENAS: Record<string, React.FC<P>> = {S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, N2, N3, N4};
 
 // ---------------------------------------------------------------- texto
+/** G16 (REGRAS.md): texto limpo, sem contorno nem sombra colada; liga só com pedido explícito do dono */
+const CONTORNO = false;
 const ESTILO_TXT = (fs: number, cor: string, brilho?: string): React.CSSProperties => ({
 	display: 'inline-block',
 	whiteSpace: 'pre',
@@ -408,15 +410,14 @@ const ESTILO_TXT = (fs: number, cor: string, brilho?: string): React.CSSProperti
 	lineHeight: 1,
 	letterSpacing: 1,
 	color: cor,
-	WebkitTextStroke: `${Math.round(fs * 0.16)}px #000`,
-	paintOrder: 'stroke fill',
-	textShadow: brilho ?? `0 ${fs * 0.07}px 0 #000`,
+	...(CONTORNO ? {WebkitTextStroke: `${Math.round(fs * 0.16)}px #000`, paintOrder: 'stroke fill' as const} : {}),
+	textShadow: brilho ?? (CONTORNO ? `0 ${fs * 0.07}px 0 #000` : undefined),
 });
 
 /** uma palavra: entra no quadro em que é dita, com um "pop" de 3 quadros (ref7: palavra grossa, branca, contorno preto) */
 const Palavra: React.FC<{i: number; f: number; n: number; fs: number; verde?: boolean}> = ({i, f, n, fs, verde}) => {
 	const s = tw(f, n, n + 3, 0.82, 1, E.out);
-	const st = ESTILO_TXT(fs, verde ? C.verde : '#ffffff', verde ? `0 0 14px ${C.verde}, 0 0 30px rgba(61,255,138,0.6), 0 ${fs * 0.07}px 0 #000` : undefined);
+	const st = ESTILO_TXT(fs, verde ? C.verde : '#ffffff', verde && CONTORNO ? `0 0 14px ${C.verde}, 0 0 30px rgba(61,255,138,0.6), 0 ${fs * 0.07}px 0 #000` : undefined);
 	return <span style={{...st, opacity: f < n ? 0 : 1, transform: `scale(${s})`}}>{txt(i)}</span>;
 };
 

@@ -36,7 +36,13 @@ const E = {out: Easing.bezier(0.16, 1, 0.3, 1), io: Easing.bezier(0.45, 0, 0.55,
 const tw = (t: number, a: number, b: number, v0: number, v1: number, e = E.out) =>
 	interpolate(t, [a, b], [v0, v1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: e});
 
-export type Props = {previas: boolean; nomesPrevias: [string, string]; musica?: boolean; efeitoFundo?: boolean};
+/* fundo (G6, dono 2026-11-05): 'real' (o padrão) é o vídeo normal da pessoa, com o fundo e a cor da gravação; 'desfoque'
+ * põe a pessoa sobre o próprio fundo levemente desfocado (public/fala_desfoque.mp4, do scripts/grade.py --desfoque);
+ * 'recorte' é o estúdio escuro do aprovado: pessoa recortada sobre o breu petróleo, vinheta (public/fala_grade.mp4).
+ * efeitoFundo: true (o nome antigo) = fundo 'recorte'. pb: o preto e branco dos planos marcados `pb` (G6: escolha do
+ * usuário, desligado por padrão). Tudo isso é opção desligada: só a pedido do dono. */
+export type Fundo = 'real' | 'desfoque' | 'recorte';
+export type Props = {previas: boolean; nomesPrevias: [string, string]; musica?: boolean; efeitoFundo?: boolean; fundo?: Fundo; pb?: boolean};
 
 type Pal = {texto: string; de: number; ate: number};
 const PS: Pal[] = (PB as {text: string; start: number; end: number}[]).map((p) => ({texto: p.text, de: p.start, ate: p.end}));
@@ -63,7 +69,7 @@ const fr = (s: number) => Math.round(s * FPS);
  * prop previas, a câmera desce e as prévias entram em cima). Sem plano marcado, não há P&B nem janela de prévias. */
 type Plano = {de: number; zoom: number; fx: number; fy: number; pb?: boolean; previas?: boolean};
 const CORTE = {
-	b: c(20), // "que eu criei": sai do bloco da abertura para o close do destaque QUALQUER
+	b: c(20), // "que eu criei": close, a caminho do fim de cena forte QUALQUER
 	c: c(34), // "Inclusive": virada
 	d: de(40) + 0.4, // "você está vendo" -> P&B ("agora," fica 0,4 s; o corte cai junto do "você")
 	e: c(48), // "Eu posso até" -> prévias
@@ -169,22 +175,20 @@ const K = (txt: string, i: number, cor: Tom, al: Al, o: Partial<LinhaK> = {}): L
 const antes = (i: number) => de(i, 'PECAS') - 0.03;
 const ler = (i: number) => de(i, 'PECAS') + 0.4; // a última palavra de um pedaço fica pelo menos 0,4 s
 
+/* G12 (dono, 2026-11-05): a maior parte do vídeo é o vídeo normal com a legenda no lugar padrão (LEG_Y), um bloco por
+ * vez. Palavra gigante só no gancho, no fim de cena forte (a frase fecha no ponto com a fala de impacto) e no comando
+ * final; nunca uma por frase. O aprovado tinha mais quatro (DIFERENÇA/MODELOS, APENAS, TRÊS VEZES, EDIÇÃO, APRENDER). */
 const PECAS: Peca[] = [
-	/* A: abertura */
+	/* A: abertura (o gancho) */
 	{tipo: 'bloco', de: 0, ate: antes(8), x: 0.87, ladoDir: true, top: 0.357, linhas: [
 		P(0, 'dir', p('esse vídeo está sendo')),
 		K('100%', 4, 'azul', 'esq', {casar: true}),
 		P(5, 'dir', p('editado pelo')),
 		K('CLAUDE', 7, 'branco', 'dir', {cap: 0.072, rapida: true}),
 	]},
-	{tipo: 'legenda', de: antes(8), ate: ler(14), pos: 1, linhas: [P(8, 'esq', p('Ele foi criado justamente')), P(12, 'dir', p('para te mostrar', 'b'))]},
-	{tipo: 'bloco', de: antes(15), ate: CORTE.b, x: 0.87, ladoDir: true, largura: 380, top: 0.357, linhas: [
-		P(15, 'esq', p('a')),
-		K('DIFERENÇA', 16, 'azul', 'esq', {casar: true}),
-		P(17, 'dir', p('entre vários')),
-		K('MODELOS', 19, 'branco', 'esq', {casar: true}),
-	]},
-	/* B: close */
+	{tipo: 'legenda', de: antes(8), ate: antes(13), pos: 1, linhas: [P(8, 'esq', p('Ele foi criado')), P(11, 'dir', p('justamente para', 'b'))]},
+	{tipo: 'legenda', de: antes(13), ate: CORTE.b, pos: 1, linhas: [P(13, 'esq', p('te mostrar a diferença')), P(17, 'dir', p('entre vários modelos', 'b'))]},
+	/* B: close; o fim de cena forte da 1ª frase longa ("...qualquer tipo de vídeo usando o Claude.") */
 	{tipo: 'legenda', de: CORTE.b, ate: CORTE.b + 1.53, pos: 1, linhas: [P(20, 'esq', p('que eu criei e'), p('melhorei', 'b'))]},
 	{tipo: 'bloco', de: antes(25), ate: CORTE.c, x: 0.5, largura: 600, top: 0.6, linhas: [
 		P(25, 'meio', p('para editar')),
@@ -193,31 +197,15 @@ const PECAS: Peca[] = [
 	]},
 	/* C: aberto */
 	{tipo: 'legenda', de: CORTE.c, ate: CORTE.d, pos: 1, linhas: [P(34, 'esq', p('Inclusive, se você estiver')), P(38, 'dir', p('no Instagram agora', 'b'))]},
-	/* D: P&B, sem o nome do modelo escrito */
-	{tipo: 'bloco', de: CORTE.d, ate: CORTE.e, x: 0.07, top: 0.566, linhas: [
-		P(41, 'esq', p('você está vendo')),
-		K('APENAS', 44, 'vermelho', 'esq', {cap: 0.085}),
-		P(45, 'esq', p('um desses modelos.')),
-	]},
+	/* D: close extremo (o P&B é opção, prop pb); só a legenda: o destaque da cena vizinha (QUALQUER) já foi o da vez */
+	{tipo: 'legenda', de: CORTE.d, ate: CORTE.e, pos: 1, linhas: [P(41, 'esq', p('você está vendo apenas')), P(45, 'dir', p('um desses modelos.', 'b'))]},
 	/* E: janela das prévias (com prévias a câmera desce e a legenda vai para LEG_Y2) */
 	{tipo: 'legenda', de: CORTE.e, ate: ler(57), pos: 1, prev: {pos: 2}, linhas: [P(48, 'esq', p('Eu posso até colocar duas')), P(53, 'dir', p('prévias rápidas aqui em cima', 'b'))]},
-	{tipo: 'bloco', de: ler(57), ate: CORTE.f, x: 0.5, largura: 560, top: 0.6, prev: {top: 0.7, largura: 400}, linhas: [
-		P(58, 'meio', p('aceleradas em')),
-		K('TRÊS VEZES', 60, 'branco', 'meio', {casar: true}),
-	]},
-	/* F: o convite; destaque só no protagonista ("outros modelos de EDIÇÃO") */
-	{tipo: 'legenda', de: CORTE.f, ate: antes(68), pos: 1, linhas: [P(62, 'esq', p('Mas se você quiser')), P(66, 'dir', p('realmente ver'))]},
-	{tipo: 'bloco', de: antes(68), ate: ler(73), x: 0.5, largura: 560, top: 0.6, linhas: [
-		P(68, 'meio', p('outros modelos de', 'b')),
-		K('EDIÇÃO', 71, 'azul', 'meio', {casar: true}),
-		P(72, 'meio', p('como esse')),
-	]},
-	{tipo: 'bloco', de: ler(73), ate: CORTE.g, x: 0.065, largura: 420, top: 0.357, linhas: [
-		P(74, 'esq', p('e')),
-		K('APRENDER', 75, 'azul', 'esq', {casar: true}),
-		P(76, 'dir', p('a como usar isso')),
-		P(80, 'dir', p('nos seus vídeos')),
-	]},
+	{tipo: 'legenda', de: ler(57), ate: CORTE.f, pos: 1, prev: {pos: 2}, linhas: [P(58, 'esq', p('aceleradas em')), P(60, 'dir', p('três vezes.', 'b'))]},
+	/* F: o convite, só legenda */
+	{tipo: 'legenda', de: CORTE.f, ate: antes(70), pos: 1, linhas: [P(62, 'esq', p('Mas se você quiser')), P(66, 'dir', p('realmente ver outros modelos', 'b'))]},
+	{tipo: 'legenda', de: antes(70), ate: antes(76), pos: 1, linhas: [P(70, 'esq', p('de edição como esse')), P(74, 'dir', p('e aprender', 'b'))]},
+	{tipo: 'legenda', de: antes(76), ate: CORTE.g, pos: 1, linhas: [P(76, 'esq', p('a como usar isso')), P(80, 'dir', p('nos seus vídeos', 'b'))]},
 	/* G: chamada. Fixo só o comando (comenta "EDIÇÃO"), o resto na legenda corrida em LEG_Y2 */
 	{tipo: 'bloco', de: CORTE.g, ate: DURACAO, x: 0.5, largura: 520, top: LEG_Y / H, linhas: [
 		P(83, 'meio', p('comenta')),
@@ -254,8 +242,10 @@ const visivelSaida = (f: number, fAte: number) => {
 	return k < PISCA_SAIDA.length ? PISCA_SAIDA[k] === 1 : false;
 };
 
+/** G16 (REGRAS.md): texto limpo, sem brilho; o brilho azul liga só com pedido explícito do dono */
+const BRILHO_TEXTO = false;
 const estiloCor = (cor: Tom, tam: number): React.CSSProperties => {
-	if (cor === 'azul') return {color: COR.sonho, textShadow: `0 0 ${tam * 0.09}px rgba(10,100,252,0.95), 0 0 ${tam * 0.22}px rgba(10,100,252,0.7), 0 0 ${tam * 0.45}px rgba(10,100,252,0.35)`};
+	if (cor === 'azul') return {color: COR.sonho, textShadow: !BRILHO_TEXTO ? '0 4px 22px rgba(0,0,0,0.45)' : `0 0 ${tam * 0.09}px rgba(10,100,252,0.95), 0 0 ${tam * 0.22}px rgba(10,100,252,0.7), 0 0 ${tam * 0.45}px rgba(10,100,252,0.35)`};
 	if (cor === 'vermelho') return {color: COR.dor, textShadow: '0 4px 22px rgba(0,0,0,0.45)'};
 	return {color: '#E6E3E5', backgroundImage: 'linear-gradient(180deg, #EEEDF0 10%, #D6CFCE 95%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'};
 };
@@ -432,14 +422,14 @@ export const caixas = (t: number, previas: boolean) => {
 };
 
 /* ---------------------------------------------------------------- vídeo, tratamento, P&B, clarões, chicote, vazamento de luz */
-const Video: React.FC<{f: number; previas: boolean; efeitoFundo: boolean}> = ({f, previas, efeitoFundo}) => {
+const Video: React.FC<{f: number; previas: boolean; fundo: Fundo; pb: boolean}> = ({f, previas, fundo, pb}) => {
 	const i = planoEm(f);
 	const pl = PLANOS[i];
 	const {s, tx, ty} = camera(f, previas);
 	const k = f - fr(pl.de);
 	const fim = fimPlano(i);
-	let filtro = efeitoFundo ? 'contrast(1.04)' : 'none';
-	if (pl.pb) {
+	let filtro = fundo === 'recorte' ? 'contrast(1.04)' : 'none';
+	if (pl.pb && pb) {
 		const pbBase = 'grayscale(1) contrast(1.32) brightness(0.74)';
 		if (k === 0) filtro = 'brightness(1.7) saturate(0.7)'; // clarão entrando
 		else if (k === 1) filtro = 'grayscale(1) brightness(2.3) contrast(0.75)'; // P&B estourado
@@ -452,8 +442,9 @@ const Video: React.FC<{f: number; previas: boolean; efeitoFundo: boolean}> = ({f
 	return (
 		<AbsoluteFill style={{filter: `${filtro}${chicote ? ' url(#chicote)' : ''}`, WebkitMaskImage: desce ? 'linear-gradient(180deg, transparent 0px, transparent 640px, #000 820px)' : undefined}}>
 			<AbsoluteFill style={{transform: `translate(${tx + (chicote ? -70 : 0)}px, ${ty}px) scale(${s})`, transformOrigin: '0 0'}}>
-				{efeitoFundo && exige('fala_grade.mp4', 'rode scripts/grade.py pela trava e depois tools/adaptar.py --desenho (modelos/pagina-de-livro/pagina-de-livro.md, seção 9, passo 2) ou renderize com "efeitoFundo": false.')}
-				<OffthreadVideo muted src={staticFile(efeitoFundo ? 'fala_grade.mp4' : 'fala.mp4')} style={{width: W, height: H}} />
+				{fundo === 'recorte' && exige('fala_grade.mp4', 'rode scripts/grade.py pela trava e depois tools/adaptar.py --desenho (modelos/pagina-de-livro/pagina-de-livro.md, seção 7) ou renderize com o fundo real (o padrão).')}
+				{fundo === 'desfoque' && exige('fala_desfoque.mp4', 'rode scripts/grade.py --desfoque pela trava (modelos/pagina-de-livro/pagina-de-livro.md, seção 7) ou renderize com o fundo real (o padrão).')}
+				<OffthreadVideo muted src={staticFile(fundo === 'recorte' ? 'fala_grade.mp4' : fundo === 'desfoque' ? 'fala_desfoque.mp4' : 'fala.mp4')} style={{width: W, height: H}} />
 			</AbsoluteFill>
 			<svg width="0" height="0" style={{position: 'absolute'}}>
 				<filter id="chicote" x="-10%" y="0" width="120%" height="100%">
@@ -508,14 +499,15 @@ export const PreviasEmCima: React.FC<{f: number; nomes: [string, string]}> = ({f
 	);
 };
 
-export const VitrineStoryPodcast01: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], musica = false, efeitoFundo = true}) => {
+export const VitrineStoryPodcast01: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], musica = false, efeitoFundo = false, fundo: fundoProp, pb = false}) => {
+	const fundo: Fundo = fundoProp ?? (efeitoFundo ? 'recorte' : 'real');
 	const f = useCurrentFrame();
 	const t = f / FPS;
 	const ok = useFontes();
 	return (
 		<AbsoluteFill style={{background: COR.breu}}>
-			<Video f={f} previas={previas} efeitoFundo={efeitoFundo} />
-			{efeitoFundo && <Vinheta />}
+			<Video f={f} previas={previas} fundo={fundo} pb={pb} />
+			{fundo === 'recorte' && <Vinheta />}
 			{previas && <PreviasEmCima f={f} nomes={nomesPrevias} />}
 			{ok &&
 				PECAS.map((pc, i) => {

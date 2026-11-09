@@ -36,7 +36,7 @@ try {
 	fs.rmSync(tmp, {force: true});
 }
 const {PS, PLANOS, BLOCOS, PICOS, HEROI, PONTES, FLASHES, NEGATIVOS, EVENTOS, TROCAS, DURACAO, ZONA, ZW, QUEIXO, ZOOM, ORIGEM, TEM_ROSTO, PICO_PX, PICO_ALT, LEG_LH,
-	IMGS: IM, ERROS_PLANO, TEM_MAOS, maoSobre, caixas, escrita, entra, geometria, largLeg, largPico, fechaTrecho} = M;
+	IMGS: IM, ERROS_PLANO, TEM_MAOS, bocaY, maoSobre, caixas, escrita, entra, geometria, largLeg, largPico, fechaTrecho} = M;
 
 // os limites do modelo (imagem-por-palavra.md, seções 2, 3 e 5)
 const LIM = {
@@ -46,9 +46,10 @@ const LIM = {
 	janela: 5, minJanela: 4, minJanelaFecho: 3, // nenhuma janela de 5 s com menos de 4 trocas (a última, do fecho, 3)
 	trocasMin: 1.8, trocasMax: 2.6,             // trocas por segundo no vídeo (ref1 2,41; ref2 1,52 com o miolo de rosto)
 	bloco: 1.5, blocoPiso: 1.2, palavra: 0.4, linhas: 2, // bloco 1,2–1,5 s só entre duas pausas da fala (aviso); abaixo de 1,2 s só um trecho inteiro
-	picoMin: 4, picoMax: 9,                      // um pico a cada 5–8 s (E6); avisa fora de 4–9 s
+	picoMin: 3, picoMax: 12,                     // a trava só onde importa (G17): avisa só se ficarem colados
+	palavrasBloco: 9,                            // I-LEGENDA: bloco curto (1–6 palavras nas refs); avisa acima de 9
 	card: 4.0,                                   // tempo contínuo em cartão chapado (preto/creme) sem imagem
-	pessoaSeguidos: 3,                           // planos da pessoa seguidos (reenquadramentos) antes de voltar a imagem
+	pessoaMin: 0.5,                              // G6: a pessoa (o vídeo normal) é a maior parte do vídeo
 	margemQueixo: 30,
 	mao: 0.15, maoAviso: 0.08,                    // área do texto sobre mão/braço na média do plano da pessoa
 };
@@ -91,16 +92,33 @@ for (let k = 0; k <= iv.length; k++) {
 		r0 = null;
 	}
 }
+// G6 (2026-11-05): a pessoa carrega a maior parte do vídeo; a imagem vem em ONDAS (planos seguidos que não são a pessoa),
+// no fim das cenas fortes. O ritmo do modelo (trocas por segundo, janelas de 5 s) é cobrado dentro das ondas.
+const ONDAS = [];
+// I-LEGENDA (2026-11-07): onda é só IMAGEM (img, estilos, rajada, mosaico, paineis). Cartão chapado é palco da tipografia,
+// não conta como onda nem pode fingir corte (cartões trocando de cor sem texto novo saíram).
+const IMAGEM = new Set(['img', 'estilos', 'rajada', 'mosaico', 'paineis']);
+PLANOS.forEach((p) => {
+	if (!IMAGEM.has(p.tipo)) return;
+	const u = ONDAS[ONDAS.length - 1];
+	if (u && Math.abs(u.t1 - p.t0) < 1e-6) u.t1 = p.t1;
+	else ONDAS.push({t0: p.t0, t1: p.t1});
+});
 const janelas = [];
-for (let a = 0; a + LIM.janela <= DURACAO + 0.01; a += LIM.janela) {
-	const n = tr.filter((x) => x >= a && x < a + LIM.janela).length + (a === 0 ? 1 : 0);
-	const ultima = a + 2 * LIM.janela > DURACAO;
-	janelas.push(`${a}-${a + LIM.janela}s:${n}`);
-	if (n < (ultima ? LIM.minJanelaFecho : LIM.minJanela)) erros.push(`janela ${a}–${a + LIM.janela} s com ${n} trocas (mínimo ${ultima ? LIM.minJanelaFecho : LIM.minJanela})`);
+for (const o of ONDAS) {
+	const n = tr.filter((x) => x >= o.t0 - 1e-6 && x < o.t1 - 1e-6).length;
+	janelas.push(`${t2(o.t0)}-${t2(o.t1)}s:${n}`);
+	for (let a = o.t0; a + LIM.janela <= o.t1 + 0.01; a += LIM.janela) {
+		const m = tr.filter((x) => x >= a && x < a + LIM.janela).length;
+		if (m < LIM.minJanela) erros.push(`janela ${t2(a)}–${t2(a + LIM.janela)} s dentro da onda com ${m} trocas (mínimo ${LIM.minJanela})`);
+	}
 }
-const porSeg = tr.length / DURACAO;
-if (porSeg < LIM.trocasMin || porSeg > LIM.trocasMax) avisos.push(`${porSeg.toFixed(2)} trocas/s (faixa do modelo ${LIM.trocasMin}–${LIM.trocasMax})`);
-if (porSeg < 1.4) erros.push(`${porSeg.toFixed(2)} trocas/s: isto não é o imagem-por-palavra (mínimo 1,4)`);
+const tOndas = ONDAS.reduce((a, o) => a + o.t1 - o.t0, 0);
+const nOndas = tr.filter((x) => ONDAS.some((o) => x >= o.t0 - 1e-6 && x < o.t1 - 1e-6)).length;
+const porSeg = tOndas ? nOndas / tOndas : 0; // trocas por segundo DENTRO das ondas de imagem (G6)
+if (!ONDAS.length) avisos.push('sem onda de imagem (sem material, G7): a camada de imagem não entrou; o ritmo vem da fala, da trava e do reenquadre');
+else if (porSeg < LIM.trocasMin || porSeg > LIM.trocasMax) avisos.push(`${porSeg.toFixed(2)} trocas/s nas ondas de imagem (faixa do modelo ${LIM.trocasMin}–${LIM.trocasMax})`);
+if (ONDAS.length && porSeg < 1.4) erros.push(`${porSeg.toFixed(2)} trocas/s nas ondas de imagem: isto não é o imagem-por-palavra (mínimo 1,4 dentro da onda)`);
 const med = [...iv].sort((a, b) => a - b)[Math.floor(iv.length / 2)] ?? 0;
 
 // 3. cartão chapado contínuo e pessoa seguida
@@ -114,13 +132,10 @@ PLANOS.forEach((p, k) => {
 		c0 = null;
 	}
 });
-let ps0 = 0;
 PLANOS.forEach((p, k) => {
-	ps0 = p.tipo === 'pessoa' ? ps0 + 1 : 0;
-	if (ps0 > LIM.pessoaSeguidos) erros.push(`planos[${k}]: ${ps0} planos da pessoa seguidos (máx. ${LIM.pessoaSeguidos}); ponha uma imagem ou um cartão`);
 	if (p.tipo === 'pessoa' && k && PLANOS[k - 1].tipo === 'pessoa' && PLANOS[k - 1].plano === p.plano) erros.push(`planos[${k}]: duas telas da pessoa seguidas no mesmo enquadre (o corte não aparece)`);
 });
-NEGATIVOS.forEach((x) => { if (PLANOS.find((p) => x >= p.t0 && x < p.t1)?.tipo === 'pessoa') erros.push(`negativo em ${t2(x)} s cai na pessoa (G33: nada de efeito de cor na gravação)`); });
+NEGATIVOS.forEach((x) => { if (PLANOS.find((p) => x >= p.t0 && x < p.t1)?.tipo === 'pessoa') erros.push(`negativo em ${t2(x)} s cai na pessoa (G6: nada de efeito de cor na gravação)`); });
 if (FLASHES.length > Math.max(1, Math.round(DURACAO / 8))) avisos.push(`${FLASHES.length} flashes: 1 a cada ~8 s no máximo`);
 
 // 4. o texto: cada palavra uma vez, blocos, leitura, linhas, zona, rosto
@@ -131,33 +146,45 @@ const textoEm = (t) => PLANOS.find((p) => t >= p.t0 && t < p.t1);
 BLOCOS.forEach((b) => {
 	const nome = `bloco ${b.k} "${b.ids.map(escrita).join(' ').slice(0, 40)}"`;
 	const dur = (b.fixo ? DURACAO : b.t1) - b.t0;
-	b.ids.slice(0, -1).forEach((i) => { if (fechaTrecho(i)) erros.push(`${nome}: passa da pontuação em "${PS[i].texto}" (G35: um bloco é um trecho só)`); });
+	b.ids.slice(0, -1).forEach((i) => { if (fechaTrecho(i)) erros.push(`${nome}: passa da pontuação em "${PS[i].texto}" (G11/G14: um bloco é um trecho só)`); });
 	if (dur < LIM.blocoPiso - 1e-6 && !b.trechoInteiro) erros.push(`${nome}: ${t2(dur)} s na tela (mínimo ${LIM.blocoPiso} s; só um trecho inteiro curto fica menos)`);
 	else if (dur < LIM.bloco - 1e-6 && !b.trechoInteiro) avisos.push(`${nome}: ${t2(dur)} s na tela (alvo ${LIM.bloco} s): só vale se a fala não dá outra divisão com cada palavra a 0,4 s`);
 	for (const i of b.ids) {
-		const fica = (b.fixo ? DURACAO : b.t1) - Math.max(entra(i), b.t0);
+		const naGigante = b.pico && i >= b.pico.de && i <= b.pico.ate; // a gigante entra inteira na 1ª palavra dela
+		const fica = (b.fixo ? DURACAO : b.t1) - Math.max(naGigante ? entra(b.pico.de) : entra(i), b.t0);
 		if (fica < LIM.palavra - 1e-6) erros.push(`${nome}: "${PS[i].texto}" fica ${t2(fica)} s (mínimo 0,4 s)`);
-		if (entra(i) < b.t0 - 1e-6 && !b.gancho) erros.push(`${nome}: "${PS[i].texto}" entra antes do bloco`);
+		if (entra(i) < b.t0 - 1e-6) erros.push(`${nome}: "${PS[i].texto}" entra antes do bloco`);
 	}
 	if (b.estilo === 'heroi') return;
-	if (b.antes.length + b.depois.length > LIM.linhas + (b.pico ? 0 : 0)) erros.push(`${nome}: ${b.antes.length + b.depois.length} linhas de legenda (máx. 2)`);
+	if (b.ids.length > LIM.palavrasBloco) avisos.push(`${nome}: ${b.ids.length} palavras no bloco (a identidade é o bloco curto): divida numa quebra se os dois lados ficarem com 1,5 s ou mais`);
+	if (b.antes.length + b.depois.length > LIM.linhas) erros.push(`${nome}: ${b.antes.length + b.depois.length} linhas de legenda (máx. 2, G12)`);
+	// o bloco não atravessa pessoa/imagem <-> cartão: o texto mudaria de lugar no meio da fala
+	const fim = b.fixo ? DURACAO : b.t1;
+	const tipos = PLANOS.filter((p) => p.t0 < fim - 1e-6 && p.t1 > b.t0 + 1e-6).map((p) => p.tipo === 'card');
+	if (tipos.some((x) => x !== b.cartao)) erros.push(`${nome}: atravessa ${b.cartao ? 'cartão -> pessoa/imagem' : 'pessoa/imagem -> cartão'}: o cartão entra e sai junto com o bloco (G23)`);
 	[...b.antes, ...b.depois].forEach((l) => { if (l.w > ZW + 1) erros.push(`${nome}: linha "${l.ids.map(escrita).join(' ')}" com ${Math.round(l.w)} px (cabe ${ZW}); ponha uma quebra`); });
 	if (b.pico) {
 		const p = b.pico;
 		const dentro = b.ids.filter((i) => i >= p.de && i <= p.ate);
 		const w = largPico(dentro.map(escrita).join(' '), PICO_PX);
 		if (w > ZW + 1) erros.push(`${nome}: o pico "${dentro.map(escrita).join(' ')}" tem ${Math.round(w)} px a ${PICO_PX} px (cabe ${ZW})`);
-		if (b.antes.length > 1 || b.depois.length > 1) erros.push(`${nome}: com pico, no máximo 1 linha antes e 1 depois`);
+		if (b.depois.length > 1) erros.push(`${nome}: na trava, no máximo 1 linha depois da gigante`);
+		// I-LEGENDA v3: a gigante é do tamanho das referências (60–100% da largura): abaixo de 55% da zona não é a trava
+		if (w < 0.55 * ZW) erros.push(`${nome}: a gigante "${dentro.map(escrita).join(' ')}" ocupa ${Math.round((100 * w) / ZW)}% da largura (mínimo 55%): escolha um termo mais longo ou deixe sem gigante`);
 	}
 	const g = geometria(b);
-	const tops = [...g.antes, ...(b.pico ? [g.pico] : []), ...g.depois];
-	const fundo = b.depois.length ? g.depois[g.depois.length - 1] + LEG_LH : b.pico ? g.pico + PICO_ALT : g.antes[g.antes.length - 1] + LEG_LH;
+	const cx = caixas(b);
+	const tops = cx.map((c) => c.y0);
+	const fundo = Math.max(...cx.map((c) => c.y1));
 	if (Math.min(...tops) < ZONA.topo || fundo > ZONA.base) erros.push(`${nome}: fora da zona segura (y ${Math.round(Math.min(...tops))}–${Math.round(fundo)}; zona ${ZONA.topo}–${ZONA.base})`);
+	if (cx.some((c) => c.x0 < ZONA.esq - 1 || c.x1 > ZONA.dir + 1)) erros.push(`${nome}: texto fora da zona segura na horizontal`);
 	// nenhum texto sobre o rosto: em qualquer plano da pessoa que o bloco atravessa, o topo do texto fica abaixo do queixo
 	const topo = Math.min(...tops);
 	PLANOS.filter((p) => p.tipo === 'pessoa' && p.t0 < (b.fixo ? DURACAO : b.t1) && p.t1 > b.t0).forEach((p) => {
 		const queixo = ORIGEM.y; // o zoom puxa do queixo: ele fica no lugar em todos os enquadres
-		if (topo < queixo + LIM.margemQueixo) erros.push(`${nome}: texto em y ${Math.round(topo)} sobre o rosto (queixo em ${Math.round(queixo)}) no plano da pessoa de ${t2(p.t0)} s`);
+		// o texto pode encostar no queixo (as referências põem a gigante no peito), nunca na boca nem nos olhos
+		const boca = bocaY(ZOOM[p.plano ?? 'aberto']);
+		if (topo < boca + 10) erros.push(`${nome}: texto em y ${Math.round(topo)} sobre a boca (boca em ~${Math.round(boca)}, queixo ${Math.round(queixo)}) no plano da pessoa de ${t2(p.t0)} s: plano mais fechado (o rosto sobe) ou menos linhas antes da gigante`);
 		const a0 = Math.max(p.t0, b.t0), a1 = Math.min(p.t1, b.fixo ? DURACAO : b.t1);
 		const amostra = [];
 		for (let t = a0; t < a1; t += 0.25) amostra.push(maoSobre(caixas(b), t, ZOOM[p.plano ?? 'aberto']));
@@ -177,10 +204,25 @@ PICOS.forEach((p, k) => {
 	const b = BLOCOS.find((x) => x.ids.includes(p.de));
 	if (b && !b.ids.includes(p.ate)) erros.push(`picos[${k}] atravessa o fim do bloco`);
 	if (b?.estilo === 'heroi') erros.push(`picos[${k}] dentro do herói (o herói já é o pico)`);
-	if (p.voz === 'conta' && !/\d/.test(PS[p.de].texto)) erros.push(`picos[${k}]: "conta" só em número escrito em algarismos (G8: o número na tela é o dito)`);
+	if (p.voz === 'conta') erros.push(`picos[${k}]: "conta" mostra números que a pessoa não disse (G10); use a gigante`);
+	if (/[.,;:!?…"“”]/.test(escrita(p.ate).slice(-1)) || /^["“]/.test(escrita(p.de))) erros.push(`picos[${k}]: pontuação ou aspas dentro da gigante (G18): tire no "texto" do plano`);
 });
-const posicoes = new Set(BLOCOS.filter((b) => b.estilo !== 'heroi' && !b.fixo).flatMap((b) => [geometria(b).antes[0], ...geometria(b).depois].filter((y) => y !== undefined)));
-if (posicoes.size > 2) erros.push(`legenda em ${posicoes.size} posições (${[...posicoes].join(', ')}): no máximo 2 (G15)`);
+// G12/G13: a legenda padrão tem um lugar (Y1) sobre a pessoa e a imagem; a gigante da trava tem um lugar por tipo de fundo
+// (pessoa/imagem: logo abaixo da 1ª linha; cartão: no meio do quadro). No máximo 3 posições de destaque no vídeo.
+const posLeg = new Set(BLOCOS.filter((b) => b.estilo !== 'heroi' && !b.fixo && !b.cartao && !b.pico).map((b) => Math.round(geometria(b).antes[0]?.y ?? geometria(b).pico.y)));
+if (posLeg.size > 1) erros.push(`a legenda sobre a pessoa começa em ${posLeg.size} alturas (${[...posLeg].join(', ')}): um lugar só (G12)`);
+const posPico = new Set(BLOCOS.filter((b) => b.pico).map((b) => `${b.cartao ? 'cartão' : 'pessoa'}:${Math.round(geometria(b).pico.y / 10) * 10}`));
+const tiposPico = new Set([...posPico].map((x) => x.split(':')[0]));
+if (posPico.size > 3) erros.push(`a gigante em ${posPico.size} posições (${[...posPico].join(', ')}): no máximo 3 (G13)`);
+if (tiposPico.has('pessoa') && [...posPico].filter((x) => x.startsWith('pessoa')).length > 1) erros.push(`a gigante sobre a pessoa muda de altura (${[...posPico].join(', ')}): mesmo tipo, mesma posição (G13)`);
+// o cartão é palco: só entra com a gigante, o herói ou o comando fixo dentro dele; nunca dois cartões seguidos trocando de cor
+PLANOS.forEach((p, k) => {
+	if (p.tipo !== 'card') return;
+	const dentro = BLOCOS.filter((b) => b.t0 < p.t1 - 1e-6 && (b.fixo ? DURACAO : b.t1) > p.t0 + 1e-6);
+	if (!p.porque) erros.push(`planos[${k}] cartão em "${PS[p.i].texto}" sem "porque": o cartão preto é raro (respiro tipográfico pedido pela fala, ou rosto que cobriria o texto); a gigante mora sobre a gravação (I-LEGENDA v3)`);
+	if (!dentro.some((b) => b.pico || b.estilo === 'heroi' || b.estilo === 'tarja')) erros.push(`planos[${k}] cartão em "${PS[p.i].texto}" sem tipografia gigante: cartão chapado não é corte de enfeite (I-LEGENDA)`);
+	if (k && PLANOS[k - 1].tipo === 'card') erros.push(`planos[${k}]: cartão depois de cartão (trocar a cor do fundo sem texto novo não é corte; I-LEGENDA)`);
+});
 // 6. o que a casa proíbe na tela
 for (const v of [...Object.values(M.PS.map((_, i) => escrita(i)))]) if (/[—–]/.test(v)) erros.push(`travessão na tela: "${v}"`);
 if (BLOCOS.some((b) => b.ids.map(escrita).join(' ').toLowerCase().includes('superdopamina'))) erros.push('o nome do modelo está na tela (G20)');
@@ -191,8 +233,9 @@ fs.writeFileSync(path.join(MOLDE, 'src', 'eventos.json'), JSON.stringify({duraca
 // relatório
 const tempoCard = PLANOS.filter((p) => p.tipo === 'card').reduce((a, p) => a + p.t1 - p.t0, 0);
 const tempoPessoa = PLANOS.filter((p) => p.tipo === 'pessoa').reduce((a, p) => a + p.t1 - p.t0, 0);
-console.log(`duração ${t2(DURACAO)} s | ${PLANOS.length} planos | ${tr.length} trocas = ${porSeg.toFixed(2)}/s (${(porSeg * 60).toFixed(0)}/min) | intervalo mediano ${t2(med)} s | menor ${t2(Math.min(...iv))} s`);
-console.log(`janelas de 5 s: ${janelas.join('  ')}`);
+if (tempoPessoa / DURACAO < LIM.pessoaMin) console.log(`aviso: a pessoa está em ${(100 * tempoPessoa / DURACAO).toFixed(0)}% do vídeo (alvo ${100 * LIM.pessoaMin}%); confira se cada imagem serve à fala e ao tema (G28), não reprova`);
+console.log(`duração ${t2(DURACAO)} s | ${PLANOS.length} planos | ${tr.length} trocas, ${porSeg.toFixed(2)}/s dentro das ondas de imagem (${t2(tOndas)} s) | intervalo mediano ${t2(med)} s | menor ${t2(Math.min(...iv))} s`);
+console.log(`ondas de imagem (G6): ${janelas.join('  ')}`);
 console.log(`pessoa ${(100 * tempoPessoa / DURACAO).toFixed(0)}% | cartão ${(100 * tempoCard / DURACAO).toFixed(0)}% | imagem ${(100 - 100 * (tempoPessoa + tempoCard) / DURACAO).toFixed(0)}% | picos ${tp.map(t2).join(', ')} s | pico ${PICO_PX} px | ${BLOCOS.length} blocos | imagens ${presentes.length}/${Object.keys(IMGS).length}`);
 for (const p of PLANOS) console.log(`  ${t2(p.t0).padStart(6)}–${t2(p.t1).padEnd(6)} ${p.tipo.padEnd(8)} ${(p.img ?? p.plano ?? p.fundo ?? (p.imgs ?? []).join('+')).slice(0, 40).padEnd(40)} "${PS[p.i].texto}"`);
 avisos.forEach((a) => console.log('AVISO', a));

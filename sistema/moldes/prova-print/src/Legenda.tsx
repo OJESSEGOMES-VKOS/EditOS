@@ -3,10 +3,10 @@ import {C, CENAS, FIXOS, G, P, SANS, SERIF, cenaEm, iw, tw, useT} from './tema';
 import type {Modo} from './tema';
 
 /**
- * A legenda (prova-print.md §5): dois lugares no vídeo (G15): no palco y 940, entre o card da prova e a cabeça que sai
+ * A legenda (prova-print.md §5): um lugar padrão, y 1180, um bloco por vez (G12); só o palco (opção) a sobe para y 940, entre o card da prova e a cabeça que sai
  * do cartão de câmera (ref4); na vitrine, no capítulo e no rosto fechado y 1180 (abaixo do card, no peito). O pedaço inteiro aparece de uma vez com as palavras ainda não ditas apagadas, e
  * cada uma acende no início dela (o "apagada que acende" das referências), com o tempo de leitura da casa: o pedaço dura
- * >= 1,5 s, nunca atravessa um corte, nunca passa de 2 linhas e nunca junta fim de frase com começo de outra (G35).
+ * >= 1,5 s, nunca atravessa um corte, nunca passa de 2 linhas e nunca junta fim de frase com começo de outra (G11, G14).
  */
 type Pal = {texto: string; de: number; ate: number; i: number};
 type Pedaco = {pal: Pal[]; de: number; ate: number; cheio?: boolean};
@@ -35,7 +35,7 @@ const caixa = 1080 - LUGAR.esq - LUGAR.dir;
 export const linhasDe = (pal: Pal[]) => Math.max(1, Math.ceil(largura(pal) / caixa));
 
 /** fala corrida: um trecho (entre pontuação, corte ou o comando fixo) vira o menor número de pedaços de até 2 linhas,
- * equilibrados pelo número de letras. Um pedaço nunca junta dois trechos (G35). Cada pedaço fica até o próximo nascer,
+ * equilibrados pelo número de letras. Um pedaço nunca junta dois trechos (G11, G14). Cada pedaço fica até o próximo nascer,
  * no mínimo 1,5 s quando a fala deixa, e nunca atravessa o corte. */
 const pedacos = (): Pedaco[] => {
 	const trechos: Pal[][] = [];
@@ -97,7 +97,7 @@ export const PEDACOS = pedacos();
 const estilo = (modo: Modo) =>
 	modo === 'palco' || modo === 'capitulo'
 		? {cor: C.tinta, chave: C.chave, sombra: undefined}
-		: {cor: C.branco, chave: C.chaveEscuro, sombra: modo === 'rosto' ? '0 6px 48px rgba(0,0,0,0.5)' : undefined};
+		: {cor: C.branco, chave: C.chaveEscuro, sombra: modo === 'rosto' || modo === 'pessoa' ? '0 6px 48px rgba(0,0,0,0.5)' : undefined};
 
 export const Legenda: React.FC = () => {
 	const {t} = useT();

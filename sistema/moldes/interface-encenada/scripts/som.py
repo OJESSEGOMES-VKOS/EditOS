@@ -143,26 +143,34 @@ def subida(d):
 fx = np.zeros(N)
 c = lambda t: t - 0.06  # os cortes de tema.ts
 
-# cortes entre modos: a tela nova surge com o popup grave (mais baixo quando corta pro rosto)
-cortes = {'criado': c(w('ele')), 'modelos': c(w('diferença')), 'instagram': c(w('inclusive')), 'nome': c(w('você', 2)),
-          'previas': c(w('eu', 2)), 'mas': c(w('mas')), 'outros': c(w('ver')), 'comenta': c(w('comenta'))}
+# G6 (2026-11-05): o plano padrão é o rosto cheio na maior parte; só as telas que o plano usa (base() em src/tema.ts)
+# têm som. TELAS = as cenas de interface do plano; as outras (gancho, criado, instagram, nome, outros) ficam prontas para
+# quando um plano as chamar: ponha o id em TELAS e o corte dele em `cortes`.
+TELAS = {'modelos', 'comenta'} | ({'previas'} if PREVIAS else set())
+# cortes visíveis do plano: a tela nova surge com o popup grave; a volta ao rosto (e o punch-in da virada), mais baixo.
+# O corte entre dois rostos iguais (fala -> previas sem prévias) não tem som.
+cortes = {'modelos': c(w('diferença')), 'fala': c(w('inclusive')), 'mas': c(w('mas')), 'comenta': c(w('comenta'))}
+if PREVIAS:
+    cortes['previas'] = c(w('eu', 2))
 for nome, t0 in cortes.items():
-    rosto = nome == 'mas' or (nome == 'previas' and not PREVIAS)
+    rosto = nome not in TELAS
     add(fx, t0, pop(540 if rosto else 600), 0.3 if rosto else 0.42)
 
 # gancho: o celular, o contador a 100%, o chip do Claude
-add(fx, 0.02, pop(560), 0.36)
-cem = w('100%')
-for k in range(10):
-    add(fx, cem + k * 0.035, tic(), 0.35 - k * 0.015)
-add(fx, cem + 0.36, pop(820), 0.35)
-add(fx, w('claude'), pop(560), 0.4)
+if 'gancho' in TELAS:
+    add(fx, 0.02, pop(560), 0.36)
+    cem = w('100%')
+    for k in range(10):
+        add(fx, cem + k * 0.035, tic(), 0.35 - k * 0.015)
+    add(fx, cem + 0.36, pop(820), 0.35)
+    add(fx, w('claude'), pop(560), 0.4)
 
 # criado: as linhas da pasta entram, a última fica selecionada
-cd = cortes['criado']
-for t0 in (cd + 0.2, w('criado'), w('justamente'), w('para')):
-    add(fx, t0, tic(), 0.3)
-add(fx, w('mostrar'), clique(0.7), 0.45)
+if 'criado' in TELAS:
+    cd = c(w('ele'))
+    for t0 in (cd + 0.2, w('criado'), w('justamente'), w('para')):
+        add(fx, t0, tic(), 0.3)
+    add(fx, w('mostrar'), clique(0.7), 0.45)
 
 # modelos: as 8 pastas entram, enchem (criei), o ✓ desce (melhorei); troca de card; os formatos; o Claude
 md = cortes['modelos'] + 0.12
@@ -180,14 +188,16 @@ for t0 in (w('qualquer'), w('tipo'), w('vídeo', 2)):
 add(fx, w('claude', 2), pop(560), 0.4)
 
 # instagram: o toque, a aba, o coração de toque duplo
-add(fx, w('estiver'), clique(0.7), 0.45)
-add(fx, w('instagram'), tic(), 0.3)
-add(fx, w('agora'), pop(720), 0.42)
+if 'instagram' in TELAS:
+    add(fx, w('estiver'), clique(0.7), 0.45)
+    add(fx, w('instagram'), tic(), 0.3)
+    add(fx, w('agora'), pop(720), 0.42)
 
 # nome: as miniaturas entram, a seleção no modelo da vez
-for i in range(4):
-    add(fx, w('vendo') - 0.1 + i * 0.07, tic(), 0.2)
-add(fx, w('um'), clique(0.8), 0.5)
+if 'nome' in TELAS:
+    for i in range(4):
+        add(fx, w('vendo') - 0.1 + i * 0.07, tic(), 0.2)
+    add(fx, w('um'), clique(0.8), 0.5)
 
 # prévias (só na versão com prévias): o contorno desenhado, as duas entram, o 3x
 if PREVIAS:
@@ -199,16 +209,17 @@ if PREVIAS:
         add(fx, w('aceleradas') + i * 0.08, tic(), 0.32)
 
 # outros: o catálogo entra, o cursor clica no modelo; o prompt digita o comando, o arquivo entra, envia
-for i in range(6):
-    add(fx, w('ver') + i * 0.1, tic(), 0.22)
-add(fx, w('esse', 2) - 0.04, clique(), 0.5)
-add(fx, w('aprender') - 0.08, pop(620), 0.32)
-como = w('como', 2)
-for j in range(17):
-    add(fx, como + 0.45 * j / 17 + rng.uniform(-0.006, 0.006), tecla(), rng.uniform(0.18, 0.28))
-add(fx, w('isso'), pop(700), 0.32)
-add(fx, w('vídeos') - 0.03, clique(), 0.5)
-add(fx, w('vídeos') + 0.05, toque(), 0.28)
+if 'outros' in TELAS:
+    for i in range(6):
+        add(fx, w('ver') + i * 0.1, tic(), 0.22)
+    add(fx, w('esse', 2) - 0.04, clique(), 0.5)
+    add(fx, w('aprender') - 0.08, pop(620), 0.32)
+    como = w('como', 2)
+    for j in range(17):
+        add(fx, como + 0.45 * j / 17 + rng.uniform(-0.006, 0.006), tecla(), rng.uniform(0.18, 0.28))
+    add(fx, w('isso'), pop(700), 0.32)
+    add(fx, w('vídeos') - 0.03, clique(), 0.5)
+    add(fx, w('vídeos') + 0.05, toque(), 0.28)
 
 # comenta: toque no campo, EDIÇÃO digitado, Publicar, o comentário surge, o coração, a DM chega
 cm = cortes['comenta']

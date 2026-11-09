@@ -3,6 +3,8 @@
 Este é o único arquivo que você precisa ler para editar neste modelo. Tudo o que está aqui é regra. Quando algo daqui
 bater com o código do molde, vale o que está aqui.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo. A G29 (começo na gravação original) não se aplica: este modelo não tem gravação de pessoa.
+
 **A referência é o `referencia/referencia.mp4`**, o vídeo aprovado do modelo (30 s, só a voz). Os tempos entre
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo, com o segundo
 escrito) e o `mapa.json` (luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4` e o `original-16x9.mp4`, a versão deitada, para ler letra pequena e detalhe de tela.
@@ -34,8 +36,8 @@ Ninguém aparece. A narração conduz e a tela encena cada frase com objetos de 
   (escuro em 0 s, claro em 3 s, escuro em 5 s, claro em 13 s e 25 s).
 - **Objetos que fazem o que a fala diz:** play nos anéis (0 s), editor numa placa (3 s), placas inclinadas (6 s), ícone
   herói com órbita (9 s), celular flutuando (11 s), interruptor que liga (25 s).
-- **Toda a fala vira texto** numa altura de partida (no máximo duas), em linhas de tamanho e peso misturados (6 s, 10 s).
-- **Destaque em pílula de contorno brilhante**, escrita letra por letra (22 s, 28 s).
+- **Toda a fala vira texto** numa altura só (y 1170, G12), um bloco por vez, em linhas de tamanho e peso misturados (6 s, 10 s).
+- **Destaque em pílula de contorno brilhante**, escrita letra por letra, só no trecho ligado ao tema (G17, G28) e no fecho (22 s, 28 s). Pílula: porquê a confirmar com o dono (G30).
 - **Câmera viva:** nada fica parado. Uma ideia nova a cada 0,7 a 1,5 s.
 - **Fecho com o comando:** comenta e a palavra entre aspas numa pílula, sobre anéis (27 s a 29 s). Sem comando na
   fala, a pílula leva o termo protagonista da última frase.
@@ -127,11 +129,15 @@ vídeo segue com as telas genéricas.
 - **Tempo de leitura:** cada bloco fica pelo menos 1,5 s, cada palavra pelo menos 0,4 s depois de nascer. No máximo 4
   linhas por bloco. O bloco some num desfoque de 12 px nos últimos 0,1 s da cena.
 - **Altura:** a primeira linha com o centro em y 1170 e as seguintes a cada 80 a 92 px (1258, 1346, 1432). No vídeo
-  inteiro a legenda parte de no máximo duas alturas (o checador reprova a terceira), e o melhor é uma só: o aprovado
-  usa só 1170. Centro horizontal em x 500, o meio da zona segura.
+  inteiro a legenda parte de **uma altura só, y 1170** (G12; o checador reprova a segunda), como no aprovado. **Um bloco
+  por vez:** o bloco novo só entra quando o anterior saiu (o checador reprova blocos sobrepostos; só o comando fixo do
+  fecho fica junto da legenda). Centro horizontal em x 500, o meio da zona segura.
 - **Pílula de destaque:** Sora 700 com 84 px, caixa de contorno brilhante do tamanho da frase, entra inclinada em 3D
   com mola e endireita, e as letras se escrevem em 0,14 s por palavra (22 s). Pílulas do mesmo vídeo têm o mesmo
   tamanho. Uma pílula fica em y 790 e a segunda em y 950 (22 s), ou sozinha em y 880 no fecho (28 s).
+  **Quando entra (G17, G28):** só no trecho ligado ao tema (no aprovado, "outros modelos / de edição"
+  fecha a S8), ou no fecho; no máximo 2 blocos com pílula fora do fecho. Nunca uma pílula por frase: o resto do vídeo é
+  a legenda no lugar dela.
 - **Contador:** Sora 700 com 300 px, branco com brilho da cor da marca, centro em y 760, conta de 0 ao número dito em
   0,45 s e nasce de um desfoque com escala 0,6 → 1 (1 s a 2 s). O número é sempre o dito: o molde lê o número da
   própria palavra (`"40%"` conta até 40).
@@ -155,7 +161,7 @@ vídeo segue com as telas genéricas.
 
 | Opção | Padrão | Como mudar |
 |---|---|---|
-| Efeitos sonoros do modelo (whoosh, estalo, impacto, tiques) | **ligados** | Prop `efeitos: false` |
+| Efeitos sonoros do modelo (whoosh, estalo, impacto, tiques) | **ligados** (som: confirmar com o dono se continua padrão, G6) | Prop `efeitos: false` |
 | Trilha eletrônica sintetizada | desligada | `scripts/som.py` e prop `musica: true` |
 | Prévias de dois vídeos (15 s a 19 s) | desligadas | `tools/previa.py`, `"previas"` no plano e props `previas: true, nomesPrevias: [...]` |
 | Ir ao preto no fim | **ligado** | `"escurece": false` no `src/tempos.json` |
@@ -217,9 +223,10 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
      `y`, `marca` e `tipo` (`contador` ou `pilula`).
 5. **Confira as regras:** `../../.venv/Scripts/python.exe scripts/conferir.py` (na pasta do vídeo) até sair `0 erros`.
    Ele confere que o plano é desta fala, que toda palavra aparece uma vez, nasce no tempo e fica 0,4 s, blocos de 1,5 s
-   e até 4 linhas, zona segura, legenda em no máximo 2 alturas, pílulas do mesmo tamanho, nenhum trecho de 2,5 s sem
-   evento, nenhum travessão e nenhum nome de modelo.
-6. **Som:** `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo). Grava
+   e até 4 linhas, zona segura, legenda numa altura só e um bloco por vez (G12), pílula só no último bloco da cena ou
+   no fecho e no máximo 2 fora dele (regra antiga que o checador ainda cobra; a régua agora é a G17/G28), pílulas do mesmo tamanho, nenhum trecho de 2,5 s sem evento, nenhum
+   travessão e nenhum nome de modelo.
+6. **Som** (som: confirmar com o dono se continua padrão, G6): `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo). Grava
    `public/trilha.wav` e `public/efeitos.wav` a partir do plano. Os efeitos vêm ligados, então rode sempre que o plano
    mudar.
 7. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 5 10 15 20 25` (na pasta do
@@ -230,7 +237,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    `"previas":true,"nomesPrevias":["<modelo1>","<modelo2>"]`.
 9. **Mixe:** `sh scripts/finalizar.sh out/bruto.mp4 out/final.mp4` (na pasta do vídeo). O som já sai do render; aqui
    só normaliza em -14 LUFS e pico -1 dBTP.
-10. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 anuncio-neon`.
+10. **Confira a identidade do modelo (cor, luz, ritmo; nunca a sequência de telas, G30):** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 anuncio-neon`.
     Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
     em cima e o seu embaixo. Folha de 1 quadro por segundo do seu:
     `../../.venv/Scripts/python.exe scripts/folhas.py out/final.mp4` (na pasta do vídeo, em `conferencia/folha-1qps.png`,

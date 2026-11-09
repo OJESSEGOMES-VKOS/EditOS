@@ -1,4 +1,4 @@
-# Interface fiel: a tela recriada tem que parecer um print (G34)
+# Interface fiel: a tela recriada tem que parecer um print (G25)
 
 Vale pra todo modelo e pra todo vídeo: sempre que a tela mostra um app, um site, um painel, uma conversa, um
 aparelho (celular, notebook, relógio) ou qualquer interface, ela é recriada **de ponta a ponta como aquela interface
@@ -19,7 +19,7 @@ O dono viu o contrário acontecer várias vezes: um celular 3D genérico, um car
    família e peso da fonte, tamanhos relativos, cores exatas (hex de quadro cheio), ícones (forma, traço, cor),
    espaçamento entre itens, estados (botão ativo, campo com cursor, mensagem lida).
 3. **Liste o que é conteúdo e o que é moldura.** A moldura (barras, ícones, cores, fontes) é fiel ao produto real. O
-   conteúdo (o texto da mensagem, o nome no perfil, o número no painel) é o do vídeo, **real** (G31, nada inventado) ou
+   conteúdo (o texto da mensagem, o nome no perfil, o número no painel) é o do vídeo, **real** (G8, nada inventado) ou
    claramente o do próprio criador.
 
 Sem print real, não se recria a interface "de memória": a tela vira outra coisa (a palavra dita grande, a tela da
@@ -39,7 +39,7 @@ casa) ou entra no `PEDIDO.md`. Interface inventada de memória é exatamente a v
   genérica no lugar do ícone do produto.
 - **Estados e detalhes vivos.** Hora na barra de status, bateria, "visto por último", contador de curtidas, cursor
   piscando, teclado quando o campo está em foco. São os detalhes que fazem o olho acreditar.
-- **Conteúdo com tempo de leitura e tamanho de prova** (G1, G9): a interface entra grande, para ser lida, e a câmera
+- **Conteúdo com tempo de leitura e tamanho de prova** (G24, G9): a interface entra grande, para ser lida, e a câmera
   só viaja depois.
 - **Mesma interface no vídeo inteiro.** Se o app aparece três vezes, é o mesmo componente, com estados diferentes.
 

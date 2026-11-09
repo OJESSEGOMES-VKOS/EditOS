@@ -28,7 +28,7 @@ const precisa = (nome: keyof typeof COMO) => {
 };
 precisa('voz.wav');
 
-export const VitrineYoutubeDark01: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], musica = false, efeitos = true}) => {
+export const VitrineYoutubeDark01: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], musica = false, efeitos = false}) => { // G6: sons só com ordem explícita
 	if (musica) precisa('trilha.wav');
 	if (efeitos) precisa('efeitos.wav');
 	if (previas && T.previas) (precisa('previa1.mp4'), precisa('previa2.mp4'));

@@ -1,4 +1,8 @@
-"""Grade do pagina-de-livro (modelos/pagina-de-livro/pagina-de-livro.md, seção 1): estúdio escuro e frio, pretos esmagados, pele quente.
+"""OPÇÃO de fundo (G6, 2026-11-05): o padrão do modelo é o fundo real, sem este script. Só a pedido do dono.
+  sem argumento: fundo "recorte" (public/fala_grade.mp4), a pessoa recortada sobre o estúdio do modelo.
+  --desfoque:    fundo "desfoque" (public/fala_desfoque.mp4), a pessoa intacta (cor da gravação) sobre o próprio
+                 fundo levemente desfocado; nada de cor, vinheta ou luz trocada.
+Grade do pagina-de-livro (modelos/pagina-de-livro/pagina-de-livro.md, seção 1): estúdio escuro e frio, pretos esmagados, pele quente.
 A gravação tem parede bege clara, mais clara que a pele: um grade global não chega no Petróleo sem apagar o rosto.
 Então a pessoa é recortada com o Robust Video Matting (<estúdio>/tools/modelos/rvm_mobilenetv3_fp32.onnx)
 e o fundo vira breu petróleo desfocado (a própria luz da parede vira a variação do painel), enquanto a pessoa ganha
@@ -24,7 +28,8 @@ AQUI = Path(__file__).resolve().parent.parent
 MOD = AQUI.parents[1] / 'tools' / 'modelos'  # <estúdio>/tools/modelos
 W, H, FPS = 1080, 1920, 30
 ENT = AQUI / 'public' / 'fala.mp4'
-SAI = Path(sys.argv[sys.argv.index('--saida') + 1]) if '--saida' in sys.argv else AQUI / 'public' / 'fala_grade.mp4'
+DESFOQUE = '--desfoque' in sys.argv  # G6: desfoque leve do fundo real, sem tratamento
+SAI = Path(sys.argv[sys.argv.index('--saida') + 1]) if '--saida' in sys.argv else AQUI / 'public' / ('fala_desfoque.mp4' if DESFOQUE else 'fala_grade.mp4')
 ROSTO = json.loads((AQUI / 'src' / 'rosto.json').read_text(encoding='utf-8'))
 
 PETROLEO = np.array([17, 26, 27], np.float32) / 255  # #111A1B
@@ -75,11 +80,19 @@ def grade(rgb, fgr, a, t):
     return (np.clip(out, 0, 1) * 255 + 0.5).astype(np.uint8)
 
 
+def desfoque(rgb, a):
+    """G6: a pessoa como veio, sobre o próprio fundo com um desfoque leve (8 px). Nenhuma cor muda."""
+    src = rgb.astype(np.float32) / 255
+    fundo = cv2.GaussianBlur(src, (0, 0), 8)
+    a3 = a[..., None]
+    return (np.clip(src * a3 + fundo * (1 - a3), 0, 1) * 255 + 0.5).astype(np.uint8)
+
+
 def main():
     args = sys.argv[1:]
     if '--saida' in args:
         i = args.index('--saida'); del args[i:i + 2]
-    testes = [float(x) for x in args]
+    testes = [float(x) for x in args if x.replace('.', '', 1).isdigit()]
     rec = [np.zeros((1, 1, 1, 1), np.float32)] * 4
     le = subprocess.Popen(['ffmpeg', '-loglevel', 'error', '-i', str(ENT), '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], stdout=subprocess.PIPE)
     es = None
@@ -96,7 +109,7 @@ def main():
         src = (rgb.astype(np.float32) / 255).transpose(2, 0, 1)[None]
         fgr, pha, *rec = sess.run(None, {'src': src, 'r1i': rec[0], 'r2i': rec[1], 'r3i': rec[2], 'r4i': rec[3], 'downsample_ratio': RATIO})
         if es or f in alvo:
-            out = grade(rgb, fgr[0].transpose(1, 2, 0), pha[0, 0], f / FPS)
+            out = desfoque(rgb, pha[0, 0]) if DESFOQUE else grade(rgb, fgr[0].transpose(1, 2, 0), pha[0, 0], f / FPS)
             if es:
                 es.stdin.write(out.tobytes())
             else:
@@ -113,7 +126,8 @@ def main():
         es.wait()
     print(f, 'quadros', SAI if es else 'testes')
     # num vídeo novo (oficina/<v>/), leva a luz do fala_grade.mp4 até a do aprovado logo em seguida (o molde em si não)
-    if es and '--saida' not in sys.argv and AQUI.parent.name == 'videos':
+    # (o fundo desfocado não tem desenho a casar: a cor é a da gravação)
+    if es and '--saida' not in sys.argv and AQUI.parent.name in ('videos', 'oficina') and not DESFOQUE:
 
         raiz = AQUI.parent.parent
         subprocess.run([sys.executable, str(raiz / 'tools' / 'adaptar.py'), str(AQUI), 'pagina-de-livro', '--desenho'], check=True)

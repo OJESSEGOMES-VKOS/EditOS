@@ -46,5 +46,5 @@ Quatro perguntas decidem, nesta ordem:
 "**Ritmo** (`interface-encenada`): você vai mostrar o app funcionando e falar olhando pra câmera, e ele encena cada
 frase com interface de verdade. Segundo colocado: **Creator**, se preferir prints em vez de interface animada."
 
-Depois da escolha: leia o `sistema/modelos/<m>/<m>.md` inteiro e estude a referência dele. O vídeo tem que parecer o modelo
-desde o 1º segundo; a cor é a do modelo, nunca a da marca do criador; nunca escreva o nome do modelo na tela.
+Depois da escolha: leia o `sistema/modelos/<m>/<m>.md` inteiro e estude a referência dele. O modelo é inspiração, não molde
+(G30): o porquê e o como de cada tela, com a edição de cada trecho nascendo da fala nova (G28); a cor é a do modelo, nunca a da marca do criador; nunca escreva o nome do modelo na tela.

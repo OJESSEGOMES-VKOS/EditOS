@@ -24,7 +24,7 @@ Você edita vídeos em modelos de edição, com Remotion, dentro desta pasta.
    `novoperfil`.
 2. Antes de editar, leia `<perfil>/perfil.md` e olhe `<perfil>/materiais/`: logo, cores e prints dali são os oficiais.
    Nunca use material de outro perfil.
-   **Material, três modos (G24; o dono diz qual vale para o vídeo):** **só materiais** (o padrão, se ele não disse
+   **Material, três modos (G7; o dono diz qual vale para o vídeo):** **só materiais** (o padrão, se ele não disse
    nada): somente o que ele forneceu, em geral na pasta de materiais indicada do vídeo; gerar imagem (kie.ai, Codex,
    qualquer IA) ou buscar foto, vídeo ou som online é proibido. **Livre** ("faz o que der com tudo"): os materiais mais
    busca, recorte e geração, API incluída. **Indicado** ("materiais e API só"): os materiais mais exatamente o que ele
@@ -68,9 +68,9 @@ vídeo aprovado em código; ele não é a regra.
 
 **Nomes dos modelos (2026-11-03):** cada modelo tem o nome do que faz (`rosto-telas`, `youtube-didatico`, `prova-print`...; estilos de cena `cena01` a `cena46`). O nome antigo continua valendo como apelido (`sistema/tools/nomes-antigos.json`; os tools resolvem sozinhos): "edita no youtubeedition01" é o `youtube-didatico`.
 
-**O vídeo é uma composição de cenas, não o modelo copiado (G40, `sistema/cenas/METODO.md`).** O modelo escolhido é a
-casa: a identidade do vídeo inteiro (tratamento de cor, rosto, legenda, tipografia, cores, som, ritmo) vem do aprovado
-dele e fica ligada do começo ao fim. O que a tela faz em cada cena se decide cena a cena: rosto puro, uma resposta da
+**O modelo é inspiração, não molde (G28, G30, `sistema/cenas/METODO.md`).** Do modelo o vídeo herda a identidade
+(legenda, tipografia, cores); cada tela dele é repertório com um porquê, e só entra no trecho da fala nova em que o
+mesmo porquê se repete. Tratamento de cor, fundo, som e música só com ordem explícita (G6). O que a tela faz em cada cena se decide cena a cena: rosto puro, uma resposta da
 casa, a resposta de outro modelo ou um estilo de cena (`cenaNN`, os 46 de `sistema/cenas/INDICE.md`). O
 pedido do dono para uma cena ("cena 3 na cena07") manda nela. Só fica desligado de vez o que o `<modelo>.md`
 diz que é opção desligada.
@@ -80,18 +80,17 @@ os estilos de cena com profundidade feitos no próprio Remotion, sem Blender (ma
 1. Leia `README.md` e o `sistema/modelos/<modelo>/<modelo>.md` inteiro antes de qualquer edição.
 2. Estude o vídeo aprovado do modelo em `sistema/modelos/<modelo>/referencia/`: o `referencia.mp4` (com a voz), a
    `folha.jpg` (1 quadro por segundo) e o `mapa.json` (rosto, luz e cortes medidos a cada 0,25 s). Assista, tire os
-   quadros que precisar e meça. O `original.mp4` é o mesmo vídeo em qualidade cheia. O vídeo tem que parecer o modelo,
-   não o seu gosto; mas a referência mostra o jeito, não um roteiro para copiar: as telas, os textos e os cortes
-   nascem da fala nova.
+   quadros que precisar e meça. O `original.mp4` é o mesmo vídeo em qualidade cheia. Entenda o porquê de cada tela;
+   a referência mostra o jeito, nunca um roteiro para copiar: as telas, os textos e os cortes nascem da fala nova (G30).
 3. Um vídeo novo nasce, de dentro de `sistema/`, com
    `.venv/Scripts/python.exe tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>` (nome que a transcrição errar:
    `--trocar Errado=Certo`; achou o erro depois, `tools/trocar.py oficina/<pasta> Errado=Certo` corrige sem
    transcrever de novo) e vive em `sistema/oficina/`. A gravação deixada em `<perfil>/materiais/` vai junto para a
-   pasta do vídeo (`entrada/`). Ele já adapta a gravação ao ponto de partida do modelo (`tools/adaptar.py`: rosto no
-   tamanho e na altura, luz de partida); não pule esse passo. Depois siga a seção do vídeo novo do `<modelo>.md`, com
+   pasta do vídeo (`entrada/`). Ele já enquadra a gravação no modelo (`tools/adaptar.py`: rosto no tamanho e na altura,
+   9:16; cor e luz ficam as reais pela G6, `--luz` só a pedido); não pule esse passo. Depois siga a seção do vídeo novo do `<modelo>.md`, com
    um `plano.md` sobre `src/palavras.json` que abre com o **plano de cenas** e segue frase a frase. A demarcação já
    sai pronta no fim do `novo-video.py` (`tools/decupar.py`: cena até o ponto, subcena até a vírgula, reais ou
-   imaginários; G41). **Dois modos** (`sistema/cenas/METODO.md` §6): no **semiautomático** ("semi", "me manda as
+   imaginários; G14, G28). **Dois modos** (`sistema/cenas/METODO.md` §6): no **semiautomático** ("semi", "me manda as
    cenas") você mostra a lista numerada e espera o dono responder cena a cena ("1 - cena04; 2 - tela da
    casa"); no **automático** (o padrão, "edita no <modelo>") você escolhe cada cena. "Legenda padrão em <modelo>" é a
    legenda do vídeo todo, menos na zona que mostra a fala como imagem (§6). As respostas vão para o `cenas.json`, e
@@ -99,14 +98,12 @@ os estilos de cena com profundidade feitos no próprio Remotion, sem Blender (ma
    para ele trocar qualquer uma pelo número.
 4. Confira com prova, nesta ordem (comandos de dentro de `sistema/`), e só chame de pronto quando tudo passar:
    - o checador do molde zerado;
-   - `tools/parece.py <video.mp4> <modelo>`: luz, cor, enquadramento do rosto e ritmo contra o aprovado (vídeo curto é
-     comparado com os trechos do mesmo tamanho do aprovado). Reprovou, o vídeo não sai: corrija o que ele aponta;
-   - olhe a folha lado a lado que o `parece.py` grava (aprovado em cima, o seu embaixo). Se a diferença salta aos olhos,
-     não está pronto, mesmo com os números dentro;
+   - `tools/decupar.py <pasta> --conferir` zerado (regras G novas);
+   - `tools/parece.py` é opcional: compara só a identidade (fonte, cor, legenda) e não reprova (G30 aboliu "parecer o aprovado");
    - folha de 1 quadro por segundo, -14 LUFS.
 5. Tudo confinado: use `.venv/`, `node_modules/`, `tools/`, `kit/` e `.tmp/` de `sistema/`; render com
    `QUEM=<nome> sh tools/com-trava.sh ...` e `--concurrency=2`. Nada fora da pasta.
-   **O computador do dono nunca trava (G36).** Todo comando pesado (render do Remotion, ffmpeg longo, Blender, Whisper,
+   **O computador do dono nunca trava (G4).** Todo comando pesado (render do Remotion, ffmpeg longo, Blender, Whisper,
    montagem final) roda pelo `sistema/tools/com-trava.sh`, que liga a contenção (`sistema/tools/contencao.ps1`:
    prioridade ociosa e os últimos 6 núcleos sempre livres; na placa, prioridade ociosa e o Blender a 40% enquanto o
    dono usa o PC e no máximo 90% quando ele sai). Comando pesado fora da trava? Antes dele, solte o vigia:
@@ -114,7 +111,7 @@ os estilos de cena com profundidade feitos no próprio Remotion, sem Blender (ma
    último processo pesado). Um pesado por vez; com menos de 2 GB de RAM livre, espere em vez de começar outro.
 6. Nunca invente prova, número, fala, marca ou nome. Nome e @ na tela são os reais de quem fala (o `perfil.md`), ou
    nenhum. Interface, app ou aparelho na tela são recriados fiéis como um print, a partir de um print real com origem
-   (G34, procedimento em `.claude/skills/criar-modelo/referencias/interface-fiel.md`); nunca o mockup genérico.
+   (G25, procedimento em `.claude/skills/criar-modelo/referencias/interface-fiel.md`); nunca o mockup genérico.
 7. Correção do dono sobre um modelo entra no `<modelo>.md` daquele modelo, como regra (e, no EditOS local, também no
    `CORRECOES.md` dele, com data e as palavras do dono). Regra que vale para todos vai para `REGRAS.md` §0 e para o
    `<modelo>.md` de cada modelo em que se aplica. Mudou o vídeo aprovado de um modelo? Rode `tools/assinatura.py

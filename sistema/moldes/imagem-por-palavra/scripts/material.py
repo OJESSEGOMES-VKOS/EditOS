@@ -4,7 +4,7 @@ O gargalo deste modelo é a imagem (~2 por segundo de fala). Por isso a ordem é
   1. a lista (src/imagens.json): cada imagem com a palavra que ela ilustra ([índice, "palavra"] de src/palavras.json),
      o arquivo, a fonte ("kie", "kie+recorte", "livre", "usuario") e o prompt (só para "kie");
   2. `material.py --lista`: confere a lista contra a fala e escreve material/LISTA.md (a tabela que o dono pode ler);
-  3. `material.py --gerar` (SÓ se o modo de material do vídeo, em cenas.json, for livre ou indicado com API: G24): gera pela kie.ai (kit/gerar.py, Nano Banana 2.1 em 1K, 9:16) SÓ o que falta, converte foto para
+  3. `material.py --gerar` (SÓ se o modo de material do vídeo, em cenas.json, for livre ou indicado com API: G7): gera pela kie.ai (kit/gerar.py, Nano Banana 2.1 em 1K, 9:16) SÓ o que falta, converte foto para
      JPG (q 88) e recorta o fundo das "kie+recorte" (kit/recortar.py --modelo geral). Nada de imagem de filme,
      noticiário ou de terceiros: "livre" é foto com licença aberta (kit/buscar.py, anotada no ORIGEM.md) e
      "usuario" é arquivo do dono (cai no PEDIDO.md se faltar). Gente real só de foto real; IA só figurante sem rosto;
@@ -137,7 +137,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('--lista', action='store_true')
 ap.add_argument('--folha', action='store_true')
 ap.add_argument('--so', default='')
-ap.add_argument('--gerar', action='store_true')  # só se o modo de material do vídeo permitir (G24)
+ap.add_argument('--gerar', action='store_true')  # só se o modo de material do vídeo permitir (G7)
 a = ap.parse_args()
 e = conferir()
 if e:
@@ -151,10 +151,10 @@ elif a.gerar:
     cfg = json.loads(cj.read_text(encoding='utf-8')) if cj.exists() else {}
     modo, ok = cfg.get('material') or 'so-materiais', cfg.get('material_permitido') or ''
     if not (modo == 'livre' or (modo == 'indicado' and re.search(r'api|kie|gera|ia\b', ok, re.I))):
-        sys.exit(f"material: o modo deste vídeo é '{modo}' e não permite gerar imagem (G24). Só o dono muda: "
+        sys.exit(f"material: o modo deste vídeo é '{modo}' e não permite gerar imagem (G7). Só o dono muda: "
                  "'material' no cenas.json para livre, ou indicado com a API na lista.")
     gerar({x for x in a.so.split(',') if x})
     lista()
 else:
     lista()
-    print('nada gerado: só material do dono. Gerar pela kie.ai só nos modos livre ou indicado com API (G24, --gerar).')
+    print('nada gerado: só material do dono. Gerar pela kie.ai só nos modos livre ou indicado com API (G7, --gerar).')

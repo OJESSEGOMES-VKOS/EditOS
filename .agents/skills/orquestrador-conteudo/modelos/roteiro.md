@@ -7,7 +7,7 @@
 - **Status:** rascunho · aprovado em AAAA-MM-DD
 
 ## Gancho
-| | Fala | Texto na tela (desde o quadro 0) | Por quê |
+| | Fala | Texto na tela (desde o quadro 0, na legenda sobre a gravação: G29) | Por quê |
 |---|---|---|---|
 | A | | | |
 | B | | | |

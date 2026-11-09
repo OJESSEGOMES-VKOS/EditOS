@@ -4,6 +4,8 @@ import {loadFont as loadInter} from '@remotion/google-fonts/Inter';
 import {loadFont as loadSerif} from '@remotion/google-fonts/InstrumentSerif';
 import PALAVRAS from './palavras.json'; // entrada padrão: [{text,start,end}]
 import ROSTO from './rosto.json'; // entrada padrão: [[t,cx,cy,h]] a cada 0,25 s, em fração do quadro
+/** G16 (REGRAS.md): texto limpo, sem contorno, sombra colada ou brilho; liga só com pedido explícito do dono */
+const BRILHO_TEXTO = false;
 
 /**
  * Molde do pregacao (../../modelos/pregacao/pregacao.md), feito na vitrine dos modelos.
@@ -34,7 +36,12 @@ const um = (v: number) => Math.round(v * 10) / 10;
 const RT = ROSTO as number[][];
 const _cy = mediana(RT.map((r) => r[2])) * 1920;
 export const R = {cx: um(mediana(RT.map((r) => r[1])) * 1080), cy: um(_cy), queixo: um(_cy + (mediana(RT.map((r) => r[3])) * 1920) / 2)};
-export type Props = {previas: boolean; nomesPrevias: [string, string]; fundoCor?: boolean; soTexto?: boolean};
+/* fundo (G6, dono 2026-11-05): 'real' (o padrão) é o vídeo normal da pessoa, com o fundo e a cor da gravação. 'desfoque'
+ * põe a pessoa recortada (public/pessoa.webm, do scripts/recorte.py) sobre o próprio fundo levemente desfocado (6 px).
+ * 'recorte' tinge o fundo atrás da pessoa recortada (vinho na abertura, azul petróleo no plano do letreiro; o nome antigo
+ * é fundoCor: true). Os dois são opção desligada: só a pedido do dono. */
+export type Fundo = 'real' | 'desfoque' | 'recorte';
+export type Props = {previas: boolean; nomesPrevias: [string, string]; fundoCor?: boolean; fundo?: Fundo; soTexto?: boolean};
 
 /* Zona segura das redes em 9:16 (Reels / TikTok / Shorts), 2ª rodada 2026-10-12 (pedido do Jessé): nenhum texto nos
  * 250 px de cima (barra, nome), nos 420 px de baixo (legenda do post, @, botões), nos 140 px da direita (coração,
@@ -85,13 +92,15 @@ const T: {bloco1: number; base1: number; base2: Tempo; base3: Tempo; destaque: T
 	destaque: w('você', 2), // tela de destaque: "você está vendo apenas um desses modelos." (fala protagonista)
 	previas: c(w('eu', 2)), // janela das prévias: "Eu posso até colocar duas prévias rápidas aqui em cima, aceleradas em três vezes."
 	base3b: c(w('aqui')), // troca de enquadramento (só sem prévias), na virada de página da legenda
-	bloco2: c(w('mas')), // virada: frase-bloco
-	base4: w('como') + 0.04, // 0,1 s depois da página da legenda: o "edição" da virada fica 0,42 s
+	bloco2: null, // G12: a virada do aprovado ("Mas se você quiser realmente ver outros modelos de edição") cai no meio da frase: fica na legenda
+	base4: c(w('mas')), // a virada: corte seco e legenda (o aprovado: frase-bloco, depois w('como') + 0.04)
 	cta: c(w('comenta')), // Comenta “EDIÇÃO”
 	fecho: c(w('que', 2)), // dissolve para o preto
 };
-/* letreiro gigante atrás da pessoa (pregacao.md): a palavra dita sai da legenda e vira o letreiro; null desliga */
-const LETREIRO = {palavra: 'modelos', texto: 'MODELOS'} as {palavra: string; n?: number; texto: string} | null;
+/* letreiro gigante atrás da pessoa (pregacao.md): a palavra dita sai da legenda e vira o letreiro; null desliga.
+ * G6 (dono, 2026-11-05): recortar a pessoa e trabalhar camadas não é o esquema do modelo. O letreiro vem DESLIGADO
+ * (null); só liga a pedido do dono, com o scripts/recorte.py rodado. O aprovado usou {palavra: 'modelos', texto: 'MODELOS'}. */
+const LETREIRO = null as {palavra: string; n?: number; texto: string} | null;
 
 /* os trechos ligados seguem a ordem da lista no tempo (FIM_DESTAQUE, FIM_PREVIAS, FIM_VIRADA e ENQ contam com isso) */
 (Object.entries(T) as [string, Tempo][]).reduce<[string, number] | null>((ant, [k, v]) => {
@@ -142,6 +151,8 @@ export const trechoEm = (t: number) => {
 	return {nome: (Object.keys(T) as (keyof typeof T)[]).find((k) => T[k] === de) ?? '?', zoom, de};
 };
 const emPrevias = (t: number, previas: boolean) => previas && T.previas !== null && t >= T.previas && t < FIM_PREVIAS;
+/** deriva automática por tempo dentro do plano (era 0.012/s): desligada; religar só com pedido */
+const DERIVA = 0;
 const enquadramento = (t: number, previas: boolean) => {
 	if (emPrevias(t, previas)) return 1.0 + (t - (T.previas ?? 0)) * 0.006;
 	let i = 0;
@@ -149,7 +160,7 @@ const enquadramento = (t: number, previas: boolean) => {
 		if (t >= a) i = k;
 	});
 	const [a, s] = ENQ[i];
-	return s + (t - a) * 0.012; // zoom lento contínuo dentro do plano
+	return s + (t - a) * DERIVA; // zoom só pelo plano explícito (ENQ); a deriva automática por tempo vem desligada
 };
 
 /* ---------------------------------------------------------------- legenda corrida (2026-10-12, pedido do Jessé)
@@ -175,26 +186,31 @@ const LET = LETREIRO && (() => {
 if (LET && T.fecho !== null && LET.de >= T.fecho)
 	throw errPlano('LETREIRO', `a palavra "${LETREIRO?.palavra}" é dita em ${PS[LET.i].de.toFixed(2)} s, depois do fecho (o preto, ${T.fecho.toFixed(2)} s): escolha uma palavra antes do fecho, mova o fecho ou desligue o letreiro (null)`);
 const PULA = new Set(LET ? [LET.i] : []);
-const PEDACOS: [number, string, Tempo?, string?][] = [
-	// [primeira palavra, texto, até (s); sem "até", fica até a próxima página começar; aceito (só a vitrine): ver Pagina]
+const PEDACOS: [number, string, Tempo?, string?, number?][] = [
+	// [primeira palavra, texto, até (s); sem "até", fica até a próxima página começar; aceito (só a vitrine): ver Pagina;
+	//  tam: corpo da página (padrão 60), só para a página longa de fala rápida caber na largura sem empilhar 3 linhas]
 	[8, 'Ele foi criado / justamente para'],
-	[13, 'te mostrar a diferença entre / vários que eu criei e melhorei'],
+	// G12: sem o letreiro, "modelos" volta para a legenda. A fala aqui é rápida demais para uma página de 1,5 s acabar
+	// antes de "melhorei": a página longa encolhe a letra (como o trailer faz) em vez de empilhar ou picar.
+	[13, 'te mostrar a diferença entre vários / modelos que eu criei e melhorei', undefined, undefined, 50],
 	[25, 'para editar qualquer tipo / de vídeo usando o Claude.'],
 	[34, 'Inclusive, se você / estiver no Instagram agora,', T.destaque, 'vitrine'],
 	[48, 'Eu posso até colocar / duas prévias rápidas'],
-	[55, 'aqui em cima, aceleradas / em três vezes.', T.bloco2],
-	[72, 'como esse e aprender a como / usar isso nos seus vídeos,', T.cta],
+	[55, 'aqui em cima, aceleradas / em três vezes.'],
+	[62, 'Mas se você quiser / realmente ver outros modelos'],
+	[70, 'de edição como esse / e aprender'],
+	[76, 'a como usar isso / nos seus vídeos,', T.cta],
 	[85, 'aqui embaixo que eu vou te / mandar na sua DM agora.', FIM],
 ];
 /* aceito: a página fica por cima da entrada da tela creme (branco sobre o creme nos 6 quadros do dissolve), como saiu na
  * vitrine aprovada. Sem ele (o padrão; num vídeo novo, não use), a página que ainda está na tela quando o creme entra
  * fica por baixo dele e some com ele: branco nunca fica sobre o creme (pregacao.md). */
-type Pagina = {linhas: {txt: string; i: number}[][]; de: number; ate: number; is: number[]; aceito?: string};
+type Pagina = {linhas: {txt: string; i: number}[][]; de: number; ate: number; is: number[]; aceito?: string; tam?: number};
 const inicio = (i: number, txt: string) => {
 	if (!PS[i]) throw errPlano('PEDACOS', `a página "${txt}" começa na palavra ${i}, mas a fala só vai até a ${PS.length - 1}`);
 	return PS[i].de;
 };
-export const PAGINAS: Pagina[] = PEDACOS.map(([i0, txt, ate, aceito], j) => {
+export const PAGINAS: Pagina[] = PEDACOS.map(([i0, txt, ate, aceito, tam], j) => {
 	let i = i0;
 	const linhas = txt.split(' / ').map((l) =>
 		l.split(' ').map((p) => {
@@ -205,7 +221,7 @@ export const PAGINAS: Pagina[] = PEDACOS.map(([i0, txt, ate, aceito], j) => {
 		})
 	);
 	const prox = PEDACOS[j + 1];
-	return {linhas, de: c(inicio(i0, txt)), ate: ate ?? (prox ? c(inicio(prox[0], prox[1])) : FIM), is: linhas.flat().map((x) => x.i), aceito};
+	return {linhas, de: c(inicio(i0, txt)), ate: ate ?? (prox ? c(inicio(prox[0], prox[1])) : FIM), is: linhas.flat().map((x) => x.i), aceito, tam};
 });
 /** queixo na tela em t (px): o queixo medido (R.queixo) com o zoom do plano (origem do zoom em y 700) e a descida das prévias */
 export const queixoEm = (t: number, previas = false) => 700 + (R.queixo - 700) * enquadramento(t, previas) + (emPrevias(t, previas) ? DESCE : 0);
@@ -234,7 +250,7 @@ const Legenda: React.FC<{t: number; previas: boolean}> = ({t, previas}) => {
 	if (!pg) return null;
 	const sai = tw(t, pg.ate - 0.08, pg.ate, 0, 1, E.in);
 	return (
-		<div style={{position: 'absolute', left: ZONA_CX - 540, width: 1080, top: previas && naJanela(pg) ? LEG_Y2 : LEG_Y, textAlign: 'center', opacity: 1 - sai, fontFamily: SANS, fontWeight: 800, fontSize: 60, letterSpacing: '-0.035em', lineHeight: 1.16, color: BRANCO, textShadow: '0 4px 24px rgba(0,0,0,0.45)'}}>
+		<div style={{position: 'absolute', left: ZONA_CX - 540, width: 1080, top: previas && naJanela(pg) ? LEG_Y2 : LEG_Y, textAlign: 'center', opacity: 1 - sai, fontFamily: SANS, fontWeight: 800, fontSize: pg.tam ?? 60, letterSpacing: '-0.035em', lineHeight: 1.16, color: BRANCO, textShadow: '0 4px 24px rgba(0,0,0,0.45)'}}>
 			{pg.linhas.map((l, j) => (
 				<div key={j} style={{whiteSpace: 'nowrap'}}>
 					{l.map((p, m) => (
@@ -297,7 +313,7 @@ const Bloco: React.FC<{t: number; itens: Item[]; de: number; ate: number; i0: nu
 						transformOrigin: '30% 70%',
 						filter: `blur(${(1 - e) * 10}px)`,
 						opacity: t < ini - 0.02 ? 0 : Math.min(1, e * 2),
-						textShadow: '0 0 34px rgba(255,36,36,0.5)',
+						textShadow: BRILHO_TEXTO ? '0 0 34px rgba(255,36,36,0.5)' : undefined, // G16: brilho só com pedido
 					}}
 				>
 					{it.txt}
@@ -375,14 +391,14 @@ const exige = (arq: string, como: string) => {
 /* ---------------------------------------------------------------- o vídeo: cor da gravação; pessoa recortada por cima no letreiro
  * fundoCor (opção, desligada por padrão): tinge o fundo de vinho na abertura e de azul petróleo no plano do letreiro. */
 const CHICOTES = [T.bloco2, T.cta].filter((x): x is number => x !== null); // chicote borrado para entrar no momento de ênfase (pregacao.md)
-const Video: React.FC<{t: number; s: number; previas: boolean; fundoCor: boolean}> = ({t, s, previas, fundoCor}) => {
+const Video: React.FC<{t: number; s: number; previas: boolean; fundoCor: boolean; desfoque: boolean}> = ({t, s, previas, fundoCor, desfoque}) => {
 	if (T.fecho !== null && t >= T.fecho + DISSOLVE) return null; // daqui em diante é o preto
 	const ch = CHICOTES.map((a) => (t >= a && t < a + 3 / FPS ? 1 - (t - a) / (3 / FPS) : 0)).reduce((x, y) => Math.max(x, y), 0);
 	const filtro = ch ? `blur(${ch * 16}px)` : 'none';
 	const vinho = fundoCor && t < T.base1;
 	const frio = fundoCor && t >= T.base1 && t < proximoCorte(T.base1);
-	const pessoa = vinho || frio || (LET !== null && t >= LET.de && t < LET.ate);
-	if (pessoa) exige('pessoa.webm', 'rode scripts/recorte.py (modelos/pregacao/pregacao.md, seção do vídeo novo), ou desligue o letreiro (LETREIRO = null) e o fundoCor.');
+	const pessoa = desfoque || vinho || frio || (LET !== null && t >= LET.de && t < LET.ate);
+	if (pessoa) exige('pessoa.webm', 'rode scripts/recorte.py (modelos/pregacao/pregacao.md, seção do vídeo novo), ou volte ao padrão: fundo real, LETREIRO = null.');
 	const desce = emPrevias(t, previas) ? DESCE : 0; // 3ª rodada: ele nítido embaixo, topo sobre o próprio vídeo desfocado
 	const camada: React.CSSProperties = {transform: `translate(${ch * 90}px, ${desce}px) scale(${s})`, transformOrigin: '540px 700px'};
 	const mascara = desce ? `linear-gradient(to bottom, transparent 0px, transparent ${DESCE}px, black ${DESCE + 160}px)` : undefined;
@@ -394,7 +410,7 @@ const Video: React.FC<{t: number; s: number; previas: boolean; fundoCor: boolean
 				</AbsoluteFill>
 			)}
 			<AbsoluteFill style={{...camada, WebkitMaskImage: mascara, maskImage: mascara}}>
-				<OffthreadVideo muted src={staticFile('fala.mp4')} style={{width: 1080, height: 1920}} />
+				<OffthreadVideo muted src={staticFile('fala.mp4')} style={{width: 1080, height: 1920, filter: desfoque ? 'blur(6px)' : undefined}} />
 				{vinho && <AbsoluteFill style={{background: '#5A0F14', mixBlendMode: 'color', opacity: 0.9}} />}
 				{vinho && <AbsoluteFill style={{background: 'rgba(30,4,6,0.58)'}} />}
 				{frio && <AbsoluteFill style={{background: '#123F4C', mixBlendMode: 'color', opacity: 0.92}} />}
@@ -579,7 +595,8 @@ export const PreviasEmCima: React.FC<{t: number; nomes: [string, string]; soText
 	);
 };
 
-export const Corte: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], fundoCor = false, soTexto = false}) => {
+export const Corte: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], fundoCor: fundoCorProp = false, fundo = 'real', soTexto = false}) => {
+	const fundoCor = fundoCorProp || fundo === 'recorte';
 	const f = useCurrentFrame();
 	const t = f / FPS;
 	const s = enquadramento(t, previas);
@@ -589,7 +606,7 @@ export const Corte: React.FC<Props> = ({previas = false, nomesPrevias = ['', '']
 	return (
 		// soTexto: só os textos sobre fundo transparente, para o check da zona segura (scripts/cobertura.mjs)
 		<AbsoluteFill style={{background: soTexto ? 'transparent' : '#000'}}>
-			{!soTexto && <Video t={t} s={s} previas={previas} fundoCor={fundoCor} />}
+			{!soTexto && <Video t={t} s={s} previas={previas} fundoCor={fundoCor} desfoque={fundo === 'desfoque'} />}
 			{soTexto && <Letreiro t={t} fundoCor={fundoCor} />}
 			{previas && <PreviasEmCima t={t} nomes={nomesPrevias} soTexto={soTexto} />}
 			{sobCreme && <Legenda t={t} previas={previas} />}

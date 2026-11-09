@@ -11,6 +11,8 @@ coisas caem quando a referência própria for aprovada (seção 10, pendências)
 **A referência mostra o jeito do modelo, não um roteiro para copiar.** O modelo veio de dois cortes de pregação de
 terceiros, estudados como medida (`analise/`). Nenhum quadro, texto, frase, doutrina ou som deles entra em vídeo nosso.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
+
 ---
 
 ## 0. Do seu jeito (o aluno preenche, se quiser)
@@ -58,7 +60,7 @@ em que é dita). O que as referências **evitam** é regra tanto quanto o que fa
 
 | Função da frase | O que a tela faz | Prova |
 |---|---|---|
-| Gancho de pergunta sobre a vida de quem assiste | **bloco que se monta** com a voz: sans pequena + a palavra da pergunta em serifa na COR + a resposta em serifa branca; zera a cada pergunta nova | ref1 0,0–6,7 s |
+| Gancho de pergunta sobre a vida de quem assiste | **bloco que se monta** com a voz: sans pequena + a palavra da pergunta em serifa na COR; a resposta em serifa branca **entra na página seguinte, no lugar da pergunta** (G12: um bloco por vez); zera a cada pergunta nova | ref1 0,0–6,7 s |
 | Gancho de contradição ("Não estamos em…") | bloco que se monta com a palavra de peso em serifa (branca, ou na COR se o fundo pedir) | ref2 0,0–5,25 s |
 | Tese, prova, citação, explicação | só a legenda pequena | ref1 6,8–18 s; ref2 5,3–11 s |
 | Pergunta retórica + pausa | a pergunta fica na legenda **atravessando a pausa**; a resposta entra no instante dito, em **destaque na COR** (é o destaque do corpo) | ref1 18,0–20,0 s e 30,6–34,0 s |
@@ -69,7 +71,7 @@ em que é dita). O que as referências **evitam** é regra tanto quanto o que fa
 
 ### O que separa este modelo do pregacao (e do ojg)
 
-Regra de um modelo não entra no outro (G12). Nada daqui muda o `pregacao.md` nem o molde dele.
+Regra de um modelo não entra no outro (G32). Nada daqui muda o `pregacao.md` nem o molde dele.
 
 | | corte-palestra | pregacao | ojg |
 |---|---|---|---|
@@ -98,7 +100,7 @@ aprovação, o `assinatura.json` do vídeo aprovado passa a valer para o `parece
 | Cor do destaque | azul `#4562AF` contra fundo de matiz 10–16° (ref1); branco contra fundo azul de matiz 205–214° (ref2) | a matiz oposta à do fundo, com contraste de pelo menos 4,5:1 com o que fica atrás da legenda (`scripts/cor.py`) |
 | Densidade do destaque | ref1: 8 em 6,7 s, depois 2 em 60 s; ref2: 5 blocos até 26 s, depois 22 s sem | gancho com pelo menos 1; corpo no máx. 1 a cada 20 s (mínimo 2) |
 | Cortes de edição | 0 (as 4 a 13 "cenas" medidas são trocas de câmera do evento) | 0; só as emendas do recorte, quando a gravação tem tomadas repetidas |
-| Luz e cor | as da gravação | as da gravação (nenhum tratamento, G33) |
+| Luz e cor | as da gravação | as da gravação (nenhum tratamento, G6) |
 | Som | voz média -17 dB; fundo ~10 dB abaixo (música, não copiar) | só a voz, -14 LUFS, pico -1 dBTP |
 
 ## 3. O ponto certo: como escolher o trecho numa gravação longa
@@ -162,7 +164,7 @@ centro em y 1286, e **dentro dela as linhas se alinham à esquerda**: a linha cr
 a 1ª palavra nascia fora do lugar, à espera das palavras que ainda não foram ditas; revisão de diretor da vitrine).
 
 **Bloco do gancho** (0 s até `GANCHO_ATE`): páginas de até 4 degraus que se montam com a voz e zeram a cada pergunta ou
-sentença nova. Sans pequena + palavra em Playfair itálica grande (128 px). A palavra da pergunta (ou a de peso da
+sentença nova; **um trecho por página** (G14): a resposta vem na página seguinte, nunca embaixo da pergunta. Sans pequena + palavra em Playfair itálica grande (128 px). A palavra da pergunta (ou a de peso da
 contradição) vai na **COR**; a resposta em imperativo vai em **branco**. Cada degrau é uma linha (nada de palavra
 pequena "subindo" na grande).
 
@@ -178,7 +180,7 @@ e no lugar dela. Segura enquanto a ideia vale (~2,5 s na ref1).
 **Exemplo, não regra:** o azul `#4562AF` (era o oposto de um LED vermelho), o encavalamento da linha pequena sobre a
 grande (a casa proíbe), a sans pesada maior e os blocos à esquerda da ref2, o letreiro do telão do palco.
 
-**Interface (G34):** este modelo não recria interface nenhuma.
+**Interface (G25):** este modelo não recria interface nenhuma.
 
 ## 5. O texto na tela (e o que este modelo sobrescreve da herança)
 
@@ -187,16 +189,16 @@ Herda `.claude/skills/criar-modelo/referencias/heranca.md` inteira, com estas so
 | Herança | Aqui | Por quê |
 |---|---|---|
 | Legenda de gravação normal: referência de 72 px (PF16) | **56 px** (faixa por vídeo: 56 a 72 px) | a legenda pequena e quieta é o que faz o destaque raro pesar (ref1: corpo ~56 px, 2,8% da altura). 72 px vira legenda comum e apaga o contraste com a serifa |
-| Palavra-chave forte ganha animação/ilustração (G4), tela simples vira tela dividida ou ganha ilustração (PF7, PF14) | **nada de ilustração, tela criada ou tela dividida** | a forma é contenção: a força é da fala escolhida. Ilustrar uma pregação a cada frase é o oposto do que as duas referências fazem |
+| Palavra-chave forte ganha animação/ilustração (G20), tela simples vira tela dividida ou ganha ilustração (PF7, PF14) | **nada de ilustração, tela criada ou tela dividida** | a forma é contenção: a força é da fala escolhida. Ilustrar uma pregação a cada frase é o oposto do que as duas referências fazem |
 | Câmera: aproximação e afastamento leves, zoom contínuo lento | **nenhum movimento de câmera** | as trocas de plano das referências vêm da gravação do evento (dono); a gravação entra intacta |
 | Efeitos sonoros sutis, "popup" grave em elemento que surge | **sem efeito sonoro** | nenhuma das referências tem; o silêncio da edição deixa a voz sozinha |
-| Bloco de legenda é um trecho só (G35) | vale para toda **legenda**; o **bloco do gancho** pode juntar a pergunta e a resposta dela (só através do "?") | a pergunta e a resposta são uma unidade no gancho (ref1); o checador acusa qualquer outro trecho junto (decisão para o olho do dono, seção 10) |
+| Bloco de legenda é um trecho só (G14) | vale para toda legenda **e para o bloco do gancho** (decisão do dono de 2026-11-05: a exceção da pergunta com a resposta na mesma página caiu) | um bloco por vez; o checador acusa qualquer trecho junto |
 
 E o que a referência faz e a casa **não deixa** (a casa vence):
-- **Tempo de leitura (G1).** A ref1 troca a legenda a cada 1 ou 2 palavras (~0,5 s). Aqui a página dura **pelo menos
+- **Tempo de leitura (G9).** A ref1 troca a legenda a cada 1 ou 2 palavras (~0,5 s). Aqui a página dura **pelo menos
   1,5 s** e cada palavra **0,4 s**: a linha se monta palavra a palavra com a voz (o olho vê 1 a 3 palavras novas por vez,
   como na referência) e só troca quando o trecho acaba.
-- **Sem sombra justa nem contorno (G37).** Só uma sombra larga e suave (`0 8px 64px rgba(0,0,0,.34)`) para ler sobre a
+- **Sem sombra justa nem contorno (G16).** Só uma sombra larga e suave (`0 8px 64px rgba(0,0,0,.34)`) para ler sobre a
   gravação clara.
 - **No máximo 4 linhas** por bloco (a ref2 chega a 5) e **2** por página de legenda.
 - **Escreva o que foi dito, não o que o transcritor ouviu** (ref2: tela "inchou", transcrição "encheu"):
@@ -218,12 +220,14 @@ E o que a referência faz e a casa **não deixa** (a casa vence):
 
 | Opção | Padrão | Como mudar (em `src/Corte.tsx`) |
 |---|---|---|
-| Escurecer até o preto no fecho (ref1) | **ligado** | `ESCURECE = false` segura a imagem (ref2) |
+| Escurecer até o preto no fecho (ref1) | **ligado** (é um tratamento da imagem: confirmar com o dono se continua padrão, G6) | `ESCURECE = false` segura a imagem (ref2) |
 | Cor do destaque | a sugerida pelo `scripts/cor.py` para a gravação (vitrine: a do plano, seção 10) | `COR = '#...'`. Paletas prontas: azul `#4562AF` (medido na ref1, contra fundo quente: vermelho, madeira, bege), âmbar `#C98A2B` (sugestão da casa, não medida, contra fundo frio: azul, verde), só branco (fundo azul saturado, como a ref2) |
 | Tamanho da legenda | 56 px | `TAM.sans` entre 56 e 72 (o destaque fica ~2,3x: `TAM.serif`) |
 | Música | desligada | `sh scripts/mixar.sh out/so-video.mp4 public/trilha.wav out/final.mp4` (~16 dB abaixo, com ducking) |
 | Reenquadramento nas emendas | desligado | `REENQUADRA_EMENDAS = true` |
-| Tratamento de cor, preto e branco, efeitos, música | desligados (G21, G33) | não fazem parte do modelo |
+| Tratamento de cor, preto e branco, efeitos, música | desligados (G6) | não fazem parte do modelo |
+| Fundo (G6) | **real**, a gravação intacta | desfoque leve de fundo só a pedido (o molde não tem a opção pronta: pedir vira trabalho do vídeo) |
+| Destaque no corpo | **só no trecho ligado ao tema** (G17, G28); na dúvida, não destaca. A densidade de 1 a cada 20 s vem das referências: confirmar com o dono | mais, só a pedido |
 
 ## 8. Zona segura, rosto e material
 
@@ -238,7 +242,7 @@ E o que a referência faz e a casa **não deixa** (a casa vence):
   perde um degrau.
 - Material: só a gravação. Nada a buscar, gerar ou pedir.
 
-### Com o que o vídeo tiver (G32)
+### Com o que o vídeo tiver (G30)
 
 | Recurso das referências | O que o modelo faz só com a gravação da pessoa |
 |---|---|
@@ -268,7 +272,7 @@ trava.
    4 degraus no bloco. O índice é a posição da palavra em `src/palavras.json` (0 é a primeira).
 5. **Meça as mãos** (pela trava): `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/maos.py`.
    **Confira:** `node scripts/cobertura.mjs` (na pasta do vídeo; ele pega a trava sozinho, não rode dentro do
-   `com-trava.sh`) até sair "zerado". Ele confere entrada e saída, toda palavra na tela, tempo de leitura, G35, linhas,
+   `com-trava.sh`) até sair "zerado". Ele confere entrada e saída, toda palavra na tela, tempo de leitura, G14, linhas,
    densidade do destaque, emendas, queixo, mãos e zona segura, e diz o que mudar. A página que ainda está na tela quando
    chega uma emenda acaba nela sozinha. Conta de bolso para quebrar páginas: a página nasce 1 quadro antes da 1ª
    palavra e acaba 1 quadro antes da 1ª palavra da seguinte; a última palavra de cada página precisa de 0,4 s até lá,
@@ -333,9 +337,9 @@ alinhadas à esquerda dentro da página centrada); um falso rosto num quadro (a 
 queixo (o checador ignora o quadro que foge da mediana); o pico passava 0,1 dB de -1 dBTP (alvo -1,5 no `mixar.sh`).
 
 **Para o olho do dono (decisões de gosto):**
-1. A legenda segura a página por 1,5 s e monta a linha palavra a palavra (G1), em vez de trocar a cada 1 ou 2 palavras
+1. A legenda segura a página por 1,5 s e monta a linha palavra a palavra (G9), em vez de trocar a cada 1 ou 2 palavras
    como a ref1. Recomendação: manter (a regra da casa vence; o olho ainda vê 1 a 3 palavras novas por vez).
-2. No bloco do gancho, a pergunta e a resposta podem ficar na mesma página (só através do "?"). Recomendação: manter;
-   a vitrine não usou (o gancho dela é de contradição).
+2. ~~No bloco do gancho, a pergunta e a resposta podem ficar na mesma página.~~ Decidido pelo dono (2026-11-05): um
+   bloco por vez; a resposta vem na página seguinte.
 3. A mão de quem fala passa sob o texto quase o tempo todo na posição medida (67%). Recomendação: manter a posição
    (é a das duas referências) e cuidar só do contraste.

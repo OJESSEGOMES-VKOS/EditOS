@@ -33,7 +33,8 @@ const E = {out: Easing.bezier(0.16, 1, 0.3, 1), io: Easing.bezier(0.45, 0, 0.55,
 const tw = (t: number, a: number, b: number, v0: number, v1: number, e = E.out) =>
 	interpolate(t, [a, b], [v0, v1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: e});
 
-/** tratamento: grade quente + vinheta + grão. efeitos: VHS (flash rosa, verde, linhas) e o fecho borrado em verde. Os dois desligados por padrão. */
+/** tratamento: grade quente + vinheta + grão (G6, dono 2026-11-05: a cor e o fundo são os da gravação; o tratamento é opção
+ * desligada, só a pedido). efeitos: VHS (flash rosa, verde, linhas) e o fecho borrado em verde. Os dois desligados por padrão. */
 export type Props = {previas: boolean; nomesPrevias: [string, string]; tratamento?: boolean; efeitos?: boolean};
 
 type Pal = {texto: string; de: number; ate: number};
@@ -76,21 +77,21 @@ export const T = {
 	para2: c(25, 'para'), // desfoque -> aberto
 	qualquer: c(27, 'qualquer'), // bloco "qualquer TIPO de vídeo"
 	se1: c(35, 'se'), // VHS -> fechado ("se você estiver no Instagram")
-	um: c(45, 'um'), // bloco "um desses modelos." (6ª rodada: sem o nome do modelo na tela)
+	um: c(41, 'você') + 0.16, // nasce no início do "você": o "agora," de antes fica os 0,4 s dele; bloco "você está vendo apenas / um desses modelos." (antiga G43, abolida: o fim de cena forte; sem o nome do modelo na tela)
 	colocar: c(51, 'colocar'), // flash branco -> aberto / prévias em cima
 	mas: c(62, 'mas'), // desfoque -> fechado, legenda padrão "Mas se você quiser realmente ver"
-	outros: c(68, 'outros'), // desfoque -> tela de destaque (fundo borrado) só com o bloco "outros modelos de EDIÇÃO"
+	outros: c(68, 'outros'), // corte seco -> fechado (antiga G43, abolida: a tela de respiro do aprovado saiu: não é fim de cena)
 	aprender: c(75, 'aprender'), // chicote -> aberto, bloco "aprender a como USAR"
 	comenta: c(83, 'comenta'), // VHS -> fecho "Comenta EDIÇÃO aqui embaixo"
 };
 /** cortes com desfoque (o plano novo nasce do borrão) */
-const DESFOQUES: number[] = [T.para2, T.mas, T.outros];
+const DESFOQUES: number[] = [T.para2, T.mas];
 /** flash branco no corte */
 const FLASHES: number[] = [T.colocar];
 /** chicote: borrão de movimento horizontal que vira a cena seguinte */
 const CHICOTES: number[] = [T.aprender];
 /** telas de destaque [de, ate]: fundo borrado e escuro, só o bloco por cima (texto comum não entra nelas) */
-const RESPIROS: [number, number][] = [[T.outros, T.aprender]];
+const RESPIROS: [number, number][] = []; // antiga G43, abolida: só no fim de cena forte; o aprovado tinha [[T.outros, T.aprender]]
 /** VHS [de, ate], só com a prop `efeitos`: flash rosa no início, tom verde e linhas até o fim (Infinity = até o fim do vídeo) */
 const VHS: [number, number][] = [[T.se1, T.se1 + 1.6], [T.comenta, Infinity]];
 /** peça que se desliga: opcional<Tipo>(null) a tira do vídeo (o tipo continua o mesmo) */
@@ -101,7 +102,7 @@ export const PREVIAS = opcional<{de: number; ate: number}>({de: T.colocar, ate: 
 /** abertura (opcional<AberturaDef>(null) desliga): bloco de 3 vozes até o 1º corte; `contador` é o número dito, que conta de 0 até ele (null = sem número) */
 type AberturaDef = {ate: number; cima: [number, string]; contador: [number, string] | null; baixo: [number, string]};
 const ABERTURA = opcional<AberturaDef>({
-	ate: T.justamente,
+	ate: c(8, 'Ele'), // G12: a abertura sai quando a legenda entra (um bloco por vez)
 	cima: [0, 'Esse vídeo está sendo'],
 	contador: [4, '100%'],
 	baixo: [5, 'editado pelo Claude.'],
@@ -135,22 +136,23 @@ const CAM: [number, number, boolean?][] = [
 /** blocos de ênfase (texto por cima da pessoa, nas palavras fortes): `primeira` é o índice da 1ª palavra do bloco e as
  * linhas são as palavras ditas, em ordem; `camera` é o plano (do corte ao corte) que a câmera ajusta para o bloco caber */
 export const BLOCOS: BlocoDef[] = [
-	{de: T.a, ate: T.para2, camera: [T.justamente, T.para2], primeira: 15, linhas: [[['sans', 80, 'a diferença entre']], [['serif', 132, 'vários']]], carimbo: {idx: 19, palavra: 'modelos', tam: 300, dy: 84}},
-	{de: T.qualquer, ate: T.se1, camera: [T.para2, T.se1], primeira: 27, linhas: [[['serif', 124, 'qualquer tipo de']], [['condRed', 260, 'vídeo']]]},
-	{de: T.um, ate: T.colocar, camera: [T.se1, T.colocar], primeira: 45, linhas: [[['serif', 118, 'um desses modelos.']]]},
-	{de: T.outros, ate: T.aprender, camera: [T.mas, T.aprender], primeira: 68, linhas: [[['serif', 124, 'outros modelos']], [['sans', 86, 'de'], ['condRed', 250, 'edição']], [['serif', 96, 'como esse']]]}, // camera: plano do "Mas" + tela de destaque
+	/* antiga G43, abolida (dono, 2026-11-05): destaque só no fim de cena forte (a frase fecha no ponto com a fala de impacto), nunca um por
+	 * frase; o bloco sai quando a legenda seguinte entra. O aprovado tinha mais três ("a diferença entre / vários MODELOS",
+	 * "qualquer tipo de / VÍDEO", "outros modelos / de EDIÇÃO / como esse"), no meio das frases. */
+	{de: T.um, ate: c(48, 'Eu'), camera: [T.se1, T.colocar], primeira: 41, linhas: [[['sans', 80, 'você está vendo apenas']], [['serif', 118, 'um desses modelos.']]]},
 ];
 /** legenda: [índice da 1ª palavra, texto do pedaço] ('/' quebra a linha; até 2 linhas). Toda palavra fora dos destaques
  * entra uma vez só; a página fica até a próxima começar (a última até o fim). */
 const PEDACOS: [number, string][] = [
-	[8, 'Ele foi criado / justamente para te mostrar'],
-	[20, 'que eu criei e melhorei / para editar'],
-	[31, 'usando o Claude. Inclusive,'],
-	[35, 'se você estiver no Instagram agora, / você está vendo apenas'],
+	[8, 'Ele foi criado / justamente para'],
+	[13, 'te mostrar a diferença entre vários / modelos que eu criei e melhorei'],
+	[25, 'para editar qualquer tipo / de vídeo usando o Claude.'],
+	[34, 'Inclusive, se você estiver / no Instagram agora,'],
 	[48, 'Eu posso até colocar duas prévias'],
 	[54, 'rápidas aqui em cima, / aceleradas em três vezes.'],
-	[62, 'Mas se você quiser / realmente ver'],
-	[74, 'e aprender a como usar / isso nos seus vídeos,'], // 6ª rodada: "como esse" fica no destaque
+	[62, 'Mas se você quiser / realmente ver outros modelos'],
+	[70, 'de edição como esse / e aprender'],
+	[76, 'a como usar isso / nos seus vídeos,'],
 	[85, 'aqui embaixo que eu vou te mandar / na sua DM agora.'],
 ];
 /* ================================================================ fim do plano */
@@ -496,10 +498,13 @@ const FATOR: Record<string, number> = {sans: 0.53, serif: 0.45, cond: 0.46, cond
 export const larguraTxt = (txt: string, voz: string, tam: number) => txt.length * FATOR[voz] * tam;
 const legTam = (linhas: string[][]) => Math.min(LEG_TAM, ...linhas.map((l) => (LEG_TAM * ZW) / larguraTxt(l.join(' '), 'leg', LEG_TAM)));
 /* intervalos em que um destaque está na tela */
-const destaquesAtivos = (): [number, number][] => [
+/* G12 (dono, 2026-11-05): legenda num lugar só, um bloco por vez. A abertura e os blocos de destaque tomam o lugar da
+ * legenda (ela não fica embaixo deles); só o fecho, com o comando fixo, leva a legenda à 2ª posição. */
+const destaquesAtivos = (): [number, number][] => (FECHO ? [[FECHO.de, DURACAO + 1] as [number, number]] : []);
+const telaDeDestaque = (): [number, number][] => [
 	...(ABERTURA ? [[0, ABERTURA.ate] as [number, number]] : []),
-	...BLOCOS.map((b) => [b.de - 0.1, b.ate] as [number, number]),
-	...(FECHO ? [[FECHO.de, DURACAO + 1] as [number, number]] : []),
+	...BLOCOS.map((b) => [surge(b.de), b.ate] as [number, number]),
+	...RESPIROS,
 ];
 const ida = (t: number) => Math.max(0, ...destaquesAtivos().map(([a, b]) => (t < a ? tw(t, a - 0.3, a - 0.08, 0, 1, E.io) : t < b ? 1 : tw(t, b, b + 0.22, 1, 0, E.io))));
 export const legY = (t: number, previas: boolean) => (emPrevias(t, previas) ? LEG_Y2 : LEG_Y + (LEG_Y2 - LEG_Y) * ida(t));
@@ -512,8 +517,10 @@ export const PAGINAS: Pagina[] = PEDACOS.map(([i0, txt], j) => {
 	const fim = prox ? PS[prox[0]].de - 0.06 : DURACAO + 1;
 	/* 6ª rodada: texto comum não entra na tela de destaque; a página que atravessa o início dela termina ali (+0.04: some
 	 * no pico do desfoque do corte) */
-	const de = PS[i0].de - 0.06;
-	const ate = RESPIROS.reduce((a, [r]) => (de < r && a > r ? r + 0.04 : a), fim);
+	/* G12: um bloco por vez. A página que nasceria dentro de um destaque espera ele sair (o checador acusa a palavra
+	 * que fica sem tela: refaça o plano), e a que atravessaria o início de um destaque acaba ali */
+	const de = telaDeDestaque().reduce((d, [a, b]) => (d >= a - 1e-6 && d < b ? b : d), PS[i0].de - 0.06);
+	const ate = telaDeDestaque().reduce((x, [a]) => (de < a && x > a ? a : x), fim);
 	return {linhas, i0, n, de, ate};
 });
 const Legenda: React.FC<{t: number; previas: boolean}> = ({t, previas}) => {
@@ -616,7 +623,7 @@ export const lugarFecho = () => {
 	return {top, escala, fundo: top + ALTURA_FECHO * escala, larg: larg * escala};
 };
 
-export const VitrineDinamico03: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], tratamento = true, efeitos = false}) => {
+export const VitrineDinamico03: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], tratamento = false, efeitos = false}) => {
 	const f = useCurrentFrame();
 	const t = f / FPS;
 	const prev = emPrevias(t, previas);

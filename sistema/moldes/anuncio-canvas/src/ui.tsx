@@ -3,7 +3,12 @@ import {Img, staticFile} from 'remotion';
 import {C, E, MAO, SANS, existe, mola, rnd, tw, useT} from './tema';
 
 export const ab = (x: number, y: number, extra: React.CSSProperties = {}): React.CSSProperties => ({position: 'absolute', left: x, top: y, ...extra});
-export const brilho = (cor: string, k = 1) => `0 0 ${18 * k}px ${cor}, 0 0 ${48 * k}px ${cor}88`;
+/** G16 (REGRAS.md): texto limpo, sem contorno, sombra colada ou brilho; liga só com pedido explícito do dono */
+export const BRILHO_TEXTO = false;
+/** brilho de caixa e traço (não é texto) */
+export const brilhoCaixa = (cor: string, k = 1) => `0 0 ${18 * k}px ${cor}, 0 0 ${48 * k}px ${cor}88`;
+/** brilho de texto: 'none' no padrão (G16) */
+export const brilho = (cor: string, k = 1) => (BRILHO_TEXTO ? brilhoCaixa(cor, k) : 'none');
 const hexA = (hex: string, a: number) => {
 	const n = parseInt(hex.slice(1), 16);
 	return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
@@ -49,7 +54,7 @@ export const Risco: React.FC<{de: number; cor?: string; espessura?: number; top?
 	const {t} = useT();
 	const k = tw(t, de, de + dur, 0, 1, E.inOut);
 	if (k <= 0) return null;
-	return <span style={{position: 'absolute', left: '-5%', top, width: `${110 * k}%`, height: espessura, marginTop: -espessura / 2, background: cor, borderRadius: espessura, boxShadow: brilho(cor, 0.7), transform: 'rotate(-2deg)'}} />;
+	return <span style={{position: 'absolute', left: '-5%', top, width: `${110 * k}%`, height: espessura, marginTop: -espessura / 2, background: cor, borderRadius: espessura, boxShadow: brilhoCaixa(cor, 0.7), transform: 'rotate(-2deg)'}} />;
 };
 
 /** barra da cor da marca passando por baixo da frase */
@@ -318,7 +323,7 @@ export const Manuscrito: React.FC<{texto: string; de: number; tam?: number; cor?
 	const ks = tw(t, de + 0.25, de + 0.6, 0, 1, E.inOut);
 	const path = seta === 'esq-baixo' ? 'M120 10 C 40 20, 10 70, 30 150 M10 120 L30 152 L58 128' : seta === 'dir-baixo' ? 'M10 10 C 90 20, 120 70, 100 150 M72 128 L100 152 L122 120' : 'M120 150 C 40 140, 10 90, 30 12 M8 40 L30 10 L58 34';
 	return (
-		<div style={{position: 'relative', fontFamily: MAO, fontWeight: 700, fontSize: tam, color: cor, lineHeight: 1, whiteSpace: 'nowrap', textShadow: `0 0 20px ${hexA(cor, 0.5)}`}}>
+		<div style={{position: 'relative', fontFamily: MAO, fontWeight: 700, fontSize: tam, color: cor, lineHeight: 1, whiteSpace: 'nowrap', textShadow: BRILHO_TEXTO ? `0 0 20px ${hexA(cor, 0.5)}` : undefined}}>
 			<svg width={140} height={170} viewBox="0 0 140 170" style={seta === 'dir-baixo' ? {position: 'absolute', right: -130, top: 40} : {position: 'absolute', left: -140, top: seta === 'esq-cima' ? -150 : 40}}>
 				<path d={path} fill="none" stroke={cor} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - ks} />
 			</svg>

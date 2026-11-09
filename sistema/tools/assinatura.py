@@ -11,7 +11,7 @@ grava modelos/<modelo>/assinatura.json com:
   saida:   o vídeo aprovado (modelos/<m>/exemplos/vitrine-<m>.mp4 ou o exemplo mais novo que não é de cliente; no estúdio
            aberto, modelos/<m>/referencia/referencia.mp4):
            luz e cor, enquadramento do rosto (aberto, fechado, cabeça cortada) e ritmo de corte.
-           É contra isso que tools/parece.py confere o vídeo novo.
+           O tools/parece.py usa isso só como guia opcional de identidade (não reprova; REGRAS.md G30).
 Rode de novo sempre que o vídeo aprovado de um modelo mudar, e ao criar um modelo novo.
 """
 import json, re, subprocess, sys

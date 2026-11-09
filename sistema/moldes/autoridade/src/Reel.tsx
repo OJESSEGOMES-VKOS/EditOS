@@ -76,7 +76,7 @@ export const T = {
 	ele: de(7) + 0.43, // "Ele foi criado justamente para" (a legenda entra quando "Claude." já ficou 0,43 s)
 	telas: c(de(13)), // "te mostrar a diferença entre vários modelos" (tela 1)
 	tela2: c(de(20)), // "que eu criei e melhorei"
-	tela3: c(de(25)), // "para editar qualquer tipo de vídeo usando o Claude."
+	tela3: Math.max(c(de(28)), de(27) + 0.4), // "tipo de vídeo usando o Claude.": o fim de cena forte (antiga G43, abolida; "qualquer" fica os 0,4 s dele na legenda)
 	celular: c(de(34)), // "Inclusive, se você estiver no Instagram agora, você está vendo apenas um desses modelos."
 	eu: c(de(48)), // "Eu posso até colocar"
 	previas: c(de(52)), // "duas prévias rápidas aqui em cima, aceleradas em três vezes."
@@ -89,7 +89,7 @@ export const T = {
 const MARCAS = {
 	cartoes: [18], // "vários": os outros dois cartões saem de trás
 	barras: [22, 24], // "criei" nascem as barras, "melhorei" a última sobe
-	linhaTempo: [26], // "editar": a lâmina corta
+	linhaTempo: [30], // "vídeo": a lâmina corta (antiga G43, abolida: a tela entra no fim de cena forte, depois do "editar")
 	player: [78, 82], // "usar": o vídeo toca; "vídeos": ganha a legenda
 	celular: [39, 46], // "Instagram": a interface acende; "desses": os outros celulares saem de trás
 };
@@ -120,15 +120,17 @@ const CTA = {i: 83, comando: 'Comenta', palavra: '“EDIÇÃO”', de: T.comenta
 if (CTA) confere('CTA', CTA.i, `${CTA.comando} ${CTA.palavra}`);
 /* flash na ênfase (tempo do corte); null desliga. Sem public/flash.mp4, o molde desenha um flash branco no lugar */
 const FLASH = T.mas as number | null;
+/* antiga G43, abolida (dono, 2026-11-05): a maior parte do vídeo é o vídeo normal; tela cheia ou dividida só no fim de cena forte, nunca
+ * uma por frase. O aprovado tinha 3 telas cheias seguidas na mesma frase (13 a 33), o celular (34 a 47), o painel de
+ * lista (68 a 73) e a tela 4 (74 a 82). Aqui fica a tela do fim da 1ª frase longa ("...usando o Claude."). */
 const trechos = (previas: boolean): [number, Modo][] => [
 	[0, 'video'],
-	[T.telas, 'tela'],
-	[T.celular, 'celular'],
+	[T.telas, 'video'],
+	[T.tela3, 'tela'],
+	[T.celular, 'video'],
 	// com prévias, a dividida das prévias já abre em "Eu posso até colocar" (sozinho no vídeo o pedaço ficava < 1,5 s)
 	...(previas ? ([[T.eu, 'previas']] as [number, Modo][]) : ([[T.eu, 'video']] as [number, Modo][])),
 	[T.mas, 'video'],
-	[T.ver, 'lista'],
-	[T.aprender, 'tela'],
 	[T.comenta, 'video'],
 ];
 const trecho = (t: number, previas: boolean) => {
@@ -151,14 +153,17 @@ const CAM: [number, number, boolean?][] = [
 	[T.comenta, 1.0, true], // abre o quadro no fecho
 	[DURACAO, 1.03],
 ];
+/* decisão do dono (2026-11-05): o zoom do autoridade é só aproximação lenta e contínua, nunca corte seco de zoom;
+   os pontos marcados "true" (corte) são ignorados e a câmera passa por eles deslizando */
+const CAM_LENTO = CAM.filter(([, , corte]) => !corte);
 const zoomEm = (t: number) => {
 	let i = 0;
-	CAM.forEach(([a], k) => {
+	CAM_LENTO.forEach(([a], k) => {
 		if (t >= a) i = k;
 	});
-	const [a, z0] = CAM[i];
-	const prox = CAM[i + 1];
-	if (!prox || prox[2]) return z0;
+	const [a, z0] = CAM_LENTO[i];
+	const prox = CAM_LENTO[i + 1];
+	if (!prox || prox[0] <= a) return z0;
 	return tw(t, a, prox[0], z0, prox[1], E.io);
 };
 
@@ -168,7 +173,9 @@ const ROSTO_MEDIDO = {x: 590, y: 620} as {x: number; y: number} | null;
 const med = (v: number[]) => [...v].sort((a, b) => a - b)[v.length >> 1];
 const RT = ROSTO_T as number[][];
 const ROSTO = ROSTO_MEDIDO ?? (RT.length ? {x: Math.round(med(RT.map((r) => r[1])) * 1080), y: Math.round((med(RT.map((r) => r[2])) - 0.09 * med(RT.map((r) => r[3]))) * 1920)} : {x: 540, y: 620});
-const COR = 'contrast(1.06) saturate(0.94) brightness(0.98)';
+/* tratamento leve da gravação: opção desligada (G6, dono: a cor é a da gravação); liga com a prop tratamento */
+const COR_TRAT = 'contrast(1.06) saturate(0.94) brightness(0.98)';
+let COR = 'none';
 const Fala: React.FC<{zoom: number}> = ({zoom}) => (
 	<AbsoluteFill style={{transform: `scale(${zoom})`, transformOrigin: `${ROSTO.x}px ${ROSTO.y}px`, filter: COR}}>
 		<OffthreadVideo muted src={staticFile('fala.mp4')} style={{width: 1080, height: 1920}} />
@@ -185,14 +192,14 @@ const suave = (t: number, d: number, dur = 0.4): React.CSSProperties => {
 const PEDACOS = [
 	'#8',
 	'Ele foi criado / justamente para',
-	'#7', // tela 1: "te mostrar a diferença entre vários modelos"
-	'#5',
-	'#9',
-	'Inclusive, se você estiver / no *Instagram* agora,', 'você está vendo / apenas *um* desses modelos.',
+	'te mostrar a diferença / entre vários modelos',
+	'que eu criei e melhorei / para editar qualquer',
+	'#6', // tela do fim de cena forte: "tipo de vídeo usando o Claude."
+	'Inclusive, se você estiver / no Instagram agora,', 'você está vendo / apenas um desses modelos.',
 	'Eu posso até colocar / duas *prévias* rápidas', 'aqui em *cima*, / aceleradas em *três vezes.*',
 	'Mas se você quiser / realmente ver',
-	'*outros modelos* / de *edição* como esse',
-	'#9',
+	'outros modelos / de edição como esse',
+	'e aprender a como usar / isso nos seus vídeos,',
 	'#2', // fecho: Comenta "EDIÇÃO" fixo
 	'aqui embaixo que eu vou / te mandar na sua DM agora.',
 ];
@@ -218,7 +225,8 @@ const PAGINAS: Pagina[] = (() => {
 		if (!g) return [];
 		const prox = out[i + 1];
 		const fim = prox && prox.de - g.ate < 0.7 ? prox.de : g.ate + 0.4;
-		return [{...g, ate: fim}];
+		// a página acaba no fecho: dali a legenda vai para a 2ª posição com o comando fixo (nunca a mesma página nas duas)
+		return [{...g, ate: CTA && g.de < CTA.de ? Math.min(fim, CTA.de) : fim}];
 	});
 })();
 /* zona segura das redes em 9:16 (todo texto): x 60–940, y 250–1500, centro horizontal em x 500 */
@@ -228,13 +236,22 @@ const ZW = ZONA.dir - ZONA.esq;
 const FATOR = {base: 0.6, ancora: 0.6, serif: 0.5, script: 0.42} as const;
 const telaTam = (l: {txt: string; tam: number; fonte?: 'script' | 'serif' | 'ancora'}) => Math.min(l.tam, (l.tam * (ZW / 1.04)) /  larguraTxt(l.txt, l.fonte ?? 'base', l.tam));
 export const larguraTxt = (txt: string, voz: keyof typeof FATOR, tam: number) => txt.replace(/\*/g, '').length * FATOR[voz] * tam;
+/* legenda (dono, 2026-11-07, G12): UM tamanho no vídeo inteiro, nunca encolhe nem cresce para caber; frase longa quebra em
+   blocos. A largura vem das larguras reais da Poppins 600 (em, medidas no arquivo da fonte; acento = a letra base), para o
+   plano e o checador saberem se a linha cabe sem encolher */
+const LARG_POP: Record<string, number> = {};
+Object.entries({24: ' ', 25: ',', 26: '.:', 28: 'Iijl', 32: ';', 34: 'f', 35: '!', 36: '"1', 39: 't', 40: 'r', 46: 'L', 48: 'z', 53: 'EF', 54: '?sx', 55: '7', 57: '2J', 58: '-TZk', 60: '3cvy', 61: 'PS', 62: 'e', 63: '9', 64: '568BRYo', 65: '0', 66: '4Khnu', 68: 'abdgpq', 69: 'X', 70: 'U', 71: 'V', 72: 'ADH', 74: 'N', 77: 'CG', 78: 'O', 79: 'Q', 83: '%', 84: 'w', 90: 'M', 102: 'W', 105: 'm'}).forEach(([w, cs]) => [...cs].forEach((ch) => (LARG_POP[ch] = Number(w) / 100)));
+/** largura de uma linha da legenda em px (+0,005 em por letra do letterSpacing; a caixa *x* da dividida soma 32 px) */
+export const larguraLeg = (l: string, tam: number) => [...l.replace(/\*/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')].reduce((s, ch) => s + (LARG_POP[ch] ?? 0.68) + 0.005, 0) * tam + (l.split('*').length - 1) * 16;
 /* legenda em 2 posições só: LEG_Y no peito (gravação) e LEG_Y2, pé em 1500 (tela dividida e fecho) */
 export const LEG_Y = 1150;
 const LEG_TAM = 72;
 const LEG_TAM2 = 56;
 const LEG_LH = 1.25;
 export const LEG_Y2 = Math.floor(ZONA.base - 2 * LEG_TAM2 * LEG_LH - 6);
-export const legTam = (txt: string, base: number) => Math.min(base, ...txt.split(' / ').map((l) => (base * (ZW - 20)) / (larguraTxt(l, 'base', base) + (l.split('*').length - 1) * 16)));
+/* antes a linha longa encolhia sozinha (cada bloco num tamanho): abolido pelo dono em 2026-11-07 (G12). Linha que não
+   cabe é erro do plano (o checador acusa fora da zona): quebre a frase em mais blocos em PEDACOS */
+export const legTam = (_txt: string, base: number) => base;
 export const legAltura = (txt: string, base: number) => txt.split(' / ').length * legTam(txt, base) * LEG_LH;
 const Legenda: React.FC<{t: number; y: number; destaque?: boolean}> = ({t, y, destaque}) => {
 	const pe = y === LEG_Y2;
@@ -270,9 +287,15 @@ const estilo = (voz: Voz, tam: number): React.CSSProperties => {
 	if (voz === 'script') return {fontFamily: SCRIPT, fontSize: tam * 1.3, lineHeight: 0.92};
 	return {fontFamily: SANS, fontWeight: 600, fontSize: tam, letterSpacing: '-0.01em', lineHeight: 1.18};
 };
+/* título = legenda com destaque (dono, 2026-11-07, autoridade v2): o texto normal ('base') tem o MESMO tamanho da
+   legenda padrão (LEG_TAM, 72 px; só a palavra destacada cresce, G12) e o bloco entra PALAVRA POR PALAVRA, cada uma no
+   instante em que é dita (PS[i].de, tempos da fala ancorados na onda). Nunca o bloco inteiro de uma vez (o antigo
+   'inteiro' foi abolido). O fade de saída só começa depois da última palavra dita, com no mínimo 2 quadros. Palavra
+   dita perto demais do fim do título: estique o 'ate' do título, nunca adiante a palavra. O checador cobra os dois */
 const Titulo: React.FC<{t: number; de: number; ate: number; primeira: number; linhas: Linha[]; top: number; marca?: number}> = ({t, de: d, ate, primeira, linhas, top, marca}) => {
 	if (t < d - 0.1 || t >= ate) return null;
-	const sai = tw(t, ate - 0.22, ate, 1, 0, E.io);
+	const nPal = linhas.reduce((s, l) => s + l.reduce((z, x) => z + x[2].split(' ').length, 0), 0);
+	const sai = tw(t, Math.min(ate - 0.07, Math.max(ate - 0.22, PS[primeira + nPal - 1].ate)), ate, 1, 0, E.io);
 	let k = primeira;
 	return (
 		<div style={{position: 'absolute', left: 40, right: 40, top, textAlign: 'center', color: '#fff', opacity: sai, textShadow: '0 6px 26px rgba(0,0,0,0.4)'}}>
@@ -488,11 +511,11 @@ const Player: Heroi = ({t, de: d, fim, fg, ac}) => {
 	);
 };
 
+/* antiga G43, abolida: só a tela do fim de cena forte. O aprovado também tinha, em tela cheia: "te mostrar / a diferença entre vários /
+ * modelos" (Cartoes, fundo E), "que eu / criei / e melhorei" (Barras, fundo L) e "e aprender a como / usar isso / nos seus
+ * vídeos," (Player, fundo L): os heróis continuam aqui como repertório. */
 const TELAS: Tela[] = [
-	{de: T.telas, fundo: 'E', topo: 520, primeira: 13, linhas: [{txt: 'te mostrar', tam: 66}, {txt: 'a diferença entre vários', tam: 60}, {txt: 'modelos', tam: 170}], heroi: Cartoes},
-	{de: T.tela2, fundo: 'L', topo: 540, primeira: 20, linhas: [{txt: 'que eu', tam: 66}, {txt: 'criei', tam: 170}, {txt: 'e melhorei', tam: 130, fonte: 'serif', acento: true}], heroi: Barras},
-	{de: T.tela3, fundo: 'E', topo: 530, primeira: 25, linhas: [{txt: 'para editar qualquer', tam: 66}, {txt: 'tipo de vídeo', tam: 124}, {txt: 'usando o Claude.', tam: 100, fonte: 'serif', acento: true}], heroi: LinhaTempo},
-	{de: T.aprender, fundo: 'L', topo: 480, primeira: 74, linhas: [{txt: 'e aprender a como', tam: 66}, {txt: 'usar isso', tam: 170}, {txt: 'nos seus vídeos,', tam: 130, fonte: 'script', acento: true}], heroi: Player},
+	{de: T.tela3, fundo: 'E', topo: 530, primeira: 28, linhas: [{txt: 'tipo de vídeo', tam: 124}, {txt: 'usando o Claude.', tam: 100, fonte: 'serif', acento: true}], heroi: LinhaTempo},
 ];
 const TelaCheia: React.FC<{t: number; fim: number}> = ({t, fim}) => {
 	const i = TELAS.filter((s) => t >= s.de).length - 1;
@@ -727,10 +750,13 @@ const FlashDesenhado: React.FC = () => {
 
 /* ---------------------------------------------------------------- títulos */
 const TOP = 1110;
+/* todo título fica no MESMO lugar, topo em TOP, com 2 ou 3 linhas (dono, 2026-11-07, G13: mesmo tipo de destaque =
+   mesma posição; antes o de 3 linhas subia 110 px) */
 type Tit = {de: number; ate: number; primeira: number; linhas: Linha[]; marca?: number};
 const TITULOS: Tit[] = [
-	{de: 0, ate: T.ele, primeira: 0, linhas: [[['base', 60, 'Esse vídeo está sendo']], [['ancora', 116, '100%'], ['base', 60, 'editado']], [['base', 60, 'pelo'], ['serif', 100, 'Claude.']]]},
-	{de: T.previas, ate: T.mas, primeira: 52, linhas: [[['base', 60, 'duas prévias rápidas']], [['base', 60, 'aqui em cima,'], ['script', 86, 'aceleradas']], [['base', 60, 'em'], ['ancora', 116, 'três vezes.']]], marca: undefined},
+	{de: 0, ate: T.ele, primeira: 0, linhas: [[['base', 72, 'Esse vídeo está']], [['base', 72, 'sendo'], ['ancora', 116, '100%']], [['base', 72, 'editado pelo'], ['serif', 72, 'Claude.']]]},
+	/* G6: o aprovado tinha um 2º título ("duas prévias rápidas / aqui em cima, aceleradas / em três vezes.", de T.previas a
+	 * T.mas); sem as prévias na tela ele não tem motivo, e a frase fica na legenda */
 ];
 
 TELAS.forEach((s) => confere('TELAS', s.primeira, s.linhas.map((l) => l.txt).join(' ')));
@@ -743,8 +769,9 @@ const tem = (arq: string) => {
 };
 const QUADRO = 'public/quadro.jpg (um quadro da gravação, para os cartões): ffmpeg -ss 5 -i public/fala.mp4 -frames:v 1 -q:v 3 public/quadro.jpg';
 
-export type Props = {previas: boolean; nomesPrevias: [string, string]; arroba?: string};
-export const Reel: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], arroba = ''}) => {
+export type Props = {previas: boolean; nomesPrevias: [string, string]; arroba?: string; tratamento?: boolean};
+export const Reel: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''], arroba = '', tratamento = false}) => {
+	COR = tratamento ? COR_TRAT : 'none';
 	const t = useCurrentFrame() / FPS;
 	const {a, fim, modo} = trecho(t, previas);
 	const zoom = zoomEm(t);
@@ -775,7 +802,7 @@ export const Reel: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''],
 				</Dividida>
 			)}
 
-			{modo === 'video' && TITULOS.map((q, i) => <Titulo key={i} t={t} {...q} top={q.linhas.length > 2 ? TOP - 110 : TOP} />)}
+			{modo === 'video' && TITULOS.map((q, i) => <Titulo key={i} t={t} {...q} top={TOP} />)}
 			{cta && CTA && <Comenta t={t} cta={CTA} />}
 
 			{modo === 'video' && !tit && !cta && <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0) 52%, rgba(0,0,0,0.16) 59%, rgba(0,0,0,0.16) 66%, rgba(0,0,0,0) 73%)'}} />}
@@ -816,7 +843,7 @@ export const textos = (t: number, previas: boolean, arroba = ''): Caixa[] => {
 			const n = q.linhas.reduce((s, l) => s + l.reduce((z, x) => z + x[2].split(' ').length, 0), 0);
 			const larg = Math.max(...q.linhas.map((l) => l.reduce((s, [v, tam, txt], j) => s + larguraTxt(txt, v, v === 'script' ? tam * 1.3 : tam) + (j ? tam * 0.24 : 0), 0)));
 			const alt = q.linhas.reduce((s, l) => s + Math.max(...l.map(([v, tam]) => (v === 'base' ? tam * 1.18 : tam * 1.02))), 0);
-			const top = q.linhas.length > 2 ? TOP - 110 : TOP;
+			const top = TOP;
 			const ps = Array.from({length: n}, (_, k) => q.primeira + k).filter((i) => nasceu(t, i));
 			out.push({nome: 'título ' + q.primeira, tipo: 'titulo', palavras: ps, ...centro(540, larg), y0: top, y1: top + alt});
 		});
@@ -836,7 +863,7 @@ export const textos = (t: number, previas: boolean, arroba = ''): Caixa[] => {
 	if (pg && legY !== null) {
 		const base = legY === LEG_Y2 ? LEG_TAM2 : LEG_TAM;
 		const tam = legTam(pg.txt, base);
-		const larg = Math.max(...pg.txt.split(' / ').map((l) => larguraTxt(l, 'base', tam) + (l.split('*').length - 1) * 16));
+		const larg = Math.max(...pg.txt.split(' / ').map((l) => larguraLeg(l, tam)));
 		out.push({nome: pg.txt, tipo: 'legenda', palavras: Array.from({length: pg.n}, (_, k) => pg.i0 + k), ...centro(500, larg), y0: legY, y1: legY + legAltura(pg.txt, base)});
 	}
 	if (modo === 'celular' && arroba) out.push({nome: arroba, tipo: 'rotulo', palavras: [], x0: 360, x1: 640, y0: 720, y1: 790});

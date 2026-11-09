@@ -12,7 +12,7 @@ refazendo o plano sobre a fala nova, seguindo `modelos/<modelo>/<modelo>.md`.
     ElevenLabs): `../../kit/.venv/Scripts/python.exe`.
   - Ferramentas: `../../tools/` (`preparar.py`, `transcribe.py`, `align.py`, `enquadrar.py`, modelos ONNX).
   - Render: `QUEM=<m> sh ../../tools/com-trava.sh npx remotion render ... --concurrency=2` (TEMP em `../../.tmp`).
-    A trava liga a contenção (`tools/contencao.ps1`, G36): prioridade ociosa e 6 núcleos sempre livres pro dono. Todo
+    A trava liga a contenção (`tools/contencao.ps1`, G4): prioridade ociosa e 6 núcleos sempre livres pro dono. Todo
     comando pesado do molde (ffmpeg longo, mixagem, codificação final, Blender) também passa por ela.
 
 ## Entrada padrão (moldes com a pessoa gravada ou com a voz dela)

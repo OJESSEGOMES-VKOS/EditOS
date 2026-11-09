@@ -10,6 +10,6 @@ export const Root: React.FC = () => (
 		fps={FPS}
 		width={1080}
 		height={1920}
-		defaultProps={{previas: false, nomesPrevias: ['interface-encenada', 'pagina-de-livro'] as [string, string], fundoCor: false}}
+		defaultProps={{previas: false, nomesPrevias: ['interface-encenada', 'pagina-de-livro'] as [string, string], fundoCor: false, fundo: 'real' as const}}
 	/>
 );

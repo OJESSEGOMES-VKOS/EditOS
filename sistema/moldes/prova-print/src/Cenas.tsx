@@ -2,11 +2,11 @@ import React from 'react';
 import {Img, OffthreadVideo, staticFile} from 'remotion';
 import {C, CONTADORES, G, Props, SANS, SERIF, TITULO, cenaAnterior, cenaEm, mola, useT, w} from './tema';
 import type {Cena} from './tema';
-import {Card, Contador, FundoVitrine, Prova, RostoFechado, RostoPalco, Titulo} from './ui';
+import {Card, Contador, FundoVitrine, Pessoa, Prova, RostoFechado, RostoPalco, Titulo} from './ui';
 
 /**
  * As cenas do vídeo, uma por frase (prova-print.md §9). Os prints de prova moram em public/ com a origem em
- * public/ORIGEM.md (G34: print real, nunca interface inventada). Coordenadas de vista e grifo em px do print.
+ * public/ORIGEM.md (G25: print real, nunca interface inventada). Coordenadas de vista e grifo em px do print.
  * Num vídeo novo: troque os prints, as vistas, os grifos (na palavra exata) e os contadores (no número exato dito).
  */
 const PV = {
@@ -19,12 +19,12 @@ const PV = {
 /* ---------------------------------------------------------------- os quatro modos (o palco e a vitrine) */
 /** palco claro: o título-promessa só na cena dele (PV5), o card da prova (mais alto quando não há título) e o cartão de câmera
  * embaixo com a cabeça saindo da moldura (PV8). A legenda vem por cima, em Reel.tsx. */
-const cardDo = (c: Cena) => (c.id === TITULO.cena ? G.cardPalcoTitulo : G.cardPalco);
+const cardDo = (c: Cena) => (c.id === TITULO?.cena ? G.cardPalcoTitulo : G.cardPalco);
 const Palco: React.FC<{c: Cena; children: React.ReactNode}> = ({c, children}) => {
 	const primeiro = c.de === 0;
 	return (
 		<>
-			{c.id === TITULO.cena && <Titulo />}
+			{c.id === TITULO?.cena && <Titulo />}
 			<Card caixa={cardDo(c)} de={primeiro ? 0.25 : c.de}>
 				{children}
 			</Card>
@@ -185,7 +185,7 @@ const Aprender: React.FC<{c: Cena}> = ({c}) => (
 	</Vitrine>
 );
 /** fecho (E11): rosto fechado, "comenta" pequeno em serifa itálica e a palavra do pedido entre aspas, grande, amarela,
- * SEM brilho (G37). Fixo só o comando; o resto da fala segue na legenda. */
+ * SEM brilho (G16). Fixo só o comando; o resto da fala segue na legenda. */
 const Comenta: React.FC<{c: Cena}> = ({c}) => {
 	const {t} = useT();
 	const a = mola(t, w('comenta'), {damping: 15});
@@ -201,6 +201,10 @@ const Comenta: React.FC<{c: Cena}> = ({c}) => {
 	);
 };
 
+/** a pessoa (G12): toda cena de modo 'pessoa' é o vídeo normal; a legenda vem por cima, no lugar de sempre */
+export const CenaPessoa: React.FC<{c: Cena}> = () => <Pessoa />;
+
+/** as cenas com tela própria, pelo id. As de palco (gancho, modelos, previas, outros) só rodam com fundo: 'recorte' */
 export const CENA_COMP: Record<string, React.FC<{c: Cena}>> = {
 	gancho: Gancho,
 	criado: Criado,

@@ -1,6 +1,6 @@
 // Checador do corte-palestra (modelos/corte-palestra/corte-palestra.md). Sai com código 1 se algo falhar.
 // Confere: o corte começa na 1ª palavra e a última frase respira 1 a 2 s; toda palavra escrita enquanto é dita, uma vez,
-// em ordem; página >= 1,5 s e palavra >= 0,4 s na tela; legenda até 2 linhas e um trecho só (G35), bloco até 4 linhas;
+// em ordem; página >= 1,5 s e palavra >= 0,4 s na tela; legenda até 2 linhas e um trecho só (G11/G14), bloco até 4 linhas;
 // uma posição de texto; destaque denso no gancho e raro no corpo; nada atravessa uma emenda do recorte; texto abaixo do
 // queixo medido; e, pixel a pixel, a zona segura (renderiza só os textos, prop soTexto, a cada 0,2 s).
 // Usa a trava <estúdio>/.tmp/render.lock sozinho: NÃO rode dentro do com-trava.sh.
@@ -66,7 +66,7 @@ const vezes = PS.map(() => 0);
 ex.forEach((e) => e.is.forEach((i) => vezes[i]++));
 acusa('palavras exibidas mais de uma vez', vezes.flatMap((v, i) => (v > 1 ? [`${i} "${PS[i].texto}" ${v}x`] : [])));
 
-/* linhas e trecho (G35, heranca 1) */
+/* linhas e trecho (G11/G14, heranca 1) */
 const forma = [];
 for (const e of ex) {
 	if (e.tipo === 'legenda' && e.linhas > 2) forma.push(`legenda "${e.nome}" com ${e.linhas} linhas (máx. 2)`);
@@ -74,8 +74,9 @@ for (const e of ex) {
 	const ws = e.texto.split(' ');
 	ws.slice(0, -1).forEach((w, k) => {
 		const p = /[.,?!:;]["”»)]*$/.exec(w);
-		// no bloco, a pergunta e a resposta dela formam uma página (o gancho de pergunta-e-resposta, seção 4): só o "?" passa
-		if (p && !(e.tipo === 'destaque' && w.endsWith('?'))) forma.push(`"${e.nome}": "${w}" fecha um trecho e "${ws[k + 1]}" começa outro na mesma página (G35)`);
+		// G12 (dono, 2026-11-05): um bloco por vez, também no gancho. A pergunta e a resposta dela entram em páginas
+		// seguidas (a resposta substitui a pergunta), nunca empilhadas na mesma página
+		if (p) forma.push(`"${e.nome}": "${w}" fecha um trecho e "${ws[k + 1]}" começa outro na mesma página (G11/G14)`);
 	});
 }
 acusa('páginas fora da forma', forma, 'quebre a página no ponto/vírgula; legenda até 2 linhas, bloco até 4');
@@ -99,7 +100,7 @@ const rosto = ex.flatMap((e) => {
 	return q && e.topo < q + 20 ? [`"${e.nome}" (topo y ${Math.round(e.topo)}) cobre o queixo (y ${Math.round(q)})`] : [];
 });
 acusa('textos sobre o rosto', rosto, `desça o centro (Y_CENTRO ${Y_CENTRO}) até onde o pé ainda caiba em y ${ZONA.base}, ou tire uma linha do bloco`);
-/* mãos (lição do fala-escrita, G13): quanto do tempo de cada página o texto cai sobre a mão medida (src/maos.json, de
+/* mãos (lição do fala-escrita, G18): quanto do tempo de cada página o texto cai sobre a mão medida (src/maos.json, de
  * scripts/maos.py). Pregador gesticula no peito: a legenda pode passar pela mão de relance (as referências passam), mas o
  * destaque não fica a maior parte do tempo dele em cima dela. Largura do texto estimada (Montserrat 0,62 em, Playfair 0,5 em). */
 let maos = null;

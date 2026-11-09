@@ -1,4 +1,4 @@
-"""Decupagem: divide a fala de um vídeo em cenas e subcenas, a base dos modos semiautomático e automático (G41,
+"""Decupagem: divide a fala de um vídeo em cenas e subcenas, a base dos modos semiautomático e automático (G14, G28,
 sistema/cenas/METODO.md §6).
 
 uso (de dentro de sistema/):
@@ -17,8 +17,15 @@ A regra da demarcação (o dono: "uma vírgula ou um ponto, mesmo que imaginári
   de uma ideia nem fica pela metade.
 Grava <pasta>/cenas.json: a lista de cenas com tempo, fala, a marca que fechou cada uma e a resposta de cada cena
 (o assistente escreve as respostas: o pedido do dono no modo semiautomático, a escolha dele no automático).
-Também guarda o modo de material do vídeo (G24): material = so-materiais (padrão) | livre | indicado, e em indicado a lista
+Também guarda o modo de material do vídeo (G7): material = so-materiais (padrão) | livre | indicado, e em indicado a lista
 em material_permitido (ex.: "materiais + API").
+E o fundo (G6): fundo = real (padrão: o vídeo normal da pessoa, fundo de verdade) | desfoque (desfoque leve)
+| recorte (pessoa recortada sobre outro fundo); desfoque e recorte só a pedido, com as palavras do dono em fundo_pedido.
+
+O --conferir também cobra as telas (G19, G29, G30) (vídeo com a pessoa na tela, src/rosto.json com rosto):
+  resposta que começa com "rosto", "legenda", "base", "pessoa" ou "vídeo normal" é o vídeo normal; qualquer outra é TELA;
+  toda tela leva no porquê a relevância do trecho ao tema ou o pedido do dono ("pedido do dono: ..."); e a cena 1
+  é sempre a gravação original (G29), salvo pedido do dono.
 """
 import argparse, json, re, sys
 from pathlib import Path
@@ -113,7 +120,10 @@ def seg(x: float) -> str:
     return f'{x:.1f}'.replace('.', ',')
 
 
-MATERIAL = {'so-materiais': 'só materiais', 'livre': 'livre', 'indicado': 'indicado'}  # G24
+MATERIAL = {'so-materiais': 'só materiais', 'livre': 'livre', 'indicado': 'indicado'}  # G7
+FUNDO = {'real': 'real', 'desfoque': 'desfoque leve', 'recorte': 'recorte'}  # G6
+ROSTO_RESP = re.compile(r'^\s*(rosto|legenda|base|pessoa|v[íi]deo normal)', re.I)  # G6: o vídeo normal
+PEDIDO = re.compile(r'pedido do dono|dono pediu|a pedido', re.I)
 
 
 def lista(d: dict) -> str:
@@ -125,6 +135,7 @@ def lista(d: dict) -> str:
         linhas.append(f"{rec}{c['id']:<5}  {seg(c['de'])}–{seg(c['ate'])} s  {c['fala']}{imag}{r}")
     cab = [f"{len({c['cena'] for c in d['cenas']})} cenas, {len(d['cenas'])} trechos"]
     cab.append('material: ' + MATERIAL.get(d.get('material') or 'so-materiais', '?') + (f" ({d['material_permitido']})" if d.get('material_permitido') else ''))
+    cab.append('fundo: ' + FUNDO.get(d.get('fundo') or 'real', '?'))
     for k, nome in (('casa', 'casa'), ('legenda_base', 'legenda base'), ('modo', 'modo')):
         if d.get(k):
             cab.append(f'{nome}: {d[k]}')
@@ -162,7 +173,13 @@ def conferir(d: dict) -> list[str]:
     elif mat == 'so-materiais':  # nenhuma cena pode depender de coisa gerada ou buscada
         for c in d['cenas']:
             if re.search(r'\b(gerad|kie|busc|online|api\b|banco de imagens)', (c.get('resposta') or '') + ' ' + (c.get('por_que') or ''), re.I):
-                erros.append(f"cena {c['id']}: fala de material gerado ou buscado, mas o modo é só materiais (G24)")
+                erros.append(f"cena {c['id']}: fala de material gerado ou buscado, mas o modo é só materiais (G7)")
+    fundo = d.get('fundo') or 'real'
+    if fundo not in FUNDO:
+        erros.append(f"fundo: '{fundo}' não existe (real, desfoque ou recorte)")
+    elif fundo != 'real' and not d.get('fundo_pedido'):
+        erros.append(f"fundo {fundo} sem pedido do dono (G6: o padrão é o fundo real; escreva as palavras dele em fundo_pedido)")
+    erros += conferir_telas(d)
     for k in ('casa', 'legenda_base'):
         if d.get(k) and d[k] not in MODELOS:
             erros.append(f'{k}: o modelo {d[k]} não existe')
@@ -173,11 +190,39 @@ def conferir(d: dict) -> list[str]:
     return erros
 
 
+def com_rosto() -> bool:
+    r = pasta / 'src' / 'rosto.json'
+    try:
+        return any(x and len(x) >= 4 and x[3] > 0 for x in json.loads(r.read_text(encoding='utf-8')))
+    except (OSError, ValueError):
+        return False
+
+
+def conferir_telas(d: dict) -> list[str]:
+    """G19/G28/G29/G30: toda tela que não é a gravação tem porquê ligado à fala; o vídeo abre na gravação original."""
+    cs = d['cenas']
+    if not cs or not com_rosto():
+        return []  # vídeo sem a pessoa na tela (narração, 3D): a G29 não se aplica
+    tela = lambda c: bool((c.get('resposta') or '').strip()) and not ROSTO_RESP.match(c['resposta'])
+    pedido = lambda c: bool(PEDIDO.search(c.get('por_que') or ''))
+    erros = []
+    # G29: o vídeo começa na gravação original, com ênfase no gancho
+    for c in cs:
+        if c['cena'] == cs[0]['cena'] and tela(c) and not pedido(c):
+            erros.append(f"cena {c['id']}: o vídeo abre numa tela (G29: começa na gravação original, dando ênfase ao gancho)")
+    # G19/G30: tela fora da gravação só com porquê da fala (relevância ao tema) ou pedido do dono
+    for c in cs:
+        if tela(c) and len((c.get('por_que') or '').strip()) < 8:
+            erros.append(f"cena {c['id']}: tela sem porquê (G19/G30: diga a relevância do trecho ao tema ou o pedido do dono)")
+    return erros
+
+
 def plano(d: dict) -> str:
     t = ['## Plano de cenas', '',
          f"Modo: {d.get('modo') or '-'} · casa: {d.get('casa') or '-'} · legenda base: {d.get('legenda_base') or 'a da casa'}"
          f" · material: {MATERIAL.get(d.get('material') or 'so-materiais', '?')}"
-         + (f" ({d['material_permitido']})" if d.get('material_permitido') else ''), '',
+         + (f" ({d['material_permitido']})" if d.get('material_permitido') else '')
+         + f" · fundo: {FUNDO.get(d.get('fundo') or 'real', '?')}", '',
          '| Cena | Tempo | Fala | Resposta | Por quê |', '|---|---|---|---|---|']
     for c in d['cenas']:
         t.append(f"| {c['id']} | {seg(c['de'])}–{seg(c['ate'])} s | {c['fala']} | {c['resposta']} | {c['por_que']} |")
@@ -194,7 +239,7 @@ if a.lista or a.conferir or a.plano:
         if erros:
             print('\nREPROVADO:\n- ' + '\n- '.join(erros))
             sys.exit(1)
-        print('\nAPROVADO: toda cena tem resposta e porquê, e todo nome existe')
+        print('\nAPROVADO: toda cena tem resposta e porquê, todo nome existe, e o fundo e as telas seguem a G6, G19, G29 e G30')
     if a.plano:
         pl = pasta / 'plano.md'
         txt = pl.read_text(encoding='utf-8') if pl.exists() else ''
@@ -217,6 +262,7 @@ ws = [{'text': w.get('text', w.get('w', '')), 'start': w.get('start', w.get('s')
       for w in json.loads(pal.read_text(encoding='utf-8'))]
 ws = [w for w in ws if w['text'].strip()]
 d = {'modo': None, 'casa': None, 'legenda_base': None, 'material': 'so-materiais', 'material_permitido': None,
+     'fundo': 'real', 'fundo_pedido': None,
      'cenas': decupar(ws)}
 arq.write_text(json.dumps(d, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 print(lista(d))

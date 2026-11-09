@@ -91,17 +91,20 @@ export const w = (texto: string, n = 1) => P.palavras[iw(texto, n)].de;
 const corte = (t: number) => t - 0.06;
 export type Modo = 'motion' | 'palco' | 'dividido' | 'rosto';
 export type Cena = {id: string; modo: Modo; de: number; ate: number; legendaTopo?: boolean};
+/* G6 (2026-11-05): a maior parte é o ROSTO CHEIO, a gravação crua com o fundo real; a tela de interface (palco, motion,
+ * dividido) entra só onde a fala pede a coisa e fecha uma cena forte (a frase acaba no ponto). Nunca uma tela por frase. */
 const base = (previas: boolean): [string, Modo, number, boolean?][] => [
-	['gancho', 'motion', 0], // Esse vídeo está sendo 100% editado pelo Claude.
-	['criado', 'dividido', corte(w('ele'))], // Ele foi criado justamente para te mostrar a
-	['modelos', 'palco', corte(w('diferença'))], // diferença entre vários modelos que eu criei e melhorei / para editar qualquer tipo de vídeo usando o Claude.
-	['instagram', 'motion', corte(w('inclusive'))], // Inclusive, se você estiver no Instagram agora,
-	['nome', 'palco', corte(w('você', 2))], // você está vendo apenas um desses modelos.
+	['abre', 'rosto', 0], // Esse vídeo está sendo 100% editado pelo Claude. Ele foi criado justamente para te mostrar a
+	['modelos', 'palco', corte(w('diferença'))], // diferença entre vários modelos que eu criei e melhorei / para editar qualquer tipo de vídeo usando o Claude.  (fecha a cena: a interface dos modelos)
+	['fala', 'rosto', corte(w('inclusive'))], // Inclusive, se você estiver no Instagram agora, você está vendo apenas um desses modelos.
 	['previas', previas ? 'dividido' : 'rosto', corte(w('eu', 2))], // Eu posso até colocar duas prévias rápidas aqui em cima, aceleradas em três vezes.
-	['mas', 'rosto', corte(w('mas'))], // Mas se você quiser realmente
-	['outros', 'palco', corte(w('ver'))], // ver outros modelos de edição como esse / e aprender a como usar isso nos seus vídeos,
-	['comenta', 'motion', corte(w('comenta')), true], // comenta edição aqui embaixo que eu vou te mandar na sua DM agora.
+	['mas', 'rosto', corte(w('mas'))], // Mas se você quiser realmente ver outros modelos de edição como esse e aprender a como usar isso nos seus vídeos,  (punch-in da virada, até o fecho)
+	['comenta', 'motion', corte(w('comenta')), true], // comenta edição aqui embaixo que eu vou te mandar na sua DM agora.  (o fecho: a interface do pedido)
 ];
+/* O plano da vitrine aprovada (antes da G6), para refazê-la: ['gancho', 'motion', 0], ['criado', 'dividido', corte(w('ele'))],
+ * ['modelos', 'palco', corte(w('diferença'))], ['instagram', 'motion', corte(w('inclusive'))], ['nome', 'palco', corte(w('você', 2))],
+ * ['previas', previas ? 'dividido' : 'rosto', corte(w('eu', 2))], ['mas', 'rosto', corte(w('mas'))], ['outros', 'palco', corte(w('ver'))],
+ * ['comenta', 'motion', corte(w('comenta')), true] (e som.py com TELAS de todas). */
 export const montaCenas = (previas: boolean): Cena[] => {
 	const b = base(previas);
 	return b.map(([id, modo, de, topo], i) => ({id, modo, de, ate: i + 1 < b.length ? b[i + 1][2] : DURACAO, legendaTopo: topo}));

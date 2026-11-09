@@ -1,9 +1,9 @@
 // Checador do documental-dados (modelos/documental-dados/documental-dados.md). uso: node scripts/checar.mjs  (sai 1 se reprovar)
 // Lê o plano de verdade (src/plano.json, pelo src/Reel.tsx; para logo se o plano não for desta fala) e confere:
-//  - número na tela = número falado (G8 e decisão do dono): cada contador declara o "dito", que tem de estar na fala
+//  - número na tela = número falado (G10 e decisão do dono): cada contador declara o "dito", que tem de estar na fala
 //    terminando na palavra onde o contador para, e valer exatamente o número mostrado; contagem de 1 a 2,5 s;
 //  - legenda: todas as palavras, em ordem, uma vez só; bloco de no máx. 3 palavras numa linha, >= 0,4 s (0,5 s com 3), nunca
-//    atravessa pontuação (G35); nada pisca (vão < 4 quadros entre blocos);
+//    atravessa pontuação (G11/G14); nada pisca (vão < 4 quadros entre blocos);
 //  - tempo de leitura das telas: rótulo + título ficam >= 1 s + 3 palavras/s; título em no máx. 3 linhas;
 //  - zona segura: todo texto em x 60-940 e y 250-1500 (largura estimada pela fonte);
 //  - imagem viva: nenhum trecho de mais de 1,5 s sem a imagem ou a tela mudar (fora o apagão), e nenhum de mais de
@@ -90,7 +90,7 @@ if (FAMILIA === 'A' || LEGENDA.length) {
 		if (prox && prox.de - b.ate > 1e-6 && prox.de - b.ate < 4 / FPS) piscas++;
 	}
 	(curto ? erros : ok).push(`legenda: ${LEGENDA.length} blocos, ${curto} curtos (mín. 0,4 s; 0,5 s com 3 palavras)`);
-	if (cruza) erros.push(`legenda: ${cruza} blocos atravessam pontuação (G35)`);
+	if (cruza) erros.push(`legenda: ${cruza} blocos atravessam pontuação (G11/G14)`);
 	if (piscas) erros.push(`legenda: ${piscas} vãos menores que 4 quadros (pisca)`);
 }
 

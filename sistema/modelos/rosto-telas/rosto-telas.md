@@ -7,7 +7,12 @@ bater com o código do molde, vale o que está aqui.
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo) e o `mapa.json`
 (rosto, luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
 
-**A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas, os textos e os cortes do vídeo novo nascem da fala nova. Não repita as cenas do aprovado só porque estão lá.
+**A referência é inspiração, não molde (G30).** Ela mostra o porquê e o como de cada tela, nunca uma sequência para
+copiar. As telas, os textos e os cortes do vídeo novo nascem da fala nova; cada tela só entra onde o porquê dela se
+repete. Não repita as cenas do aprovado só porque estão lá. A maior parte do vídeo é o rosto cheio, na gravação crua,
+com o fundo real.
+
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
 
 ---
 
@@ -30,12 +35,13 @@ Quando a pessoa corrigir algo num vídeo e a correção valer para os próximos,
 ## 1. A cara do modelo
 
 Uma pessoa falando, em rosto cheio, e telas claras que entram para **representar o que está sendo dito**.
-- **Abre leve:** só a pessoa e a legenda. A edição entra depois do gancho (0 s a 1 s).
-- **Rosto cheio com dois enquadramentos** (A e B), fixos dentro do trecho; só mudam no corte (0 s, 15 s, 20 s, 27 s).
-- **Legenda sem tarja**, branca com sombra, com a palavra que está sendo dita em menta (0 s, 21 s).
+- **Abre na gravação original (G29):** só a pessoa e a legenda com o gancho. A edição entra depois dele (0 s a 1 s).
+- **Rosto cheio no plano A**, fixo dentro do trecho. O plano B (15% mais perto) só com motivo na fala (G6).
+- **Legenda sem tarja**, branca, com a palavra que está sendo dita em menta (0 s, 21 s).
 - **Tela dividida** com painel marfim em cima e a legenda numa pílula verde-escura na divisa (5 s a 9 s, 24 s a 26 s).
-- **Telas que encenam a fala:** o editor "Claude Code" com o próprio vídeo na prévia (2 s a 4 s), o chip do Claude
-  (10 s), o celular com o Reel (11 s a 14 s), a caixa do Claude digitando a frase dita (24 s a 26 s).
+- **Telas que encenam a fala**, só onde a fala tem o porquê de cada uma (seção 4); o resto é o rosto cheio: o editor
+  "Claude Code" com o próprio vídeo na prévia (2 s a 4 s), o chip do Claude (10 s), o celular com o Reel (11 s a 14 s), a
+  caixa do Claude digitando a frase dita (24 s a 26 s).
 - **Fecho no jeito minimalista do Instagram:** o campo de comentário com a palavra, a foto e o @ reais (27 s a 29 s).
 - **Cor:** marfim, menta, verde-escuro e o laranja do Claude. Nunca preto como fundo de tela: o preto não dá contraste
   com o vídeo.
@@ -56,10 +62,13 @@ Uma pessoa falando, em rosto cheio, e telas claras que entram para **representar
 | Tempo com rosto na tela | 76% | Referência: o `parece.py` não cobra este item |
 | Cortes | cerca de 22 por minuto | |
 
+**Esta régua mede o aprovado, não é meta.** O aprovado tinha 2/3 de tela marfim porque a fala dele pedia muitas telas.
+Num vídeo novo a proporção nasce da fala (G30), com o rosto cheio como base, então o brilho e o contraste ficam mais
+perto do rosto (90) que do aprovado (163). O `parece.py` ainda cobra o aprovado (pendência da ferramenta): leia brilho,
+contraste e cortes por minuto como aviso, nunca como motivo para pôr tela.
+
 **De onde vem o contraste e o brilho:** das telas marfim. O rosto sozinho mede brilho perto de 90; o editor, 223; o
-celular, 207; o dividido, 157. Um vídeo que fica quase só no rosto reprova em contraste e brilho no `parece.py`, por
-mais que o resto esteja certo. Por isso o vídeo novo precisa de uma proporção de tempo parecida com a do aprovado
-(medida no `mapa.json`, a cada 0,25 s):
+celular, 207; o dividido, 157. Proporção no aprovado (medida no `mapa.json`, a cada 0,25 s), só para referência:
 
 | Modo | Tempo no aprovado | Brilho médio |
 |---|---|---|
@@ -69,15 +78,17 @@ mais que o resto esteja certo. Por isso o vídeo novo precisa de uma proporção
 | Dividido (modelos, prévias, caixa do Claude) | 43% | 157 |
 | Celular | 15% | 207 |
 
-Em conta redonda: **cerca de 2/3 do tempo com tela marfim** (editor, celular ou dividido) e 1/3 só no rosto. Monte o
-plano já com essa conta: some a duração de cada modo antes de gerar o `tempos.json`.
+No aprovado, em conta redonda: cerca de 2/3 do tempo com tela marfim e 1/3 só no rosto. Num vídeo novo, a maior parte
+é o rosto cheio; as telas entram onde a fala tem o porquê delas.
 
 ## 3. Câmera e ritmo
 
 - **Rosto cheio A:** zoom 1,06, olhos em y 660. **Rosto cheio B:** zoom 1,2 (15% mais perto), olhos em y 650. O rosto
-  fica centrado na horizontal pelo rastreio. O fundo nunca aparece nas bordas.
-- **O enquadramento é fixo dentro do trecho.** A troca A/B só acontece no corte, 2 quadros antes da palavra que abre a
-  frase. Os olhos ficam na mesma altura entre trechos.
+  fica centrado na horizontal pelo rastreio. O fundo nunca aparece nas bordas. (O 1,06 do A é parte do enquadramento do
+  molde; o porquê do 1,06 em vez de 1,0 a confirmar com o dono, G6.)
+- **O enquadramento é fixo dentro do trecho.** O padrão é o plano A. A troca para B (zoom) só com motivo na fala (G6),
+  nunca aleatória, sem som: no aprovado o B entrou em 15 s e 27 s (porquê a confirmar com o dono). A troca cai no corte,
+  2 quadros antes da palavra que abre a frase. Os olhos ficam na mesma altura entre trechos.
 - **Dividido:** a divisa fica em y 960. O rosto vai para a metade de baixo, zoom 1,08, olhos em y 1400. O painel claro
   ocupa a metade de cima. Entra e sai em 0,4 s.
 - **Rosto em moldura:** dentro do editor, o vídeo vira a prévia 9:16 (x 375, y 500, 330 de largura); no celular, a tela
@@ -87,6 +98,21 @@ plano já com essa conta: some a duração de cada modo antes de gerar o `tempos
   um trecho cada.
 
 ## 4. As telas (a assinatura)
+
+Cada tela abaixo diz por que foi usada no aprovado. Usar só quando a fala nova tiver o mesmo porquê (G30, G19); a
+mesma informação nunca aparece duas vezes (G26) e cada tela sai junto com o trecho (G23, G27).
+
+| Tela | Usada no aprovado porque | Usar quando a fala nova |
+|---|---|---|
+| Editor "Claude Code" | a fala dizia que o vídeo estava sendo editado pelo Claude (2 s) | fala do próprio ato de editar ou do Claude editando |
+| Cartões dos modelos (dividido) | a fala citava os vários modelos que ele criou (5 s) | cita uma lista de coisas que a pessoa criou ou tem |
+| Formatos do vídeo | a fala dizia "qualquer tipo de vídeo" (8 s) | fala de vários formatos ou tipos |
+| Chip do Claude | a fala dizia "usando o Claude" (10 s) | nomeia o Claude como a ferramenta |
+| Celular com o Reel | a fala dizia "se você estiver no Instagram agora" (10,6 s) | fala de quem está assistindo no Instagram |
+| Etiqueta ao lado do rosto | a fala dizia "outros modelos" (22 s) | nomeia uma coisa curta sem pedir tela inteira (porquê exato a confirmar com o dono) |
+| Caixa do Claude digitando (dividido) | a fala dizia "aprender a como usar isso nos seus vídeos" (23,9 s) | fala de usar o Claude pedindo algo a ele (porquê exato a confirmar com o dono) |
+| Prévias (opção) | a fala dizia "posso colocar duas prévias aqui em cima" (14,8 s) | cita outros vídeos da própria pessoa |
+| Fecho do Instagram | a fala pedia "comenta edição" (26,7 s) | pede um comentário |
 
 - **Fundo das telas:** marfim `#F0EEE6` com grade de pontos (`#DCD7CA`, 2 px, a cada 36 px). Cartões em papel `#FBF9F4`
   com sombra macia. Tinta `#0A0A0A`, texto suave `#5E5A52`.
@@ -121,8 +147,9 @@ plano já com essa conta: some a duração de cada modo antes de gerar o `tempos
 - **Nunca escreva o nome do modelo na tela** num vídeo novo.
 - **Reforço (origem: treinamento especialista 2026-11-03, `../../../treinamento/especialista-renomado/manual.md` E9,
   E10 e R7; referência DewlyZSNcme, só o "depois"):**
-  - **Um objeto por frase:** cada tela encena uma frase com UM objeto que faz o que ela diz (a barra que enche no
-    "quitado", a lista que ganha ✓ item a item). Nunca dois objetos de frases diferentes na mesma tela.
+  - **Um objeto por tela:** quando a tela entra (onde a fala tem o porquê dela), ela encena a frase com UM objeto que faz o que ela
+    diz (a barra que enche no "quitado", a lista que ganha ✓ item a item). Nunca dois objetos de frases diferentes na
+    mesma tela. Não é uma tela por frase.
   - **O objeto entra no gesto (opção, seção 7):** quando a pessoa levanta ou abre as mãos até 0,3 s antes da palavra
     do objeto, o objeto entra no gesto e não só na palavra; no rosto cheio, a etiqueta ao lado do rosto pode morar
     entre as mãos levantadas (meça as mãos com o `scripts/maos.py` do molde especialista ou fala-escrita, que grava `src/maos.json`; nunca sobre o rosto).
@@ -147,8 +174,12 @@ plano já com essa conta: some a duração de cada modo antes de gerar o `tempos
   palavra que está no título do editor ou do celular não se repete na legenda. A legenda fica até o instante em que o
   título aparece e volta quando as camadas do editor ou do celular começam a sair: não há buraco nas bordas. Com 0, o
   molde refaz o vídeo aprovado exatamente como ele é.
-- **Só 2 posições no vídeo todo:**
-  - rosto cheio: sem tarja, 68 px, sombra escura, caixa de x 110 a 940, logo abaixo do queixo (no aprovado, a base em
+- **Texto limpo (G16):** sem contorno, sombra colada nem brilho. No branco do rosto cheio, só a sombra larga e suave
+  (`0 4px 24px .4`, desde 2026-10-30).
+- **Divisão das páginas (G11, G14):** a quebra cai em trecho ou subtrecho, com contagem parecida de palavras, sem juntar o
+  fim de uma fala com o começo de outra.
+- **Só 2 posições no vídeo todo** (G12: a do rosto cheio é o lugar padrão; a pílula é o lugar da tela dividida):
+  - rosto cheio: sem tarja, 68 px, caixa de x 110 a 940, logo abaixo do queixo (no aprovado, a base em
     y 1190; num vídeo novo, o topo 40 px abaixo do queixo medido do trecho, crescendo para baixo, para a 2ª linha
     nunca subir no queixo);
   - dividido: numa pílula verde-escura `#173F33`, raio 20, 56 px, centrada na divisa (topo em y 914), caixa de x 120 a
@@ -156,10 +187,10 @@ plano já com essa conta: some a duração de cada modo antes de gerar o `tempos
 
 ## 6. Som e fecho
 
-- **Efeitos sintetizados** só em evento de verdade (lâmina, ✓, digitar, enviar, a DM chegando). A trilha sai com o
-  tamanho do vídeo (`duracao` do plano), com um pop por cartão na entrada dele.
-- **Silêncio na virada:** o som some no corte de "Mas se você quiser" (20 s).
-- A cama de acordes calma é opcional e vem desligada. Quando ligada, fica 16 LU abaixo da voz. Final em -14 LUFS.
+- **Padrão: só a voz original (G6).** Efeitos sonoros e música só com ordem explícita do dono; nunca som de zoom.
+- **Com ordem de efeitos:** sintetizados só em evento de verdade (lâmina, ✓, digitar, enviar, a DM chegando), com um
+  pop por cartão na entrada dele; o aprovado também tinha o silêncio do efeito na virada ("Mas se você quiser", 20 s).
+- A cama de acordes calma é opcional e vem desligada. Quando ligada (com ordem), fica 16 LU abaixo da voz. Final em -14 LUFS.
 - **Fecho minimalista do Instagram** (27 s a 29 s): um cartão branco de raio 36 (x 110 a 940, topo em y 1236) com a foto
   real num anel de degradê do Instagram, o campo cinza `#EFEFEF` onde a palavra a comentar é digitada em MAIÚSCULA
   (Geist 800, 88 px) e ganha marca-texto menta, e o botão azul `#0095F6` que aperta; a DM chega em cima com a foto e o @
@@ -172,9 +203,12 @@ plano já com essa conta: some a duração de cada modo antes de gerar o `tempos
 
 | Opção | Padrão | Como mudar |
 |---|---|---|
+| Rosto cheio como base | **ligado**: a gravação crua, fundo real, a maior parte do vídeo | — |
+| Recorte, troca de fundo, blur, cor (G6) | **não existe** no molde | só com ordem explícita do dono |
+| Plano B (zoom) | só com motivo na fala (G6) | `planos` no plano |
 | Voz no render | **ligada** | Prop `voz: false` |
-| Efeitos sonoros do modelo | **ligados** | Sem o 3º argumento no `mixar.sh` sai só a voz |
-| Cama de acordes | desligada | `audio/compor.py --cama` |
+| Efeitos sonoros do modelo | **desligados** (G6): sem o 3º argumento no `mixar.sh` sai só a voz | com ordem: `audio/compor.py` e o 3º argumento `public/trilha.wav` no `mixar.sh` |
+| Cama de acordes | desligada (G6) | com ordem: `audio/compor.py --cama` |
 | @ e "Seguir" no Reel e no fecho | vazio (escondido) | Prop `arroba: "seu.arroba"` (sem o @), só o real de quem fala |
 | Foto do perfil | vazia (escondida) | Prop `foto: "foto.jpg"` (arquivo em `public/`) |
 | Prévias | desligadas | Prop `previas: true`, `nomesPrevias: ["modeloA","modeloB"]` e `compor.py --previas` |
@@ -202,8 +236,10 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`) e adapta a gravação ao modelo. Ao
    carregar, o molde para de propósito e diz que `src/tempos.json` é de outra fala.
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
-2. **Escreva o `plano.md`** na pasta do vídeo, frase a frase sobre `src/palavras.json`: onde cortar e qual plano (A, B,
-   dividido, editor, celular), o que cada tela encena e as palavras de cada título.
+2. **Escreva o `plano.md`** na pasta do vídeo, frase a frase sobre `src/palavras.json`, abrindo com a decupagem limpa
+   (cortes nas pausas, G5) e o plano de cenas: onde cortar e qual plano (A por padrão; B só com motivo, G6; dividido,
+   editor e celular só onde a fala tem o porquê da tela, seção 4, com a linha "por quê" ligada à fala, G30), o que cada
+   tela encena e as palavras de cada título.
 3. **Monte O PLANO** no bloco marcado de `scripts/gerar_tempos.py` (na pasta do vídeo). Toda tela é presa à fala por
    `w('palavra', n)` (início da n-ésima vez que ela é dita) ou `corte('palavra', n)` (2 quadros antes):
    - `BLOCOS` (os cortes) e `planos` (`'A'` ou `'B'`, um por bloco);
@@ -217,7 +253,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    - `modelos`: obrigatórios `de`, `modelos`, `criei`, `melhorei`, `sai` e `nomes`. Opcionais: `entradas` (um tempo por
      cartão; sem ele os cartões entram espaçados por igual até `modelos`), `editar` (os cartões saem; sem ele ficam até o
      painel sair), `formatos` (3 tempos) e `claude` (sem eles não há formatos nem chip).
-   Some o tempo de cada modo e confira com a tabela da seção 2 (cerca de 2/3 com tela marfim).
+   O rosto cheio é a maior parte (seção 2). Tela que a fala não pede vira `None`.
 4. **Gere o plano:** `../../.venv/Scripts/python.exe scripts/gerar_tempos.py` (na pasta do vídeo). Grava
    `src/tempos.json`; se uma palavra do plano não existe na fala, ele para e diz a linha.
 5. **Meça o rosto por trecho:** `../../.venv/Scripts/python.exe scripts/rosto.py` (na pasta do vídeo). Grava
@@ -227,17 +263,19 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    quadro e com e sem prévias, toda palavra escrita enquanto é dita, página de 1,5 s, palavra de 0,4 s (0,25 s a última
    de uma página de 1,5 s), nada em dois lugares, até 2 linhas, as 2 posições da legenda e a zona segura, e diz o que
    mexer. Página curta que ele aponta quase sempre é plano, não legenda: veja "Fala rápida" abaixo.
-8. **Som:** `../../.venv/Scripts/python.exe audio/compor.py` (na pasta do vídeo). Ele lê o `tempos.json` e segue o plano
-   sozinho. Sai `public/trilha.wav`. `--cama` liga a música.
+8. **Som (só com ordem de efeitos ou música, G6):** `../../.venv/Scripts/python.exe audio/compor.py` (na pasta do
+   vídeo). Ele lê o `tempos.json` e segue o plano sozinho. Sai `public/trilha.wav`. `--cama` liga a música. Sem ordem,
+   pule este passo.
 9. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 5 10` (na pasta do vídeo). Com
    o seu perfil: `--props '{"arroba":"seu.arroba","foto":"foto.jpg"}'`.
 10. **Renderize** (na pasta do vídeo):
     `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts VitrinePadrao01 out/so-voz.mp4 --codec=h264 --crf=16 --concurrency=2 --props='{"arroba":"seu.arroba","foto":"foto.jpg"}'`
     (tire `arroba` e `foto` se a pessoa não deu os dela).
-11. **Mixe:** `sh scripts/mixar.sh out/so-voz.mp4 out/final.mp4 public/trilha.wav` (na pasta do vídeo). Sai em -14 LUFS.
-12. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 rosto-telas`.
-    Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
-    em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
+11. **Mixe:** `sh scripts/mixar.sh out/so-voz.mp4 out/final.mp4` (na pasta do vídeo; só a voz). Com ordem de efeitos,
+    ponha `public/trilha.wav` como 3º argumento. Sai em -14 LUFS.
+12. **Confira a identidade:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 rosto-telas` e a
+    folha lado a lado. Ela confere a cara de cada tela (cor, fonte, enquadramento, posição da legenda), não a ordem nem
+    a quantidade de telas do aprovado. Brilho, contraste e cortes por minuto são aviso (seção 2).
 
 **Fala rápida (3 palavras por segundo ou mais):** as telas cabem do mesmo jeito; o que muda é o tamanho de cada pedaço.
 - **Toda quebra precisa de 1,5 s de fala dos dois lados.** Corte, entrada e saída do dividido, entrada e saída do
@@ -248,8 +286,8 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
   `de = w('1ª palavra do título') - 0.15` e devolva (`devolve`) na palavra que abre a frase seguinte, sem pausa: a
   legenda some quando o título aparece e volta quando as camadas saem.
 - **Editor direto para o dividido** (como no aprovado, 5 s): `devolve` do editor e `de` do dividido na mesma palavra.
-- **O dividido é o modo mais longo do modelo** (43%) e o mais fácil de encaixar: a legenda vai para a pílula e a
-  frase cabe inteira. Quando uma frase não rende editor nem celular, use o dividido com a caixa do Claude ou os cartões.
+- **O dividido** é a tela mais fácil de encaixar: a legenda vai para a pílula e a frase cabe inteira. Mas ele também é
+  tela e só entra com o porquê dele: quando uma frase não pede tela, ela fica no rosto cheio, que é o normal.
 - **No máximo 3 quebras numa fala curta** (até uns 30 s a 3 palavras por segundo). Cada quebra a mais rouba 1,5 s de
   algum lado e a legenda vira pedaço curto.
 - **Quebre só depois de palavra longa ou de pausa** (mais de 0,3 s). Quebra logo depois de palavra curta e corrida deixa
@@ -273,7 +311,10 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 escolhem o trecho), depois `../../.venv/Scripts/python.exe audio/compor.py --previas` (na pasta do vídeo), o render com
 `--props='{"previas":true,"nomesPrevias":["modeloA","modeloB"]}'` e a mixagem com `public/trilha_previas.wav`.
 
-## 10. O plano do vídeo aprovado (para comparar)
+## 10. O plano do vídeo aprovado (exemplo de onde cada tela caiu e por quê; não é sequência para copiar)
+
+O aprovado é anterior às regras de 2026-11-05 (2/3 de tela marfim, efeitos sonoros ligados). Ele mostra o porquê de cada
+tela; a proporção de um vídeo novo nasce da fala nova.
 
 | Tempo | Fala | Câmera / tela | Na tela |
 |---|---|---|---|

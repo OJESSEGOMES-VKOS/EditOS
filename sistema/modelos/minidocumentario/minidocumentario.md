@@ -7,8 +7,11 @@ bater com o código do molde, vale o que está aqui.
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo) e o `mapa.json`
 (rosto, luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
 
-**A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas, os textos e os cortes do vídeo novo nascem da fala nova. Não repita as cenas do aprovado só porque estão lá. A velocidade, o
-tamanho e a quantidade de texto e de cortes do aprovado são a régua.
+**A referência mostra o jeito do modelo, não um roteiro para copiar (G30).** O modelo é inspiração: o porquê e o como
+de cada tela. Não se copia a sequência nem os tempos do aprovado. Cada tela descrita aqui é repertório, com o seu porquê,
+e só entra no vídeo novo onde a fala nova tiver o mesmo porquê. As telas, os textos e os cortes nascem da fala nova.
+
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
 
 ---
 
@@ -28,70 +31,117 @@ Quando a pessoa corrigir algo num vídeo e a correção valer para os próximos,
 
 ---
 
-## 1. A cara do modelo
+## 1. A cara do modelo (as regras aprendidas das referências; M1, M2)
 
-Um trecho de conversa vira um minidocumentário: cada frase ganha a imagem do que está sendo dito.
-- **Quatro mundos, trocados por corte seco:** o **palco** (set escuro sob um foco, 0 s e 24 s), o **rosto** de quem fala
-  (3 s), o **papel** (colagem clara de fotos e prints, 6 s, 12 s, 22 s) e o **arquivo** (B-roll em tela cheia, 8 s,
-  26 s). Mais a **tela dividida** com as prévias (15 s a 19 s).
-- **A palavra-chave gigante** em serifa itálica preta, vermelha, acendendo letra por letra do borrão ("editado" 2 s,
-  "diferença" 5 s, "apenas" 13 s).
-- **O texto se monta no tempo da fala**, palavra por palavra, sempre no lugar final. Palavras comuns pequenas e brancas.
-- **Frio e escuro:** preto de estúdio, branco aceso, um único vermelho. Nada de cor quente, nada de 2ª cor de destaque.
-- **Ritmo rápido:** um corte a cada 2,3 s em média, e o texto muda a cada palavra.
+Isto é o que faz alguém reconhecer o minidocumentario sem abrir as referências. Cada regra traz o que é, o porquê e
+quando usar ou não. Aplique pelo sentido da fala nova, nunca cena por cena (G30, M1). As referências
+(`referencias/ref1-3`, decupadas em `analise/`) são três cortes de podcast do mesmo canal; o que se aprende delas está
+aqui, e não é preciso abrir os vídeos.
 
-## 2. Os números do modelo (o `parece.py` confere)
+**O princípio (M1, fala do dono em 2026-11-07):** "aprender CONTEXTUALMENTE e INTERPRETAR como a edição foi construída
+e replicar com o que você tiver". Nas referências quase não há efeito: a imagem é a íntegra das câmeras do set, cortada
+entre ângulos, com a cor como foi gravada e graduada. A edição está na **legenda** e na **escolha do ângulo**. Por
+isso: nada de imagem gerada para imitar uma cena da referência, nada de recorte da pessoa nem efeito no fundo, nada de
+cena recriada.
 
-| Item | Valor | O que é |
+### 1.1 A imagem: as câmeras do set, íntegras
+
+1. **Com vários ângulos gravados (o caso das referências).** O set tem uma câmera aberta (a mesa sob o foco, as duas
+   pessoas pequenas, a parede escura em cima) e closes/médios de cada um. O editor corta entre eles em corte seco, no
+   início da frase. Porquê de cada ângulo:
+   - **Aberto** quando a frase é tese, lema, ameaça ou fecho ("Reputation is capital", "is enormous.", "Give people
+     more...", "it could all go to zero."): a parede escura vazia é onde a palavra-chave gigante respira, e o plano
+     largo dá peso de afirmação. Também para perguntas em série (ref2): a lista mora na parede.
+   - **Close** quando a fala é pessoal, a resposta curta ou a frase mais forte ("It's cost me everything.", "the brand
+     is my life"): o rosto carrega a emoção.
+   - **Médio** para o fluxo da conversa; a troca médio ↔ close substitui o zoom (ref2).
+   - **Quem pergunta** em close só quando a pergunta é o gancho (ref3).
+   - Um plano dura de ~1 a 3 s; com a imagem parada, o texto muda a cada palavra.
+2. **Com um ângulo só (uma câmera).** A gravação fica **íntegra**: os únicos cortes são os da decupagem (G5), um
+   enquadramento só, sem zoom fingindo outra câmera e sem tela inventada no lugar do plano aberto. A ênfase que o plano
+   aberto daria vem da **palavra-chave gigante sobre a própria gravação** (1.2).
+3. **Com um vídeo íntegro que já traz vários ângulos:** use os cortes de ângulo que ele tem, com a lógica do item 1;
+   não recorte para criar ângulo novo.
+4. **B-roll** (ref1, ref3): só material real ligado ao que é dito (a pessoa citada, o objeto, a marca, o lugar).
+   Porquê: prova do que a fala afirma. Entra em rajada curta, tela cheia, quando a fala cita algo concreto e há
+   material (G7). Sem material, não entra: nada gerado, nada buscado sem pedido.
+5. **Papel claro com colagem** (ref1): só para segurar **prints e fotos reais** (manchetes, posts, fotos de época)
+   quando a fala cita imprensa, rede ou uma época. Papel liso sem material **não existe** nas referências e não entra.
+6. **Cor:** a da gravação. Nas referências o escuro frio é a luz do set mais uma graduação manual, não recorte nem
+   fundo trocado. Aqui vale a G6: a cor como veio; ajuste manual de cor só com ordem.
+
+### 1.2 A legenda: três níveis, cada um com o seu porquê
+
+A legenda é o coração do modelo. Três níveis, nunca menos que o padrão (G12, correção de 2026-11-07):
+
+| Nível | O que é | Porquê (nas referências) | Quando usar | Quando não |
+|---|---|---|---|---|
+| **Padrão** | Inter 600, 66 px, branca, 1–2 linhas centradas no peito (y 1110 e 1193), palavra por palavra no tempo da fala | ref2 e ref3 correm assim quase o vídeo inteiro: a fala é lida junto com a voz, sem disputar com o rosto | todo trecho sem termo forte; o gancho (G29) | é o chão: nada fica menor que ela |
+| **Intermediário** | a palavra em serifa itálica vermelha ~1,3x a linha, **dentro** da frase, no lugar dela ("cut… cloth.", "endpoint… die.", ref3) | marca 1 ou 2 palavras de carga numa frase longa sem parar a leitura | frase forte com mais de um termo de peso | frase comum; palavra de ligação |
+| **Gigante (palavra-chave)** | Playfair Display Black Italic 900, vermelho `#E0030A`, 60–83% da largura, nasce letra por letra do borrão; as pequenas **encostadas** (a de cima começa na borda esquerda dela, a de baixo termina na borda direita) | é a assinatura: a palavra que carrega a ideia, quase sempre a **última forte da frase** ("precarious.", "scratch.", "zero.") | o termo-imagem do tema, a conclusão de um argumento, o fecho (que repete a tese, ref1 "capital") | número de passagem, verbo comum, palavra repetida, advérbio (G17); no máximo ~1 a cada 10–15 s |
+
+- **As variações e quando cada uma aparece (M3, lidas das folhas das referências):**
+  - **Gigante vermelha** (serifa itálica): o termo do tema, a tese e o fecho ("capital", "reputation", "scratch.",
+    "zero.", "motto."). É o padrão da gigante: a palavra que o vídeo quer que fique.
+  - **Gigante BRANCA**: o predicado que qualifica, depois de "é/foi/era" ("is extremely **precarious.**", "were well
+    **built.**", "They were **interesting.**") e nome de pessoa ("**Elon Musk.**"). Porquê: descreve, não é o tema;
+    o branco tira o peso de "tese" e mantém o tamanho.
+  - **Pequena VERMELHA dentro da frase**: no tamanho da legenda, a palavra que carrega a carga da frase sem precisar
+    parar a leitura: o intensificador ou o termo de carga ("is **extremely** precarious.", "**connecting** to the
+    brand", "People are **moving**", "**Everything.**"), muitas vezes ao lado de uma gigante branca. Aqui também nos
+    termos de uma lista paralela (resistência mental / pressão / ego) e no gancho. Pontuação fica branca (G18).
+  - Nenhuma em palavra de ligação, número de passagem ou palavra repetida (G17). Sem destaque de enchimento.
+- **Encaixe (M3):** a gigante e as pequenas formam UM bloco compacto e centrado. A linha de cima pousa no ombro das
+  minúsculas da gigante, começando na borda esquerda dela; as hastes altas da gigante (t, l, d) sobem entre as palavras
+  pequenas (ref1 "in that case · was / **capital**"). A linha de baixo encosta logo sob a linha de base, terminando na
+  borda direita. Medida: centro da linha de cima a 0,32 x corpo + 33 px acima do centro da gigante; de baixo a 0,24 x
+  corpo + 33 px abaixo (2ª linha +83 px). O checador acusa linha a mais de 20 px disso. Nada de palavra solta longe da
+  gigante.
+- **Cores:** tinta só sobre papel.
+- **Marca/produto dentro da frase:** caixa branca com o nome em preto, da altura da linha (ref3 "KITH").
+- **Resposta de uma palavra** ("Everything.", ref3): a palavra sozinha na linha, vermelha, no nível intermediário.
+- **Pontuação fora do destaque** (G18): o ponto fica na letra pequena.
+- **Lugar:** um só para o padrão (peito, abaixo do queixo); a palavra-chave logo abaixo (y ~1250) com as pequenas
+  encostadas acima e abaixo. No plano aberto (quando houver), a parede escura acima da mesa. Nunca no rosto.
+- **Entrada:** a palavra nasce no lugar final, fade com desfoque de 0,15 s começando 0,22 s antes de ser dita; nada
+  desliza. O bloco some seco no fim do trecho.
+- **O que as referências fazem e aqui NÃO (regra do dono):** palavras pequenas menores que a legenda (G12: nada menor),
+  brilho colado na letra (G16), palavra da fala que some da tela (G10: toda palavra aparece, uma vez), bloco que
+  atravessa o fim do trecho (G9, G14; subtrecho curto junta com o vizinho do mesmo trecho).
+
+### 1.3 Transições
+
+- **Corte seco** é a regra (todas as referências).
+- **Vazamento de luz** vermelho → âmbar → branco em ~0,3 s: só na **virada** da história (ref1 25 s; ref3 em volta da
+  cartela do nome). Porquê: avisa que o bloco mudou. No máximo 1–2 por vídeo, sem batida (G6). Nunca por enfeite.
+- Flash branco + logo no fim (ref3) é assinatura do canal: não entra.
+
+### 1.4 Assinatura do criador (não vira regra)
+
+O set (mesa clara sob o foco), o nome do canal no terço inferior, o "COMMENT X" do fim, a cartela de logo, o tema e
+todo o material de arquivo (Musk, Tesla, Kith). Terço inferior com nome só com nome e @ reais e pedido (G8).
+
+## 2. Que trecho funciona
+
+Conversa de podcast ou fala para a câmera com frases curtas que fecham numa palavra forte; 30 a 60 s. Com B-roll real
+o modelo fica documental (ref1); sem, fica calmo (ref2). Os dois são o modelo.
+
+## 3. Repertório: que fala chama o quê (só onde o porquê se repete, G30)
+
+| Quando a fala... | Com vários ângulos | Com um ângulo só |
 |---|---|---|
-| Brilho | 42 (de 0 a 255) | Escuro, com o papel claro subindo a média |
-| Contraste | 128 | Pretos fundos |
-| Saturação | 95 | Cor contida: só o vermelho acende |
-| Temperatura | +0,2 | Neutro e frio |
-| Rosto no plano aberto | 28% da altura do quadro | (3 s) |
-| Rosto no plano fechado | 33% da altura do quadro | (10 s) |
-| Altura do rosto | centro a 33% do topo | Cabeça no terço de cima |
-| Lado do rosto | centro a 52% da largura | Um pouco à direita |
-| Cabeça cortada pelo topo | 10% do tempo | Quase nunca |
-| Tempo com rosto | 56% | O resto é palco, papel e arquivo |
-| Cortes | cerca de 24 por minuto | 12 cortes em 30 s |
+| abre com a tese/gancho | gravação com a legenda padrão desde o 1º quadro (G29) | igual |
+| fecha um argumento com o termo-imagem | corta para o aberto + palavra-chave na parede | palavra-chave gigante abaixo do queixo, pequenas encostadas |
+| diz algo pessoal, forte, curto | close | legenda padrão (ou intermediário se tem carga) |
+| faz perguntas em série | lista numerada na parede do aberto, a negação em vermelho | legenda padrão, uma pergunta por bloco |
+| cita pessoa, objeto, marca concreta | B-roll real, se houver material | sem material: legenda (marca em caixa branca) |
+| vira a história | vazamento de luz no corte | vazamento de luz, se a virada for real |
+| fecha o vídeo | aberto com a tese de volta em palavra-chave | a última palavra forte como palavra-chave |
 
-## 3. Os mundos e a câmera
-
-| Mundo | Como é | Para quê |
-|---|---|---|
-| **Palco** | Plano aberto do set: mesa clara a 55–58% da altura sob um foco de cima, cadeiras e microfones, poça de luz em elipse no chão, parede quase preta (`#0A0C0C` em cima, `#19191E` no chão). O texto mora na parede escura acima da mesa | A tese da abertura, a frase de impacto, o fecho (0 s a 3 s, 24 s a 25 s) |
-| **Rosto** | A gravação com a pessoa recortada sobre o estúdio frio `#131A1E`, vinheta, luz caindo de lado. Rosto um pouco à direita (x 0,45 a 0,58 da largura, y 0,30 a 0,33) | O miolo da fala, o terço inferior (3 s, 10 s, 13 s, 20 s, 27 s) |
-| **Papel** | Fundo claro com vinheta forte (`#EFEAE7` no centro, `#7E7C7A` nos cantos). Fotos e prints sem moldura, espalhados, de tamanhos variados, franja fina de aberração na borda e sombra curta. Os cards são quadros dos seus vídeos | Vários exemplos, época, rede social, imprensa (5 s a 8 s, 11 s a 12 s, 22 s a 23 s) |
-| **Arquivo** | B-roll em tela cheia, vinheta e bordas um pouco desfocadas | O objeto, o lugar, a ação citada (8 s a 9 s "editar", 26 s "vídeos") |
-| **Dividida** | Palco em cima até 33% da altura (40% com prévias), rosto embaixo, divisa reta sem borda | A janela das prévias (14,5 s a 20 s) |
-
-**De onde vem o palco e o B-roll:**
-- **Palco por IA, o padrão:** o estúdio já traz na `public/` do molde o `palco.png` (set de podcast vazio, mesa clara
-  sob um foco num estúdio preto, duas cadeiras, dois microfones, sem ninguém) e dois B-rolls (`broll_edicao.png`, um
-  monitor com linha do tempo de edição, 8 s; `broll_celular.png`, um celular num tripé gravando, 26 s). Foram gerados
-  por IA para o modelo, sem conteúdo de terceiros; os prompts estão em `material/GERADAS.md` do molde. O
-  `novo-video.py` copia os três para o vídeo novo, então o palco do aprovado entra sozinho.
-- **Os dois B-rolls** só entram se um plano de arquivo apontar para eles (`img`). Eles mostram edição e gravação: só
-  servem se a fala nova falar disso.
-- **Palco desenhado (plano B):** sem `public/palco.png`, o molde desenha o set no mesmo esquema (cone de luz aceso no
-  miolo, poça quase branca, mesa clara a 57,4% da altura, cadeiras e microfones). Use só se não quiser a imagem.
-- **Outra câmera nunca se gera por IA.** No lugar de "outro ângulo", nesta ordem: outros cortes de câmera do mesmo vídeo,
-  B-roll do usuário, B-roll de terceiros com licença. Imagem ou vídeo gerado por IA no lugar de câmera é escolha do
-  usuário. Pessoa real nunca gerada.
-
-**Câmera:** corte seco entre mundos, cada corte no início da palavra que o motiva. Dentro do plano, só o papel anda (a
-câmera avança até o item principal da colagem, 7 s). Um plano dura de 1,1 s a 3 s; a tela dividida segura 5,5 s.
-
-**Zoom do rosto:** quem manda é o tamanho do rosto, não o número do zoom. A gravação adaptada já vem enquadrada, então
-o `s` do plano parte dela: abra o `src/rosto.json` do vídeo (`[t, cx, cy, h]`, `h` é a altura do rosto de 0 a 1), pegue
-o `h` mediano do trecho e use `s = 0,28 / h` no plano aberto e `s = 0,33 / h` no fechado (rosto com 28% e 33% da
-altura). Numa gravação já adaptada isso costuma dar perto de 1,05 (se a conta der abaixo de 1,0, use assim mesmo) e 1,15; o 1,1 a 1,32 do aprovado vale só para a
-gravação dele e, aplicado numa adaptada, deixa o rosto com 39%. Confira nos quadros: rosto de 28% a 33% da altura.
-
-**Fala rápida sem corte limpo:** se a próxima palavra começa antes de a anterior completar o tempo de ler, não corte
-ali. Junte os dois planos num só, ou ponha o corte até 2 quadros depois do início da palavra (o checador aceita
-±2 quadros). Nunca um plano que mostre só uma palavra piscando.
+**Nunca (M1):** imagem gerada no lugar de um plano da referência (palco, B-roll), papel liso como tela de destaque,
+zoom digital trocando de enquadramento para fingir câmera, recorte da pessoa, fundo desfocado ou trocado. O checador
+(`scripts/sincronia.mjs`) acusa erro nesses casos (plano `palco`/`dividida` só com `camera:` apontando para um ângulo
+gravado; `papel` só com material; um zoom só no rosto quando há uma câmera).
 
 ## 4. Os destaques (a assinatura)
 
@@ -100,7 +150,7 @@ inferior e etiquetas das prévias). Nenhuma outra.
 
 **A palavra-chave gigante:**
 - Ocupa 74% da largura do quadro (alvo; vale de 60% a 83%), com corpo máximo de 220 px. Palavra longa encolhe até caber.
-- Centrada na horizontal. Altura: no palco y 868; no papel y 800 a 1025; no rosto y 1262 a 1322, sempre abaixo do queixo.
+- Centrada na horizontal. Altura: sobre a gravação y ~1250, sempre abaixo do queixo; na parede do plano aberto (só com câmera aberta real) y ~868.
 - Cores:
 
 | Cor | Hex | Quando |
@@ -109,13 +159,17 @@ inferior e etiquetas das prévias). Nenhuma outra.
 | Tinta | `#0B0A0F`, limpa, sem brilho | Sobre o papel, quando o vermelho não cabe ("Instagram", 12 s) |
 | Branco | `#FBFAFB` | Nome de pessoa |
 
-- **Sem halo, contorno ou sombra justa (SP6/G37, 2026-10-30).** Sobre a gravação, só uma sombra larga e bem suave
-  (`0 4px 36px rgba(0,0,0,0.3)`), que não desenha a borda da letra; no papel, nada. Confira num recorte em 100%.
+- **Texto limpo, sem halo, contorno ou sombra justa (SP6, G16).** Sobre a gravação o molde usa uma sombra larga e bem
+  suave (`0 4px 36px rgba(0,0,0,0.3)`), que não desenha a borda da letra; no papel, nada. Confira num recorte em 100%.
+  O contraste se resolve pela posição e pela cor, nunca com contorno (G18).
 - **Entrada:** letra por letra, da esquerda para a direita, cada letra do borrão (16 px, vermelho) para nítida em 3
   quadros. A palavra inteira em 0,33 a 0,47 s, começando quando é dita (5 s "diferen…", 24 s "aprende…"). Duas palavras
   num destaque ("três vezes.", 19 s): as letras da 2ª nascem quando ela é dita.
-- **Uma palavra-chave por frase** (no máximo duas). É o termo protagonista, de preferência a última palavra forte da
-  frase, com o ponto dentro ("três vezes.", 19 s). Nunca advérbio nem palavra de ligação.
+- **Palavra-chave só onde importa (G17):** nunca uma por frase nem por cota de tempo. Só o termo com relevância no
+  storytelling do tema; frase sem termo forte fica na legenda comum (número de passagem, fim de frase qualquer, verbo
+  comum e palavra repetida nunca). Na dúvida, não destaca. De preferência a última palavra forte da frase, com a
+  pontuação fora do destaque ("três vezes", 19 s, e o ponto na letra pequena; G18). Nunca advérbio nem palavra de
+  ligação.
 - **Palavras pequenas encostam nela:** a linha de cima começa na borda esquerda da palavra-chave e a de baixo termina
   na borda direita ("Esse vídeo está sendo 100%" / **editado** / "pelo", 2 s).
 - **Caixa de marca:** o nome de produto dentro da frase vai numa caixa branca `#FBFAFB` com letra preta `#0B0A0F`
@@ -156,69 +210,47 @@ traço de caneta vermelho que se desenha sobre uma foto em 0,3 s.
 - **Tempo de leitura:** bloco pelo menos 1,5 s, palavra pelo menos 0,4 s depois de nascer, palavra-chave completa pelo
   menos 0,8 s, terço pelo menos 1,5 s. Se a fala é rápida demais para isso, a palavra entra no bloco seguinte ou o bloco
   junta com o vizinho do mesmo plano; nenhum pedaço fica menos que o tempo de ler. No máximo 2 linhas de legenda por bloco (SP5), até 8 palavras pequenas mais a palavra-chave.
-- **Posição:** no rosto, a legenda padrão fica no peito, em y 1215 e y 1298 (duas linhas centradas, 4 s, 20 s). No
-  vídeo inteiro, a legenda padrão usa no máximo 2 posições. Nos outros mundos o texto vai no espaço livre: na parede do
-  palco (y 742 a 1000), na faixa livre entre as fotos do papel, abaixo do queixo na metade de baixo da dividida.
+- **Posição (G12): um lugar só, um bloco por vez.** A legenda padrão fica no peito, em y 1110 e y 1193 (duas linhas
+  centradas, 4 s, 20 s), no vídeo inteiro. Nunca dois ou três trechos empilhados, nunca um lugar novo por frase. Só a
+  tela de destaque (o papel com a palavra-chave) e as opções pedidas (palco, dividida) põem o texto em outro lugar: na
+  parede do palco (y 742 a 1000), na faixa livre do papel, abaixo do queixo na metade de baixo da dividida.
 - **Nenhum texto no rosto.** O texto fica abaixo do queixo medido (`src/rosto.json`).
 - **Nada atravessa um corte seco.** Cada bloco acaba no corte. Numa rajada, cada plano leva só a palavra dita nele.
 
-- **Papel numa frase longa que passa por vários planos:** o papel pode levar como palavra-chave o substantivo forte do
-  trecho dele (contando no máximo 2 palavras-chave num vídeo curto). Papel sem palavra-chave perde a cara do modelo.
 ## 6. Transições e fecho
 
 - **Corte seco** é a regra.
-- **Vazamento de luz** marca troca de bloco, 1 a 3 por vídeo: uma onda vermelha `#BD2027` sobe ou varre na diagonal em
-  2 a 3 quadros, vira âmbar `#FDD48B`, amarelo `#FEE87B` e um quadro branco, e revela o plano novo em 0,3 s. No aprovado:
-  na abertura (0 s) e na virada "Mas" (20 s), cada um com uma batida.
+- **Vazamento de luz:** uma onda vermelha `#BD2027` sobe ou varre na diagonal em 2 a 3 quadros, vira âmbar `#FDD48B`,
+  amarelo `#FEE87B` e um quadro branco, e revela o plano novo em 0,3 s. Usado na referência porque marcava a virada da
+  fala ("Mas", 20 s) e a abertura; usar quando a fala nova virar de bloco (porquê da abertura a confirmar com o dono).
+  A batida que o aprovado tinha em cada vazamento é efeito sonoro: só com ordem (G6).
 - Nada de VHS, glitch, deslize ou cortina.
 - **Fecho:** se a pessoa termina com a chamada, fixo só o comando, com a palavra entre aspas em palavra-chave gigante
   vermelha, “edição”, em y 1262 (27 s a 30 s). O resto da fala corre em linhas pequenas acima (y 1135) e abaixo
-  (y 1395) dela. Sem chamada, fecha no palco com a última palavra forte dita como palavra-chave.
+  (y 1395) dela. Sem chamada, fecha na gravação com a última palavra forte dita como palavra-chave (o plano aberto só
+  a pedido).
 - A última tela segura 0,53 s depois da última palavra. Se a palavra-chave final não completa 0,8 s com isso, aumente a
   `FOLGA` até completar.
 - **Prévias (opcional):** na tela dividida, dois clipes de vídeos seus acelerados 3 vezes, de 360x640 px, em y 34 e
   x 150 e 570, com o nome de cada um em JetBrains Mono 34 px embaixo (15 s a 19 s). Nunca vídeo de terceiro.
 
-## 7. Que trecho funciona e que palavra chama o quê
-
-Funciona: tese com exemplo concreto (cada substantivo vira imagem), conselho com passos, apresentação de alguém. Frases
-curtas com a palavra forte no fim, 30 a 60 s. Não funciona: fala abstrata sem nenhum substantivo concreto por mais de
-15 s, bate-bola de duas pessoas, tutorial de tela.
-
-| Quando a fala... | A tela faz |
-|---|---|
-| diz a tese (1ª frase) | palco e palavra-chave gigante, já no 1º quadro (0 s) |
-| fecha uma frase de impacto | volta ao palco com a palavra-chave (24 s) |
-| fala de vários exemplos | colagem no papel, uma foto por palavra, a câmera avança até o item principal (6 s a 7 s) |
-| fala de rede social | um card cresce no centro e explode em vários (12 s) |
-| diz um objeto ou ação concreta | B-roll curto (8 s, 26 s) |
-| nomeia uma marca ou produto | caixa branca dentro da frase (10 s) ou o logo em close |
-| nomeia uma pessoa | corta para ela e o nome entra em serifa branca |
-| lista nomes ou dá passos | um plano por nome, ou lista numerada no palco |
-| a pessoa aparece pela 1ª vez | terço inferior com nome e @ reais (3 s) |
-| muda de bloco | vazamento de luz (20 s) |
-| pede comentário | o comando com a palavra entre aspas (27 s) |
-
-No miolo do rosto entre duas palavras-chave, só as palavras pequenas. Nenhum selo, ícone, emoji ou seta.
-
-**Material:** imagem de fora só com licença aberta (`kit/buscar.py`, fonte anotada no `ORIGEM.md`) ou do próprio criador.
-Manchete, print de rede de terceiro e afins só como citação pequena, com a fonte visível, no tempo do comentário. O que
-não der para conseguir vira `PEDIDO.md` na pasta do vídeo, com o plano B (palco, palavra-chave sobre o rosto).
-
 ## 8. Opções (o que vem ligado e o que é escolha)
 
 | Opção | Padrão no código | Como mudar |
 |---|---|---|
-| Rosto recortado no estúdio frio | **ligado** se existir `public/fala_grade.mp4` | Rode o `grade.py` (seção 10, passo 3). Sem ele, a gravação crua |
-| Palco por IA | **ligado**: o `palco.png` vem no estúdio, é o padrão do modelo e o `novo-video.py` copia para o vídeo | Apague `public/palco.png` para o palco desenhado, ou troque por uma foto sua do set |
+| Fundo (G6) | **real**: o vídeo normal da pessoa, prop `fundo: 'real'` | `fundo: 'desfoque'` (desfoque leve do fundo real; rode `scripts/grade.py --desfoque`) ou `fundo: 'recorte'` (o estúdio frio `#131A1E` com vinheta do aprovado; rode `scripts/grade.py`). Só com ordem explícita; nenhuma referência recorta a pessoa (M1) |
+| Palavra-chave gigante sobre a gravação | onde a fala fecha um trecho com termo que merece destaque (G17, M2) | Escreva o porquê no `cenas.json` |
+| Plano aberto (`palco`) | só com outra câmera gravada do set (M1): o molde não traz mais imagem gerada | `camera: 'aberto.mp4'` no plano, arquivo do criador em `public/` |
+| Colagem, celulares, prints | desligados | `papel: {tipo: ...}` no plano, a pedido |
 | B-roll | só onde o plano de arquivo tem `img` | `img: 'arquivo.png'` no plano. Sem `img`, a gravação em tom de arquivo |
-| Batidas nos vazamentos | **ligadas** | O `mixar.sh` usa `public/efeitos.wav` se existir |
+| Batidas nos vazamentos | **desligadas** (G6: efeito sonoro só com ordem) | Com ordem: não apague o `public/efeitos.wav`; o `mixar.sh` usa se existir |
 | Música (cama fria) | desligada | `mixar.sh` com `public/trilha.wav` no meio |
 | Vazamentos de luz | ligados na abertura e na virada | `VAZAMENTOS` em `src/Reel.tsx` (o `scripts/trilha.py` lê de lá); `[]` desliga |
 | Terço inferior | desligado (`nome: ''`, `arroba: ''`): só liga com o nome e o @ reais de quem fala | `--props='{"nome":"<nome real>","arroba":"@<arroba real>"}'` |
 | Prévias | desligadas | Prop `previas: true` e `nomesPrevias`, com um plano `dividida` |
 
-O aprovado foi feito com o palco e os B-rolls que vêm no estúdio, terço com o nome e o @ reais de quem fala e prévias ligadas.
+O aprovado foi feito antes das regras de 2026-11-05, com o fundo recortado no estúdio frio, o palco, as colagens e os B-rolls que vêm no
+estúdio, terço com o nome e o @ reais de quem fala e prévias ligadas. Nada disso é o padrão de hoje.
 
 ## 9. Zona segura e rosto
 
@@ -241,20 +273,19 @@ por vez.
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
 2. **Reescreva o `plano.md`** na pasta do vídeo, uma linha por frase: tempo, fala, mundo, texto na tela, palavra-chave,
    gatilho (seção 7) e de onde vem a imagem. O que veio nele é o plano do aprovado, de outra fala.
-3. **Rosto no estúdio frio** (na pasta do vídeo):
-   `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/grade.py` grava
-   `public/fala_grade.mp4`. Ele recorta a pessoa na CPU: conte uns 10 min para 30 s de fala, e antes disso ele pode
+3. **Fundo (só se o dono pediu; o padrão é o fundo real e este passo não existe):** na pasta do vídeo,
+   `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/grade.py --desfoque` grava
+   `public/fala_desfoque.mp4` (desfoque leve, para `fundo: 'desfoque'`); sem `--desfoque` grava
+   `public/fala_grade.mp4` (o estúdio frio, para `fundo: 'recorte'`). Ele recorta a pessoa na CPU: conte uns 10 min para 30 s de fala, e antes disso ele pode
    ficar parado em "trava ocupada, esperando..." enquanto outro render usa a trava. É normal: espere, não mate o
    processo. `scripts/grade.py 1 13 22` grava só imagens de teste.
-4. **Cards do papel:** `.venv/Scripts/python.exe tools/cards.py oficina/<v> --fala 8` tira os cards da própria
+4. **Cards do papel (só se houver prints/fotos reais para colagem, M1):** `.venv/Scripts/python.exe tools/cards.py oficina/<v> --fala 8` tira os cards da própria
    gravação. Sem argumento além da pasta, ele puxa 3 quadros de cada vídeo pronto em `oficina/`, inclusive de outras
    pastas que não são deste vídeo: só use assim se esses vídeos forem seus e combinarem com a fala. Para escolher:
    `tools/cards.py oficina/<v> oficina/<outro>/out/final.mp4@1.5,12,23 --fala 4`. Grava `public/cards/` e
    `src/cards.json`. Rode sempre antes de usar o papel ou os celulares: o `src/cards.json` que vem do molde é o do
    aprovado e aponta para quadros que não existem no vídeo novo.
-5. **Palco e B-roll:** decida (seção 3). Para gerar um B-roll novo por IA, só se o usuário quiser (na pasta do vídeo):
-   `../../kit/.venv/Scripts/python.exe ../../kit/gerar.py "<descrição>" public/<nome>.png --formato 9:16`, anotando o
-   prompt.
+5. **Ângulos e B-roll:** conte quantas câmeras o material tem (seção 1.1). Uma só: um plano `rosto` do começo ao fim. Mais de uma: um plano por ângulo, com o porquê. B-roll só material real do criador (G7); nada gerado.
 6. **Monte O PLANO** em `src/Reel.tsx` (na pasta do vídeo). O molde para ao carregar até o plano bater com a fala nova e
    diz a lista e a linha. Os ids são índices de `src/palavras.json` (0 = a 1ª).
    - `PLANOS`: os planos emendados de 0 a `DURACAO`, cada corte no início da 1ª palavra do plano, com `mundo`, `q`
@@ -268,32 +299,37 @@ por vez.
 7. **Confira as regras:** `node scripts/sincronia.mjs` (na pasta do vídeo) até sair 0 erros. Ele confere sincronia,
    cortes, texto que atravessa corte, palavra coberta uma vez, até 4 linhas, posições, zona segura, tempo de leitura e
    texto no rosto, e avisa mídia que falta.
-8. **Som:** rode (ele lê `FOLGA` e `VAZAMENTOS` do `src/Reel.tsx`) `../../.venv/Scripts/python.exe scripts/trilha.py`
-   (na pasta do vídeo). Sai `public/efeitos.wav` e `public/trilha.wav`.
+8. **Som (só com ordem de efeito ou música, G6):** rode (ele lê `FOLGA` e `VAZAMENTOS` do `src/Reel.tsx`)
+   `../../.venv/Scripts/python.exe scripts/trilha.py` (na pasta do vídeo). Sai `public/efeitos.wav` e
+   `public/trilha.wav`. Sem ordem, pule e mixe só a voz.
 9. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 14.3 29.9` (na pasta do vídeo;
    `--previas` e `--nome "<nome real>" --arroba "<@ real>"` mostram prévias e terço). Folha:
    `../../.venv/Scripts/python.exe scripts/montar.py saida.png q1.png q2.png --cols 6`.
 10. **Renderize** (na pasta do vídeo):
     `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts VitrineSuperPodcast01 out/so-video.mp4 --codec=h264 --crf=16 --concurrency=2`
     Com terço e prévias: `--props='{"nome":"<nome real>","arroba":"@<arroba real>","previas":true,"nomesPrevias":["modeloA","modeloB"]}'`.
+    Fundo pedido: acrescente `"fundo":"desfoque"` (ou `"recorte"`) nas props.
 11. **Mixe** (na pasta do vídeo): `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4` (voz e batidas). Com música:
     `sh scripts/mixar.sh out/so-video.mp4 public/trilha.wav out/final.mp4` (cerca de 16 dB abaixo da voz). Sai em
     -14 LUFS, pico -1 dBTP.
-12. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 minidocumentario`.
-    Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
-    em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
+12. **Confira a identidade:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 minidocumentario`.
+    Reprovou, corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava: compare tipografia,
+    enquadramento e acabamento, não a sequência de telas (G30).
 
-**Vídeo curto (10 a 15 s):** 4 a 6 planos, no máximo 1 vazamento (o da abertura), 1 ou 2 palavras-chave, terço
-desligado se não houver nome e @ reais, sem tela dividida nem prévias. Sem chamada no fim, fecha no palco com a última
-palavra forte (seção 6). As regras de leitura e de corte não encolhem com o vídeo.
+**Vídeo curto (10 a 15 s):** a maior parte no rosto, telas de destaque só onde a fala pede, 4 a 6 planos, no máximo 1
+vazamento, 1 ou 2 palavras-chave, terço desligado se não houver nome e @ reais, sem tela dividida nem prévias. Sem
+chamada no fim, fecha com a última palavra forte (seção 6). As regras de leitura e de corte não encolhem com o vídeo.
 
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e o mesmo com `2`).
 
-## 11. O plano do vídeo aprovado (para comparar)
+## 11. O plano do vídeo aprovado (histórico; NÃO é molde: tinha palco e B-roll gerados por IA, hoje proibidos por M1)
+
+Feito antes das regras de 2026-11-05: tem palco, colagem, B-roll, tela dividida, batidas e o fundo recortado, uma tela
+quase por frase. Serve para ver a tipografia e o porquê de cada tela, não como receita de sequência (G30).
 
 | Tempo | Fala | Câmera / transição | Na tela |
 |---|---|---|---|
-| 0 s | Esse vídeo está sendo 100% editado pelo Claude. | vazamento com batida; palco | "Esse vídeo está sendo 100%" / **editado** (vermelho) / "pelo Claude." na parede, y 742 a 1000 |
+| 0 s | Esse vídeo está sendo 100% editado pelo Claude. | rosto 1,1 (hoje abre na gravação, G29; no aprovado era o palco com vazamento e batida) | legenda padrão no peito: "Esse vídeo está sendo 100%" / "editado pelo Claude.", y 1215 e 1298, sem palavra-chave |
 | 3 s | Ele foi criado justamente para te mostrar | corte seco, rosto 1,1 | terço com o nome e o @ reais de quem fala; legenda y 1215 e 1298 |
 | 5,2 s | a diferença entre vários modelos que eu criei e | corte seco, papel (colagem; fotos entram em "vários", câmera avança em "criei") | **diferença** (vermelho) y 800, "entre vários modelos" e "que eu criei e" embaixo |
 | 8 s | para editar qualquer tipo de vídeo | corte seco, arquivo (monitor de edição) | "para editar" / **qualquer** (vermelho) / "tipo de vídeo" |

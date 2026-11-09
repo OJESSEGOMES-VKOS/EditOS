@@ -9,6 +9,8 @@ escrito) e o `mapa.json` (luz e cortes medidos a cada 0,25 s). Antes de editar, 
 
 **A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas, os textos e os cortes do vídeo novo nascem da fala nova. Não repita as cenas do aprovado só porque estão lá.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo. A G29 (começo na gravação original) não se aplica: este modelo não tem gravação de pessoa.
+
 ---
 
 ## 0. Do seu jeito (o aluno preenche, se quiser)
@@ -31,8 +33,8 @@ Quando a pessoa corrigir algo num vídeo e a correção valer para os próximos,
 
 Sem apresentador. A voz fala, a tela desenha o que foi dito, e a tela é bonita o bastante para parecer peça de estúdio.
 - **Registro Ouro na Noite:** preto, ouro e laranja com brilho de neon; vermelho só no pico da tensão (13 s).
-- **Cada frase vira uma tela desenhada:** tipografia que se monta palavra por palavra no tempo da fala e um objeto que
-  ilustra a palavra concreta (anéis com contador 1 s, notebook 3 s, anéis com cartões 6 s, roleta 9 s, celular 11 s,
+- **Cada cena vira uma tela desenhada** (até o ponto ou a vírgula, G14; os destaques só no trecho ligado ao tema, G17, G28):
+  tipografia que se monta palavra por palavra no tempo da fala e um objeto que ilustra a palavra concreta (anéis com contador 1 s, notebook 3 s, anéis com cartões 6 s, roleta 9 s, celular 11 s,
   túnel 15 s, pasta de vidro 24 s).
 - **Contraste tipográfico:** Inter Bold limpa e a palavra protagonista só em contorno neon (22 s).
 - **Muito ar em volta do texto** e uma família de cor só.
@@ -80,9 +82,11 @@ entrando junto com o objeto. O molde não traz isso porque o aprovado não usa.
   disso, pode tirar respiro e take repetido, sem tirar palavra que muda o sentido.
 
 **Layout em 9:16:**
-- **Objeto em cima, texto embaixo:** objeto em y 250 a 1050, texto com a 1ª linha em y 1210 e as seguintes a cada
-  84 px (1294, 1378), até 3 linhas de 70 px (3 s, 9 s, 11 s, 17 s).
-- **Ou texto no centro:** pilha em volta de y 850 a 1080, com o objeto em volta (anéis, 6 s; contorno neon, 22 s).
+- **Objeto em cima, texto embaixo (o lugar padrão, G12):** objeto em y 250 a 1050, texto com a 1ª linha em y 1210 e as
+  seguintes a cada 84 px (1294, 1378), até 3 linhas de 70 px (3 s, 9 s, 11 s, 17 s).
+- **Texto no centro, só na tela de destaque (G13, G28):** pilha em volta de y 850 a 1080, com o objeto em volta (anéis, 6 s;
+  contorno neon, 22 s). No aprovado os anéis do 6 s também usam o centro; num vídeo novo, o centro fica para o trecho de destaque
+  (G28).
 - Largura de texto até 800 px, centrada em x 540. A roleta pode vazar pela esquerda e os cartões rolar à direita
   (9 s). Objeto que cruzaria o texto ganha máscara embaixo (túnel, 15 s).
 
@@ -148,8 +152,9 @@ entrando junto com o objeto. O molde não traz isso porque o aprovado não usa.
   - **contorno neon** que se escreve da esquerda para a direita em 9 quadros: "outros modelos / de edição" (22 s);
   - **assinatura** em ouro que assenta em branco: “EDIÇÃO” (27 s).
 - **Tensão:** no pico vermelho o texto vira `#FFE0E8` com halo vermelho (13 s).
-- **Encolhe:** um bloco pode encolher para 58% e subir para y 590 para dar lugar ao destaque ("Mas se você quiser
-  realmente ver", 22 s).
+- **Um bloco por vez (G12):** no aprovado um bloco encolhe para 58% e sobe para y 590 para dar lugar ao destaque ("Mas
+  se você quiser realmente ver", 22 s), e os dois ficam na tela. Num vídeo novo não: o bloco anterior sai (desfoque de
+  14 px em 4 quadros) antes do destaque entrar.
 - **Nunca escreva o nome do modelo na tela** (as etiquetas das prévias nomeiam os vídeos mostrados). Nunca travessão.
 
 ## 6. Transições e fecho
@@ -172,7 +177,9 @@ entrando junto com o objeto. O molde não traz isso porque o aprovado não usa.
 
 | Opção | Padrão | Como mudar |
 |---|---|---|
-| Efeitos sonoros do modelo (whoosh e estalo no flash, impacto no clarão, tique por gomo e cartão, brilho na assinatura) | **ligados** | Prop `efeitos: false` |
+| Telas de destaque (T4, T7, T9, contorno neon, flash, clarão) | só no trecho ligado ao tema (G17, G28); na dúvida, não destaca | o `plano.md` diz qual trecho ganha qual destaque e por quê (G30) |
+| A pessoa na tela | não aparece (o modelo é narrado); se o dono pedir, crua, sem recorte nem blur (G6) | — |
+| Efeitos sonoros do modelo (whoosh e estalo no flash, impacto no clarão, tique por gomo e cartão, brilho na assinatura) | **ligados** (som: confirmar com o dono se continua padrão, G6) | Prop `efeitos: false` |
 | Trilha sintetizada (16 dB abaixo da voz, com ducking, pulso que sobe na virada) | desligada | `scripts/som.py` e prop `musica: true` |
 | Prévias de dois vídeos (16 s a 19 s) | desligadas (fica só o túnel) | `tools/previa.py`, `"previas"` no plano e props `previas: true, nomesPrevias: [...]` |
 | Ir ao preto no fim | **ligado** | Tire `"escurece_q"` do `src/tempos.json` |
@@ -202,8 +209,10 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 2. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py motion-ouro <narracao.mp4> <AAAA-MM-DD-tema>`.
    Isso copia o molde, grava `public/voz.wav` e transcreve a fala em `src/palavras.json`. Se a transcrição errar um
    nome, acrescente `--trocar Cloud=Claude` (errado=certo).
-3. **Escreva o `plano.md`** na pasta do vídeo: cada frase, a tela do repertório (seção 4), as palavras na tela e o
-   gatilho. Frase sem objeto que a ilustre fica só com tipografia (T7), nunca com enfeite.
+3. **Escreva o `plano.md`** na pasta do vídeo, abrindo com a decupagem limpa da narração e o plano de cenas: cada cena,
+   a tela do repertório (seção 4), as palavras na tela e o gatilho. As telas de destaque só no trecho ligado ao tema, com a
+   linha "por quê" ligada à fala (G28, G30). Frase sem objeto que a ilustre fica só com tipografia, embaixo, nunca com
+   enfeite.
 4. **Monte O PLANO em `src/tempos.json`** (na pasta do vídeo). O molde para de propósito enquanto o plano não bater com
    a fala nova e diz o que refazer.
    - `"fala"`: o texto da fala nova (o checador imprime pronto para colar).
@@ -250,7 +259,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    `"previas":true,"nomesPrevias":["<modelo1>","<modelo2>"]`.
 9. **Mixe:** `sh scripts/finalizar.sh out/bruto.mp4 out/final.mp4` (na pasta do vídeo). O som já sai do render; aqui
    só normaliza em -14 LUFS e pico -1 dBTP.
-10. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 motion-ouro`.
+10. **Confira a identidade do modelo (cor, luz, ritmo; nunca a sequência de telas, G30):** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 motion-ouro`.
     Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
     em cima e o seu embaixo. Folha de 1 quadro por segundo do seu:
     `../../.venv/Scripts/python.exe scripts/folhas.py out/final.mp4` (na pasta do vídeo).

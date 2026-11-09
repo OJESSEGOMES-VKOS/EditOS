@@ -3,6 +3,8 @@
 Este é o único arquivo que você precisa ler para editar neste modelo. Tudo o que está aqui é regra. Quando algo daqui
 bater com o código do molde, vale o que está aqui.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo. A G29 (começo na gravação original) não se aplica: este modelo não tem gravação de pessoa.
+
 **A referência é o `referencia/referencia.mp4`**, o vídeo aprovado do modelo (42 s, só a voz). Os tempos entre
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo, com o segundo
 escrito) e o `mapa.json` (luz e trocas medidas a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
@@ -255,7 +257,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts Anuncio out/video.mp4 --codec=h264 --crf=16 --concurrency=2`.
 9. **Mixe:** `sh scripts/finalizar.sh out/video.mp4 out/final.mp4` (na pasta do vídeo). Normaliza em -14 LUFS e pico
    -1 dBTP.
-10. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 anuncio-canvas`.
+10. **Confira a identidade do modelo (cor, luz, ritmo; nunca a sequência de telas, G30):** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 anuncio-canvas`.
     Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
     em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
 

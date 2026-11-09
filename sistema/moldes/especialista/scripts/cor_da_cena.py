@@ -3,7 +3,7 @@
 - quente: o tom mais saturado entre as partes claras (abajur, parede quente, janela) -> o miolo do clarão;
 - ouro: o mesmo tom de "quente", mais saturado -> a legenda da citação (fala citada);
 - traço: vermelho de sinal, fixo (é o único "sinal" do modelo, como na ref1).
-Nada disso mexe na gravação (G33): é só a cor dos elementos do modelo.
+Nada disso mexe na gravação (G6): é só a cor dos elementos do modelo.
 uso (na pasta do vídeo): ../../.venv/Scripts/python.exe scripts/cor_da_cena.py
 """
 import colorsys

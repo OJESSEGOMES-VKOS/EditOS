@@ -3,6 +3,8 @@
 Este é o único arquivo que você precisa ler para editar neste modelo. Tudo o que está aqui é regra. Quando algo daqui
 bater com o código do molde, vale o que está aqui.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo. A G29 (começo na gravação original) não se aplica: este modelo não tem gravação de pessoa.
+
 **A referência é o `referencia/referencia.mp4`**, o vídeo aprovado do modelo (30,4 s, 9:16, narrado). Os tempos entre
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo) e o `mapa.json`
 (luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
@@ -159,7 +161,7 @@ cena quente; o fecho em loop no cenário do começo; cartela com a palavra em ca
 
 | Opção | Padrão no código | Como mudar |
 |---|---|---|
-| Efeitos sonoros do modelo | **ligados** (`efeitos: true`) | Prop `efeitos: false`. Ligado exige `public/efeitos.wav` (`scripts/som.py`) |
+| Efeitos sonoros do modelo | **ligados** (`efeitos: true`) (som: confirmar com o dono se continua padrão, G6) | Prop `efeitos: false`. Ligado exige `public/efeitos.wav` (`scripts/som.py`) |
 | Música | desligada (`musica: false`) | Prop `musica: true`, depois do `scripts/som.py` |
 | Grão de filme | **ligado** se existir `public/grao/` | Não vem garantido com o molde: rode `scripts/grao.py`. Para desligar, apague `public/grao/` |
 | Prévias | desligadas (`previas: false`) | Prop `previas: true` e `nomesPrevias`, com `"previas"` no plano |
@@ -223,7 +225,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    Com música: `--props='{"musica":true,"efeitos":true}'`; com prévias, acrescente
    `"previas":true,"nomesPrevias":["modeloA","modeloB"]`.
 9. **Finalize o som** (na pasta do vídeo): `sh scripts/finalizar.sh out/bruto.mp4 out/final.mp4` (-14 LUFS).
-10. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 personagem`.
+10. **Confira a identidade do modelo (cor, luz, ritmo; nunca a sequência de telas, G30):** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 personagem`.
     Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
     em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
 

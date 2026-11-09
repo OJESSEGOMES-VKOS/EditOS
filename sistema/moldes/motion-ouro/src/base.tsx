@@ -106,9 +106,11 @@ export const tw = (f: number, a: number, b: number, v0: number, v1: number, ease
 export const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 
 // brilho neon: núcleo quase branco, a cor mora no halo (motion-ouro.md §5)
-export const HALO_TEXTO = `0 0 10px rgba(255,214,140,0.35), 0 0 34px rgba(244,137,7,0.22)`;
-export const HALO_OURO = `0 0 6px rgba(248,216,52,0.9), 0 0 22px rgba(242,190,58,0.75), 0 0 54px rgba(244,137,7,0.5)`;
-export const HALO_TENSAO = `0 0 6px rgba(225,59,80,0.95), 0 0 22px rgba(225,59,80,0.8), 0 0 50px rgba(224,3,10,0.55)`;
+/** G16 + decisão do dono (2026-11-05): o brilho neon é a identidade deste modelo e fica ligado */
+export const BRILHO_TEXTO = true;
+export const HALO_TEXTO = !BRILHO_TEXTO ? 'none' : `0 0 10px rgba(255,214,140,0.35), 0 0 34px rgba(244,137,7,0.22)`;
+export const HALO_OURO = !BRILHO_TEXTO ? 'none' : `0 0 6px rgba(248,216,52,0.9), 0 0 22px rgba(242,190,58,0.75), 0 0 54px rgba(244,137,7,0.5)`;
+export const HALO_TENSAO = !BRILHO_TEXTO ? 'none' : `0 0 6px rgba(225,59,80,0.95), 0 0 22px rgba(225,59,80,0.8), 0 0 50px rgba(224,3,10,0.55)`;
 export const FILTRO_NEON = (cor = COR.fogo) => `drop-shadow(0 0 3px ${cor}) drop-shadow(0 0 12px ${cor}) drop-shadow(0 0 30px ${cor}aa)`;
 
 // entrada mais usada nas duas refs: desfoque para foco com leve escala

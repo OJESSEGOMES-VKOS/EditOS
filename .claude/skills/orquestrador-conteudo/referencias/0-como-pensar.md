@@ -67,7 +67,7 @@ Procedimento para escrever o gancho:
 2. Escreva a cena da pessoa (§1).
 3. Escreva o fato ou a surpresa verdadeira.
 4. Junte fato + pessoa + tensão numa frase falada em voz alta. Corte toda palavra que não é fato, pessoa ou tensão.
-5. Escreva como ele fica **na tela** desde o quadro 0 (curto, legível mudo).
+5. Escreva como ele fica **na legenda sobre a gravação** desde o quadro 0 (curto, legível mudo; G29: começo dinâmico na gravação original).
 6. Rode os testes 2, 3 e 5. Faça o gancho B por outro movimento do §2, não por sinônimo do A.
 
 ## 5. Roteiro: mostrar, não relatar

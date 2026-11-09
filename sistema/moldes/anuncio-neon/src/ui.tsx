@@ -2,7 +2,12 @@ import React from 'react';
 import {C, E, SANS, mola, rnd, tw, useT} from './tema';
 
 export const ab = (x: number, y: number, extra: React.CSSProperties = {}): React.CSSProperties => ({position: 'absolute', left: x, top: y, ...extra});
-export const brilho = (cor: string, k = 1) => `0 0 ${18 * k}px ${cor}, 0 0 ${48 * k}px ${cor}88`;
+/** G16 + decisão do dono (2026-11-05): o brilho neon é a identidade deste modelo e fica ligado */
+export const BRILHO_TEXTO = true;
+/** brilho de caixa e traço (não é texto) */
+export const brilhoCaixa = (cor: string, k = 1) => `0 0 ${18 * k}px ${cor}, 0 0 ${48 * k}px ${cor}88`;
+/** brilho de texto: 'none' no padrão (G16) */
+export const brilho = (cor: string, k = 1) => (BRILHO_TEXTO ? brilhoCaixa(cor, k) : 'none');
 const hexA = (hex: string, a: number) => {
 	const n = parseInt(hex.slice(1), 16);
 	return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
@@ -62,7 +67,7 @@ export const Risco: React.FC<{de: number; cor?: string; espessura?: number; top?
 	const {t} = useT();
 	const k = tw(t, de, de + dur, 0, 1, E.inOut);
 	if (k <= 0) return null;
-	return <span style={{position: 'absolute', left: '-5%', top, width: `${110 * k}%`, height: espessura, marginTop: -espessura / 2, background: cor, borderRadius: espessura, boxShadow: brilho(cor, 0.7), transform: 'rotate(-2deg)'}} />;
+	return <span style={{position: 'absolute', left: '-5%', top, width: `${110 * k}%`, height: espessura, marginTop: -espessura / 2, background: cor, borderRadius: espessura, boxShadow: brilhoCaixa(cor, 0.7), transform: 'rotate(-2deg)'}} />;
 };
 
 /** barra da cor da marca passando por baixo da frase */

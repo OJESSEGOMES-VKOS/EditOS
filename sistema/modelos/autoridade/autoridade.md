@@ -7,7 +7,11 @@ bater com o código do molde, vale o que está aqui.
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo) e o `mapa.json`
 (rosto, luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
 
-**A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas, os textos e os cortes do vídeo novo nascem da fala nova. Não repita as cenas do aprovado só porque estão lá.
+**A referência mostra o jeito do modelo, não um roteiro para copiar (G30).** O modelo é inspiração: o porquê e o como
+de cada tela. Não se copia a sequência nem os tempos do aprovado. Cada tela descrita aqui é repertório, com o seu
+porquê, e só entra onde a fala nova tiver o mesmo porquê.
+
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
 
 ---
 
@@ -29,17 +33,22 @@ Quando a pessoa corrigir algo num vídeo e a correção valer para os próximos,
 
 ## 1. A cara do modelo
 
-Um profissional falando com a câmera numa tomada só. **O vídeo transmite autoridade e é muito didático:** tudo o que
-puder virar ilustração, elemento ou tela dividida, vira.
+Um profissional falando com a câmera numa tomada só. **O vídeo transmite autoridade e é didático na medida:** a maior
+parte é a pessoa falando com a legenda limpa, e a ilustração, a tela cheia ou a dividida entram **só onde a fala tem
+o porquê delas** (G19, G28, G30). O aprovado ilustrava quase toda frase: não é mais o padrão.
 - **Câmera calma:** aproximação e afastamento bem lentos, e só uns 3 cortes de ênfase no vídeo todo (0 s a 4 s, 20 s).
 - **Legenda limpa** em Poppins branca, no peito (2 s, 11 s, 20 s).
-- **Títulos de frase-chave** sobre o vídeo, de até 3 linhas, só nos momentos de ênfase (1 s a 2 s).
-- **Telas cheias** no desenho de tipografia cinética com objeto herói, alternando fundo escuro e fundo de cor
-  (5 s a 10 s, 24 s a 26 s).
-- **Tela dividida com o vídeo sempre embaixo** e um painel, ilustração ou B-roll em cima (11 s a 19 s, 22 s a 23 s).
+- **Títulos de frase-chave** sobre o vídeo, de até 3 linhas: usados na referência porque o gancho era a frase da tese
+  (1 s a 2 s); usar no gancho e na frase de extremo destaque do tema.
+- **Telas cheias**, no desenho de tipografia cinética com objeto herói, no fundo escuro ou no de cor: usadas na
+  referência porque a frase descrevia uma ação que dá para desenhar (os cartões dos "vários modelos", a lâmina do
+  "editar"); usar quando a fala nova descrever uma ação ou um objeto que o herói pode fazer, numa frase de peso no tema.
+- **Tela dividida com o vídeo sempre embaixo**: usada na referência porque a fala citava algo que dá para mostrar em
+  cima (o Instagram no celular, as prévias, a lista de modelos; 11 s a 19 s, 22 s a 23 s); usar quando a fala nova
+  citar uma lista, um app ou um material para mostrar, ou a pedido.
 - **Uma cor de destaque tirada do cenário** da gravação (no vídeo aprovado, caramelo `#8F5F33`, da parede bege).
 - **Fecho:** o comando fixo, Comenta “EDIÇÃO”, num botão que acende (27 s a 29 s).
-- **Nada de efeito mirabolante no fundo. Nada de preto e branco.**
+- **Nada de efeito no fundo, nada de tratamento de cor na gravação, nada de preto e branco** (G6).
 
 ## 2. Os números do modelo (o `parece.py` confere)
 
@@ -57,9 +66,13 @@ puder virar ilustração, elemento ou tela dividida, vira.
 | Tempo com rosto na tela | 71% | |
 | Cortes | cerca de 14 por minuto | Poucos: a câmera é calma |
 
+Com o fundo e a cor reais (o padrão, G6), brilho, contraste, saturação e temperatura são os da gravação de quem usa: o
+`parece.py` só avisa nesses quatro (G6) e cobra o rosto e o ritmo. O "tempo com rosto" de 71% vinha das telas do
+aprovado; hoje ele sobe (no molde de hoje, a única tela cheia dura 2,5 s).
+
 ## 3. Câmera e ritmo
 
-- **Uma tomada, com deriva bem lenta:** menos de 1% por segundo (por exemplo, de 1,0 a 1,035 ao longo de um trecho
+- **Uma tomada, com deriva bem lenta** (pedido do dono neste modelo, PF5 e PF13; sem som de zoom, G6). **Decisão do dono (2026-11-05): a deriva continua, mas sempre como aproximação lenta e contínua; corte seco de zoom não existe mais neste modelo (o molde ignora os pontos `true` do `CAM`)**: menos de 1% por segundo (por exemplo, de 1,0 a 1,035 ao longo de um trecho
   inteiro). O zoom nasce do ponto entre os olhos.
 - **No máximo 3 cortes de enquadramento no vídeo todo**, só nas ênfases da fala: a pergunta-gancho, a frase da ação e o
   fecho, este abrindo o quadro. No vídeo aprovado: "Mas se você quiser" fecha de 1,07 para 1,18 (20 s), e o fecho abre
@@ -78,9 +91,12 @@ puder virar ilustração, elemento ou tela dividida, vira.
   isso cascateia (cada palavra empurrada também precisa de 0,4 s): ande o corte até achar duas palavras seguidas com
   0,4 s ou mais entre elas e comece o título na segunda, mesmo no meio da frase. O checador cobra os 0,4 s também da
   última palavra antes de um corte.
-- **Flash na ênfase:** um flash branco e quente de 4 quadros no corte de ênfase (20 s), com um whoosh.
-- **Transição limpa** entre algumas cenas, como do gancho para a 1ª parte.
-- Tratamento leve na gravação: contraste 1,06, saturação 0,94, brilho 0,98.
+- **Flash na ênfase:** um flash branco e quente de 4 quadros no corte de ênfase: usado na referência porque marcava a
+  virada "Mas se você quiser" (20 s); usar quando a fala nova virar o rumo. O whoosh que ia junto é efeito sonoro: só
+  com ordem (G6).
+- **Transição limpa** entre algumas cenas, como do gancho para a 1ª parte (PF3).
+- **Sem tratamento na gravação (G6).** O aprovado usava contraste 1,06, saturação 0,94 e brilho 0,98: é a opção
+  `tratamento: true`, só a pedido.
 
 ## 4. Títulos e telas (a assinatura)
 
@@ -92,13 +108,25 @@ alternativa. O tamanho varia pouco.
 - Cada palavra entra suave em 0,4 s (desfoque de 4 px e deslize de 10 px), junto com a voz. O título sai num fade de
   0,22 s.
 - Palavra comum em Poppins 600; âncora em Poppins 800 (no máximo 2 vezes o tamanho das comuns, "100%", 1 s); alternativa
-  em DM Serif ou Great Vibes. Branco com sombra de 2 camadas. Uma linha pode ganhar marca-texto da cor de destaque.
-- Fica num lugar só, do peito para baixo: topo em y 1110 (y 1000 com 3 linhas). Nunca no rosto.
-- **Quantos títulos:** no aprovado, 2 em 30 s (o gancho e uma frase-chave). Num vídeo curto, de 10 a 15 s, cabem 2: o
-  gancho e a frase da ênfase. Nunca dois títulos seguidos sem vídeo com legenda entre eles.
+  em DM Serif ou Great Vibes. Branco, sem contorno nem sombra colada (G16): só a sombra larga e suave do molde (a
+  camada justa saiu em 2026-10-30). Uma linha pode ganhar marca-texto da cor de destaque.
+- Fica num lugar só, do peito para baixo: topo em y 1110, com 2 ou 3 linhas. Nunca no rosto. **Todos os títulos no
+  mesmo lugar e nos mesmos tamanhos** (dono, 2026-11-07, G13: o de 3 linhas subia para y 1000 e o gancho e a tese
+  ficaram em posições diferentes).
+- **Título = legenda com destaque** (dono, 2026-11-07, v2 do corte "dieta"; vence o `inteiro: true` de antes, que foi
+  apagado do molde): (1) o texto normal (`'base'`) tem o **mesmo tamanho da legenda padrão, 72 px** (`LEG_TAM`); só a
+  palavra destacada cresce (âncora até 1,5x a 2x). Linha que passa da zona em 72 px quebra em mais linhas (até 3),
+  nunca encolhe. (2) O bloco entra **palavra por palavra, cada uma no instante em que é dita** (`PS[i].de`, tempos da
+  transcrição ancorados na onda por `scripts/palavras.py`), nunca o bloco inteiro de uma vez. O fade de saída só começa
+  depois da última palavra dita. Palavra perto do fim do título: estique o `ate`; se a fala seguinte começa logo e
+  precisa do seu texto, a palavra fica o tempo da sua fala (o checador lista como limite G9). O `scripts/cobertura.mjs`
+  reprova texto normal de título fora de 72 px e palavra de título que aparece fora do tempo da voz (±0,1 s).
+- **Quantos títulos:** o do gancho e os das frases de extremo destaque do tema (G17, G28). Nunca dois títulos seguidos
+  sem vídeo com legenda entre eles, nunca título sem motivo na fala (o 2º título do aprovado, das prévias, saiu do
+  molde).
 - Nunca use cartela branca de texto tipográfico.
 
-**Telas cheias** (quando a tela não mostra o vídeo):
+**Telas cheias** (quando a tela não mostra o vídeo; só onde a fala tem o porquê, seção 1):
 - **Dois fundos que alternam no corte:** escuro (degradê radial de `#3B2D22` para `#16110D`) e cor (degradê de `#B27C48`
   para `#8F5F33` e `#6A4422` nas bordas), sempre com uma grade de pontos sutil (2 px a cada 44 px).
 - **Tipografia grande palavra a palavra**, entrando do desfoque, com tamanhos misturados, até 3 linhas: ligação em
@@ -111,9 +139,9 @@ alternativa. O tamanho varia pouco.
   aparece sozinho na ponta esquerda (a linha reserva o lugar de todas as palavras e só ele chegou) até a voz dizer
   "mandei". No molde fica `false`, que é como o aprovado foi feito.
 - A tela inteira aproxima 1,2% por segundo.
-- Uma ideia por tela, de 1 a 2,5 s.
+- Uma ideia por tela, de 1 a 2,5 s. Nunca duas cenas seguidas com tela: entre elas, o vídeo com a legenda.
 
-**Tela dividida:**
+**Tela dividida** (só onde a fala tem o porquê, seção 1, ou a pedido):
 - **O vídeo original fica sempre embaixo**, com os olhos a 180 px do topo da metade de baixo e a mesma deriva lenta.
 - Em cima: ilustração, foto, painel ou B-roll. **O fundo do painel de cima é opaco desde o 1º quadro**: nenhuma outra
   cena aparece por trás. Só o conteúdo do painel entra animado (celular, cartões, lista).
@@ -126,7 +154,8 @@ alternativa. O tamanho varia pouco.
   painel fica a 85% do tamanho, com o topo em y 262; com menos itens ele fica a 96% (o zoom lento do painel não o leva para fora da zona segura), centrado na metade de
   cima. Título e itens saem da fala nova (veja `LISTA` na seção 9).
 - Celular com interface genérica de Reels e só o @ real de quem fala, ou nenhum (11 s a 14 s).
-- Tela simples demais vira tela dividida. Pouco texto por tela, bem enquadrado.
+- Pouco texto por tela, bem enquadrado. Frase sem o porquê de uma tela fica no vídeo com a legenda (a antiga regra
+  "tela simples demais vira tela dividida", da PF7, não vale mais).
 
 **Espinha de princípios e analogia desenhada** (reforço do treinamento talking-head 2026-11-03, molde do Joseph,
 `../../../treinamento/talking-head-explicativo/manual.md` R7 e R8; vale quando a fala ensina 2 a 5 itens numerados):
@@ -136,13 +165,14 @@ alternativa. O tamanho varia pouco.
   nunca cartela branca. Os nomes dos itens são os ditos; item que a fala ainda não nomeou não entra no mapa.
 - **Etiqueta "PRINCÍPIO N" a cada troca:** quando a fala passa ao item seguinte, a pílula branca do rótulo (Poppins 800,
   34 px) entra no canto do vídeo com a palavra que a pessoa usa e o número dito ("PRINCÍPIO 2", "PASSO 2", "DICA 2";
-  G8: se ela não diz o número, a etiqueta não inventa) e fica 1,5 s (DejD 7 s, 23,5 s, 39,5 s). Se a fala diz o nome do
+  G10: se ela não diz o número, a etiqueta não inventa) e fica 1,5 s (DejD 7 s, 23,5 s, 39,5 s). Se a fala diz o nome do
   item na mesma frase, a pílula leva o nome numa segunda linha em Poppins 600.
 - **Recapitulação (opcional):** se a fala recapitula ("faça os três"), o mapa volta com os vistos acendendo um a um.
 - **Analogia desenhada:** no ponto mais abstrato, uma analogia por vídeo vira a **tela cheia com objeto herói** literal
   (a mesa na garagem e no showroom, com o preço contando até o valor dito, DejD 25,5 s a 31,5 s), no fundo escuro ou de
   cor do modelo. Só quando a fala faz a analogia; o modelo não cria analogia que não foi dita.
-- Nada disso muda a câmera calma, a legenda de 72 px no peito nem as cores: só acrescenta a espinha.
+- Nada disso muda a câmera calma, a legenda de 72 px no peito nem as cores: só acrescenta a espinha. A espinha conta
+  como tela: mapa e analogia só quando a fala os pede, e nunca em duas cenas seguidas.
 
 **Sempre:** número e frase exatamente como foram ditos; painel entra já preenchido; nada atravessa um corte. Nunca
 escreva o nome do modelo na tela (a fala "um desses modelos" fica só na legenda, 13 s).
@@ -151,9 +181,14 @@ escreva o nome do modelo na tela (a fala "um desses modelos" fica só na legenda
 
 - **Toda palavra dita aparece na tela, uma vez só, em ordem.** O que um título, uma tela ou o fecho já mostra não se
   repete na legenda.
-- **Poppins 600 branca**, sem itálico, sombra de 2 camadas (`0 2px 4px rgba(0,0,0,.45)` e `0 4px 22px rgba(0,0,0,.4)`),
-  com uma faixa escura bem suave (16% a 20%) atrás da linha.
-- Pedaços de 2 a 4 palavras, cortados pelo sentido e escritos à mão; fala rápida vira página de até 2 linhas.
+- **Poppins 600 branca**, sem itálico, sem contorno nem sombra colada (G16): só a sombra larga e suave do molde
+  (`0 4px 22px rgba(0,0,0,.4)`; a camada justa `0 2px 4px` saiu em 2026-10-30), com uma faixa escura bem suave (16% a
+  20%) atrás da linha.
+- Pedaços de 2 a 4 palavras, cortados pelo sentido (G11, G14) e escritos à mão; fala rápida vira página de até 2 linhas
+  (nunca 3 linhas, nunca dois trechos empilhados, G12). **Tamanho único, 72 px no vídeo inteiro** (dono, 2026-11-07,
+  G12): a linha não encolhe mais para caber; frase longa quebra em mais blocos. Junte subtrechos curtos do MESMO trecho
+  até o bloco dar 1,5 s, sem passar de 2 linhas; nunca junte trechos diferentes (G9). O checador lista à parte o bloco
+  curto que não tem como juntar (trecho inteiro, ou a junção passaria de 2 linhas) e reprova o que dava para juntar.
 - **Troca seca** com fade de 2 quadros (de 50% a 100%). Cada palavra entra no quadro do corte, 2 quadros antes da voz,
   ancorada no ataque da voz. A página fica até a próxima entrar e nunca pisca no meio da fala.
 - **Tempo de leitura:** cada página fica pelo menos 1,5 s e cada palavra pelo menos 0,4 s. Corte que cairia no meio de
@@ -162,35 +197,44 @@ escreva o nome do modelo na tela (a fala "um desses modelos" fica só na legenda
 - **Só 2 posições:**
   - na gravação: **72 px**, topo em y 1150 (2 s, 20 s);
   - na tela dividida e no fecho: 56 px, até 2 linhas, com o pé em y 1500 (topo em y 1354) (11 s, 27 s).
-  A linha que passaria da largura encolhe só ela.
+  Nenhuma linha encolhe: a que não cabe (largura real da Poppins 600, `larguraLeg`) aparece fora da zona no checador.
 - **Na tela dividida**, as palavras-chave ganham uma caixa da cor de destaque (raio 12) ("Instagram", "prévias", "três
-  vezes", 11 s a 19 s). No plano, `*palavra*` marca a caixa. **Pontuação colada vai dentro da caixa:** escreva
-  `*corte,*` e `*três vezes.*`, nunca `*corte*,` (a vírgula fica solta depois da caixa, como "corte ,").
+  vezes", 11 s a 19 s). No plano, `*palavra*` marca a caixa. **Pontuação fora da caixa (G18):** escreva `*corte*,` e
+  `*três vezes*.`. Confira no quadro que a vírgula encosta na caixa, sem espaço solto ("corte ,"); se o molde soltar,
+  é ajuste de código a pedir ao dono.
+
+- **Decupagem (G5):** confira o FIM de cada trecho na onda (RMS de 5 a 10 ms) até a última sílaba sumir; o limiar de
+  -40 dB come o fim átono ("aperta-do" foi cortado no meio na v1 do corte 08, 2026-11-07).
+- **Tela cheia só onde a frase tem força de tela** (G28): a tela do 108 (barras) foi tirada pelo dono em 2026-11-07,
+  frase sem força e momento errado. Tela de destaque é texto centrado, sem gráfico, salvo pedido.
 
 ## 6. Som e fecho
 
-- **Som padrão:** a voz e o whoosh do flash. A voz leva passa-alta e compressão leve. Final em -14 LUFS.
-- A música (uma cama clara em ré maior) é opcional e vem desligada. Quando ligada, fica 16 LU abaixo da voz, com ducking.
+- **Som padrão:** só a voz, com passa-alta e compressão leve (G6). Final em -14 LUFS. O whoosh do flash, só com ordem.
+- A música (uma cama clara em ré maior) é opcional e vem desligada (G6). Quando ligada, fica 16 LU abaixo da voz, com ducking.
 - **Fecho** (27 s a 29 s): o quadro abre (zoom 1,0). Entre o queixo e a legenda ficam fixos só o comando, "Comenta"
   (Poppins 600, 64 px), e um botão em pílula (170 px de altura) com o ícone de comentário e **“EDIÇÃO”** entre aspas
   (Poppins 800, 84 px), de borda branca, que acende na cor de destaque na palavra. O resto da fala segue na legenda,
   na 2ª posição.
-- **Prévias (opcional):** a dividida com dois clipes de vídeos seus lado a lado, o nome de cada modelo na pílula (15 s a
-  19 s). Nunca use vídeo de terceiro.
+- **Prévias (opcional):** a dividida com dois clipes de vídeos seus lado a lado, o nome de cada vídeo na pílula (nunca
+  o nome do modelo, G33; 15 s a 19 s). Nunca use vídeo de terceiro.
 
 ## 7. Opções (o que vem ligado e o que é escolha)
 
 | Opção | Padrão | Como mudar |
 |---|---|---|
-| Whoosh do flash | **ligado** | `FLASH = None` em `scripts/som.py` (ou o tempo dele, veja o passo 7 da seção 9) |
-| Flash na ênfase | **ligado** | `FLASH = null` em `src/Reel.tsx` |
+| Fundo e cor (G6) | **o vídeo normal**, prop `tratamento: false` | `tratamento: true` (o leve do aprovado), com ordem. Desfoque de fundo só com ordem |
+| Telas cheias, dividida, títulos | onde a fala tem o porquê (seção 1), mais o título do gancho e o fecho | Mais, só a pedido do dono |
+| Whoosh do flash | **desligado** (G6) | Com ordem: `FLASH` em `scripts/som.py` (veja o passo 7 da seção 9) |
+| Flash na ênfase | só na virada da fala | `FLASH = null` em `src/Reel.tsx` quando não há virada |
 | Fecho com o botão Comenta | **ligado** | `CTA = null` em `src/Reel.tsx` |
-| Música (cama em ré maior) | desligada | `sh scripts/mixar.sh out/so-video.mp4 public/trilha.wav out/final.mp4` |
+| Música (cama em ré maior) | desligada (G6) | Com ordem: `sh scripts/mixar.sh out/so-video.mp4 public/trilha.wav out/final.mp4` |
 | @ no celular | vazio (a linha do perfil some) | Prop `arroba: "@seu.arroba"`, só o real de quem fala |
 | Prévias | desligadas | Prop `previas: true` e `nomesPrevias: ["modeloA","modeloB"]` |
 | Cor de destaque | a do cenário | Os tons de `C` no topo de `src/Reel.tsx` (destaque, escuro, claro), tirados da gravação |
 
-Os padrões vêm do `src/Root.tsx`: `{previas: false, nomesPrevias: ['interface-encenada', 'rosto-telas'], arroba: ''}`.
+Os padrões vêm do `src/Root.tsx`: `{previas: false, nomesPrevias: ['interface-encenada', 'rosto-telas'], arroba: '',
+tratamento: false}`.
 O render sai **sem som**; a voz entra no `mixar.sh`.
 
 ## 8. Zona segura e rosto
@@ -218,12 +262,14 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    (0 = a 1ª palavra). Mudou a transcrição, rode de novo.
 3. **Tire o quadro dos cartões:** `ffmpeg -ss 5 -i public/fala.mp4 -frames:v 1 -q:v 3 public/quadro.jpg` (na pasta do
    vídeo; escolha um segundo com o rosto bem enquadrado).
-4. **Escreva o `plano.md`** na pasta do vídeo, frase a frase: onde cai a ênfase, o que vira tela cheia, o que vira tela
-   dividida, os títulos, a cor de destaque do cenário.
+4. **Escreva o `plano.md`** na pasta do vídeo, frase a frase: onde cai a ênfase, o trecho ligado ao tema que vira tela cheia
+   ou dividida (G28), com o porquê de cada uma (G30; a maior parte é o vídeo com a legenda), o título do gancho, a cor de
+   destaque do cenário.
 5. **Monte O PLANO** no topo de `src/Reel.tsx` (na pasta do vídeo). O molde para ao carregar e diz qual lista não bate:
    - `T`: os cortes, `c(de(i))` = 2 quadros antes da palavra i. As chaves são livres (troque as do aprovado pelas
      suas, sem guardar chave que sobrou): só o plano lê `T`;
-   - `trechos`: o modo de cada trecho (`video`, `tela`, `celular`, `previas`, `lista`);
+   - `trechos`: o modo de cada trecho (`video`, `tela`, `celular`, `previas`, `lista`); `video` na maior parte, os outros
+     só onde a fala tem o porquê deles (seção 1);
    - `CAM`: a deriva e os cortes de ênfase (`true` = corte), no máximo 3, no tamanho de rosto da seção 3;
    - `MARCAS`: as palavras que fazem cada herói agir, uma lista por herói (as do aprovado são dos heróis dele);
    - `LISTA`: o painel de lista, `{titulo, itens, vistos, acende}`, ou `null`. `titulo` e `itens` vêm da fala nova;
@@ -244,7 +290,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 6. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo; `--previas` se for usar prévias) até zerar.
    Ele confere, quadro a quadro, toda palavra escrita enquanto é dita, página de 1,5 s e palavra de 0,4 s, nada repetido,
    legenda em no máximo 2 posições, zona segura e linhas, e diz o que mexer.
-7. **Som:** o whoosh cai no mesmo tempo do `FLASH` do `src/Reel.tsx`. Em `FLASH` de `scripts/som.py`, um inteiro é o
+7. **Som (só com ordem de efeito ou música, G6; sem ordem, pule):** o whoosh cai no mesmo tempo do `FLASH` do `src/Reel.tsx`. Em `FLASH` de `scripts/som.py`, um inteiro é o
    índice da palavra (corte 2 quadros antes dela, como `c(de(i))`) e um número com casa decimal são os segundos. Se o
    corte da ênfase não é `c(de(i))` (por exemplo `de(20) + 0.42`), passe os segundos:
    `../../.venv/Scripts/python.exe scripts/som.py --flash 7.76` (na pasta do vídeo). Sai `public/efeitos.wav` (e
@@ -253,10 +299,11 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 9. **Renderize** (na pasta do vídeo):
    `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts VitrineProfissional01 out/so-video.mp4 --codec=h264 --crf=16 --concurrency=2`
    (com o @ real: `--props='{"arroba":"@seu.arroba"}'`).
-10. **Mixe:** `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4` (na pasta do vídeo; voz e whoosh). Sai em -14 LUFS.
-11. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 autoridade`.
-    Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
-    em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
+10. **Mixe:** `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4` (na pasta do vídeo; a voz, e o whoosh só se houve
+    ordem). Sai em -14 LUFS.
+11. **Confira a identidade:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 autoridade`.
+    Reprovou, corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava: compare tipografia,
+    enquadramento e acabamento, não a sequência de telas (G30).
 
 **Como escrever um herói** (o objeto da tela cheia que faz o que a frase diz):
 - O formato é `Heroi`: um componente que recebe `{t, de, fim, fg, ac}` (o tempo atual, o começo e o fim da tela, a cor
@@ -295,9 +342,14 @@ const Player: Heroi = ({t, de: d, fim, fg, ac}) => {
 com `--previas` e o render com `--props='{"previas":true,"nomesPrevias":["modeloA","modeloB"]}'`.
 
 **Série de um mesmo cliente:** o vídeo novo parte do código do vídeo que o cliente aprovou. Variação nova só acrescenta;
-a base segue a aprovada.
+a base segue a aprovada (G35).
 
 ## 10. O plano do vídeo aprovado (para comparar)
+
+Feito antes das regras de 2026-11-05: três telas cheias seguidas na mesma frase, o celular, o painel e a tela 4, quase
+uma tela por frase, whoosh e o tratamento leve na gravação. Serve para ver a tipografia e o porquê de cada tela, não
+como receita de sequência (G30). O molde de hoje fica com o título do gancho, uma tela cheia ("tipo de vídeo / usando o
+Claude.", 8,9 s a 10,7 s, a lâmina corta em "vídeo"), o fecho, e o resto no vídeo com a legenda.
 
 | Tempo | Fala | Câmera / modo | Na tela |
 |---|---|---|---|

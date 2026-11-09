@@ -5,7 +5,9 @@ uso: ../../.venv/Scripts/python.exe scripts/conferir.py   (sai 1 se algo falhar;
 - toda palavra da fala aparece uma vez só, nasce no start dela (±2 quadros) e fica >= 0,4 s depois de nascer;
 - bloco >= 1,5 s, máx. 4 linhas, dentro da cena dele (nada atravessa troca);
 - zona segura 9:16: y 250-1500, x 60-940 (largura medida com a Sora do vídeo, scripts/Sora.ttf, no peso da linha);
-- legenda em no máximo 2 alturas de início de bloco; destaques (pílulas) todos do mesmo tamanho;
+- G12 (REGRAS.md, 2026-11-05): legenda padrão num lugar só (uma altura de início de bloco) e um bloco por vez (dois
+  blocos nunca se sobrepõem no tempo); destaques (pílulas) todos do mesmo tamanho. A antiga "pílula só no fim de cena
+  forte, no máximo 2" foi abolida: onde destacar é a G17 (relevância ao tema), decidida no plano, não aqui;
 - nenhum trecho > 2,5 s sem palavra nova ou troca de cena (fora o fecho, a última cena);
 - texto na tela: nenhum travessão, nenhum nome de modelo.
 Adaptado do conferir.py do motion-ouro.
@@ -111,7 +113,16 @@ for b in T['blocos']:
             nasc.append(n)
 for i, v in enumerate(vezes):
     if v != 1: erros.append(f"palavra {i} '{PS[i]['text']}' aparece {v}x")
-if len(tops) > 2: erros.append(f"legenda em {len(tops)} alturas: {sorted(tops)}")
+if len(tops) > 1: erros.append(f"legenda em {len(tops)} alturas {sorted(tops)}: G12, um lugar só (o padrão é y 1170)")
+# G12: um bloco por vez
+ini = lambda b: b.get('de_q', cenas[b['cena']]['de_q'])
+fim = lambda b: b.get('ate_q', cenas[b['cena']]['ate_q'])
+fecho = T['cenas'][-1]['id']
+pilula = lambda b: any(l.get('tipo') == 'pilula' for l in b['linhas'])
+# o comando fixo do fecho (bloco com pílula na última cena) é o único que fica junto da legenda
+blocos = sorted((b for b in T['blocos'] if not (b['cena'] == fecho and pilula(b))), key=ini)
+for a, b2 in zip(blocos, blocos[1:]):
+    if ini(b2) < fim(a): erros.append(f"{a['id']} e {b2['id']}: dois blocos na tela ao mesmo tempo (G12: um bloco por vez)")
 if len(pilulas) > 1: erros.append(f"destaques de tamanhos diferentes: {sorted(pilulas)}")
 ev = sorted(set(nasc + [c['de_q'] for c in T['cenas']]))
 for a, b2 in zip(ev, ev[1:]):

@@ -4,6 +4,8 @@
 # com silêncio e nada corta o fim.
 # uso: sh scripts/mixar.sh out/so-video.mp4 out/final.mp4 [public/trilha.wav] [public/efeitos.wav]   (sem extras: só a voz)
 set -e
+# G6 + decisão do dono (2026-11-05): a voz sai como foi gravada; passa-alta, compressor e loudnorm só com TRATAR_VOZ=1
+if [ "${TRATAR_VOZ:-0}" = 1 ]; then TRAT="highpass=f=80,acompressor=threshold=-20dB:ratio=3:attack=8:release=120:makeup=2"; TRAT70="highpass=f=70"; else TRAT=anull; TRAT70=anull; fi
 cd "$(dirname "$0")/.."
 V="${1:-out/so-video.mp4}"; O="${2:-out/final.mp4}"
 [ -f "$V" ] || { echo "não achei o vídeo $V (renderize antes)"; exit 1; }
@@ -15,11 +17,12 @@ for x in "$@"; do
   n=$((n + 1)); ENT="$ENT -i $x"; ROT="$ROT[$n:a]"
 done
 DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$V")
-MIX="[1:a]aresample=48000,highpass=f=70[voz];$ROT""amix=inputs=$n:duration=longest:normalize=0,aresample=48000,apad,atrim=0:$DUR"
-[ $n = 1 ] && MIX="[1:a]aresample=48000,highpass=f=70,apad,atrim=0:$DUR"
+MIX="[1:a]aresample=48000,${TRAT70}[voz];$ROT""amix=inputs=$n:duration=longest:normalize=0,aresample=48000,apad,atrim=0:$DUR"
+[ $n = 1 ] && MIX="[1:a]aresample=48000,${TRAT70},apad,atrim=0:$DUR"
 J=$(ffmpeg -nostdin -hide_banner -nostats -i "$V" -i public/voz.wav $ENT -filter_complex "$MIX,loudnorm=I=-14:TP=-1:LRA=11:print_format=json" -f null - 2>&1 | sed -n '/^{/,/^}/p')
 g() { echo "$J" | grep "\"$1\"" | sed 's/.*: "\(.*\)".*/\1/'; }
-ffmpeg -nostdin -hide_banner -loglevel error -y -i "$V" -i public/voz.wav $ENT -filter_complex "$MIX,loudnorm=I=-14:TP=-1:LRA=11:measured_I=$(g input_i):measured_TP=$(g input_tp):measured_LRA=$(g input_lra):measured_thresh=$(g input_thresh):offset=$(g target_offset):linear=true,aresample=48000[a]" \
+if [ "${TRATAR_VOZ:-0}" = 1 ]; then LN2="loudnorm=I=-14:TP=-1:LRA=11:measured_I=$(g input_i):measured_TP=$(g input_tp):measured_LRA=$(g input_lra):measured_thresh=$(g input_thresh):offset=$(g target_offset):linear=true"; else LN2=anull; fi
+ffmpeg -nostdin -hide_banner -loglevel error -y -i "$V" -i public/voz.wav $ENT -filter_complex "$MIX,${LN2},aresample=48000[a]" \
   -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 256k -ar 48000 -movflags +faststart "$O"
 ffmpeg -nostdin -hide_banner -nostats -i "$O" -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+(I:|Peak:)"
 # a versão nova vai sozinha para <perfil>/conteudo/<tema>-DD-MM-AA/vN.mp4 (tools/entregar.py; fora da oficina ou com

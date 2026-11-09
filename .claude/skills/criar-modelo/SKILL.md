@@ -14,18 +14,20 @@ description: >
 Um modelo **não é uma cara**. É uma **forma de execução**: o que a tela faz com cada tipo de frase, como a câmera
 se comporta, como o texto nasce, onde o som entra, e o que acontece quando só existe a pessoa falando. A cara (cores,
 fontes, cartões) é consequência e é opção. Quem cria um modelo copiando a cara entrega um template; quem extrai a
-forma entrega uma capacidade que funciona com qualquer gravação. É isso que o dono pediu (G32): *"criar um modelo não
+forma entrega uma capacidade que funciona com qualquer gravação. É isso que o dono pediu (G30): *"criar um modelo não
 é copiar, é aprender uma forma de execução. Nem sempre vou ter um B-roll ou uma imagem ou várias cenas, e daí faz
 com o que tiver."*
 
-**Desde 2026-11-03 (G40, `sistema/cenas/METODO.md`), o vídeo é uma composição de cenas.** Um modelo é a **casa** (a
+**O vídeo é uma composição de cenas (G28, `sistema/cenas/METODO.md`).** Um modelo é a **casa** (a
 identidade que vale no vídeo inteiro: tratamento, rosto, legenda, tipografia, cores, som, ritmo) mais um **repertório**
 de respostas de cena, que qualquer vídeo de outra casa também pode usar. Escreva a gramática do `<modelo>.md` como
 repertório (cada resposta com a função de cena que resolve e o gatilho na fala), nunca como uma sequência a repetir, e
-diga quais estilos de cena (`sistema/cenas/INDICE.md`) completam o modelo. A vitrine prova o repertório numa
-composição decidida cena a cena.
+diga quais estilos de cena (`sistema/cenas/INDICE.md`) completam o modelo. O modelo é inspiração, não molde (G30):
+ensina o porquê e o como de cada tela; num vídeo novo, a edição de cada trecho e subtrecho nasce da fala nova e da
+relevância dela ao tema (G28, G14), nunca do timestamp da referência. A vitrine prova o repertório numa composição
+decidida cena a cena.
 
-Leia antes: `CLAUDE.md`, `REGRAS.md` inteiro (G1 a G33), `sistema/moldes/CONTRATO.md`, `sistema/tools/PROTOCOLO-decupagem-curto.md`,
+Leia antes: `CLAUDE.md`, `REGRAS.md` inteiro (seção 0, G1 a G35), `sistema/moldes/CONTRATO.md`, `sistema/tools/PROTOCOLO-decupagem-curto.md`,
 e as três referências desta skill: `referencias/heranca.md` (o que todo modelo nasce sabendo),
 `referencias/como-pensar-um-modelo.md` (os testes que separam modelo de template) e `referencias/interface-fiel.md`
 (toda interface recriada é fiel como um print, nunca o mockup genérico repetido).
@@ -78,7 +80,7 @@ honestidade: só o que você viu e mediu; "não deu pra ver" é uma seção, nã
 - **A gramática fala→tela**: para cada função de frase (gancho, problema, prova, passo, virada, fecho), o que a tela
   faz neste modelo. É daqui que o vídeo novo nasce da fala nova, e não do roteiro da referência.
 - **Os três sinais de reconhecimento**: o que faz alguém reconhecer o modelo em 1 segundo, mudo. Se precisar de mais
-  de três, o modelo não tem identidade; se um deles for "a cor", procure outro, porque cor é opção (G33).
+  de três, o modelo não tem identidade; se um deles for "a cor", procure outro, porque cor é opção (G31).
 - **"Com o que o vídeo tiver"**: a tabela recurso da referência → o que o modelo faz só com a gravação da pessoa.
   B-roll vira reenquadramento ou cartão; imagem de prova vira número dito grande; segunda câmera vira corte da mesma
   tomada. Se um recurso não tem equivalente, ele é opção, não regra.
@@ -98,22 +100,26 @@ precisa renderizar algo. Crie `CORRECOES.md` e `CORRECOES-origem.md` vazios com 
 `scripts/` com som, mixagem, quadros de conferência). O checador cobre, no mínimo: tempo de leitura, nada atravessa
 corte, zona segura, texto fora do rosto (e das mãos, quando a pessoa gesticula no peito), máximo de zooms por tela,
 máximo de tempo contínuo em cartão, legenda em no máximo 2 posições, nada pisca. O que a herança proíbe, o checador
-acusa. Nenhum tratamento de cor na gravação, nem como opção (G33). Sem `public/pessoa.webm` ou `src/maos.json` do
+acusa. Tudo que a G6 cobre (efeito sonoro, inclusive de zoom; música; tratamento de cor; recorte da pessoa; blur ou
+troca de fundo) nasce desligado e só liga por opção explícita do pedido; zoom só por plano explícito, nunca automático;
+texto sem contorno, sombra colada ou brilho (G16). Sem `public/pessoa.webm` ou `src/maos.json` do
 vídeo de origem (o `novo-video.py` já os ignora).
 
 ### Etapa 6: a vitrine
-A gravação comum é `sistema/teste-comum/gravacao.mp4` (base em `sistema/teste-comum/base/`), porque a prova é **parecer o modelo com
-outra gravação**, não com a da referência. `sistema/tools/novo-video.py <m> sistema/teste-comum/gravacao.mp4 AAAA-MM-DD-<m>-vitrine
+A gravação comum é `sistema/teste-comum/gravacao.mp4` (base em `sistema/teste-comum/base/`), porque a prova é **o modelo
+funcionar com outra gravação**: identidade da casa e edição decidida pela fala nova (G30), não a cópia da referência. `sistema/tools/novo-video.py <m> sistema/teste-comum/gravacao.mp4 AAAA-MM-DD-<m>-vitrine
 --sem-adaptar` (antes da aprovação ainda não existe `assinatura.json`; anote no `.md` que o `--sem-adaptar` cai
 depois). Plano frase a frase, render com `QUEM=<m> sh sistema/tools/com-trava.sh … --concurrency=2`, mix -14 LUFS (a vitrine é prova do sistema, não conteúdo de ninguém: pasta terminada em `-vitrine` não cai no `<perfil>/conteudo/`). Folhas em
-`conferencia/`: 1 quadro por segundo e a **lado a lado** (referência em cima, vitrine embaixo, um par por recurso).
-Um render por vez; apague quadros intermediários sem valor de prova (G29).
+`conferencia/`: 1 quadro por segundo e a **lado a lado** (referência em cima, vitrine embaixo, um par por recurso), para
+conferir identidade e o porquê de cada tela, não para igualar.
+Um render por vez; apague quadros intermediários sem valor de prova (G2, G4).
 
 ### Etapa 7: revisão de diretor (antes do dono)
 Olhe as duas folhas como quem vai reprovar. Procure, nesta ordem: texto sobre rosto ou mãos; cartão ou tela com letra
-pequena e vazio; trecho longo parado; abertura sem a pessoa ou sem o gancho; fala que não bate com a tela; ritmo fora
-da faixa das referências; qualquer coisa que pisca, teleporta ou some. Meça: duração, LUFS, pico, trocas/min, % em
-cartão, maior trecho em cartão. Compare com as referências nos mesmos números. Corrija o que for defeito. O que for
+pequena e vazio; trecho longo parado; abertura sem a pessoa ou sem o gancho; fala que não bate com a tela; tela que não
+serve à fala nem ao tema (G19, G28); qualquer coisa que pisca, teleporta ou some. Meça: duração, LUFS, pico, trocas/min, % em
+cartão, maior trecho em cartão. Compare com as referências nos mesmos números como guia, não como portão (o `parece.py`, se usado, é opcional e só
+de identidade: fonte, cor, legenda; não reprova). Corrija o que for defeito. O que for
 **decisão de gosto** vai nomeado pro dono, em até três itens, com a sua recomendação em cada um.
 
 O relatório pro dono tem, nesta ordem: o que o modelo ensina em 3 linhas; como se resolve só com a gravação; os
@@ -125,7 +131,7 @@ Com o "ok": a vitrine vai pra `sistema/modelos/<m>/exemplos/vitrine-<m>.mp4`; `s
 `sistema/tools/referencia.py <m>`; o `--sem-adaptar` sai do `.md`; o modelo entra na contagem do `LEIA.md` e, se for do
 catálogo, deixa de ser excluído no `sistema/tools/gerar-aberto.py`. Correção do dono na aprovação entra no `CORRECOES.md`
 com data e as palavras dele, e no `<m>.md` como regra. Se a correção vale pra todo modelo, vai pra `REGRAS.md` §0 e
-pra `heranca.md`. Commit e aberto só com ordem.
+pra `heranca.md` (que só indexa o `REGRAS.md`). Commit e aberto só com ordem.
 
 ## Fusão e refino (quando a triagem diz "não é novo")
 - **Fusão:** uma pasta só, referências renumeradas com `ORIGEM.txt` preservando a origem, decupagens movidas, um

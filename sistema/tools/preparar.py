@@ -4,7 +4,7 @@ uso (venv do estúdio):
   .venv/Scripts/python.exe tools/preparar.py <gravacao.mp4|narracao.mp3> oficina/<AAAA-MM-DD-tema> [--idioma pt] [--trocar Cloud=Claude ...] [--sem-voz]
 saída em oficina/<...>/base/:
   fala.mp4       vídeo com a rotação aplicada, 30 qps, H.264 (o que o Remotion lê)
-  voz.wav        voz limpa (passa-alta, redução de ruído, compressor, limitador), 48 kHz estéreo
+  voz.wav        a voz como foi gravada, 48 kHz estéreo (com --tratar-voz: passa-alta, redução de ruído, compressor, limitador)
   palavras.json  [{text,start,end}] (Whisper large-v3 + align.py), com "%" colado no número e as trocas pedidas
   rosto.json     [[t, cx, cy, h]] a cada 0,25 s, em fração do quadro (YuNet); vazio se não houver rosto
 Tudo temporário fica em <estúdio>/.tmp.
@@ -24,6 +24,7 @@ ap.add_argument('entrada')
 ap.add_argument('pasta')
 ap.add_argument('--idioma', default='pt')
 ap.add_argument('--trocar', nargs='*', default=[], help='palavra=certa, ex.: Cloud=Claude')
+ap.add_argument('--tratar-voz', action='store_true', help='G6: passa-alta, redução de ruído e compressor na voz; só com ordem do dono')
 ap.add_argument('--sem-voz', action='store_true', help='vídeo sem fala (pula transcrição)')
 a = ap.parse_args()
 
@@ -56,7 +57,8 @@ else:
 
 print('2/4 voz')
 subprocess.run(ff + ['-i', str(base / 'fala.mp4'), '-vn', '-af',
-                     'highpass=f=70,afftdn=nr=10:nf=-40,acompressor=threshold=-22dB:ratio=2.5:attack=8:release=120:makeup=2,alimiter=limit=0.95',
+                     ('highpass=f=70,afftdn=nr=10:nf=-40,acompressor=threshold=-22dB:ratio=2.5:attack=8:release=120:makeup=2,alimiter=limit=0.95'
+                      if a.tratar_voz else 'anull'),  # G6: a voz como foi gravada, salvo ordem do dono
                      '-ar', '48000', '-ac', '2', str(base / 'voz.wav')], check=True)
 
 if not a.sem_voz:

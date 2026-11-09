@@ -19,7 +19,7 @@ const CAIXA_ALTA = new Set([iw('edição', 2)]);
 const SELECAO = new Set([iw('edição', 2)]);
 /** tempo mínimo de cada pedaço na tela (s). 0 = pedaços de 1 a 3 palavras como na vitrine (MODELO §3); com 1.5 os pedaços
  * se juntam até durar 1,5 s e cada palavra ficar 0,4 s (REGRAS §3), que é o que o conferidor cobra */
-export const MIN_PEDACO = 0;
+export const MIN_PEDACO = 1.5; // G12 e REGRAS §3: o padrão do molde é o tempo de ler (0 refaz a vitrine aprovada)
 /* ---------------------------------------------------------------- fim do plano */
 
 const CORTES = montaCenas(false);
@@ -69,10 +69,10 @@ const limpa = (s: string) => s.replace(/[.,!?]$/, '');
  * centra entre elas), fonte e a escala da palavra-chave. A vitrine usa a caixa x 40-1040; a zona segura (REGRAS §5) é
  * x 60-940 e y 250-1500: num vídeo novo, esq 60 e dir 140 e um topo que caiba (o conferidor mede). */
 export const LUGAR = {
-	motion: {topo: 1430, topoAlto: 250, esq: 40, dir: 40, fonte: 84, chave: 1.25},
-	palco: {topo: 1210, esq: 40, dir: 40, fonte: 54, chave: 1.3},
-	dividido: {topo: DIVISA - 34, esq: 0, dir: 0, fonte: 40, chave: 1},
-	rosto: {topo: 1200, esq: 40, dir: 40, fonte: 78, chave: 1.3},
+	motion: {topo: 1290, topoAlto: 250, esq: 60, dir: 140, fonte: 84, chave: 1.25},
+	palco: {topo: 1210, esq: 60, dir: 140, fonte: 54, chave: 1.3},
+	dividido: {topo: DIVISA - 34, esq: 60, dir: 140, fonte: 40, chave: 1},
+	rosto: {topo: 1200, esq: 60, dir: 140, fonte: 78, chave: 1.3}, // o lugar padrão da legenda (G12): o peito, y 1200
 };
 
 export const Legenda: React.FC = () => {

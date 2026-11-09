@@ -7,8 +7,10 @@ faz:
   2. liga node_modules à raiz (junção)
   3. roda tools/preparar.py na gravação e põe a base onde o contrato manda
      (public/fala.mp4, public/voz.wav, src/palavras.json, src/rosto.json)
-  4. adapta a gravação ao ponto de partida do modelo (tools/adaptar.py): rosto no tamanho e na altura, luz e cor de
-     partida iguais às da gravação em que o modelo foi calibrado. --sem-adaptar pula (só para comparar).
+  4. adapta a gravação ao ponto de partida do modelo (tools/adaptar.py): só o ENQUADRAMENTO, rosto no tamanho e na altura
+     em que o modelo foi calibrado; a cor, a luz e o fundo real da gravação ficam intactos (G6). --luz casa também a
+     luz e a cor com as do modelo e --reduzir encolhe o quadro sobre borda desfocada (opções, só a pedido do dono).
+     --sem-adaptar pula (só para comparar).
   5. gravação deixada em <perfil>/materiais/ vai para oficina/<AAAA-MM-DD-tema>/entrada/ (a pasta do vídeo fica
      completa e os materiais do perfil, limpos); gravação de outro lugar fica onde está.
 Cada versão final sai sozinha em <perfil>/conteudo/<tema>-DD-MM-AA/vN.mp4 (tools/entregar.py, chamado pelo final do molde).
@@ -28,7 +30,7 @@ if (AQUI / '.cache' / 'ffmpeg' / 'ffmpeg.exe').exists() or (AQUI / '.cache' / 'f
 _comp = RAIZ / 'node_modules' / '@remotion' / 'compositor-win32-x64-msvc'
 if _comp.is_dir():
     os.environ['PATH'] = os.environ['PATH'].replace(os.pathsep, os.pathsep + str(_comp) + os.pathsep, 1)
-MIDIA_ORIGEM = {'fala.mp4', 'voz.wav', 'previa1.mp4', 'previa2.mp4', 'fala_grade.mp4'}
+MIDIA_ORIGEM = {'fala.mp4', 'voz.wav', 'previa1.mp4', 'previa2.mp4', 'fala_grade.mp4', 'fala_desfoque.mp4'}
 
 ap = argparse.ArgumentParser()
 ap.add_argument('modelo')
@@ -37,7 +39,10 @@ ap.add_argument('nome')
 ap.add_argument('--idioma', default='pt')
 ap.add_argument('--trocar', nargs='*', default=[])
 ap.add_argument('--sem-voz', action='store_true')
+ap.add_argument('--tratar-voz', action='store_true', help='opção (G6, só com ordem explícita): limpa a voz no preparar.py; no mixar, TRATAR_VOZ=1')
 ap.add_argument('--sem-adaptar', action='store_true')
+ap.add_argument('--luz', action='store_true', help='opção (G6, só com ordem explícita): casa a luz e a cor da gravação com as do modelo')
+ap.add_argument('--reduzir', action='store_true', help='opção (G6, só com ordem explícita): rosto grande encolhe sobre borda desfocada')
 a = ap.parse_args()
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from nomes import resolver  # nome antigo continua valendo
@@ -84,6 +89,8 @@ if a.trocar:
     cmd += ['--trocar', *a.trocar]
 if a.sem_voz:
     cmd.append('--sem-voz')
+if a.tratar_voz:
+    cmd.append('--tratar-voz')
 subprocess.run(cmd, check=True)
 base = destino / 'base'
 (destino / 'public').mkdir(exist_ok=True)
@@ -102,13 +109,14 @@ if a.sem_adaptar or a.modelo in SEM_TRATAMENTO:
     print('4/4 adaptação pulada (--sem-adaptar ou modelo sem tratamento de imagem)')
 else:
     print('4/4 adaptando a gravação ao modelo')
-    subprocess.run([sys.executable, str(AQUI / 'adaptar.py'), str(destino), a.modelo], check=True)
+    subprocess.run([sys.executable, str(AQUI / 'adaptar.py'), str(destino), a.modelo]
+                   + (['--luz'] if a.luz else []) + (['--reduzir'] if a.reduzir else []), check=True)
 grav = Path(a.gravacao).resolve()
 if grav.parent.name == 'materiais' and (grav.parent.parent / 'perfil.md').exists() and grav.parent.parent.parent == RAIZ.parent:
     (destino / 'entrada').mkdir(exist_ok=True)
     shutil.move(str(grav), str(destino / 'entrada' / grav.name))
     print('gravação levada para', destino / 'entrada' / grav.name)
-print('decupagem (cenas e subcenas, G41):')
+print('decupagem (trechos e subtrechos, G14, G28):')
 subprocess.run([sys.executable, str(AQUI / 'decupar.py'), str(destino)], check=False)
 print('pronto:', destino)
 print('próximo passo: no modo semiautomático, mostrar a lista acima ao dono e esperar a resposta dele cena a cena; no '

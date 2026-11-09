@@ -12,7 +12,7 @@ export const Root: React.FC = () => (
 		fps={FPS}
 		width={1080}
 		height={1920}
-		defaultProps={{voz: true, previas: false}}
+		defaultProps={{voz: true, previas: false, fundo: 'real' as const}}
 	/>
 );
 /** prova do componente de capítulo (a fala da vitrine não enumera): só still de conferência, nunca vai para vídeo */

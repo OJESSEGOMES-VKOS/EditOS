@@ -4,7 +4,7 @@ import {loadFont} from '@remotion/google-fonts/InterTight';
 import PRESENTES from './presentes.json';
 import {
 	BLOCOS, CORES_PLANO, DURACAO, ESTILOS, HEROI, ESTILO_PASSO, FIXO, FLASHES, FPS, IMGS, LEG_LH, LEG_PX, NEGATIVOS, ORIGEM, PALETA_PLANO,
-	PICO_ALT, PICO_PX, PLANOS, PONTES, PS, ZONA, ZOOM, ZW, blocosEm, passoDe, subEm, entra, escrita, geometria, largLeg, largPico, paletaDe, planoEm,
+	PICO_ALT, PICO_PX, PLANOS, PONTES, PS, ZONA, ZOOM, ZW, blocosEm, passoDe, picoTexto, subEm, entra, escrita, geometria, largLeg, largPico, paletaDe, planoEm,
 	type Bloco, type CoresSoltas, type Paleta, type Plano, type Trat,
 } from './modelo';
 
@@ -12,7 +12,7 @@ import {
  * Molde do imagem-por-palavra (../../modelos/imagem-por-palavra/imagem-por-palavra.md): a imagem troca a cada 1 a 3 palavras por
  * baixo de uma legenda pequena e fixa que acumula a frase; a cada ~6 s um pico tipográfico; um som por evento.
  * O plano do vídeo é src/plano.json (+ src/imagens.json, a lista palavra -> imagem); a lógica é src/modelo.ts.
- * A gravação entra como foi gravada (G33): estilos, duotone, negativo e grão só nas imagens e cartões.
+ * A gravação entra como foi gravada (G6): estilos, duotone, negativo e grão só nas imagens e cartões.
  */
 export {DURACAO, FPS};
 const {fontFamily} = loadFont('normal', {weights: ['700', '900'], subsets: ['latin', 'latin-ext']});
@@ -207,15 +207,13 @@ const Ponte: React.FC<{t: number}> = ({t}) => (
 	</>
 );
 
-/* ---------------------------------------------------------------- o texto */
-const SOMBRA = '0 6px 42px rgba(0,0,0,0.5)'; // larga e suave, nunca desenha a borda da letra (G37)
-const APAGADA = 0.38;
-const naTela = (t: number, i: number, gancho: boolean): React.CSSProperties => {
+/* ---------------------------------------------------------------- o texto (I-LEGENDA, 2026-11-07) */
+const SOMBRA = '0 6px 42px rgba(0,0,0,0.5)'; // larga e suave, nunca desenha a borda da letra (G16)
+/** a palavra entra na voz: aparece em 2 quadros e assenta de 0,9 a 1,0 em 0,1 s (as referências: a palavra estala na fala) */
+const naTela = (t: number, i: number): React.CSSProperties => {
 	const t0 = entra(i);
-	if (t < t0) return {opacity: gancho ? APAGADA : 0};
-	const u = tw(t, t0, t0 + 0.12, 0, 1);
-	if (gancho) return {opacity: APAGADA + (1 - APAGADA) * u};
-	return {opacity: u, transform: `translateY(${(1 - u) * 10}px)`, filter: u < 0.99 ? `blur(${(1 - u) * 8}px)` : undefined};
+	if (t < t0) return {opacity: 0};
+	return {opacity: tw(t, t0, t0 + 2 / FPS, 0, 1, Easing.linear), transform: `scale(${tw(t, t0, t0 + 0.1, 0.9, 1)})`};
 };
 /** a cor do texto pelo fundo que está embaixo dele agora */
 const corTexto = (t: number, pal: Paleta) => {
@@ -224,14 +222,14 @@ const corTexto = (t: number, pal: Paleta) => {
 	return claro ? {cor: pal.tinta, sombra: undefined} : {cor: pal.texto, sombra: SOMBRA};
 };
 
-const LinhaLeg: React.FC<{ids: number[]; top: number; t: number; b: Bloco; pal: Paleta}> = ({ids, top, t, b, pal}) => {
+const LinhaLeg: React.FC<{ids: number[]; x: number; top: number; t: number; b: Bloco; pal: Paleta}> = ({ids, x, top, t, b, pal}) => {
 	const {cor, sombra} = corTexto(t, pal);
 	return (
-		<div style={{position: 'absolute', left: ZONA.esq, width: ZW, top, display: 'flex', justifyContent: 'center', fontFamily, fontWeight: 700, fontSize: LEG_PX, lineHeight: `${LEG_LH}px`, letterSpacing: '-0.01em', color: cor, textShadow: sombra, whiteSpace: 'nowrap'}}>
+		<div style={{position: 'absolute', left: x, top, display: 'flex', fontFamily, fontWeight: 900, fontSize: LEG_PX, lineHeight: `${LEG_LH}px`, letterSpacing: '-0.02em', color: cor, textShadow: sombra, whiteSpace: 'nowrap'}}>
 			{ids.map((i, m) => {
 				const w = largLeg(escrita(i));
 				if (b.estilo === 'tarja') {
-					// E11: a palavra é uma tarja até ser dita, e a tarja se abre em texto (tela preta = respiro + suspense)
+					// E11: a palavra é uma tarja até ser dita, e a tarja se abre em texto (só em revelação anunciada)
 					const u = tw(t, entra(i), entra(i) + 0.16, 0, 1);
 					return (
 						<span key={i} style={{position: 'relative', display: 'inline-block', width: w, marginLeft: m ? largLeg(' ') : 0}}>
@@ -240,13 +238,13 @@ const LinhaLeg: React.FC<{ids: number[]; top: number; t: number; b: Bloco; pal: 
 						</span>
 					);
 				}
-				return <span key={i} style={{display: 'inline-block', marginLeft: m ? largLeg(' ') : 0, ...naTela(t, i, b.gancho)}}>{escrita(i)}</span>;
+				return <span key={i} style={{display: 'inline-block', marginLeft: m ? largLeg(' ') : 0, transformOrigin: '50% 70%', ...naTela(t, i)}}>{escrita(i)}</span>;
 			})}
 		</div>
 	);
 };
 
-/** número dito pula de ordem de grandeza até ele (E7): 100% = 1% → 10% → 100%, um salto a cada 0,17 s. Sempre o número dito (G8). */
+/** número dito pula de ordem de grandeza até ele (só a pedido: mostra números não ditos, G10) */
 export const saltos = (txt: string): string[] => {
 	const m = txt.match(/^(\D*)([\d.,]+)(.*)$/);
 	if (!m) return [txt];
@@ -256,31 +254,28 @@ export const saltos = (txt: string): string[] => {
 	out[out.length - 1] = txt;
 	return out;
 };
-const Pico: React.FC<{b: Bloco; top: number; t: number; pal: Paleta}> = ({b, top, t, pal}) => {
+/** a gigante da trava: entra com soco na voz (1,35 → 1,0 em 0,14 s, foco do borrão) e cresce 3% até o fim do bloco */
+const Pico: React.FC<{b: Bloco; x: number; top: number; w: number; t: number; pal: Paleta}> = ({b, x, top, w, t, pal}) => {
 	const p = b.pico!;
-	const txt = b.ids.filter((i) => i >= p.de && i <= p.ate).map(escrita).join(' ');
+	const txt = picoTexto(b);
 	const t0 = entra(p.de);
+	if (t < t0) return null;
 	const fundoClaro = corTexto(t, pal).cor === pal.tinta;
-	const cor = fundoClaro ? pal.tinta : pal.destaque;
+	const cor = fundoClaro ? pal.tinta : pal.texto;
 	let mostra = txt;
 	let estilo: React.CSSProperties = {};
-	if (t < t0) {
-		if (!b.gancho) return null;
-		estilo = {opacity: APAGADA, color: pal.texto};
-	} else if (p.voz === 'conta') {
+	if (p.voz === 'conta') {
 		const s = saltos(txt);
 		mostra = s[Math.min(s.length - 1, Math.floor((t - t0) / 0.17))];
-		estilo = {transform: `scale(${1 + 0.06 * Math.max(0, 1 - ((t - t0) % 0.17) / 0.1)})`};
 	} else if (p.voz === 'digita') {
-		const n = Math.floor((t - t0) / 0.04) + 1;
-		mostra = txt.slice(0, n);
+		mostra = txt.slice(0, Math.floor((t - t0) / 0.04) + 1);
 	} else {
 		const u = tw(t, t0, t0 + 0.14, 0, 1);
-		estilo = {opacity: Math.min(1, u * 3), transform: `scale(${1.35 - 0.35 * u + 0.04 * tw(t, t0 + 0.14, b.fixo ? DURACAO : b.t1, 0, 1, Easing.linear)})`, filter: u < 0.99 ? `blur(${(1 - u) * 14}px)` : undefined};
+		estilo = {opacity: Math.min(1, u * 3), transform: `scale(${1.35 - 0.35 * u + 0.03 * tw(t, t0 + 0.14, b.fixo ? DURACAO : b.t1, 0, 1, Easing.linear)})`, filter: u < 0.99 ? `blur(${(1 - u) * 14}px)` : undefined};
 	}
 	return (
-		<div style={{position: 'absolute', left: ZONA.esq, width: ZW, top, height: PICO_ALT, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-			<div style={{fontFamily, fontWeight: 900, fontSize: PICO_PX, lineHeight: 1, letterSpacing: '-0.04em', color: cor, whiteSpace: 'nowrap', textShadow: fundoClaro ? undefined : SOMBRA, fontVariantNumeric: 'tabular-nums', ...estilo}}>
+		<div style={{position: 'absolute', left: x, top, width: w, height: PICO_ALT, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+			<div style={{fontFamily, fontWeight: 900, fontSize: PICO_PX, lineHeight: 1, letterSpacing: '-0.04em', color: cor, whiteSpace: 'nowrap', textShadow: fundoClaro ? undefined : SOMBRA, ...estilo}}>
 				{mostra}
 			</div>
 		</div>
@@ -343,9 +338,9 @@ const Texto: React.FC<{t: number; pal: Paleta}> = ({t, pal}) => (
 			const g = geometria(b);
 			return (
 				<React.Fragment key={b.k}>
-					{b.antes.map((l, n) => <LinhaLeg key={`a${n}`} ids={l.ids} top={g.antes[n]} t={t} b={b} pal={pal} />)}
-					{b.pico ? <Pico b={b} top={g.pico} t={t} pal={pal} /> : null}
-					{b.depois.map((l, n) => <LinhaLeg key={`d${n}`} ids={l.ids} top={g.depois[n]} t={t} b={b} pal={pal} />)}
+					{b.antes.map((l, n) => <LinhaLeg key={`a${n}`} ids={l.ids} x={g.antes[n].x} top={g.antes[n].y} t={t} b={b} pal={pal} />)}
+					{b.pico ? <Pico b={b} x={g.pico!.x} top={g.pico!.y} w={g.pico!.w} t={t} pal={pal} /> : null}
+					{b.depois.map((l, n) => <LinhaLeg key={`d${n}`} ids={l.ids} x={g.depois[n].x} top={g.depois[n].y} t={t} b={b} pal={pal} />)}
 				</React.Fragment>
 			);
 		})}

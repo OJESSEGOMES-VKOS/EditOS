@@ -56,7 +56,7 @@ suposição.
 | 6 | Produção no modelo | `sistema/modelos/<m>/<m>.md` | vídeo pelo `sistema/tools/novo-video.py` e plano frase a frase | (segue) |
 | 7 | Som | `referencias/4-som.md` | tabela de cues no mesmo tempo da imagem | (entra na prévia) |
 | 8 | Prévia | `referencias/5-formatos.md` §prévia | folha de quadros por trecho + prévia leve com som | **Prévia aprovada** |
-| 9 | Conferência e entrega | `referencias/6-conferencia.md` | checador, `parece.py`, rubrica de conteúdo, áudio medido | Tudo passa |
+| 9 | Conferência e entrega | `referencias/6-conferencia.md` | checador, `parece.py` opcional, rubrica de conteúdo, áudio medido | Tudo passa |
 | 10 | Registro | `modelos/andamento.md` | linha no `sistema/criador/REGISTRO.md`, legenda do post | — |
 
 Carrossel animado segue as mesmas etapas, com a etapa 6 trocada pela receita de `referencias/5-formatos.md`
@@ -77,7 +77,7 @@ uma frase o que entendeu, aponte a lacuna mais cara e proponha padrão pro resto
 
 ### Etapa 3: roteiro
 Siga `referencias/2-roteiro.md`: uma linha por frase com função (F1 a F6), fala e tela lado a lado, o gancho escrito
-grande na tela desde o quadro 0, tempo de leitura conferido, prova só real. **Escreva o texto corrido primeiro**, em
+desde o quadro 0 na legenda sobre a gravação (G29: o vídeo começa dinâmico na gravação original), destaque só no termo com peso (G17, G18), tempo de leitura conferido, prova só real. **Escreva o texto corrido primeiro**, em
 voz alta, e só depois divida em linhas; toda afirmação ganha uma tela que a prova ou sai (`0-como-pensar.md` §5).
 O gancho segue o procedimento da §4 (fato + pessoa + tensão; A e B por movimentos diferentes). Todo texto público
 passa pelo `/humanizer` (se existir no sistema) antes de ir pra aprovação. **Nada de produção antes do roteiro
@@ -86,8 +86,9 @@ aprovado.**
 ### Etapa 4: modelo e direção
 Use `referencias/3-seletor-de-modelos.md`: formato, rosto ou não, tom e material decidem. O modelo escolhido é a casa do vídeo
 (identidade); as cenas que pedem algo além dela ganham uma resposta de outro modelo ou um estilo de cena (`sistema/cenas/INDICE.md`). Diga o modelo, o porquê em
-duas linhas e o segundo colocado. Depois leia o `sistema/modelos/<m>/<m>.md` inteiro e a referência dele: **o vídeo tem que
-parecer o modelo desde o 1º segundo**, e a cor é a do modelo, não a da marca do criador.
+duas linhas e o segundo colocado. Depois leia o `sistema/modelos/<m>/<m>.md` inteiro e a referência dele: **o modelo é inspiração, não molde
+(G30)**: entenda o porquê e o como de cada tela e decida, trecho a trecho e subtrecho a subtrecho, a edição que nasce
+da fala nova e da relevância dela ao tema (G28, G14). A cor é a do modelo ou a do pedido (G31), não a da marca do criador.
 Peça nova que só usa os modelos como capacidade (conceito próprio) **também** lê as referências originais deles:
 folha de quadros e `sistema/tools/ritmo.py` nos vídeos de `sistema/modelos/<m>/referencias/`. A densidade medida ali (quantas coisas
 acontecem por segundo, quanto do tempo a tela fica parada) vira a meta da decupagem, plano a plano.
@@ -100,13 +101,13 @@ transcreva e compare com o roteiro aprovado: palavra trocada, faltando ou pronú
 
 ### Etapa 6: produção
 Siga o passo a passo do `<m>.md`: `sistema/tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>`, decupagem em
-cenas e plano de cenas no topo do `plano.md` (demarcação do `tools/decupar.py` e os modos semiautomático e automático, G41; G40, `sistema/cenas/METODO.md`: cada cena decide a própria edição entre
+cenas e plano de cenas no topo do `plano.md` (demarcação do `tools/decupar.py` e os modos semiautomático e automático; G28, G14, `sistema/cenas/METODO.md`: cada trecho e subtrecho decide a própria edição entre
 rosto puro, a casa, outro modelo ou um estilo de cena `cenaNN`), depois o plano frase a frase sobre
 `src/palavras.json`. O roteiro em fala e tela já pode marcar o estilo de cena de um trecho quando ele for a ideia. Render sempre confinado, com
 `sistema/tools/com-trava.sh` e `--concurrency=2`.
 
 ### Etapa 7: som
-Siga `referencias/4-som.md`: o som sai do mesmo arquivo de tempo da imagem, marca mudança e não palavra, cai no quadro
+Padrão sem efeito sonoro e sem música (G6); só entram com ordem explícita no pedido. Com a ordem, siga `referencias/4-som.md`: o som sai do mesmo arquivo de tempo da imagem, marca mudança e não palavra, cai no quadro
 do evento e morre com o movimento. Efeito novo pela ElevenLabs só com aprovação de custo, uma chamada por vez, com a
 origem anotada em `SONS.md`.
 
@@ -115,7 +116,7 @@ Depois de cada mudança, confira só o trecho mexido em folha de quadros. Antes 
 com som e espere o "ok". Render que terminou sem erro não é aprovação de gosto.
 
 ### Etapa 9: conferência
-Siga `referencias/6-conferencia.md`: o checador do molde zerado, o `parece.py`, a folha lado a lado olhada, a rubrica
+Siga `referencias/6-conferencia.md`: o checador do molde zerado, o `parece.py` só se quiser (opcional, só identidade: fonte, cor, legenda; não reprova), a rubrica
 de conteúdo (gancho, promessa cumprida, prova real, CTA), o teste de cara de template, **o ritmo**
 (`sistema/tools/ritmo.py` lado a lado com a referência: movimento médio e % de quadros parados no mesmo patamar; motion bem
 abaixo da referência volta pra bancada antes de ser mostrado) e o áudio medido (-14 LUFS,
@@ -136,7 +137,7 @@ anotar o gancho que venceu"). Pendência que depende da pessoa vem listada fora 
 1. **Uma ideia por tela, um foco de movimento por vez.** A frase decide a tela pela função dela.
 2. **Voz primeiro, tempo depois.** O tempo nasce da fala real; imagem, legenda e som leem o mesmo arquivo.
 3. **Nunca inventar** prova, número, fala, nome, depoimento ou resultado. Faltou, pergunta ou deixa de fora.
-4. **O gancho é o ponto principal mais a emoção**, escrito na tela desde o quadro 0; nunca slogan de formato nem a
+4. **O gancho é o ponto principal mais a emoção**, escrito desde o quadro 0 na legenda sobre a gravação (G29); nunca slogan de formato nem a
    conclusão entregue de graça.
 5. **Portões existem pra economizar render.** Gosto se discute no roteiro e na prévia, não depois do render cheio.
 6. **Publicar, enviar, pagar ou gravar em sistema de fora só com "ok" explícito.** Chave de API nunca aparece em

@@ -1,5 +1,8 @@
 # 4 · Som
 
+**Padrão: sem efeito sonoro e sem música (G6).** Efeito (inclusive o de zoom), trilha e qualquer tratamento do áudio
+da gravação só entram com ordem explícita no pedido de edição. Quando o pedido liga o som, valem as regras abaixo.
+
 Som sincronizado é o que faz animação parecer cara; som espalhado é o que faz parecer modelo pronto. A regra é uma
 só: **o som explica a imagem** (velocidade, peso, chegada, mudança). Se você não sabe dizer por que um som está ali,
 ele sai.

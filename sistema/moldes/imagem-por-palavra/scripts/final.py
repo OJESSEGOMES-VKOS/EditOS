@@ -9,7 +9,7 @@ ladrilho, pico, tecla, tarja, flash e ponte) e public/voz.wav. Gera:
     tarja = estalo; flash = subida + impacto; ponte = sopro de entrada e de saída; fim = varredura e grave;
   - a mixagem: voz (passa-alta 80 Hz + compressão leve), efeitos ~13 LU abaixo dela, cama ~22 LU abaixo;
     tudo a -14 LUFS integrado e pico real <= -1 dBTP (medidos aqui, BS.1770, tools/midia.py).
-Sem música (G21): trilha do usuário entra com --trilha <arquivo.wav> (16 LU abaixo da voz, com ducking).
+Padrão (G6): só a voz, crua (sem filtro, compressão nem -14 LUFS); --tratar-voz trata; efeitos e cama só com --sons. Trilha do usuário entra com --trilha <arquivo.wav> (16 LU abaixo da voz, com ducking).
 uso (na pasta do vídeo): ../../.venv/Scripts/python.exe scripts/final.py out/so-video.mp4 out/final.mp4 [--trilha x.wav]
          --so-som  grava só public/efeitos.wav e public/cama.wav (para ouvir)
 No fim chama ../../tools/entregar.py (na vitrine e no molde não faz nada).
@@ -33,6 +33,8 @@ ap.add_argument('video', nargs='?', default='out/so-video.mp4')
 ap.add_argument('saida', nargs='?', default='out/final.mp4')
 ap.add_argument('--trilha', default='')
 ap.add_argument('--so-som', action='store_true')
+ap.add_argument('--sons', action='store_true', help='liga os efeitos e a cama (G6: só com ordem explícita no pedido)')
+ap.add_argument('--tratar-voz', action='store_true', help='passa-alta, compressão, -14 LUFS e limitador (G6: só com pedido; o padrão é a voz crua)')
 a = ap.parse_args()
 
 EV = json.loads((AQUI / 'src' / 'eventos.json').read_text(encoding='utf-8'))
@@ -153,6 +155,7 @@ voz = voz.mean(1) if voz.ndim == 2 else voz
 if sr_v != SR:
     voz = resample_poly(voz, SR, sr_v)
 voz = np.pad(voz, (0, max(0, N - len(voz))))[:N]
+CRUA = voz.copy()  # G6: a voz como foi gravada
 voz = hp(voz, 80)
 # compressão leve (3:1 acima de -20 dBFS de envelope)
 envv = np.sqrt(lp(voz ** 2, 20).clip(1e-12))
@@ -178,8 +181,10 @@ if a.so_som:
     for nome, x in (('efeitos.wav', fx), ('cama.wav', cama)):
         wavfile.write(AQUI / 'public' / nome, SR, (st(x / (np.abs(x).max() + 1e-9) * 0.7) * 32767).astype(np.int16))
     print('public/efeitos.wav e public/cama.wav'); sys.exit(0)
-mix = voz + fx + cama + trilha
-mix *= 10 ** ((-14 - L(mix)) / 20)
+CRU = not (a.tratar_voz or a.sons or a.trilha)  # G6 (2026-11-05): sem pedido, a voz sai crua, sem filtro nem normalização
+mix = CRUA if CRU else voz + trilha + ((fx + cama) if a.sons else 0)
+if not CRU:
+    mix *= 10 ** ((-14 - L(mix)) / 20)
 
 
 def limitar(x, teto_db):
@@ -191,13 +196,14 @@ def limitar(x, teto_db):
     return x * np.minimum(g, np.convolve(g, np.ones(n) / n, 'same'))
 
 
-for _ in range(4):
+for _ in range(0 if CRU else 4):
     mix = limitar(mix, -1.6)
     mix *= 10 ** ((-14 - L(mix)) / 20)
     pr = midia.pico_real(st(mix))
     if pr is not None and pr <= -1.05:
         break
-mix = limitar(mix, -1.6)
+if not CRU:
+    mix = limitar(mix, -1.6)
 out_wav = AQUI / 'out' / 'mix.wav'
 out_wav.parent.mkdir(exist_ok=True)
 wavfile.write(out_wav, SR, (st(mix) * 32767).clip(-32768, 32767).astype(np.int16))

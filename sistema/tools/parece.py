@@ -1,11 +1,20 @@
-"""Parece o modelo? Confere um vídeo pronto contra a assinatura do modelo (modelos/<m>/assinatura.json) e monta o lado a
-lado com o vídeo aprovado. Obrigatório antes de chamar um vídeo de pronto: reprovou, o vídeo não sai.
+"""Identidade do modelo (OPCIONAL, não reprova). Compara um vídeo pronto com a assinatura do modelo
+(modelos/<m>/assinatura.json) e monta o lado a lado com o aprovado, só como guia de identidade (fonte, cor, legenda).
+Desde 2026-11-05 (REGRAS.md G30) o modelo é inspiração, não molde: o vídeo não precisa parecer a referência, e a
+edição de cada trecho nasce da fala nova e do tema (G28). Por isso nada aqui é portão: tudo sai como AVISO e o código
+de saída é sempre 0.
 
 uso (da raiz do estúdio):  .venv/Scripts/python.exe tools/parece.py <video.mp4> <modelo> [--folha saida.jpg]
 faz:  mede luz, cor, enquadramento do rosto e ritmo do vídeo e compara com o aprovado, item a item, dizendo o que mexer;
       grava a folha (padrão: ao lado do vídeo, <nome>-parece.jpg): em cima o aprovado, embaixo o seu, no 1º segundo
       e em 6 momentos do vídeo (no estúdio aberto, o aprovado é a modelos/<m>/referencia/referencia.mp4).
-sai com código 1 se algum item estiver fora da faixa. Passar aqui é o mínimo: olhe a folha.
+os itens fora da faixa saem como AVISO, nunca como reprovação.
+fundo (G6): o padrão de todo modelo é o vídeo da pessoa com o fundo real e a cor da gravação, sem
+tratamento. Com o fundo real (ou o desfoque leve) a luz e a cor são as da gravação de quem usa, não as do aprovado:
+brilho, contraste, saturação e temperatura só AVISAM, e a altura do rosto (rosto_cy) também: os aprovados cheios de
+tela (rosto-telas, interface-encenada) medem a altura média com as telas, e o vídeo de fundo real é quase todo rosto. Os itens de
+rosto e ritmo são marcados à parte, mas também só avisam. Sem --fundo, vale o campo
+`fundo` do cenas.json da pasta do vídeo (oficina/<v>/cenas.json), e sem ele, 'real'.
 vídeo curto (menos de 70% do aprovado): cada item é comparado com o que os trechos do mesmo tamanho do aprovado mostram
 (do menor ao maior valor entre eles), porque 10 s de um modelo que alterna modos nunca têm a média do vídeo inteiro.
 """
@@ -27,7 +36,7 @@ SO_AVISA = {'saturacao', 'cortes_min'}
 COR_PROPRIA = {'anuncio-neon', 'anuncio-canvas'}
 COR = {'brilho', 'contraste', 'saturacao', 'temperatura'}
 FAIXA = {
-    'brilho': (14, False, 'a luz do vídeo está diferente da do modelo: confira o tratamento de cor do modelo (está ligado?) e a adaptação da gravação (tools/adaptar.py)'),
+    'brilho': (14, False, 'a luz do vídeo está diferente da do modelo: com o fundo recortado ligado, confira o scripts/grade.py e o tools/adaptar.py --desenho; com o fundo real é a luz da gravação (G6)'),
     'contraste': (0.18, True, 'o contraste está diferente do modelo: confira o tratamento de cor do modelo'),
     'saturacao': (0.30, True, 'a saturação está diferente do modelo: se não vem da roupa ou do cenário, confira o tratamento de cor'),
     'temperatura': (3.5, False, 'a temperatura de cor (quente/frio) está diferente do modelo: confira o tratamento de cor do modelo'),
@@ -115,9 +124,16 @@ def folha(video: Path, m: str, saida: Path) -> None:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description='Confere se o vídeo parece o modelo.')
+    ap = argparse.ArgumentParser(description='Opcional: compara a identidade (fonte, cor, legenda) do vídeo com a do modelo; não reprova.')
     ap.add_argument('video'); ap.add_argument('modelo'); ap.add_argument('--folha')
+    ap.add_argument('--fundo', choices=['real', 'desfoque', 'recorte'], help='padrão: o do cenas.json do vídeo, ou real')
     a = ap.parse_args()
+    if not a.fundo:  # o cenas.json mora na pasta do vídeo (oficina/<v>/), um ou dois níveis acima do mp4
+        for d in (Path(a.video).resolve().parent, Path(a.video).resolve().parent.parent):
+            if (d / 'cenas.json').exists():
+                a.fundo = json.loads((d / 'cenas.json').read_text(encoding='utf-8')).get('fundo') or 'real'
+                break
+        a.fundo = a.fundo or 'real'
     from nomes import resolver  # nome antigo continua valendo
     a.modelo = resolver(a.modelo)
     sig_arq = RAIZ / 'modelos' / a.modelo / 'assinatura.json'
@@ -134,23 +150,28 @@ def main() -> int:
     else:
         print(f'{v.name} contra o aprovado do {a.modelo} ({ref["video"]}):')
         linhas = comparar(novo, ref)
+    cor_avisa = a.modelo in COR_PROPRIA or a.fundo != 'recorte'  # G6: fundo real, a cor é a da gravação
+    real = a.fundo != 'recorte'  # fundo real: a altura média do rosto do aprovado vem misturada com as telas dele
+    print(f'  fundo: {a.fundo}' + (' (luz e cor da gravação: brilho, contraste, saturação e temperatura só avisam)' if cor_avisa else '')
+          + (' (altura do rosto só avisa)' if real else ''))
     fora = 0
     for k, x, y, f, dica in linhas:
-        aviso = f and (k in SO_AVISA or (a.modelo in COR_PROPRIA and k in COR))
+        aviso = f and (k in SO_AVISA or (cor_avisa and k in COR) or (real and k == 'rosto_cy'))
         fora += f and not aviso
         perto = not f and dica == 'perto'
-        print(f"  {'AVISO' if aviso else 'FORA ' if f else 'perto' if perto else 'ok   '} {k:15} modelo {x:>14} | seu {y:>8}"
+        print(f"  {'AVISO' if aviso or f else 'perto' if perto else 'ok   '} {k:15} modelo {x:>14} | seu {y:>8}"
               + (f'  -> {dica}' if f else '  -> fora do que o aprovado mostra, mas dentro da tolerância: confira na folha' if perto else ''))
     if 'rosto_aberto' in ref and 'rosto_aberto' not in novo:
         fora += 1
-        print('  FORA rosto           o modelo mostra a pessoa e o detector não achou rosto em quadros suficientes do seu vídeo')
+        print('  AVISO rosto          o modelo mostra a pessoa e o detector não achou rosto em quadros suficientes do seu vídeo')
     saida = Path(a.folha) if a.folha else v.with_name(v.stem + '-parece.jpg')
     if not a.folha and v.resolve().parent.parent.name == 'conteudo':  # no conteúdo do perfil só entram as versões mp4
         saida = Path(__file__).resolve().parents[1] / '.tmp' / f'{v.resolve().parent.name}-{v.stem}-parece.jpg'
     folha(v, a.modelo, saida)
     print(f'folha lado a lado: {saida}')
-    print('REPROVADO: não parece o modelo' if fora else 'parece o modelo nos números; agora olhe a folha')
-    return 1 if fora else 0
+    print(f'{fora} diferença(s) de identidade, só aviso (G30: o modelo é inspiração, não molde)' if fora
+          else 'identidade dentro do que o modelo mostra')
+    return 0  # opcional: nunca reprova
 
 
 if __name__ == '__main__':

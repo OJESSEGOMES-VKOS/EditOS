@@ -8,10 +8,13 @@
  *     palavra (corte no 1º quadro da palavra que ele ilustra). Plano é a pessoa (aberto/fechado/close da mesma tomada),
  *     uma imagem (src/imagens.json), a mesma imagem trocando de estilo, um mosaico, dois painéis, ou um cartão chapado.
  *     Ela troca a cada 1 a 3 palavras, em ondas (rajada de 0,17–0,25 s por no máximo 3 s, depois respiro).
- *  2. A FAIXA DE TEXTO: a legenda-âncora, pequena e fixa, que acumula a frase palavra a palavra e só troca de bloco no
- *     fim do trecho (G35) ou numa quebra do plano. A imagem troca por baixo dela; o texto fica (é assim que o tempo de
- *     ler é respeitado com imagem a 0,37 s). Um bloco pode ter um PICO: a palavra/número enorme que se mexe.
- * Nenhum filtro de cor na gravação da pessoa (G33): estilos, duotone e negativo só nas imagens.
+ *  2. A FAIXA DE TEXTO (correção I-LEGENDA, 2026-11-07): blocos CURTOS da fala (o pedaço que está sendo dito, de 1 a
+ *     ~6 palavras, nunca a frase empilhada), centrados, um tamanho só (72 px), cada palavra entrando na voz. O bloco
+ *     troca no fim do trecho (G11, G14) ou numa quebra do plano; a imagem troca por baixo dele (E4). Um bloco pode ter
+ *     uma TRAVA: a palavra/termo enorme com as palavras pequenas encostadas nos cantos dela (antes em cima, alinhadas à
+ *     esquerda dela; depois embaixo, alinhadas à direita). Sobre a pessoa e a imagem o texto mora logo abaixo do queixo;
+ *     num cartão chapado (palco da tipografia), no meio do quadro.
+ * Nenhum filtro de cor na gravação da pessoa (G6): estilos, duotone e negativo só nas imagens.
  */
 import PB from './palavras.json';
 import ROSTO from './rosto.json';
@@ -26,8 +29,8 @@ export const W = 1080, H = 1920;
 export const ZONA = {esq: 60, dir: 940, topo: 250, base: 1500};
 export const ZW = ZONA.dir - ZONA.esq;
 export const CX = (ZONA.esq + ZONA.dir) / 2;
-/** a palavra da legenda nasce 0,15 s antes da voz, para estar legível no ataque do som (heranca §1, SP: "entrando depois da fala") */
-export const ANTECIPA = 0.15;
+/** a palavra nasce 1 quadro antes da voz (nas referências ela aparece junto com o som; nada fica escrito antes de ser dito) */
+export const ANTECIPA = 1 / 30;
 /** o corte de imagem cai 1 quadro antes da palavra (E2: a imagem chega junto com a palavra, ±1 quadro) */
 export const Q1 = 1 / FPS;
 
@@ -42,7 +45,7 @@ export const entra = (i: number) => Math.max(0, quadro(PS[i].de - ANTECIPA));
 /** quando o plano que começa na palavra i corta */
 export const corta = (i: number) => (i === 0 ? 0 : Math.max(0, quadro(PS[i].de - Q1)));
 
-/* ---------------------------------------------------------------- paletas (opção do usuário, G33) */
+/* ---------------------------------------------------------------- paletas (opção do usuário, G31) */
 export type NomePaleta = 'noite' | 'creme-lima' | 'sangue';
 export type Paleta = {preto: string; creme: string; tinta: string; texto: string; destaque: string; destaque2: string};
 /** As paletas prontas, medidas nas referências. Nenhuma é regra: o usuário escolhe e troca qualquer cor solta. */
@@ -70,13 +73,13 @@ export type Mov = 'empurra' | 'recua' | 'gira' | 'desliza';
 export type PlanoIn = {
 	de: Ref; tipo: TipoPlano;
 	plano?: Enquadre; img?: string; imgs?: string[]; trat?: Trat; mov?: Mov;
-	fundo?: 'preto' | 'creme' | 'destaque'; sobe?: Ref; passo?: number; escuro?: number;
+	fundo?: 'preto' | 'creme' | 'destaque'; sobe?: Ref;  porque?: string; passo?: number; escuro?: number;
 };
 export type Plano = PlanoIn & {i: number; t0: number; t1: number; k: number};
 export type VozPico = 'gigante' | 'conta' | 'digita';
 export type PicoIn = {de: Ref; ate?: Ref; voz?: VozPico; fixo?: boolean};
 type PlanoJson = {
-	paleta?: string; cores?: CoresSoltas; picoPx?: number;
+	paleta?: string; cores?: CoresSoltas; picoPx?: number; queixo?: number;
 	planos: PlanoIn[];
 	quebras?: Ref[];
 	picos?: PicoIn[];
@@ -118,7 +121,9 @@ export const planoEm = (t: number) => {
 const RJ = ROSTO as number[][];
 export const TEM_ROSTO = RJ.length > 0;
 /** o queixo mais baixo da gravação (fração do quadro): o zoom puxa dele, então ele não sai do lugar em nenhum plano */
-export const QUEIXO = TEM_ROSTO ? Math.max(...RJ.map((r) => r[2] + r[3] / 2)) * H : 0;
+/** o queixo: o "queixo" do plano (medido no quadro, quando o detector exagera porque a pessoa encosta na câmera) ou o mais
+ * baixo medido */
+export const QUEIXO = TEM_ROSTO ? (PJ.queixo ?? Math.max(...RJ.map((r) => r[2] + r[3] / 2)) * H) : 0;
 export const ORIGEM = {x: TEM_ROSTO ? (RJ.reduce((a, r) => a + r[1], 0) / RJ.length) * W : W / 2, y: TEM_ROSTO ? QUEIXO : H * 0.5};
 export const ZOOM: Record<Enquadre, number> = {aberto: 1.0, fechado: 1.25, close: 1.5};
 
@@ -142,23 +147,28 @@ export const maoSobre = (caixas: Caixa[], t: number, zoom: number) => {
 };
 
 /* ---------------------------------------------------------------- a legenda-âncora e o pico */
-export const LEG_PX = 64; // Inter Tight 700 (seção 5 do .md): ref1 ~13% da largura em 9 letras, dobrada para o celular
-export const LEG_LH = Math.round(LEG_PX * 1.12);
-/** a legenda tem um lugar só: o topo da 1ª linha em Y1, 40 px abaixo do queixo mais baixo medido (o zoom puxa do queixo,
- * então ele não sai do lugar e as mãos descem nos planos fechados). Sem rosto (narração), 1000. O 2º lugar é a linha de
- * depois do pico. */
-export const Y1 = TEM_ROSTO ? Math.round(Math.min(1150, Math.max(900, QUEIXO + 40))) : 1000;
-export const PICO_TOPO = Y1 + LEG_LH + 8; // o pico mora logo abaixo da 1ª linha
-const LS_LEG = -0.01, LS_PICO = -0.04;
+export const LEG_PX = 68; // Inter Tight 900 (sans pesada das refs), UM tamanho no vídeo (G12); nada fica menor que isto (I-LEGENDA)
+export const LEG_LH = Math.round(LEG_PX * 1.1);
+/** a legenda tem um lugar só sobre a pessoa e a imagem: o topo da 1ª linha em Y1, 40 px abaixo do queixo mais baixo medido
+ * (o zoom puxa do queixo, então ele não sai do lugar). Sem rosto (narração), 1000. No cartão, o texto é centrado em CY. */
+export const Y1 = TEM_ROSTO ? Math.round(Math.min(1340, Math.max(900, QUEIXO + 40))) : 1000;
+export const CY = 900;
+/** altura mediana do rosto (px): a boca fica ~0,18 dela acima do queixo; o texto pode encostar no queixo, nunca na boca */
+export const ROSTO_H = TEM_ROSTO ? [...RJ.map((r) => r[3] * H)].sort((a, b) => a - b)[Math.floor(RJ.length / 2)] : 0;
+export const bocaY = (zoom: number) => ORIGEM.y - 0.18 * ROSTO_H * zoom;
+const LS_LEG = -0.02, LS_PICO = -0.04;
 const larg = (s: string, peso: 'w700' | 'w900', px: number, ls: number) =>
 	[...s].reduce((a, c) => a + ((LARG as Record<string, Record<string, number>>)[peso][c] ?? 600) / 1000 + ls, 0) * px;
-export const largLeg = (s: string) => larg(s, 'w700', LEG_PX, LS_LEG);
+export const largLeg = (s: string) => larg(s, 'w900', LEG_PX, LS_LEG);
 export const largPico = (s: string, px: number) => larg(s, 'w900', px, LS_PICO);
-export const ESPACO = larg(' ', 'w700', LEG_PX, LS_LEG);
+export const ESPACO = larg(' ', 'w900', LEG_PX, LS_LEG);
 
-/** pontuação que fecha um trecho (G35) */
-const FECHA = /[.,;:!?…]["”’)]*$/;
+/** pontuação que fecha um trecho (G14: ponto) e um subtrecho (vírgula). O bloco troca sozinho só no fim do trecho; na
+ * vírgula só com "quebras" no plano, e só se os dois lados ficarem legíveis (G9: "Ah," sozinho não vira bloco). */
+const FECHA = /[.;:!?…]["”’)]*$/;
+const VIRG = /[,]["”’)]*$/;
 export const fechaTrecho = (i: number) => FECHA.test(PS[i].texto);
+export const fechaSub = (i: number) => VIRG.test(PS[i].texto);
 
 export const HEROI = PJ.heroi ? {de: idx(PJ.heroi.de, 'heroi.de'), ate: idx(PJ.heroi.ate, 'heroi.ate'), caixa: PJ.heroi.caixa ?? []} : null;
 const TARJA = new Set((PJ.tarja ?? []).map((r, k) => idx(r, `tarja[${k}]`)));
@@ -167,7 +177,8 @@ export type Pico = {de: number; ate: number; voz: VozPico; fixo: boolean};
 export const PICOS: Pico[] = (PJ.picos ?? []).map((p, k) => {
 	const de = idx(p.de, `picos[${k}].de`);
 	const ate = p.ate ? idx(p.ate, `picos[${k}].ate`) : de; // pico de 2 palavras: "ate" é a última
-	return {de, ate, voz: p.voz ?? (/\d/.test(PS[de].texto) ? 'conta' : 'gigante'), fixo: !!p.fixo};
+	// "conta" (1 → 10 → 100) mostra números que a pessoa não disse (G10): só a pedido; o padrão é a gigante
+	return {de, ate, voz: p.voz ?? 'gigante', fixo: !!p.fixo};
 });
 
 export type Linha = {ids: number[]; w: number};
@@ -175,7 +186,7 @@ export type Bloco = {
 	k: number; ids: number[]; t0: number; t1: number;
 	estilo: 'leg' | 'heroi' | 'tarja';
 	antes: Linha[]; pico: Pico | null; depois: Linha[]; fixo: boolean;
-	gancho: boolean; trechoInteiro: boolean;
+	trechoInteiro: boolean; cartao: boolean;
 };
 /** quebra as palavras pequenas em até 2 linhas equilibradas (o checador acusa se não couber) */
 const quebrar = (ids: number[], maxLinhas: number): Linha[] => {
@@ -190,7 +201,7 @@ const quebrar = (ids: number[], maxLinhas: number): Linha[] => {
 	return [{ids: ids.slice(0, melhor), w: w(ids.slice(0, melhor))}, {ids: ids.slice(melhor), w: w(ids.slice(melhor))}];
 };
 
-/** os blocos: um trecho (até a pontuação), cortado nas quebras do plano, no pico fixo e no herói */
+/** os blocos: um trecho (até o ponto), cortado nas quebras do plano, no pico fixo e no herói */
 export const BLOCOS: Bloco[] = (() => {
 	const grupos: number[][] = [];
 	let g: number[] = [];
@@ -203,58 +214,69 @@ export const BLOCOS: Bloco[] = (() => {
 		if (fechaTrecho(i) || (HEROI && i === HEROI.ate)) fecha();
 	}
 	fecha();
-	// trechos inteiros (para a exceção do bloco curto de um trecho só, como "Inclusive,")
 	const inicioTrecho = (i: number) => i === 0 || fechaTrecho(i - 1);
 	const blocos: Bloco[] = grupos.map((ids, k) => {
 		const pico = PICOS.find((p) => p.de >= ids[0] && p.ate <= ids[ids.length - 1]) ?? null;
 		const heroi = !!HEROI && ids[0] === HEROI.de;
 		const tarja = ids.some((i) => TARJA.has(i));
 		const peq = pico ? ids.filter((i) => i < pico.de || i > pico.ate) : ids;
-		const antes = pico ? quebrar(peq.filter((i) => i < pico.de), 1) : heroi ? [] : quebrar(peq, 2);
+		const antes = pico ? quebrar(peq.filter((i) => i < pico.de), 2) : heroi ? [] : quebrar(peq, 2);
 		const depois = pico ? quebrar(peq.filter((i) => i > pico.ate), 1) : [];
 		const ultimo = ids[ids.length - 1];
 		return {
 			k, ids, t0: entra(ids[0]), t1: 0, estilo: heroi ? 'heroi' : tarja ? 'tarja' : 'leg', antes, pico, depois,
-			fixo: !!pico?.fixo, gancho: ids[0] === 0,
-			trechoInteiro: inicioTrecho(ids[0]) && fechaTrecho(ultimo),
+			fixo: !!pico?.fixo, trechoInteiro: inicioTrecho(ids[0]) && fechaTrecho(ultimo), cartao: false,
 		};
 	});
 	blocos.forEach((b, k) => {
 		b.t1 = k + 1 < blocos.length ? blocos[k + 1].t0 : DURACAO;
-		if (b.gancho) b.t0 = 0; // o gancho já está escrito desde o quadro 0 (G23), apagado
+		if (k === 0) b.t0 = 0;
+		b.cartao = planoEm(b.t0 + 0.001).tipo === 'card';
 	});
-	// o pico fixo (o comando do fecho) fica até o fim; os blocos que vêm depois dele moram embaixo, no lugar normal
 	return blocos;
 })();
 export const FIXO = BLOCOS.find((b) => b.fixo) ?? null;
 export const blocosEm = (t: number) => BLOCOS.filter((b) => (t >= b.t0 && t < b.t1) || (b.fixo && t >= b.t0));
 
-/** o tamanho do pico: um só no vídeo (heranca §2), o maior em que o pico mais longo cabe em 92% da zona */
+/** a gigante: um tamanho só no vídeo (G12, G13), o maior em que a mais longa cabe em 92% da zona, nunca menor que 2x a
+ * legenda (variação só para cima, até 2 tamanhos: a gigante e o herói) */
 export const PICO_PX = (() => {
 	if (PJ.picoPx) return PJ.picoPx;
 	const textos = BLOCOS.filter((b) => b.pico).map((b) => b.ids.filter((i) => i >= b.pico!.de && i <= b.pico!.ate).map(escrita).join(' '));
-	if (!textos.length) return 170;
+	if (!textos.length) return 200;
 	const px = Math.min(...textos.map((s) => (0.92 * ZW) / (largPico(s, 1))));
-	return Math.max(140, Math.min(260, Math.floor(px)));
+	return Math.max(2 * LEG_PX, Math.min(300, Math.floor(px)));
 })();
-export const PICO_ALT = Math.round(PICO_PX * 1.0);
-/** onde cada parte do bloco fica (topo de cada linha), para o render e para o checador */
-export const geometria = (b: Bloco) => {
-	if (b.fixo) {
-		// o comando do fecho: no meio do quadro (é cartão, sem rosto), e a fala segue embaixo no lugar normal
-		const topoPico = 760;
-		return {antes: [topoPico - LEG_LH - 6], pico: topoPico, depois: [topoPico + PICO_ALT + 8]};
-	}
-	if (b.pico) return {antes: [Y1], pico: PICO_TOPO, depois: [PICO_TOPO + PICO_ALT + 8]};
-	return {antes: b.antes.map((_, n) => Y1 + n * LEG_LH), pico: 0, depois: []};
+export const PICO_ALT = Math.round(PICO_PX * 0.86); // a caixa da gigante é justa: as pequenas encostam nela (a trava)
+/** o topo da gigante sobre a pessoa/imagem: fixo no vídeo (G13), com 1 linha de 68 px embaixo dela até o fim da zona */
+export const YG = ZONA.base - 4 - LEG_LH - PICO_ALT;
+export const picoTexto = (b: Bloco) => b.ids.filter((i) => i >= b.pico!.de && i <= b.pico!.ate).map(escrita).join(' ');
+
+export type Geo = {antes: {x: number; y: number}[]; pico: {x: number; y: number; w: number} | null; depois: {x: number; y: number}[]};
+/** onde cada linha fica (x à esquerda, y no topo), para o render e para o checador.
+ * Pessoa e imagem: tudo a partir de Y1 (o lugar fixo, G12). Cartão: a pilha centrada em CY (palco da tipografia).
+ * A trava: as de antes alinhadas à esquerda da gigante, as de depois alinhadas à direita dela, encostadas. */
+export const geometria = (b: Bloco): Geo => {
+	const altura = b.antes.length * LEG_LH + (b.pico ? PICO_ALT : 0) + b.depois.length * LEG_LH;
+	// a gigante sobre a pessoa/imagem mora numa altura fixa, no peito, colada na base da zona com 1 linha embaixo
+	let y = b.cartao || b.fixo ? Math.round(CY - altura / 2) : b.pico ? YG - b.antes.length * LEG_LH : Y1;
+	const centro = (w: number) => CX - w / 2;
+	if (!b.pico) return {antes: b.antes.map((l) => { const r = {x: centro(l.w), y}; y += LEG_LH; return r; }), pico: null, depois: []};
+	const gw = largPico(picoTexto(b), PICO_PX);
+	const gx = centro(gw);
+	const antes = b.antes.map((l) => { const x = gx + l.w <= ZONA.dir ? Math.max(ZONA.esq, gx) : centro(l.w); const r = {x, y}; y += LEG_LH; return r; });
+	const pico = {x: gx, y, w: gw};
+	y += PICO_ALT;
+	const depois = b.depois.map((l) => { const x = gx + gw - l.w >= ZONA.esq ? Math.min(ZONA.dir - l.w, gx + gw - l.w) : centro(l.w); const r = {x, y}; y += LEG_LH; return r; });
+	return {antes, pico, depois};
 };
 
 /** as caixas de texto do bloco (para zona, rosto e mãos) */
 export const caixas = (b: Bloco): Caixa[] => {
 	const g = geometria(b);
-	const linha = (w: number, y: number, h: number): Caixa => ({x0: CX - w / 2, y0: y, x1: CX + w / 2, y1: y + h});
-	const out = [...b.antes.map((l, n) => linha(l.w, g.antes[n], LEG_LH)), ...b.depois.map((l, n) => linha(l.w, g.depois[n], LEG_LH))];
-	if (b.pico) out.push(linha(largPico(b.ids.filter((i) => i >= b.pico!.de && i <= b.pico!.ate).map(escrita).join(' '), PICO_PX), g.pico, PICO_ALT));
+	const cx = (x: number, w: number, y: number, h: number): Caixa => ({x0: x, y0: y, x1: x + w, y1: y + h});
+	const out = [...b.antes.map((l, n) => cx(g.antes[n].x, l.w, g.antes[n].y, LEG_LH)), ...b.depois.map((l, n) => cx(g.depois[n].x, l.w, g.depois[n].y, LEG_LH))];
+	if (g.pico) out.push(cx(g.pico.x, g.pico.w, g.pico.y, PICO_ALT));
 	return out;
 };
 

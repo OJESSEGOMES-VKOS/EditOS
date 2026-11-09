@@ -128,19 +128,18 @@ c = lambda t: t - 0.06  # os cortes de src/tema.ts
 
 # ---------------------------------------------------------------- o plano do som (refazer num vídeo novo, junto com Cenas.tsx)
 # cortes entre modos: a tela nova surge com o popup grave (mais baixo quando corta pro rosto)
-CORTES = [('criado', c(w('ele')), 'vitrine'), ('modelos', c(w('diferença')), 'palco'), ('editar', c(w('qualquer')), 'vitrine'),
-          ('vendo', c(w('inclusive')), 'vitrine'), ('previas', c(w('eu', 2)), 'palco'), ('tres', c(w('aceleradas')), 'vitrine'),
-          ('mas', c(w('mas')), 'rosto'), ('outros', c(w('outros')), 'palco'), ('aprender', c(w('e', 2)), 'vitrine'),
-          ('comenta', c(w('comenta')), 'rosto')]
-GRIFOS = [w('editado'), w('claude'), w('criado'), w('modelos'), w('vídeo', 2), w('claude', 2), w('modelos', 2), w('modelos', 3), w('como', 2)]
-CONTADORES = [(w('três') - 0.64, 3)]  # (início, valor): os mesmos de CONTADORES em src/tema.ts (o gancho não tem: o 100% está no título, PV4)
-EXTRAS = [(0.25, pop(600), 0.38), (0.33, risco(0.25), 0.25), (w('edição', 2), pop(760), 0.46)]
-if PREVIAS:  # as duas prévias entram (prop previas); sem elas o card segura o print
-    EXTRAS += [(c(w('eu', 2)) + 0.1, pop(660), 0.34), (c(w('eu', 2)) + 0.25, pop(700), 0.34)]
+# antiga G43, abolida (2026-11-05): o plano padrão é a pessoa na maior parte e a prova só fechando cena forte (base() em src/tema.ts)
+CORTES = [('editar', c(w('qualquer')), 'vitrine'), ('instagram', c(w('inclusive')), 'pessoa'), ('tres', c(w('aceleradas')), 'vitrine'),
+          ('mas', c(w('mas')), 'rosto'), ('ver', c(w('outros')), 'pessoa'), ('comenta', c(w('comenta')), 'rosto')]
+GRIFOS = [w('vídeo', 2), w('claude', 2)]
+CONTADORES = [(w('três') - 0.64, 3)]  # (início, valor): os mesmos de CONTADORES em src/tema.ts
+EXTRAS = [(w('edição', 2), pop(760), 0.46)]
+if PREVIAS:  # as duas prévias entram na vitrine do "três vezes" (prop previas); sem elas o card segura o print
+    EXTRAS += [(c(w('aceleradas')) + 0.1, pop(660), 0.34)]
 # ---------------------------------------------------------------- fim do plano
 
 for _, t0, modo in CORTES:
-    add(fx, t0, pop(540 if modo == 'rosto' else 600), 0.28 if modo == 'rosto' else 0.4)
+    add(fx, t0, pop(540 if modo in ('rosto', 'pessoa') else 600), 0.28 if modo in ('rosto', 'pessoa') else 0.4)
 for t0 in GRIFOS:
     add(fx, t0, risco(), 0.32)
 for t0, v in CONTADORES:

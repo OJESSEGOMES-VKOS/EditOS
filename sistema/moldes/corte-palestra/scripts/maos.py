@@ -1,4 +1,4 @@
-"""Mede onde estão as mãos (e os braços) da pessoa, para o texto do peito não ficar por cima delas (lição técnica do fala-escrita, G13; corte-palestra.md, seção 8).
+"""Mede onde estão as mãos (e os braços) da pessoa, para o texto do peito não ficar por cima delas (lição técnica do fala-escrita, G18; corte-palestra.md, seção 8).
 Lê public/fala.mp4 e src/rosto.json. A cada 0,25 s:
   1. recorta a pessoa do fundo (Robust Video Matting, ../../tools/modelos/rvm_mobilenetv3_fp32.onnx): parede e
      móvel da cor da pele não contam;

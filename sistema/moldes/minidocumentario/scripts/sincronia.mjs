@@ -43,7 +43,7 @@ try {
 }
 const Q = 2 / 30 + 1e-6, erros = [], avisos = [];
 const MIN_BLOCO = 1.5, MIN_PALAVRA = 0.4, MIN_CHAVE = 0.8;
-const FIM_TRECHO = /[.,;:!?…]$/;
+const FIM_TRECHO = /[.;:!?…]$/; // G9/G14 (2026-11-07): o bloco não atravessa fim de TRECHO; subtrecho curto (vírgula) junta com o vizinho do mesmo trecho
 const cortes = C.PLANOS.slice(1).map((p) => p.de);
 const idsDe = (l) => (l.tipo === 'k' ? [l.id, ...(l.id2 !== undefined ? [l.id2] : [])] : l.ids);
 for (const prev of [false, true]) {
@@ -51,7 +51,7 @@ for (const prev of [false, true]) {
 	for (const b of BL) {
 		if (b.linhas.length > 4) erros.push(`${modo}: bloco ${b.de} com ${b.linhas.length} linhas -> divida o bloco`);
 		// SP5 (2026-10-29): no máximo 2 linhas de legenda por bloco (a palavra-chave gigante não conta) e nenhum bloco
-		// atravessa pontuação de fim de trecho (. , ? ! : ;)
+		// atravessa fim de trecho (. ? ! : ;); vírgula pode ficar dentro (G9)
 		const peq = b.linhas.filter((l) => l.tipo === 'p').length;
 		if (peq > 2) erros.push(`${modo}: bloco ${b.de} com ${peq} linhas de legenda (SP5: máx. 2) -> divida em blocos menores do mesmo trecho`);
 		const todos = b.linhas.flatMap(idsDe).sort((x, y) => x - y);
@@ -68,7 +68,7 @@ for (const prev of [false, true]) {
 			}
 			const corpo = l.tipo === 'k' ? Math.min(220, (0.74 * C.W) / (0.55 * (l.texto ?? C.PS[l.id].texto).length)) : C.FS, y0 = l.y - corpo * 0.62, y1 = l.y + corpo * 0.68;
 			if (y0 < 250 || y1 > 1500) erros.push(`${modo}: linha "${lids.map((i) => C.PS[i].texto).join(' ')}" fora da zona (y ${Math.round(y0)}-${Math.round(y1)}) -> mude o y`);
-			if (l.tipo === 'p' && l.al === 'c') { const w = lids.map((i) => C.PS[i].texto).join(' ').length * C.FS * 0.52; if ((C.W - w) / 2 < 60) erros.push(`${modo}: linha "${lids.map((i) => C.PS[i].texto).join(' ')}" larga demais -> quebre em duas linhas`); }
+			if (l.tipo === 'p' && l.al === 'c') { const w = lids.map((i) => C.PS[i].texto).join(' ').length * C.FS * 0.50; if ((C.W - w) / 2 < 60) erros.push(`${modo}: linha "${lids.map((i) => C.PS[i].texto).join(' ')}" larga demais -> quebre em duas linhas`); }
 		}
 		// tempo de leitura e corte (uma vez só: os tempos não mudam com as prévias)
 		if (!prev && ids.length) {
@@ -81,7 +81,7 @@ for (const prev of [false, true]) {
 			if (b.ate - t0 < MIN_BLOCO - 1e-6 && trechoInteiro) avisos.push(`bloco "${nome}" fica ${(b.ate - t0).toFixed(2)} s, mas fecha um trecho (SP5)`);
 			else if (b.ate - t0 < MIN_BLOCO - 1e-6) nota(`bloco "${nome}" fica ${(b.ate - t0).toFixed(2)} s (mín. ${MIN_BLOCO}) -> junte com o bloco vizinho do mesmo plano`);
 			for (const i of ids) {
-				const fica = b.ate - Math.max(C.PS[i].de, b.de);
+				const fica = b.ate - Math.max(C.PS[i].de - 0.22, b.de); // conta do nascer (ANTECIPA 0,22 s, minidocumentario.md §5)
 				if (fica < MIN_PALAVRA - 1e-6) nota(`"${C.PS[i].texto}" fica ${fica.toFixed(2)} s em "${nome}" (mín. ${MIN_PALAVRA}) -> segure o bloco ou passe a palavra para o seguinte`);
 			}
 			for (const l of b.linhas.filter((x) => x.tipo === 'k')) {
@@ -181,6 +181,35 @@ for (const p of C.PLANOS) {
 	if (p.img && !existe(p.img)) avisos.push(`o plano ${p.id} (${p.mundo}) usa img '${p.img}', que não está em public/: sai a gravação em tom de arquivo (plano B); veja se o texto dele não cai no rosto`);
 	if (p.mundo === 'palco' && !existe('palco.png')) avisos.push(`o plano ${p.id} é de palco e não há public/palco.png: sai o palco desenhado pelo molde (o padrão sem IA)`);
 }
+// M3 (2026-11-07): encaixe. Nas referências as pequenas ficam coladas na gigante: a linha de cima pousa no ombro das
+// minúsculas (centro a 0,32 corpo + 33 px acima do centro da gigante), a de baixo logo sob a linha de base (0,24 corpo
+// + 33 px abaixo; uma 2ª linha só +83 px). Mais longe que isso (tolerância 20 px) é palavra solta.
+{
+	const vistos = new Set();
+	for (const b of C.blocos(false)) {
+		const k = C.blocos(false).find((o) => o.linhas.some((l) => l.tipo === 'k') && o.de <= b.de + 1e-6 && b.de < o.ate);
+		if (!k) continue;
+		const kl = k.linhas.find((l) => l.tipo === 'k'), txt = (kl.texto ?? C.PS[kl.id].texto).replace(/[.,;:!?…]/g, '');
+		const px = Math.min(220, (0.74 * C.W) / (0.55 * txt.length));
+		for (const l of b.linhas.filter((x) => x.tipo === 'p')) {
+			const chave = b.de + ':' + l.y; if (vistos.has(chave)) continue; vistos.add(chave);
+			const cima = kl.y - l.y, alvoC = 0.32 * px + 33, alvoB = 0.24 * px + 33;
+			const ok = cima > 0 ? Math.abs(cima - alvoC) <= 20 : Math.abs(-cima - alvoB) <= 20 || Math.abs(-cima - alvoB - 83) <= 20;
+			if (!ok) erros.push(`M3: linha "${l.ids.map((i) => C.PS[i].texto).join(' ')}" a ${Math.round(Math.abs(cima))} px da gigante "${txt}" (encaixe: ${Math.round(alvoC)} acima ou ${Math.round(alvoB)} abaixo) -> cole na gigante`);
+		}
+	}
+}
+// M1 (2026-11-07): o modelo não inventa cena. Palco, papel e dividida só existem se forem material real do criador
+// (outra câmera do set, prints e fotos dele); imagem gerada (palco.png, broll_*.png) nunca entra. Com uma câmera só,
+// o rosto não troca de enquadramento para simular outra câmera (zoom digital fingindo corte de ângulo).
+const GERADAS = ['palco.png', 'broll_celular.png', 'broll_edicao.png'];
+for (const p of C.PLANOS) {
+	if (p.img && GERADAS.includes(p.img)) erros.push(`o plano ${p.id} usa '${p.img}', imagem gerada para imitar a referência (M1) -> use a gravação ou material real do criador`);
+	if (['palco', 'dividida'].includes(p.mundo) && !p.camera) erros.push(`o plano ${p.id} é '${p.mundo}' sem câmera real (M1) -> só com outro ângulo gravado do set (campo camera: 'arquivo.mp4')`);
+	if (p.mundo === 'papel' && !p.papel) erros.push(`o plano ${p.id} é papel liso sem material (M1): nas referências o papel só existe para segurar prints e fotos reais -> palavra-chave sobre a gravação`);
+}
+const rostos = C.PLANOS.filter((p) => p.mundo === 'rosto' && p.q && !p.camera);
+if (new Set(rostos.map((p) => p.q.s.toFixed(2))).size > 1) erros.push(`com uma câmera só, o rosto muda de zoom entre planos (${[...new Set(rostos.map((p) => p.q.s))].join(', ')}) (M1) -> um enquadramento só; ênfase vem da palavra-chave, não de câmera falsa`);
 console.log(`${erros.length} erros`); erros.forEach((e) => console.log('  ' + e));
 if (avisos.length) { console.log(`${avisos.length} avisos (palavra-chave curta, ou bloco aceito no plano)`); avisos.forEach((e) => console.log('  ' + e)); }
 process.exit(erros.length ? 1 : 0);

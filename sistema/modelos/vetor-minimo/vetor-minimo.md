@@ -3,6 +3,8 @@
 Este é o único arquivo que você precisa ler para editar neste modelo. Tudo o que está aqui é regra. Quando algo daqui
 bater com o código do molde, vale o que está aqui.
 
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo. A G29 (começo na gravação original) não se aplica: este modelo não tem gravação de pessoa.
+
 **A referência é o `referencia/referencia.mp4`**, o vídeo aprovado do modelo (30 s, só a voz). Os tempos entre
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo, com o segundo
 escrito) e o `mapa.json` (luz medida a cada 0,25 s; nenhum corte). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
@@ -155,7 +157,7 @@ comando na fala, não há apagão nem moral: segure o resultado na tela com a ú
 
 | Opção | Padrão | Como mudar |
 |---|---|---|
-| Efeitos sonoros do modelo (passo, varredura, impacto, baque, digitação) | **ligados** | `scripts/som.py` e `public/efeitos.wav` no `mixar.sh`; para tirar, prop `efeitos: false` e mixar sem ele |
+| Efeitos sonoros do modelo (passo, varredura, impacto, baque, digitação) | **ligados** (som: confirmar com o dono se continua padrão, G6) | `scripts/som.py` e `public/efeitos.wav` no `mixar.sh`; para tirar, prop `efeitos: false` e mixar sem ele |
 | Trilha sintetizada (pulso a cada 0,73 s, parte forte na virada) | desligada | `scripts/som.py`, prop `musica: true` e `public/trilha.wav` no `mixar.sh` |
 | Prévias de dois vídeos (16 s a 19 s) | desligadas | `tools/previa.py`, props `previas: true, nomesPrevias: [...]` |
 | O escolhido que acende branco | ligado | `"apenasUm": null` |
@@ -216,7 +218,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4 public/efeitos.wav`. Com trilha:
    `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4 public/trilha.wav public/efeitos.wav`. Só a voz: sem os dois
    últimos argumentos. Sai em -14 LUFS e pico -1 dBTP, com a trilha cerca de 16 dB abaixo da voz antes da virada.
-10. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 vetor-minimo`.
+10. **Confira a identidade do modelo (cor, luz, ritmo; nunca a sequência de telas, G30):** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 vetor-minimo`.
     Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
     em cima e o seu embaixo. Folha de 1 quadro por segundo do seu:
     `../../.venv/Scripts/python.exe scripts/folhas.py out/final.mp4` (na pasta do vídeo).

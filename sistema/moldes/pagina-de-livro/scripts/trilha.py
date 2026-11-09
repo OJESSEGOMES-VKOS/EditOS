@@ -51,7 +51,7 @@ def add(buf, t, s, g):
 # ================================================================ EVENTOS (o plano do som; None tira o efeito)
 # Os índices abaixo são do vídeo APROVADO (palavras 41 e 83 da fala dele). Num vídeo novo, troque pelos índices do plano
 # novo de src/Reel.tsx (a 1ª palavra do plano pb e a 1ª da chamada) ou ponha None quando não há P&B ou chamada.
-PB_PALAVRA = 41  # 1ª palavra do plano em P&B (o sopro entra no clarão)
+PB_PALAVRA = None  # G6: o P&B vem desligado (prop pb). Com pb ligado: a 1ª palavra do plano pb (o aprovado usou 41); o sopro entra no clarão
 CHICOTE_PALAVRA = 83  # 1ª palavra da chamada (o whoosh antecede o chicote)
 for nome, i in (('PB_PALAVRA', PB_PALAVRA), ('CHICOTE_PALAVRA', CHICOTE_PALAVRA)):
     if i is not None and not 0 <= i < len(PS):

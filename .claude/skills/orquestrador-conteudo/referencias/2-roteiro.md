@@ -29,7 +29,7 @@ Re-gancho no meio do vídeo é uma F1 marcada `regancho`.
 | F2 problema | rosto (empatia) ou o documento real da dor | número gigante sem fonte |
 | F3 número | o número sozinho, grande, com a conta acontecendo enquanto é dita | imagem genérica competindo |
 | F3 documento | o print real com o trecho marcado e a fonte pequena | título no lugar do documento |
-| F3 demonstração | a tela do produto agindo, recriada fiel como um print (G34: aparelho, fonte, ícones e estados reais, a partir de print com origem), zoom que segue a ação | texto dizendo o que devia mostrar; mockup genérico de celular ou cartão com ícone |
+| F3 demonstração | a tela do produto agindo, recriada fiel como um print (G25: aparelho, fonte, ícones e estados reais, a partir de print com origem), zoom que segue a ação | texto dizendo o que devia mostrar; mockup genérico de celular ou cartão com ícone |
 | F3 comparação | antes e depois com os mesmos elementos | listas soltas |
 | F4 passo | organização visível (lista que se monta, tela real, quadro que se desenha) | manchete, tela preta |
 | F5 virada | respiro e um foco: uma palavra, o rosto, silêncio curto antes | qualquer coisa que precise ser lida em detalhe |
@@ -59,8 +59,10 @@ Copie `modelos/roteiro.md`. Uma linha por frase funcional:
 - **A pessoa se vê na cena.** Segunda pessoa, situação concreta que ela viveu, detalhe sensorial, e só então a
   pergunta. Gancho que só anuncia o tema é notícia. O procedimento e os exemplos fraco × forte estão em
   `0-como-pensar.md` §4.
-- **Escrito grande na tela desde o quadro 0.** Metade das pessoas está sem som; o gancho tem que funcionar mudo e com
-  som. Nada de tela vazia ou texto pequeno crescendo nos primeiros segundos.
+- **Escrito desde o quadro 0, na legenda sobre a gravação (G29).** Metade das pessoas está sem som; o
+  gancho tem que funcionar mudo e com som. O começo é dinâmico, na gravação original, com ênfase no gancho e a frase dele
+  na legenda; nada de frase que não é a fala do começo. Destaque dentro do gancho só no termo com peso (G17), sem
+  pontuação dentro (G18).
 - **Os 3 primeiros segundos não podem servir pra outro vídeo.** Se servem, são genéricos.
 - Entregue **gancho A e gancho B**, com o motivo de cada um.
 
@@ -92,7 +94,7 @@ aprovado, frase a frase. Palavra trocada, faltando ou pronúncia ruim: regrava a
 
 ## 8. Antes de mandar pra aprovação
 - [ ] A UMA coisa cabe em 12 palavras e todo o resto serve a ela.
-- [ ] Gancho escrito na tela desde o quadro 0, A e B.
+- [ ] Gancho escrito desde o quadro 0 na legenda sobre a gravação (G29), A e B.
 - [ ] Toda prova é real e tem origem; nada de número, nome ou depoimento inventado.
 - [ ] Tempo de leitura conferido nas linhas com texto.
 - [ ] CTA dito e escrito, uma ação só.

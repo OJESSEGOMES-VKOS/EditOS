@@ -7,7 +7,9 @@ import {H, W, rostoEm} from './tempos';
  * pode ser a tela inteira, o cartão do canto, a tela de reels recriada ou a metade de baixo da tela dividida.
  * Dentro dela, o zoom `s` e o lugar onde o rosto deve ficar (`fx`, `fy`, fração da janela), sem nunca mostrar borda.
  * Chave com `giro`: a entrada do cartão, o plano encolhe girando com borrão de movimento.
- * `atras`: o que vai entre o fundo da gravação e a pessoa recortada (o texto ATRÁS da pessoa).
+ * `atras`: o que vai entre o fundo da gravação e a pessoa recortada (o texto ATRÁS da pessoa; só com fundo 'recorte').
+ * `desfoque`: o fundo da gravação com desfoque leve e a pessoa recortada nítida por cima (fundo 'desfoque', só com pedido).
+ * Padrão (G6): a gravação crua, com o fundo real, sem camada nenhuma.
  */
 export type Pose = {x: number; y: number; w: number; h: number; r: number; s: number; fx: number; fy: number; sombra: number};
 const base: Pose = {x: 0, y: 0, w: W, h: H, r: 0, s: 1, fx: 0.5, fy: 0.35, sombra: 0};
@@ -43,7 +45,8 @@ export const poseEm = (chaves: Chave[], t: number): {p: Pose; giro: number} => {
 	return {p, giro};
 };
 
-export const Camera: React.FC<{chaves: Chave[]; t: number; atras?: React.ReactNode}> = ({chaves, t, atras}) => {
+export const DESFOQUE_LEVE = 8; // px: "um desfoque leve basta" (G6)
+export const Camera: React.FC<{chaves: Chave[]; t: number; atras?: React.ReactNode; desfoque?: boolean}> = ({chaves, t, atras, desfoque}) => {
 	const {p, giro} = poseEm(chaves, t);
 	const [cx, cy] = rostoEm(t);
 	const k = Math.max(p.w / W, p.h / H) * p.s;
@@ -60,8 +63,8 @@ export const Camera: React.FC<{chaves: Chave[]; t: number; atras?: React.ReactNo
 				boxShadow: p.sombra > 0.01 ? `0 ${26 * p.sombra}px ${60 * p.sombra}px rgba(0,0,0,${0.32 * p.sombra}), 0 4px 14px rgba(0,0,0,${0.14 * p.sombra})` : undefined,
 			}}
 		>
-			<OffthreadVideo muted src={staticFile('fala.mp4')} style={st} />
-			{atras ? (
+			<OffthreadVideo muted src={staticFile('fala.mp4')} style={desfoque ? {...st, filter: `blur(${DESFOQUE_LEVE}px)`, transform: 'scale(1.04)'} : st} />
+			{atras || desfoque ? (
 				<>
 					{atras}
 					<OffthreadVideo muted transparent src={staticFile('pessoa.webm')} style={st} />

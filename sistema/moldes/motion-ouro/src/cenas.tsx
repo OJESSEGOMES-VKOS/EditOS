@@ -3,7 +3,7 @@
 import React from 'react';
 import {OffthreadVideo, Sequence, staticFile} from 'remotion';
 import {AnelNeon, Cartao, Celular, Cursor, Ladrilho, Notebook, Pasta, Roleta, TelaEditor, TelaReels} from './objetos';
-import {COR, DefsSvg, E, Estrela, Fachos, FILTRO_NEON, H, HALO_TEXTO, INTER, Nevoa, Poeira, Seta, T, W, cena, talvez, clamp, ini, marca, mede, surge, tw, txt} from './base';
+import {COR, DefsSvg, E, Estrela, Fachos, BRILHO_TEXTO, FILTRO_NEON, H, HALO_TEXTO, INTER, Nevoa, Poeira, Seta, T, W, cena, talvez, clamp, ini, marca, mede, surge, tw, txt} from './base';
 
 /** início e fim (quadros) da cena no plano: cada tela conta o tempo a partir do começo dela */
 const janela = (id: string) => {
@@ -86,7 +86,7 @@ export const C1: React.FC<{f: number; ok: boolean}> = ({f: fg, ok}) => {
 								{gigantes()}
 							</div>
 						))}
-					<div style={{position: 'absolute', left: 0, top: 0, whiteSpace: 'nowrap', fontFamily: INTER, fontWeight: 700, fontSize: FSG, letterSpacing: '-0.02em', lineHeight: 1, color: '#FBFBFB', textShadow: '0 0 30px rgba(255,214,140,0.35)'}}>
+					<div style={{position: 'absolute', left: 0, top: 0, whiteSpace: 'nowrap', fontFamily: INTER, fontWeight: 700, fontSize: FSG, letterSpacing: '-0.02em', lineHeight: 1, color: '#FBFBFB', textShadow: BRILHO_TEXTO ? '0 0 30px rgba(255,214,140,0.35)' : undefined}}>
 						{gigantes()}
 					</div>
 				</div>
@@ -105,7 +105,7 @@ export const LinhaContador: React.FC<{f: number; y: number; fs: number; i: numbe
 	return (
 		<div style={{position: 'absolute', left: 0, width: W, top: y - fs * 0.5, height: fs, textAlign: 'center', whiteSpace: 'nowrap', fontFamily: INTER, fontWeight: 700, fontSize: fs, letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', ...surge(f, n0, 6, 18, 0.1)}}>
 			{dig.split('').map((d, k) => (
-				<span key={k} style={{color: COR.texto, opacity: k < zeros ? 0 : 1, textShadow: `0 0 14px rgba(248,216,52,0.55), 0 0 40px rgba(244,137,7,0.45)`}}>
+				<span key={k} style={{color: COR.texto, opacity: k < zeros ? 0 : 1, textShadow: BRILHO_TEXTO ? `0 0 14px rgba(248,216,52,0.55), 0 0 40px rgba(244,137,7,0.45)` : undefined}}>
 					{d}
 				</span>
 			))}
@@ -563,7 +563,7 @@ export const LinhaAssinatura: React.FC<{f: number; y: number; fs: number; texto:
 	return (
 		<div style={{position: 'absolute', left: 0, width: W, top: y - fs * 0.5, height: fs, opacity: clamp(e * 1.6), filter: e < 1 ? `blur(${(1 - e) * 14}px)` : undefined, transform: `scale(${1 + 0.25 * (1 - e)})`, transformOrigin: `540px ${fs * 0.5}px`}}>
 			<div style={{position: 'absolute', left: 540 - 520, width: 1040, top: -fs * 0.6, height: fs * 2.2, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(242,190,58,0.28) 0%, rgba(176,100,25,0.12) 45%, rgba(0,0,0,0) 72%)'}} />
-			<div style={{...base, color: '#5a3806', textShadow: `${volume}, 0 16px 30px rgba(0,0,0,0.7), 0 0 60px rgba(244,137,7,${0.55 - 0.25 * assenta})`}}>{texto}</div>
+			<div style={{...base, color: '#5a3806', textShadow: BRILHO_TEXTO ? `${volume}, 0 16px 30px rgba(0,0,0,0.7), 0 0 60px rgba(244,137,7,${0.55 - 0.25 * assenta})` : undefined}}>{texto}</div>
 			<div
 				style={{
 					...base,
@@ -576,7 +576,7 @@ export const LinhaAssinatura: React.FC<{f: number; y: number; fs: number; texto:
 			>
 				{texto}
 			</div>
-			<div style={{...base, color: '#FFF7F3', opacity: assenta, textShadow: `0 -1px 0 rgba(255,255,255,0.9), 0 0 18px rgba(248,216,52,0.45), 0 0 46px rgba(244,137,7,0.35)`}}>{texto}</div>
+			<div style={{...base, color: '#FFF7F3', opacity: assenta, textShadow: BRILHO_TEXTO ? `0 -1px 0 rgba(255,255,255,0.9), 0 0 18px rgba(248,216,52,0.45), 0 0 46px rgba(244,137,7,0.35)` : undefined}}>{texto}</div>
 			<div style={faixa(luz, 0.95)}>{texto}</div>
 			{luz2 > -60 && <div style={faixa(luz2, 0.55)}>{texto}</div>}
 		</div>

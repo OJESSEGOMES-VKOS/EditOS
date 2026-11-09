@@ -7,7 +7,13 @@ bater com o código do molde, vale o que está aqui.
 parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 quadro por segundo) e o `mapa.json`
 (rosto, luz e cortes medidos a cada 0,25 s). Antes de editar, assista ao vídeo inteiro uma vez. O mesmo vídeo em qualidade cheia está no `original.mp4`, para ler letra pequena e detalhe de tela.
 
-**A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas, os textos e os cortes do vídeo novo nascem da fala nova. Não repita as cenas do aprovado só porque estão lá.
+Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
+
+**O modelo é inspiração, não molde (G30).** O aprovado mostra o porquê e o como de cada tela. Num vídeo novo, cada tela
+só entra onde a fala nova tiver o mesmo porquê; a ordem e os tempos do aprovado nunca se copiam. Padrão sem pedido: o
+vídeo normal da pessoa, com o fundo e a cor reais (prop `fundo: 'real'`, `pb: false`): nada de pessoa recortada, breu
+petróleo, vinheta, máscara, camadas, blur de fundo nem preto e branco; tudo isso só com ordem explícita (G6). A maior
+parte do vídeo é a pessoa com a legenda. O vídeo abre na gravação original, dinâmico, com ênfase no gancho (G29).
 
 ---
 
@@ -30,17 +36,20 @@ Quando a pessoa corrigir algo num vídeo e a correção valer para os próximos,
 ## 1. A cara do modelo
 
 Uma pessoa pensando em voz alta, e a tela escreve a fala como uma página de livro sobre o rosto.
-- **Estúdio escuro e frio:** a pessoa recortada sobre um breu petróleo desfocado, pretos esmagados, pele quente, luz
-  caindo de lado (0 s a 29 s). A imagem e o contraste do aprovado são a cara do modelo: ficam como estão.
-- **Uma palavra gigante por frase**, em letra condensada caixa alta, colorida pelo sentido: azul quando é o que se
+- **O vídeo normal, com o fundo real** (G6). O estúdio escuro e frio do aprovado (a pessoa recortada sobre um breu
+  petróleo desfocado, pretos esmagados, 0 s a 29 s) é a opção `fundo: 'recorte'`.
+- **A palavra gigante só no termo que importa ao tema** (G17, G28; o aprovado tinha uma por frase), em letra condensada caixa alta,
+  colorida pelo sentido: azul quando é o que se
   busca, vermelho quando dói, branco quando é a resposta neutra ("100%" azul em 1 s, "MODELOS" branco em 6 s,
   "APENAS" vermelho em 13 s).
 - **A palavra-chave se revela letra a letra fora de ordem**, do desfoque, pisca e assenta (5 s, 19 s, 27 s).
 - **Texto pequeno, fino e branco** em volta dela e na legenda corrida (3 s, 11 s).
-- **O momento de dor vira preto e branco**, em close extremo, e o texto continua colorido (13 s).
+- **O momento de dor em close extremo** (13 s); o preto e branco dele é opção desligada (prop `pb`, G6).
 - **Corte seco** entre planos do mesmo rosto. Chicote de 1 quadro só na chamada (26,7 s).
 
 ## 2. Os números do modelo (o `parece.py` confere)
+
+Estes números são conferência técnica (rosto, enquadramento, ritmo). Não são ordem de copiar a sequência do aprovado (G30).
 
 | Item | Valor | O que é |
 |---|---|---|
@@ -55,16 +64,20 @@ Uma pessoa pensando em voz alta, e a tela escreve a fala como uma página de liv
 | Cabeça cortada pelo topo | 67% do tempo | Planos médios e fechados cortam o alto da cabeça |
 | Cortes | cerca de 8 por minuto | 6 cortes em 29,8 s |
 
+**Fundo real (G6) e o `parece.py`:** brilho, contraste, saturação e temperatura da tabela vêm do aprovado com o fundo
+recortado. Com o fundo real (o padrão) são a luz da gravação: o `parece.py` só avisa nesses quatro (G6) e continua
+cobrando o rosto e o ritmo. Com `fundo: 'recorte'`, use `--fundo recorte` e valem os dois parágrafos abaixo sobre a luz.
+
 - **O rosto depende do plano, não só da gravação.** Por plano, o aprovado tem o rosto em 38% da altura no médio 1,45,
   46% no close 1,65 e 28% a 29% no aberto 1,0 e no médio aberto 1,1. Os 36% e 44% da tabela são a mistura dos planos
   dele, que passa cerca de 1/4 do tempo em plano aberto. Vídeo só com médio e close (comum em vídeo curto) mede rosto
   grande e cabeça cortada 100% e reprova, mesmo com a gravação certa. Por isso todo vídeo, curto ou não, tem um plano
   aberto (1,0 ou 1,1) numa virada da fala, de pelo menos 1,5 s (num vídeo de 10 s, um aberto de 1,7 s já passa).
-- **A luz é do molde, não do filtro.** O brilho e o contraste certos saem do `scripts/grade.py` seguido do
+- **Com `fundo: 'recorte'`, a luz é do molde, não do filtro.** O brilho e o contraste certos saem do `scripts/grade.py` seguido do
   `tools/adaptar.py --desenho` (seção 9, passo 2). Nunca mude o filtro `contrast(1.04)` do `src/Reel.tsx` para
   compensar luz: se o `parece.py` acusar luz, o passo 2 não foi feito ou foi feito antes do grade.
-- **O único âmbar do modelo:** um vazamento de luz laranja nos quadros 0 a 4 do vídeo (a abertura acende quente e
-  apaga em 0,17 s). Faz parte do aprovado e fica. Fora dele, nada de âmbar.
+- **O único âmbar do modelo:** um vazamento de luz laranja nos quadros 0 a 4 do aprovado (a abertura acende quente e
+  apaga em 0,17 s). É tratamento sobre a gravação: num vídeo novo, só com ordem explícita (G6). Fora dele, nada de âmbar.
 
 ## 3. Câmera e ritmo
 
@@ -96,16 +109,19 @@ Uma pessoa pensando em voz alta, e a tela escreve a fala como uma página de liv
 **Fontes: duas, mais uma variação de peso.** Poppins 400 e 600, e Anton. Nenhuma outra fonte entra (nada de manuscrita,
 nada de serifada).
 
-**Três jeitos de pôr o destaque:**
-1. **Bloco lateral** (o padrão). Topo da 1ª linha em y 685 (35,7% da altura). Do lado direito, a borda direita em
+**Três jeitos de pôr o destaque** (só no termo que importa ao tema, G17; na dúvida, legenda). São as posições de
+destaque do modelo, no máximo 3 por vídeo (G13); cada uma com o seu porquê:
+1. **Bloco lateral** (o padrão; usado na referência porque o rosto ocupa um lado e a palavra-chave mora no outro, como
+   página de livro; usar quando a fala nova tiver um termo forte num plano médio). Topo da 1ª linha em y 685 (35,7% da altura). Do lado direito, a borda direita em
    x 940; do lado esquerdo, a borda esquerda em x 70 a 76. Largura do bloco 380 a 420 px. As linhas alternam:
    pequena / PALAVRA / pequena encostada na borda oposta / PALAVRA. Fica um zigue-zague justificado ("esse vídeo está
    sendo / 100% / editado pelo / CLAUDE", 1 s a 2 s; "a / DIFERENÇA / entre vários / MODELOS", 6 s; "e / APRENDER /
    a como usar isso / nos seus vídeos", 26 s).
-2. **Palavra central gigante** (no close ou no médio centrado). Bloco centrado com topo em y 1152 (60% da altura),
+2. **Palavra central gigante** (no close ou no médio centrado; usada na referência porque o termo é a conclusão da
+   frase longa, "QUALQUER", "EDIÇÃO"; usar quando a fala nova tiver o mesmo porquê). Bloco centrado com topo em y 1152 (60% da altura),
    largura 560 a 600 px, linha pequena em cima e embaixo ("para editar / QUALQUER / tipo de vídeo usando o Claude",
    9 s a 10 s; "outros modelos de / EDIÇÃO / como esse", 23 s).
-3. **Bloco do P&B**, no canto de baixo à esquerda: x 76, topo em y 1087 (56,6%) ("você está vendo / APENAS / um desses
+3. **Bloco do P&B** (só existe com o P&B pedido; usado na referência porque é o momento de dor), no canto de baixo à esquerda: x 76, topo em y 1087 (56,6%) ("você está vendo / APENAS / um desses
    modelos.", 13 s).
 
 **A palavra-chave:**
@@ -119,15 +135,15 @@ nada de serifada).
 
 | Papel | Cor | Acabamento | Quando |
 |---|---|---|---|
-| Azul (o que se busca) | `#0A64FC` | brilho azul em 3 camadas em volta das letras | sonho, valor, ganho, o sujeito que importa ("100%", "DIFERENÇA", "QUALQUER", "EDIÇÃO", "APRENDER") |
+| Azul (o que se busca) | `#0A64FC` | chapado, sem brilho (G16; o aprovado tinha brilho azul em 3 camadas, só com ordem explícita) | sonho, valor, ganho, o sujeito que importa ("100%", "DIFERENÇA", "QUALQUER", "EDIÇÃO", "APRENDER") |
 | Vermelho (o que dói) | `#FD1701` | chapado, sombra escura | custo, perda, limite, erro ("APENAS", 13 s) |
 | Branco | degradê `#EEEDF0` em cima para `#D6CFCE` embaixo | sombra escura | a 2ª palavra forte quando a 1ª já tem cor, ou a resposta neutra ("CLAUDE", "MODELOS", "TRÊS VEZES") |
 
 - **Duas palavras do mesmo bloco nunca têm a mesma cor:** azul e branco, ou vermelho e azul.
-- **Destaque só no termo protagonista** da fala (o assunto: "outros modelos de EDIÇÃO", 23 s). Advérbio ou ligação
+- **Destaque só onde importa** (G17) (o assunto: "outros modelos de EDIÇÃO", 23 s). Advérbio ou ligação
   nunca vira destaque nem ganha fonte diferente: "realmente" vai na legenda comum (21 s).
-- **Número e palavra exatamente como foram ditos** ("100%", 1 s).
-- **Nunca escreva o nome do modelo na tela.** A fala diz "um desses modelos" e a tela escreve só isso (13 s).
+- **Número e palavra exatamente como foram ditos** ("100%", 1 s; G10). Pontuação e aspas fora do destaque (G18).
+- **Nunca escreva o nome do modelo na tela (G33).** A fala diz "um desses modelos" e a tela escreve só isso (13 s).
 
 **Entrada da palavra-chave:** as letras nascem fora de ordem, uma a cada 0,065 s no máximo (a palavra toda em até
 0,3 s), cada uma do desfoque forte para nítida em 3 quadros. Depois cerca de 30% das letras piscam (somem de 0,36 a
@@ -143,32 +159,36 @@ palavra curta no fim de uma frase rápida entra inteira, sem piscar, em 0,15 s (
   2ª linha: "**para te mostrar**", 4 s; "**no Instagram agora**", 12 s; "**DM**", 29 s).
 - Páginas de 1 ou 2 linhas, entrelinha 1,12. A 1ª linha encosta à esquerda e a 2ª à direita, em zigue-zague.
 - Cada palavra nasce do desfoque (7 px) para nítida em 4 quadros, no tempo da fala.
-- **Tempo de leitura:** cada página fica pelo menos 1,5 s, e cada palavra pelo menos 0,4 s depois de nascer. Fala rápida
-  junta numa frase maior; nunca pica. No máximo 4 linhas por bloco.
-- **Posição: só duas, fixas.** Topo da caixa em y 1050 (no peito) e y 1400 (a 2ª). A legenda vai para a 2ª só quando um
-  destaque ocupa a 1ª, quando o rosto desce nas prévias (17 s, 27 s a 29 s) ou na fala sem pausa (abaixo). Nunca um lugar novo por frase, nunca no
-  pé do quadro.
+- **Tempo de leitura:** a página fica o tempo da fala (G9), e cada palavra pelo menos 0,4 s depois de nascer. A legenda
+  padrão tem no máximo 2 linhas (G12) e divide por trecho, sem juntar o fim de uma fala com o começo de outra (G11, G14).
+  Só o bloco de destaque pode ter até 4 linhas.
+- **Posição: um lugar só, um bloco por vez (G12).** Topo da caixa em y 1050 (no peito) no vídeo inteiro. A 2ª posição
+  (y 1400) só no fecho, com o comando fixo, e quando o rosto desce nas prévias (17 s, 27 s a 29 s). O bloco de destaque
+  toma o lugar da legenda: os dois nunca ficam empilhados na mesma tela. Nunca um lugar novo por frase, nunca no pé do
+  quadro.
 - **Fala sem pausa (troca de página):** na mesma posição, a página seguinte entra no mesmo quadro em que a anterior
   sai (`ate` de uma = `de` da outra, em geral `antes(i)`); as duas nunca convivem ali. Em posições diferentes (bloco ou
   legenda em 1050 saindo, legenda em 1400 entrando), a seguinte pode entrar até 0,25 s antes de a anterior sair, desde
   que as caixas não se cruzem. O `cobertura.mjs` reprova qualquer cruzamento e qualquer página com menos de 1,5 s.
-- **Bloco central de 3 linhas com legenda em 1400 ao mesmo tempo:** o bloco precisa acabar 10 px acima da legenda.
+- **Bloco central de 3 linhas com legenda em 1400 ao mesmo tempo:** não é mais o padrão (um bloco por vez; G18: nunca empilhar legenda e destaque). Só
+  na janela das prévias, se o dono pedir as prévias; aí o bloco precisa acabar 10 px acima da legenda.
   Com o topo do bloco em y 1152 e linhas pequena / PALAVRA / pequena, a maiúscula da palavra vai até 6,4% da altura
   (`cap: 0.064`, 123 px); com acento na palavra (É, Ã...) até 5,3% (`cap: 0.053`); com Q ou Ç até 5,6%. A conta do
   `cobertura.mjs`: topo + 112 px + altura da maiúscula (mais 22% dela com acento) tem de ficar em y 1390 ou acima.
-- **A tela pode limpar a fala** (tira "pô", "cara", "né"; troca "tá" por "está", "pra" por "para"), mas nunca muda o
-  sentido nem inventa palavra.
+- **A tela escreve a fala como foi dita (G10).** Limpar "pô", "cara", "né" ou trocar "tá" por "está" só com pedido
+  explícito do dono.
 - **Nada atravessa um corte seco.** Todo texto some no corte. Nada aparece antes do seu tempo de entrada.
 
 ## 6. Preto e branco, transições e fecho
 
-- **P&B no momento de dor:** só quando a fala diz um custo, uma perda, um limite ou um erro (o que vira palavra
+- **P&B no momento de dor (opção desligada, prop `pb: true`, G6):** só a pedido, e só quando a fala diz um custo, uma perda, um limite ou um erro (o que vira palavra
   vermelha). Então 1 a 2 vezes por vídeo, 1,4 a 3,6 s cada, sempre num bloco com palavra vermelha e sempre no close
   extremo (12,98 s a 14,44 s). O texto não perde a cor: é quando o vermelho mais salta. Fala sem dor não tem P&B:
   nunca invente um para cumprir a gramática (tire o `pb` do plano e ponha `PB_PALAVRA = None` no `scripts/trilha.py`).
 - **Entrada do P&B com clarão:** 2 quadros clareando, 1 quadro estourado, assenta escuro em cerca de 0,15 s. Saída por
   clarão de 3 quadros ou por corte seco (14,4 s).
-- **Chicote de 1 quadro** na entrada da chamada (26,7 s), com um whoosh baixo 0,2 s antes.
+- **Chicote de 1 quadro** na entrada da chamada (26,7 s; usado na referência porque marca a virada para o pedido; usar
+  quando a fala nova tiver chamada). O whoosh que o acompanhava só com ordem explícita (G6).
 - **Chamada (fecho):** fixo só o comando, em bloco centrado com topo em y 1050: "comenta" pequeno e a palavra entre
   aspas gigante azul, “EDIÇÃO” (27 s). O resto da fala corre na legenda da 2ª posição, y 1400 (28 s a 29 s).
   Fala sem chamada (vídeo curto que acaba numa afirmação): sem chicote e sem bloco de comando. `CHICOTE = null`,
@@ -185,14 +205,16 @@ palavra curta no fim de uma frase rápida entra inteira, sem piscar, em 0,15 s (
 
 | Opção | Padrão no código | Como mudar |
 |---|---|---|
-| Fundo escuro do modelo (recorte, breu petróleo, vinheta) | **ligado** | Prop `efeitoFundo: false`. Ligado exige `public/fala_grade.mp4` (passo 2 da seção 9) |
-| Efeitos sonoros do modelo (sopro no P&B, whoosh no chicote) | **ligados** | O `mixar.sh` usa `public/efeitos.wav` se existir; apague-o para sair só a voz |
-| Música (pad escuro de 4 acordes) | desligada | `mixar.sh` com `public/trilha.wav` no meio (seção 9, passo 8) e prop `musica: true` só para ouvir no Studio |
+| Fundo (G6) | **real**: o vídeo normal, prop `fundo: 'real'` | `fundo: 'desfoque'` (desfoque leve; `scripts/grade.py --desfoque` grava `public/fala_desfoque.mp4`) ou `fundo: 'recorte'` (o estúdio escuro do aprovado: recorte, breu petróleo, vinheta; o antigo `efeitoFundo: true`; exige `public/fala_grade.mp4`, passo 2 da seção 9). Só a pedido |
+| Palavra gigante | **só no termo que importa ao tema** (G17), e o comando quando há chamada | Mais, só a pedido do dono |
+| Efeitos sonoros do modelo (sopro no P&B, whoosh no chicote) | **desligados** (G6) | Só com ordem explícita: gere `public/efeitos.wav` (seção 9, passo 6); o `mixar.sh` usa o arquivo se existir |
+| Música (pad escuro de 4 acordes) | desligada (G6, só com ordem explícita) | `mixar.sh` com `public/trilha.wav` no meio (seção 9, passo 8) e prop `musica: true` só para ouvir no Studio |
 | Prévias | desligadas | Prop `previas: true` e `nomesPrevias: ["modeloA","modeloB"]`, com o plano marcado `previas: true` |
-| P&B | ligado onde o plano marca `pb: true` | Tire o `pb` do plano |
+| P&B | desligado (prop `pb: false`, G6; o plano pode marcar `pb: true` que nada muda) | Prop `pb: true` e o `PB_PALAVRA` do `scripts/trilha.py`, a pedido |
 | Chicote na chamada | ligado | `CHICOTE = null` em `src/Reel.tsx` |
 
-O aprovado foi feito com o fundo escuro e com as prévias ligadas, para mostrar a capacidade.
+O aprovado foi feito antes de 2026-11-05, com o fundo escuro, o P&B, uma palavra gigante por frase e as prévias ligadas, para
+mostrar a capacidade. Nada disso é o padrão de hoje.
 
 ## 8. Zona segura e rosto
 
@@ -209,10 +231,12 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py pagina-de-livro <gravacao.mp4> <AAAA-MM-DD-tema>`.
    Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`), mede o rosto (`src/rosto.json`) e
-   adapta a gravação ao modelo (rosto no tamanho e na altura do aprovado, mesma luz de partida). Peça uma gravação com
-   luz lateral, fundo escuro e folga de resolução (4K ajuda: o close P&B é um recorte de 2,3x).
+   enquadra a gravação no modelo (rosto no tamanho e na altura do aprovado; a cor e o fundo ficam os da gravação).
+   Folga de resolução ajuda (4K: o close extremo é um recorte de 2,3x).
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
-2. **Fundo escuro** (na pasta do vídeo):
+2. **Fundo (só se o dono pediu; o padrão é o fundo real e este passo não existe).** Desfoque leve:
+   `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/grade.py --desfoque` grava
+   `public/fala_desfoque.mp4` (render com `"fundo":"desfoque"`). Fundo escuro do aprovado (render com `"fundo":"recorte"`):
    `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/grade.py` grava
    `public/fala_grade.mp4`. É pesado. Para testar antes, `scripts/grade.py 1 13 22` grava só imagens em `conferencia/`.
    No fim, o `grade.py` já roda sozinho o acerto de luz (`tools/adaptar.py oficina/<v> pagina-de-livro --desenho`); só rode à mão
@@ -222,8 +246,8 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    `fala_grade.mp4` do molde. Sem ele o vídeo sai apagado (contraste perto de 90 em vez de 124). Rode de novo sempre
    que refizer o grade.
 3. **Escreva o `plano.md`** na pasta do vídeo, uma linha por frase sobre `src/palavras.json`: tempo, fala, jeito
-   (bloco lateral, central, legenda), palavra-chave, cor pelo sentido, plano e P&B. Procure o arco da fala (tese,
-   custo, virada, fecho) e siga a gramática do `referencia.mp4`.
+   (bloco lateral, central, legenda), palavra-chave, cor pelo sentido e plano. Procure o arco da fala (tese, custo,
+   virada, fecho): o bloco vai só no termo que importa ao tema (G17, G28); o resto é legenda.
 4. **Monte O PLANO** em `src/Reel.tsx` (na pasta do vídeo). O molde para de propósito ao carregar até o plano bater com
    a fala nova e diz qual lista e qual palavra não batem. Os números são índices das palavras (0 = a 1ª).
    - `CORTE` e `PLANOS`: os cortes, `c(i)` = 2 quadros antes da palavra `i`, com `zoom`, `fx`, `fy` (onde o rosto cai)
@@ -239,26 +263,40 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 5. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo) até zerar. Ele confere palavra coberta uma
    vez, tempo de leitura, até 4 linhas, legenda só em 1050 e 1400, texto sem cruzar texto, zona segura, fontes e a
    conta de cortes, e diz o que mexer.
-6. **Som:** ponha em `scripts/trilha.py` o `PB_PALAVRA` (1ª palavra do plano P&B) e o `CHICOTE_PALAVRA` (1ª palavra da
+6. **Som (só se o dono pediu efeito ou música, G6; senão pule e apague `public/efeitos.wav` se veio do molde):** ponha em `scripts/trilha.py` o `PB_PALAVRA` (1ª palavra do plano P&B) e o `CHICOTE_PALAVRA` (1ª palavra da
    chamada), ou `None`, e rode `../../.venv/Scripts/python.exe scripts/trilha.py` (na pasta do vídeo). Sai
    `public/efeitos.wav` e `public/trilha.wav`.
 7. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 13 27` (na pasta do
-   vídeo). O fundo escuro vem ligado, como no render; `--sem-fundo` desliga e `--previas` liga as prévias. Monte a folha com
+   vídeo). O fundo vem real, como no render; `--fundo desfoque` ou `--fundo recorte` mostram as opções, `--pb` o P&B e
+   `--previas` as prévias. Monte a folha com
    `../../.venv/Scripts/python.exe scripts/montar.py saida.png q1.png q2.png --cols 6`.
 8. **Renderize** (na pasta do vídeo):
    `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts VitrineStoryPodcast01 out/so-video.mp4 --codec=h264 --crf=16 --concurrency=2 --muted`
-   Com prévias, acrescente `--props='{"previas":true,"nomesPrevias":["modeloA","modeloB"]}'`.
+   Com prévias, acrescente `--props='{"previas":true,"nomesPrevias":["modeloA","modeloB"]}'`. Fundo ou P&B pedidos:
+   `"fundo":"desfoque"` (ou `"recorte"`) e `"pb":true` nas props.
 9. **Mixe** (na pasta do vídeo): `sh scripts/mixar.sh out/so-video.mp4 out/final.mp4` (voz e efeitos). Com música:
    `sh scripts/mixar.sh out/so-video.mp4 public/trilha.wav out/final.mp4` (trilha cerca de 16 dB abaixo da voz). Sai em
    -14 LUFS, pico -1 dBTP.
-10. **Prove que parece o modelo:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 pagina-de-livro`.
-    Reprovou, o vídeo não sai: corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava, com o aprovado
-    em cima e o seu embaixo. Se a diferença salta aos olhos, ainda não está pronto.
+10. **Confira os números técnicos:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 pagina-de-livro`
+    (rosto, enquadramento, ritmo). Corrija o que ele aponta. Ele não pede que o vídeo repita a sequência do aprovado
+    (G30): a pergunta final é se cada tela entrou onde a fala tem o porquê dela.
 
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e o mesmo com `2`), o
 plano com `previas: true` e o render com as props acima.
 
-## 10. O plano do vídeo aprovado (para comparar)
+## 10. O plano do vídeo aprovado (repertório, não roteiro)
+
+Feito antes de 2026-11-05: fundo escuro recortado, P&B e uma palavra gigante por frase. Cada linha mostra uma tela e o
+porquê dela; num vídeo novo, a tela só entra onde a fala nova tiver o mesmo porquê, e nunca se copia a ordem nem os
+tempos (G30). O molde de hoje fica com o bloco do gancho, o QUALQUER (a conclusão da 1ª frase longa, 8,1 s) e o comando;
+o resto vai na legenda em y 1050, um bloco por vez.
+
+- Bloco lateral no gancho ("100%", "CLAUDE"): usado porque o gancho tem o fato principal; usar quando a fala nova abrir com um fato forte, sempre sobre a gravação original (G29).
+- Palavra central "QUALQUER": usada porque é a conclusão da frase longa; usar quando a fala nova tiver o mesmo porquê.
+- Corte para o aberto em "Inclusive": usado porque é a virada da fala; usar numa virada.
+- Close extremo P&B com "APENAS" vermelho: usado porque é o momento de limite/custo; só com P&B pedido (G6).
+- Prévias: usadas porque a fala diz "colocar duas prévias aqui em cima"; usar quando a fala nova pedir a coisa mostrada.
+- Chicote + comando "EDIÇÃO": usado porque a fala pede comentário; usar quando a fala nova tiver chamada.
 
 | Tempo | Fala | Câmera / transição | Na tela |
 |---|---|---|---|

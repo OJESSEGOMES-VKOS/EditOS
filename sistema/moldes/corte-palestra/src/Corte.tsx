@@ -73,7 +73,7 @@ const LH = {sans: 1.15, serif: 0.98};
 const sans = loadSans('normal', {weights: ['700'], subsets: ['latin']});
 const serif = loadSerif('italic', {weights: ['700'], subsets: ['latin']});
 const BRANCO = '#FFFFFF';
-/* G37: sem contorno nem sombra justa. Só uma sombra larga e bem suave, que não desenha a borda da letra. */
+/* G16: sem contorno nem sombra justa. Só uma sombra larga e bem suave, que não desenha a borda da letra. */
 const SOMBRA = '0 8px 64px rgba(0,0,0,0.34)';
 const tw = (t: number, a: number, b: number, v0: number, v1: number, e = Easing.bezier(0.16, 1, 0.3, 1)) =>
 	interpolate(t, [a, b], [v0, v1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: e});

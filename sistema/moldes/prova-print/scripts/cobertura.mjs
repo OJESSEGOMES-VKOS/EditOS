@@ -4,13 +4,15 @@
 //  1) toda palavra do plano (w('x', n) / iw(...)) existe na fala;
 //  2) toda palavra dita aparece na legenda enquanto é dita (as do comando fixo do fecho contam como cobertas pelo fecho);
 //  3) tempo de leitura: pedaço >= 1,5 s (cheio >= 1 s) e cada palavra >= 0,4 s depois de nascer;
-//  4) nenhuma palavra duas vezes; 5) no máximo 2 linhas; 6) G35: pedaço não junta fim de frase com começo de outra;
-//  7) a legenda em até 2 lugares (G15) e dentro da zona segura (x 60-940, y 250-1500); título-promessa dentro da zona;
+//  4) nenhuma palavra duas vezes; 5) no máximo 2 linhas; 6) G11/G14: pedaço não junta fim de frase com começo de outra;
+//  7) a legenda em até 2 lugares (G12) e dentro da zona segura (x 60-940, y 250-1500); título-promessa dentro da zona;
 //  8) nada atravessa corte (pedaço acaba até o fim da cena);
-//  9) contador para no número DITO: a palavra do instante do contador é aquele número (G8, "números como ele disse");
-// 10) todo grifo nasce numa palavra da fala (at: w(...)); 11) todo print de prova tem origem em public/ORIGEM.md (G34);
-// 12) rosto fechado só em cena 'rosto', no máximo 3 cenas e até 20% do vídeo; nenhuma cena passa de 5,5 s; vitrine
-//     seguida (sem rosto) no máximo 8 s; 13) nada de brilho/sombra justa na letra (G37): textShadow só com desfoque >= 30 px;
+//  9) contador para no número DITO: a palavra do instante do contador é aquele número (G10, "números como ele disse");
+// 10) todo grifo nasce numa palavra da fala (at: w(...)); 11) todo print de prova tem origem em public/ORIGEM.md (G25);
+// 12) rosto fechado só em cena 'rosto', no máximo 3 cenas e até 20% do vídeo; nenhuma cena de tela passa de 5,5 s (a
+//     'pessoa', o vídeo normal, pode durar o que a fala durar); vitrine seguida (sem rosto) no máximo 8 s;
+//     a pessoa (pessoa + rosto fechado) é a maior parte do vídeo (só aviso; a antiga regra "vitrine e capítulo só fechando
+//     cena forte" foi abolida); palco só com a prop fundo: 'recorte'; 13) nada de brilho/sombra justa na letra (G16): textShadow só com desfoque >= 30 px;
 // 14) PV4: nenhuma palavra/ideia em dois elementos ao mesmo tempo (título, contador, comando, legenda);
 // 15) PV5: nenhum texto fixo pendurado: sai até 1 s depois da última palavra dele e não passa da cena (só o comando do fecho fica);
 // 16) PV6/PV8: no cartão de câmera a cabeça inteira (topo medido no recorte) sai da moldura, sem bater na legenda, rosto centrado;
@@ -98,14 +100,14 @@ for (const e of ex) {
 	if (d < 1.5) {
 		// curto porque o corte da cena caiu no meio do trecho: defeito do plano (mova o corte para a pausa ou a pontuação)
 		if (Math.abs(e.ate - c0.ate) < 1e-6 && !fimDeTrecho) falha('leitura', `"${e.texto}" fica ${fmt(d)} s: o corte de ${fmt(c0.ate)} s parte o trecho; mova o corte em base()`);
-		// curto porque a fala corre (o próximo trecho já começou): G35 vence; aceito a partir de 0,4 s, e listado
+		// curto porque a fala corre (o próximo trecho já começou): G11/G14 vence; aceito a partir de 0,4 s, e listado
 		else if (d < 0.4) falha('leitura', `"${e.texto}" fica ${fmt(d)} s (pisca: mín. 0,4 s)`);
 		else aceitos.push(`"${e.texto}" ${fmt(d)} s`);
 	}
 	// a palavra nasce com o pedaço (apagada, acende quando é dita): o mínimo de 0,4 s conta do nascimento do pedaço
 	if (d < 0.4) falha('leitura', `"${e.texto}": palavras na tela por ${fmt(d)} s`);
 	if (e.linhas > 2) falha('linhas', `"${e.texto}" com ~${e.linhas} linhas`);
-	e.ids.slice(0, -1).forEach((i) => /[.,!?:;]$/.test(PB[i].text) && falha('G35', `"${e.texto}" junta fim de trecho ("${PB[i].text}") com o seguinte`));
+	e.ids.slice(0, -1).forEach((i) => /[.,!?:;]$/.test(PB[i].text) && falha('G11/G14', `"${e.texto}" junta fim de trecho ("${PB[i].text}") com o seguinte`));
 	e.ids.forEach((i) => vezes[i]++);
 	lugares.add(e.y0);
 	if (e.x0 < ZONA.esq || e.x1 > ZONA.dir || e.y0 < ZONA.topo || e.y1 > ZONA.base) falha('zona', `"${e.texto}" x ${Math.round(e.x0)}-${Math.round(e.x1)}, y ${e.y0}-${e.y1}`);
@@ -113,9 +115,9 @@ for (const e of ex) {
 	if (e.ate > c.ate + 1e-6) falha('corte', `"${e.texto}" atravessa o corte de ${fmt(c.ate)} s`);
 }
 vezes.forEach((v, i) => v > 1 && falha('repete', `${i} "${PB[i].text}" ${v} vezes`));
-if (lugares.size > 2) falha('G15', `legenda em ${lugares.size} lugares (máx. 2): ${[...lugares].join(', ')}`);
+if (lugares.size > 2) falha('G12', `legenda em ${lugares.size} lugares (máx. 2): ${[...lugares].join(', ')}`);
 // título-promessa: 1 linha cada, largura estimada (sans 84 px, serifa 108 px) dentro de x 60-940
-for (const [k, fonte, fator] of [['linha1', 84, 0.56], ['linha2', 108, 0.42]]) {
+for (const [k, fonte, fator] of TITULO ? [['linha1', 84, 0.56], ['linha2', 108, 0.42]] : []) {
 	const larg = TITULO[k].length * fonte * fator + (k === 'linha2' ? 60 : 0);
 	if (500 - larg / 2 < ZONA.esq - 1 || larg > ZONA.dir - ZONA.esq) falha('zona', `título ${k} "${TITULO[k]}" larga demais (~${Math.round(larg)} px; até 880): encurte`);
 }
@@ -126,14 +128,14 @@ const cenasTxt = FONTES.find((x) => x.f === 'src/Cenas.tsx').txt;
 for (const k of CONTADORES) {
 	const dito = limpa(PB[k.ids[0]].text);
 	const num = /^\d+%?$/.test(dito) ? Number(dito.replace('%', '')) : NUM[dito];
-	if (num !== k.valor) falha('G8', `contador da cena ${k.cena} vai até ${k.valor}, mas a palavra dita é "${PB[k.ids[0]].text}" (${num ?? 'não é número'}): a tela mostra o número como foi falado`);
+	if (num !== k.valor) falha('G10', `contador da cena ${k.cena} vai até ${k.valor}, mas a palavra dita é "${PB[k.ids[0]].text}" (${num ?? 'não é número'}): a tela mostra o número como foi falado`);
 }
-if (/<Contador\b(?![^>]*de=\{k\.de\})/.test(cenasTxt)) falha('G8', 'contador fora de CONTADORES (src/tema.ts): todo contador nasce lá, com a palavra dita');
+if (/<Contador\b(?![^>]*de=\{k\.de\})/.test(cenasTxt)) falha('G10', 'contador fora de CONTADORES (src/tema.ts): todo contador nasce lá, com a palavra dita');
 // 10. grifo nasce numa palavra
 for (const m of cenasTxt.matchAll(/\{at: ([^,]+), x: \d+, y: \d+, w: \d+, h: \d+\}/g)) if (!/^w\(/.test(m[1].trim())) falha('grifo', `grifo com at: ${m[1]} (tem de ser w('palavra dita'))`);
 // 11. prints com origem
 const origem = fs.existsSync(path.join(MOLDE, 'public', 'ORIGEM.md')) ? fs.readFileSync(path.join(MOLDE, 'public', 'ORIGEM.md'), 'utf8') : '';
-for (const m of cenasTxt.matchAll(/src: '([^']+\.(?:png|jpg|webp))'/g)) if (!origem.includes(m[1])) falha('G34', `print ${m[1]} sem origem em public/ORIGEM.md`);
+for (const m of cenasTxt.matchAll(/src: '([^']+\.(?:png|jpg|webp))'/g)) if (!origem.includes(m[1])) falha('G25', `print ${m[1]} sem origem em public/ORIGEM.md`);
 // 12. ritmo e rosto
 const rosto = CENAS.filter((c) => c.modo === 'rosto');
 const tRosto = rosto.reduce((s, c) => s + c.ate - c.de, 0);
@@ -141,15 +143,21 @@ if (rosto.length > 3) falha('rosto', `${rosto.length} cenas de rosto fechado (m�
 if (tRosto / DURACAO > 0.2) falha('rosto', `rosto fechado em ${Math.round((100 * tRosto) / DURACAO)}% do vídeo (máx. 20%)`);
 let seguida = 0;
 for (const c of CENAS) {
-	if (c.ate - c.de > 5.5) falha('ritmo', `cena ${c.id} dura ${fmt(c.ate - c.de)} s (máx. 5,5: quebre num corte entre palavras)`);
+	if (c.modo !== 'pessoa' && c.ate - c.de > 5.5) falha('ritmo', `cena ${c.id} dura ${fmt(c.ate - c.de)} s (máx. 5,5: quebre num corte entre palavras)`);
+	// (a antiga G43 "tela só fechando cena forte" foi abolida em 2026-11-05: onde a tela entra é a G28, pela relevância ao tema)
 	seguida = c.modo === 'vitrine' ? seguida + c.ate - c.de : 0;
 	if (seguida > 8) falha('ritmo', `vitrine seguida (sem rosto) por ${fmt(seguida)} s até ${c.id} (máx. 8)`);
 }
-// 13. G37
+// G6: a pessoa (o vídeo normal + o rosto fechado) é a maior parte do vídeo
+{
+	const tPessoa = CENAS.filter((c) => c.modo === 'pessoa' || c.modo === 'rosto').reduce((s, c) => s + c.ate - c.de, 0);
+	if (tPessoa / DURACAO < 0.5) console.log(`aviso: a pessoa está em ${Math.round((100 * tPessoa) / DURACAO)}% do vídeo (menos de 50%); confira se cada tela serve à fala e ao tema (G28), não reprova`);
+}
+// 13. G16
 for (const {f, txt} of FONTES)
 	for (const m of txt.matchAll(/textShadow: '([^']+)'/g)) {
 		const blur = Number((m[1].match(/^-?\d+p?x? -?\d+px (\d+)px/) ?? [])[1] ?? 0);
-		if (blur < 30) falha('G37', `${f}: textShadow "${m[1]}" desenha a borda da letra (desfoque < 30 px)`);
+		if (blur < 30) falha('G16', `${f}: textShadow "${m[1]}" desenha a borda da letra (desfoque < 30 px)`);
 	}
 
 // 14. PV4: um elemento por ideia. Dois textos na tela ao mesmo tempo não dizem a mesma palavra (número escrito ou falado
@@ -175,9 +183,11 @@ for (const x of FIXOS) {
 	if (cenaDe(x.de) !== cenaDe(Math.max(x.de, x.ate - 0.01))) falha('PV5', `${x.nome} "${x.texto}" atravessa o corte de ${fmt(cenaDe(x.de).ate)} s`);
 }
 if ((cenasTxt.match(/<Titulo\b/g) ?? []).length > 1) falha('PV5', 'o título-promessa aparece em mais de um lugar de src/Cenas.tsx: ele é só da cena do gancho');
-// 16. PV6/PV8: o cartão de câmera do palco
+// 16. PV6/PV8: o cartão de câmera do palco (só quando o plano tem palco: a opção fundo: 'recorte', G6)
 const g = G.rostoPalco;
-if (typeof RM.topo !== 'number') falha('PV6', 'src/rosto_med.json sem o topo da cabeça: rode scripts/recorte.py');
+const temPalco = CENAS.some((c) => c.modo === 'palco');
+if (!temPalco) console.log("sem palco no plano (G6: padrão sem recorte); PV6/PV8 não se aplicam");
+else if (typeof RM.topo !== 'number') falha('PV6', 'src/rosto_med.json sem o topo da cabeça: rode scripts/recorte.py');
 else {
 	const topo = g.olhos - g.s * (RM.olhos - RM.topo); // o ponto mais alto da cabeça no vídeo (p2), na tela
 	const legBase = G.legendaPalco + 2 * 78;
@@ -186,9 +196,9 @@ else {
 	if (g.olhos - g.y < 90) falha('PV6', `olhos a ${g.olhos - g.y} px da borda do cartão: o rosto fica cortado pela borda (ref4: ~125 px)`);
 	console.log(`cartão de câmera: borda y ${g.y}, olhos y ${g.olhos}, topo da cabeça y ${Math.round(topo)} (o mais alto do vídeo; mediana ${Math.round(g.olhos - g.s * (RM.olhos - RM.topo_med))}), legenda do palco até y ${legBase}`);
 }
-if (!fs.existsSync(path.join(MOLDE, 'public', 'pessoa.webm'))) falha('PV8', 'public/pessoa.webm não existe: rode scripts/recorte.py (a cabeça sai da moldura recortada)');
+if (temPalco && !fs.existsSync(path.join(MOLDE, 'public', 'pessoa.webm'))) falha('PV8', 'public/pessoa.webm não existe: rode scripts/recorte.py (a cabeça sai da moldura recortada)');
 for (const cp of [G.cardPalco, G.cardPalcoTitulo]) if (cp.y + cp.h > G.legendaPalco - 16) falha('zona', `card do palco termina em y ${cp.y + cp.h}, colado na legenda do palco (y ${G.legendaPalco})`);
-{
+if (temPalco) {
 	let pior = 0;
 	CAMINHO.forEach((cx) => {
 		const x = Math.min(g.x, Math.max(g.x + g.w - 1080 * g.s, 540 - g.s * cx)); // o mesmo de RostoPalco (src/ui.tsx)
@@ -214,7 +224,7 @@ const modos = {};
 CENAS.forEach((c) => (modos[c.modo] = (modos[c.modo] ?? 0) + c.ate - c.de));
 console.log(`${ex.length} pedaços de legenda | ${CENAS.length} cenas | duração ${fmt(DURACAO)} s`);
 console.log('tempo por modo: ' + Object.entries(modos).map(([m, s]) => `${m} ${Math.round((100 * s) / DURACAO)}%`).join(', '));
-if (aceitos.length) console.log(`${aceitos.length} pedaços curtos aceitos (fala corrida; G35 não deixa juntar trechos): ${aceitos.join(' | ')}`);
+if (aceitos.length) console.log(`${aceitos.length} pedaços curtos aceitos (fala corrida; G11/G14 não deixa juntar trechos): ${aceitos.join(' | ')}`);
 falhas.forEach((x) => console.log('  ' + x));
 console.log(falhas.length ? `REPROVADO: ${falhas.length} achados.` : 'APROVADO: 0 em todas as regras.');
 process.exit(falhas.length ? 1 : 0);
