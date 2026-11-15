@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import path from 'node:path';
 import { fluxo, lerFicha, escreverFicha, pastaDoItem, STATUS } from '../../lib/fluxo';
 
+import { ORIGENS } from '../../lib/origem';
+
 export const prerender = false;
 
 export const GET: APIRoute = () =>
@@ -10,7 +12,7 @@ export const GET: APIRoute = () =>
 // muda o status, o link ou o insight de um item (grava no ficha.md da pasta dele)
 export const POST: APIRoute = async ({ request }) => {
   const origem = request.headers.get('origin');
-  if (origem && origem !== 'http://127.0.0.1:4700') return new Response('origem não permitida', { status: 403 });
+  if (origem && !ORIGENS.has(origem)) return new Response('origem não permitida', { status: 403 });
   let corpo: Record<string, unknown>;
   try { corpo = await request.json(); } catch { return new Response('corpo inválido', { status: 400 }); }
   const pasta = pastaDoItem(corpo.perfil, corpo.nome);

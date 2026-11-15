@@ -39,7 +39,7 @@ Você edita vídeos em modelos de edição, com Remotion, dentro desta pasta.
    `sistema/tools/entregar.py <pasta-do-video> <video.mp4>` quando a versão estiver aprovada.
 
 ## O fluxo de produção (EditOS online)
-O dono acompanha tudo no painel (`/abrir-editos-online`, http://127.0.0.1:4700), que lê as pastas e se atualiza
+O dono acompanha tudo no painel (`/abrir-editos-online`, http://localhost:4700), que lê as pastas e se atualiza
 sozinho. Cada vídeo é uma pasta `<perfil>/conteudo/<nome-do-video>-DD-MM-AA/`, com um `ficha.md`:
 ```
 ---
@@ -58,6 +58,12 @@ notas livres
   traz cada roteiro de `roteiros/<AAAA-MM-DD-tema>/` para a pasta do tema no perfil que o roteiro cita no começo
   (`origem: dark/<slug>` na ficha). Roteiro sem o nome da página no começo não entra.
 - **insight:** o que o vídeo ensinou e pode virar regra do sistema; leia os insights antes de mexer num modelo.
+
+## As salas (um agente e um banco por perfil)
+Cada perfil é uma sala do Escritório, com um agente (`sala-<perfil>`, em `.claude/agents/` da raiz do VKOS) e um
+banco (`<perfil>/sala.md`: voz, estilo aprovado, fórmula, o que foi reprovado). Pedido sobre um perfil: chame o
+agente da sala em vez de reler tudo; você orquestra e revisa o que ele devolve. Correção ou aprovação duradoura do
+dono sobre um perfil vira uma linha no `sala.md` dele, com data. O protocolo está em `sistema/salas.md`.
 
 ## Fazer um vídeo
 **Cada modelo tem um arquivo só que manda: `sistema/modelos/<modelo>/<modelo>.md`.** Ele traz a cara do modelo, os

@@ -1,5 +1,5 @@
 ---
-// EditOS online: o fluxo de produção de todos os perfis numa tela. Lê as pastas e se atualiza sozinho.
+// EditOS Online: o EditOS numa tela, com cara de sistema. Lê as pastas e se atualiza sozinho.
 import '../estilos/app.css';
 ---
 <!doctype html>
@@ -7,58 +7,122 @@ import '../estilos/app.css';
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EditOS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>EditOS Online</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <!-- o tema entra antes da primeira pintura, pra tela não piscar -->
+  <script is:inline>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('editos-tema'); } catch (e) {}
+      if (t !== 'dia' && t !== 'noite') t = matchMedia('(prefers-color-scheme: light)').matches ? 'dia' : 'noite';
+      document.documentElement.dataset.tema = t;
+      var e = null;
+      try { e = localStorage.getItem('editos-estilo'); } catch (x) {}
+      document.documentElement.dataset.estilo = e === 'app' ? 'app' : 'jogo';
+    })();
+  </script>
+  <link rel="preload" href="/fontes/rubik-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fontes/pixelify-latin.woff2" as="font" type="font/woff2" crossorigin />
 </head>
 <body>
-  <div class="app">
-    <aside class="lado" aria-label="Perfis">
+  <canvas class="ceu" id="ceu" aria-hidden="true"></canvas>
+
+  <div class="os">
+    <header class="barra vidro">
       <div class="marca">
-        <span class="marca-icone" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 5h9M6 12h7M6 19h9M6 5v14"/></svg>
-        </span>
-        <span class="marca-nome">EditOS <span>online</span></span>
+        <span class="marca-icone" id="marca-icone" aria-hidden="true"></span>
+        <span class="marca-nome">EditOS <span>Online</span></span>
       </div>
-      <div class="lado-sec"><div id="nav-todos"></div></div>
-      <div class="lado-sec">
-        <div class="lado-rotulo">Perfis</div>
-        <div id="nav-perfis"></div>
-      </div>
-      <div class="lado-pe" id="vivo"><span class="ponto-vivo"></span><span>Conectando…</span></div>
-    </aside>
-
-    <div class="principal">
-      <header class="topo">
-        <select class="seletor-perfil" id="seletor-perfil" aria-label="Perfil"></select>
-        <h1 id="titulo">Todos os perfis</h1>
-        <div class="numeros" id="numeros"></div>
-        <label class="busca">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4"/></svg>
-          <input id="busca" type="search" placeholder="Buscar vídeo   /" aria-label="Buscar vídeo" />
-        </label>
-      </header>
-
-      <main class="quadro" id="quadro" aria-label="Fluxo de produção"></main>
-
-      <aside class="ficha" id="ficha" aria-hidden="true" aria-label="Ficha do vídeo">
-        <div class="ficha-cab">
-          <div class="ficha-linha">
-            <div class="ficha-origem" id="ficha-origem"></div>
-            <button class="btn" id="abrir-pasta" title="Abrir a pasta do vídeo no computador">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-              Abrir pasta
-            </button>
-            <button class="btn-icone" id="fechar" aria-label="Fechar (Esc)" title="Fechar (Esc)">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-            </button>
-          </div>
-          <h2 class="ficha-titulo" id="ficha-titulo"></h2>
-          <div class="estados" id="estados" role="group" aria-label="Status"></div>
+      <!-- os programas do sistema: cada um abre e fecha a sua janela -->
+      <nav class="apps" aria-label="Programas">
+        <button class="app-btn" id="btn-fluxo" type="button" aria-pressed="true" aria-controls="app-fluxo">
+          <span class="app-icone" data-icone="quadro" aria-hidden="true"></span><span class="app-nome">Fluxo de produção</span>
+        </button>
+        <button class="app-btn" id="btn-escritorio" type="button" aria-pressed="false" aria-controls="app-escritorio">
+          <span class="app-icone" data-icone="predio" aria-hidden="true"></span><span class="app-nome">Escritório</span>
+        </button>
+      </nav>
+      <label class="busca" id="busca-caixa">
+        <span class="busca-icone" id="busca-icone" aria-hidden="true"></span>
+        <input id="busca" type="search" placeholder="Buscar vídeo   /" aria-label="Buscar vídeo" />
+      </label>
+      <div class="barra-fim">
+        <div class="vivo" id="vivo"><span class="ponto-vivo"></span><span class="vivo-texto">Conectando…</span></div>
+        <div class="estilo" role="group" aria-label="Estilo do sistema">
+          <button type="button" data-vai="jogo" title="Cara de jogo: pixel">Jogo</button>
+          <button type="button" data-vai="app" title="Cara de app: vidro liso">App</button>
         </div>
-        <div class="ficha-corpo" id="ficha-corpo"></div>
+        <button class="btn-icone" id="privado" type="button" aria-pressed="false"></button>
+        <button class="btn-icone" id="tema" type="button"></button>
+        <time class="relogio" id="relogio"></time>
+      </div>
+    </header>
+
+    <!-- a área de trabalho: a casa do sistema. Um cartão por perfil, mais a sala de produção. Aparece com os programas fechados -->
+    <section class="escritorio" id="area" aria-labelledby="escritorio-titulo" hidden>
+      <header class="escritorio-cab">
+        <h1 id="escritorio-titulo">Área de trabalho</h1>
+        <p id="escritorio-resumo"></p>
+      </header>
+      <div class="salas" id="salas"></div>
+    </section>
+
+    <!-- o Escritório: a empresa EditOS Online vista de cima, uma sala por projeto -->
+    <section class="janela vidro janela-escritorio" id="app-escritorio" aria-label="Escritório" hidden>
+      <div class="janela-titulo"><span data-icone="predio" aria-hidden="true"></span>Escritório · EditOS Online
+        <button class="janela-fechar" type="button" data-fecha="escritorio" aria-label="Fechar o Escritório" title="Fechar"></button>
+      </div>
+      <p class="mapa-legenda" id="mapa-legenda"></p>
+      <!-- o painel da sala focada: o fluxo só daquele projeto -->
+      <aside class="painel-ver" id="painel-ver" aria-hidden="true" aria-label="Roteiro ou vídeo aberto"></aside>
+      <aside class="painel-sala" id="painel-sala" aria-hidden="true" aria-label="Fluxo da sala">
+        <div class="painel-cab" id="painel-cab"></div>
+        <div class="painel-corpo" id="painel-corpo"></div>
       </aside>
+      <div class="mapa-rolagem" id="mapa-rolagem"><div class="mapa" id="mapa"></div>
+        <div class="zoom" role="group" aria-label="Zoom do escritório">
+          <button class="btn-icone" type="button" id="zoom-menos" aria-label="Afastar" title="Afastar (Ctrl + rolar)">−</button>
+          <span class="zoom-valor" id="zoom-valor">100%</span>
+          <button class="btn-icone" type="button" id="zoom-mais" aria-label="Aproximar" title="Aproximar (Ctrl + rolar)">+</button>
+          <button class="btn" type="button" id="zoom-centro" title="Voltar a ver o escritório inteiro">Centralizar</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="mesa" id="app-fluxo">
+      <nav class="doca vidro" aria-label="Perfis">
+        <div id="nav-todos"></div>
+        <div class="doca-rotulo">Perfis</div>
+        <div id="nav-perfis"></div>
+      </nav>
+
+      <div class="janela vidro">
+        <div class="janela-titulo"><span id="janela-icone" aria-hidden="true"></span>Fluxo de produção
+          <button class="janela-fechar" type="button" data-fecha="fluxo" aria-label="Fechar o Fluxo de produção" title="Fechar"></button>
+        </div>
+        <header class="topo">
+          <select class="seletor-perfil" id="seletor-perfil" aria-label="Perfil"></select>
+          <h1 id="titulo">Todos os perfis</h1>
+          <div class="numeros" id="numeros"></div>
+          <div class="distribuicao" id="distribuicao" role="img"></div>
+        </header>
+
+        <main class="quadro" id="quadro" aria-label="Fluxo de produção"></main>
+
+        <aside class="ficha" id="ficha" aria-hidden="true" aria-label="Ficha do vídeo">
+          <div class="ficha-cab">
+            <div class="ficha-linha">
+              <div class="ficha-origem" id="ficha-origem"></div>
+              <button class="btn" id="abrir-pasta" type="button" title="Abrir a pasta do vídeo no computador"></button>
+              <button class="btn-icone" id="fechar" type="button" aria-label="Fechar (Esc)" title="Fechar (Esc)"></button>
+            </div>
+            <h2 class="ficha-titulo" id="ficha-titulo"></h2>
+            <div class="estados" id="estados" role="group" aria-label="Etapa do vídeo"></div>
+          </div>
+          <div class="ficha-corpo" id="ficha-corpo"></div>
+        </aside>
+      </div>
     </div>
   </div>
   <div class="aviso" id="aviso" role="status" aria-live="polite"><span class="ponto"></span><span></span></div>
