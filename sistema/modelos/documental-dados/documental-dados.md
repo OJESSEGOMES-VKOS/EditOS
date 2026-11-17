@@ -13,6 +13,8 @@ para ela. Até lá, os tempos entre parênteses apontam para a vitrine; "ref1 12
 
 **A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas,
 os textos e os números do vídeo novo nascem da fala nova e do dado novo.
+A skill `.claude/skills/documental-dados/SKILL.md` (na raiz do EditOS) é a entrada: a personalidade, as peças, a
+invenção e o teste do clone. O vídeo novo nasce com o plano vazio (§9).
 
 Uso: vídeo dark, só narração, sem rosto, das páginas da Operação Dark: **jovemdevirtude** (bíblica), **umjovemprofessor**
 (ensino) e **umjovemprospero** (finanças). Serve para qualquer narração que tenha uma prova real para mostrar.
@@ -252,11 +254,18 @@ Remotion não tem os filtros do `preparar.py`).
    <voz.wav> <AAAA-MM-DD-tema> --sem-adaptar` (o `--sem-adaptar` cai depois da aprovação, quando existir a
    `assinatura.json`). Confira `src/palavras.json`: número que a transcrição partiu ("1" + ".189") se junta num item só
    (mesmo `start` do primeiro, `end` do último).
-4. **O plano em `src/plano.json`** (e o `plano.md` frase a frase na pasta do vídeo). O molde para enquanto o plano não
-   bater com a fala e diz a palavra que difere. Um tempo é `segundos`, `[índice, "palavra"]` ou `[índice, "palavra",
-   ±segundos]`.
-   - `"fala"`, `"cauda"` (2,6 s: a cama sobe no fim), `"familia"`, `"paleta"`, `"inicial"` (nível das barras no
-     quadro 0, 0,25).
+4. **O dado do vídeo em `src/dados.json`**, com `"fala"` (o texto desta narração), as `fontes` e os `itens`. O
+   `src/dados.json` que veio do molde é o do exemplo (a Bíblia): ele não desenha nada e o checador reprova até ser
+   trocado. Sem dado (modo só materiais sem planilha nem contagem): `"itens": []`.
+5. **O plano no bloco O PLANO de `src/plano.ts`** (e o `plano.md` frase a frase na pasta do vídeo). O vídeo **nasce com
+   o bloco vazio** (`scripts/plano_novo.ts`, aplicado pelo `tools/novo-video.py`): só a narração, a legenda e o fundo.
+   Cada estado entra porque a fala pediu, com uma linha no `plano.md` que diz o nome da peça e a palavra dita entre
+   aspas (`tools/clone.py` cobra). No bloco, string só para texto de tela ou palavra da fala; família, paleta e
+   varredura são as constantes `A`/`B`, `OURO`/`PERGAMINHO`/`MARROM`, `IGUAL`/`VALOR`. O `src/plano.json` é a cópia
+   que o checador grava para o `som.py`: não edite. Um tempo é `segundos`, `[índice, "palavra"]` ou `[índice,
+   "palavra", ±segundos]`; o molde para se a palavra do índice não bate com a fala.
+   - `fala` (`FALA` usa a transcrição), `cauda` (2,6 s: a cama sobe no fim), `familia`, `paleta`, `inicial` (nível das
+     barras no quadro 0, 0,25).
    - `"telas"`: cada uma com `de` e `rotulo`, e `titulo` ("texto com *itálico*", "|" quebra a linha) ou `numeros`
      (`valor`, `inicio`, `de`, `para`, `dito`, `sub`) ou `semana` (`dias`, `valores`, `rotulos`) ou, na B, `ligacao` +
      `frase`. A 1ª tela começa em 0 (o gancho escrito no quadro 0).
@@ -264,25 +273,37 @@ Remotion não tem os filtros do `preparar.py`).
    - `"apagao"`, `"camera"` (`t`, `x`, `zoom`, `dur`), `"marcas"` (`t`, `barra` ou `null`, `nome`, `dur`),
      `"reguas"`, `"divisao"`, `"pilha"`, `"documento"` (B: `arquivo`, `largura`, `altura`, `y`, `credito`, `pontos`,
      `fios`), `"destaques"` (índices das palavras protagonistas na legenda) e `"credito"`.
-5. **Confira:** `node scripts/checar.mjs` (na pasta do vídeo) até `sem problemas`. Ele confere número falado =
+6. **Confira:** `node scripts/checar.mjs` (na pasta do vídeo) até `sem problemas` (ele grava o `src/plano.json`). Confere o dado do vídeo, número falado =
    mostrado, contagem de 1 a 2,5 s, legenda completa (bloco >= 0,4 s, nunca atravessa pontuação), tempo de leitura das
    telas (1 s + 3 palavras/s), zona segura, imagem viva (1,5 s / 1,0 s), apagão entre 55 e 75%, crédito na tela,
    nome do modelo e travessão.
-6. **Quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 5 10 20 30 40` (na pasta do vídeo;
+7. **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até `SEM CLONE` e
+   `.venv/Scripts/python.exe tools/decupar.py oficina/<v> --conferir`; depois a folha lado a lado com a da vitrine
+   (mesmo modelo, outro vídeo; skill `documental-dados`).
+8. **Quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 5 10 20 30 40` (na pasta do vídeo;
    `ESCALA=1` para tamanho cheio).
-7. **Som:** `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo).
-8. **Render:** `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts Documental01 out/so-video.mp4
+9. **Som:** `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo).
+10. **Render:** `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts Documental01 out/so-video.mp4
    --codec=h264 --crf=16 --concurrency=2`.
-9. **Mix:** `QUEM=<nome> sh ../../tools/com-trava.sh sh scripts/mixar.sh out/so-video.mp4 out/final.mp4 public/trilha.wav
+11. **Mix:** `QUEM=<nome> sh ../../tools/com-trava.sh sh scripts/mixar.sh out/so-video.mp4 out/final.mp4 public/trilha.wav
    public/efeitos.wav` (-14 LUFS, -1 dBTP; entrega sozinha no `conteudo/` do perfil).
-10. **Prova:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 documental-dados` (depois da aprovação)
+12. **Prova:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 documental-dados` (depois da aprovação)
     e a folha: `../../.venv/Scripts/python.exe scripts/folhas.py out/final.mp4 [conferencia/pares.json]`.
 
 **Terceiro vídeo, tema chato, sem número forte:** use a família B com a frase-chave por capítulo e os nomes como
 pontos; se nem obra houver, a linha do tempo dos nomes (família A com `valor` = ano) já é prova real. Se não houver
 prova nenhuma, este não é o modelo: use o vetor-minimo (tese de atitude) ou o texto-e-objeto (tipografia).
 
-## 10. O plano da vitrine (para comparar)
+## 10. A vitrine: exemplos do aprovado com o porquê (repertório, não roteiro)
+
+Cada estado abaixo existe porque aquela fala pediu; num vídeo novo ele só volta onde a fala nova tem o mesmo porquê
+(G30, `sistema/JEITO.md`). Os porquês: a varredura no gancho porque a fala nomeia a imagem ("isso é um gráfico"); o
+marcador de Gênesis a Apocalipse porque a fala percorre o eixo; o zoom em Obadias porque o exemplo é pequeno demais para
+ler; a divisão porque a fala separa "no Antigo... no Novo"; a **semana** porque a fala transforma 1.189 em rotina
+("três por dia"); a **pilha** porque a fala soma os evangelhos para comparar com Salmos; o apagão porque "E o livro mais
+longo?" é a pergunta-clímax. O dado (a Bíblia), os títulos, os nomes e o crédito são só deste vídeo. O vídeo novo
+nasce do `scripts/plano_novo.ts`, nunca deste plano; a skill `documental-dados` tem dois exemplos de fala que esta
+vitrine não tem e a prova com a fala do earshot.
 
 Tema da página jovemdevirtude: **a Bíblia em capítulos** (52,6 s, voz Sulafat). Dado conferido em duas fontes,
 contado por código livro a livro: Almeida (`github.com/thiagobodruk/biblia`, `json/aa.json`) e King James

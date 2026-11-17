@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, getStaticFiles, staticFile} from 'remotion';
 import {CENAS, Props, cenaEm, fundoPalco, useT} from './tema';
 import type {Fundo} from './tema';
-import {CENA_COMP, CenaPessoa} from './Cenas';
+import {telaDe} from './Cenas';
 import {Legenda} from './Legenda';
 
 /** voz: a voz no render; previas: as duas prévias do próprio criador na cena das prévias (public/previa1.mp4 e previa2.mp4);
@@ -17,7 +17,7 @@ export const ProvaFerramenta01: React.FC<PropsReel> = ({voz, previas = false, fu
 		throw new Error(`fundo: '${fundo}' precisa de public/pessoa.webm: QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py (ou fundo: 'real', o padrão).`);
 	const {t} = useT();
 	const c = cenaEm(t);
-	const Cena = c.modo === 'pessoa' ? CenaPessoa : CENA_COMP[c.id];
+	const Cena = telaDe(c);
 	return (
 		<Props.Provider value={{previas, fundo}}>
 			<AbsoluteFill style={c.modo === 'palco' ? fundoPalco : {background: '#000'}}>

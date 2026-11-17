@@ -3,6 +3,7 @@ import {AbsoluteFill, Audio, getStaticFiles, staticFile} from 'remotion';
 import {C, DURACAO, E, FPS, T, pare, tw, useT} from './tema';
 import {Texto} from './texto';
 import * as S from './cenas';
+import {TELAS as NOVAS} from './telas';
 
 /**
  * Vitrine no anuncio-neon. Câmera viva e transições do modelo (anuncio-neon.md §6): corte seco com batida de zoom (escuro <-> claro), borrão (a cena incha e borra, a
@@ -13,9 +14,12 @@ export type Props = {previas: boolean; nomesPrevias: [string, string]; musica: b
 const TB = 0.22; // borrão
 const TI = 0.42; // íris
 const CENAS = T.cenas.map((c) => ({...c, de: c.de_q / FPS, ate: c.ate_q / FPS}));
-/* as telas são os exports S<n> de src/cenas.tsx: tela nova = export const S11: React.FC<TelaProps> = ... lá, e a cena "S11" no src/tempos.json */
+/* as telas da casa são os exports S<n> de src/cenas.tsx; as novas deste vídeo moram em src/telas/ (registradas em
+ * src/telas/index.ts) e entram no plano como livre(comp='Nome', ...) */
 const TELAS = Object.fromEntries(Object.entries(S).filter(([k]) => /^S\d+$/.test(k))) as Record<string, React.FC<S.TelaProps>>;
-for (const c of T.cenas) if (!TELAS[c.id]) pare(`a cena "${c.id}" de src/tempos.json não está desenhada em src/cenas.tsx. Use uma de ${Object.keys(TELAS).join(', ')} ou desenhe a nova lá (export const ${c.id}).`);
+for (const c of T.cenas)
+	if (!TELAS[c.id] && !NOVAS[c.id])
+		pare(`a cena "${c.id}" do plano não é uma tela da casa (${Object.keys(TELAS).join(', ')}) nem uma tela nova registrada em src/telas/index.ts. Desenhe src/telas/${c.id}.tsx com o kit de src/kit.tsx e registre lá.`);
 /* som e prévias ligados pedem os arquivos: para logo, dizendo como fazer */
 const ARQUIVOS = new Set(getStaticFiles().map((a) => a.name.replace(/\\/g, '/')));
 const COMO: Record<string, string> = {
@@ -41,7 +45,8 @@ const Camera: React.FC<{c: Cena; children: React.ReactNode}> = ({c, children}) =
 
 const Quadro: React.FC<{c: Cena; p: Props}> = ({c, p}) => {
 	const Tela = TELAS[c.id];
-	const vis = <Tela previas={p.previas} nomes={p.nomesPrevias} />;
+	const Nova = Tela ? null : NOVAS[c.id];
+	const vis = Nova ? <Nova c={c} /> : <Tela previas={p.previas} nomes={p.nomesPrevias} />;
 	return (
 		<Camera c={c}>
 			{vis}
@@ -55,6 +60,13 @@ export const VitrineAnuncioMotion01: React.FC<Props> = (p) => {
 	if (p.efeitos) precisa('efeitos.wav');
 	if (p.previas && T.previas) (precisa('previa1.mp4'), precisa('previa2.mp4'));
 	const {t} = useT();
+	/* o começo vazio (scripts/plano_novo.py): sem cenas, o vídeo é preto com a voz até o plano existir */
+	if (!CENAS.length)
+		return (
+			<AbsoluteFill style={{background: C.preto}}>
+				<Audio src={staticFile('voz.wav')} />
+			</AbsoluteFill>
+		);
 	let i = CENAS.findIndex((c) => t >= c.de && t < c.ate);
 	if (i < 0) i = CENAS.length - 1;
 	const c = CENAS[i];

@@ -12,8 +12,9 @@ const {fontFamily: MONO} = loadMono('normal', {weights: ['500'], subsets: ['lati
 export type Chamada = {valor: string; legenda: string; lado: 'esq' | 'dir'; y: number};
 
 export type Cena29Props = {
-  nome?: string;
-  chamadas?: Chamada[]; // até 4; y em px do palco (de -260 topo do produto a 170 base)
+  nome: string; // o nome do produto como foi dito
+  chamadas: Chamada[]; // 1 a 4; y em px do palco (de -260 topo do produto a 170 base)
+  inicios?: number[]; // quadro em que cada chamada salta (padrão 30 + i * 10, escalado pela duração)
   corCorpo?: string;
   corMetal?: string;
   width?: number;
@@ -120,13 +121,9 @@ const Produto: React.FC<{rotY: number; corCorpo: string; corMetal: string; dim: 
 };
 
 export const Cena29: React.FC<Cena29Props> = ({
-  nome = 'Eco Um',
-  chamadas = [
-    {valor: 'IP67', legenda: 'À PROVA D’ÁGUA', lado: 'esq', y: -280},
-    {valor: '360°', legenda: 'SOM', lado: 'dir', y: -190},
-    {valor: '40 h', legenda: 'BATERIA', lado: 'esq', y: -60},
-    {valor: '480 g', legenda: 'PESO', lado: 'dir', y: 80},
-  ],
+  nome,
+  chamadas,
+  inicios,
   corCorpo = '#353940',
   corMetal = '#8A8F98',
   width = 1080,
@@ -143,7 +140,7 @@ export const Cena29: React.FC<Cena29Props> = ({
   const zoom = interpolate(frame, [0, t(84)], [-120, 0], {extrapolateRight: 'clamp', easing: Easing.bezier(0.45, 0, 0.2, 1)});
 
   const callout = (c: Chamada, i: number) => {
-    const t0 = t(30 + i * 10);
+    const t0 = inicios?.[i] ?? t(30 + i * 10);
     const pop = spring({frame: frame - t0, fps, config: {damping: 12, stiffness: 260}});
     const linha = interpolate(frame, [t0 + 2, t0 + 7], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
     const val = spring({frame: frame - t0 - 5, fps, config: {damping: 11, stiffness: 200}});

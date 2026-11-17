@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py. O corte-palestra não tem telas da casa nem texto fixo: na tela só a fala (a legenda e a palavra em serifa), e a contenção é a forma do modelo. O que o clone.py confere aqui é o bloco O PLANO de src/Corte.tsx (páginas e destaques da vitrine que a fala nova não diz, plano igual ao da vitrine).",
+ "telas": [],
+ "fixos": {}
+}

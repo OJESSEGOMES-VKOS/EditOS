@@ -11,8 +11,13 @@ const {fontFamily: MONO} = loadMono('normal', {weights: ['500'], subsets: ['lati
 export type Cena18Props = {
   width?: number;
   height?: number;
+  // textos da janela de exemplo: sem padrão (os da demo ficam no demo.tsx)
+  janela?: React.ReactNode; // a tela recriada fiel do dono (G25), desenhada em 1000x1100; se vier, substitui a janela de exemplo
+  alvo?: {x: number; y: number; w: number; h: number}; // o botão que a fala manda clicar, em unidades da janela
   projeto?: string;
   status?: string;
+  pessoas?: string[]; // iniciais na barra de título (vazio: nenhuma)
+  rotuloQualidade?: string;
   compartilhar?: string;
   dialogo?: string;
   abas?: string[];
@@ -23,7 +28,7 @@ export type Cena18Props = {
   cancelar?: string;
   botao?: string;
   passoNumero?: string;
-  passoTexto?: string;
+  passoTexto?: string; // vazio: sem pílula do passo
   legendaPrevia?: string;
   azul?: string;
 };
@@ -54,20 +59,24 @@ const Onda: React.FC<{w: number; seed: number}> = ({w, seed}) => {
 export const Cena18: React.FC<Cena18Props> = ({
   width = 1080,
   height = 1350,
-  projeto = 'Resumo do fim de semana v3',
-  status = 'Salvo · 9:16 · 00:42',
-  compartilhar = 'Compartilhar',
-  dialogo = 'Exportar',
-  abas = ['Vídeo', 'GIF', 'Áudio'],
-  campos = [['Formato', 'MP4 · H.264'], ['Resolução', '1080 × 1920'], ['Quadros', '30 fps']],
-  qualidade = 'Alta',
-  tamanhoRotulo = 'Tamanho estimado',
-  tamanho = '148 MB · 0:42',
-  cancelar = 'Cancelar',
-  botao = 'Exportar',
-  passoNumero = '3',
-  passoTexto = 'Clique em Exportar',
-  legendaPrevia = 'dia um.',
+  janela,
+  alvo = BTN,
+  projeto = '',
+  status = '',
+  pessoas = [],
+  rotuloQualidade = '',
+  compartilhar = '',
+  dialogo = '',
+  abas = [],
+  campos = [],
+  qualidade = '',
+  tamanhoRotulo = '',
+  tamanho = '',
+  cancelar = '',
+  botao = '',
+  passoNumero = '',
+  passoTexto = '',
+  legendaPrevia = '',
   azul = '#3D7BFA',
 }) => {
   const frame = useCurrentFrame();
@@ -77,7 +86,7 @@ export const Cena18: React.FC<Cena18Props> = ({
 
   // cursor conduz, câmera segue um tempo depois numa mola só, sem quique
   const cur = interpolate(frame, [6, 38], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.4, 0, 0.2, 1)});
-  const p0 = {x: 905, y: 60}, pc = {x: 640, y: 300}, p1 = {x: BTN.x + 74, y: BTN.y + 30};
+  const p0 = {x: 905, y: 60}, pc = {x: 640, y: 300}, p1 = {x: alvo.x + alvo.w / 2 + 10, y: alvo.y + alvo.h / 2 + 7};
   const bez = (t: number) => ({x: (1 - t) ** 2 * p0.x + 2 * (1 - t) * t * pc.x + t * t * p1.x, y: (1 - t) ** 2 * p0.y + 2 * (1 - t) * t * pc.y + t * t * p1.y});
   const c = bez(cur);
   const cAnt = bez(interpolate(frame - 1, [6, 38], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.4, 0, 0.2, 1)}));
@@ -86,8 +95,10 @@ export const Cena18: React.FC<Cena18Props> = ({
   const z = spring({frame: frame - 15, fps, config: {damping: 200, stiffness: 38, mass: 1}});
   const zAnt = spring({frame: frame - 16, fps, config: {damping: 200, stiffness: 38, mass: 1}});
   const esc = interpolate(z, [0, 1], [0.86, 1.32]);
-  const left = interpolate(z, [0, 1], [540 - (WW * 0.86) / 2, 1012 - WW * 1.32]);
-  const top = interpolate(z, [0, 1], [640 - (WH * 0.86) / 2, 124]);
+  // o zoom pousa com o alvo no terço de baixo à direita (onde o botão da demo pousava)
+  const dx = 1.32 * (BTN.x + BTN.w / 2 - (alvo.x + alvo.w / 2)), dy = 1.32 * (BTN.y + BTN.h / 2 - (alvo.y + alvo.h / 2));
+  const left = interpolate(z, [0, 1], [540 - (WW * 0.86) / 2, 1012 - WW * 1.32 + dx]);
+  const top = interpolate(z, [0, 1], [640 - (WH * 0.86) / 2, 124 + dy]);
   const borrao = Math.min(6, Math.abs(z - zAnt) * 160);
 
   // clique
@@ -114,6 +125,7 @@ export const Cena18: React.FC<Cena18Props> = ({
         {/* a janela do app */}
         <div style={{position: 'absolute', left, top, width: WW, height: WH, transform: `scale(${esc})`, transformOrigin: '0 0', filter: borrao > 0.3 ? `blur(${borrao}px)` : undefined}}>
           <div style={{position: 'absolute', inset: 0, background: '#1B1C20', borderRadius: 18, overflow: 'hidden', boxShadow: '0 50px 90px rgba(20,50,45,0.45), 0 12px 30px rgba(20,50,45,0.3)'}}>
+            {janela ? janela : (<>
             {/* barra de título */}
             <div style={{height: 76, background: '#212227', borderBottom: `1px solid ${HAIR}`, display: 'flex', alignItems: 'center', padding: '0 22px', gap: 16}}>
               {['#FF5F57', '#FEBC2E', '#28C840'].map((cc) => <span key={cc} style={{width: 13, height: 13, borderRadius: 7, background: cc}} />)}
@@ -124,9 +136,9 @@ export const Cena18: React.FC<Cena18Props> = ({
                 <div style={{color: LBL, fontWeight: 500, fontSize: 13, marginTop: 2}}><span style={{color: '#3FBF7F'}}>●</span> {status}</div>
               </div>
               <div style={{flex: 1}} />
-              {[['MK', '#E0806E'], ['JR', '#6EA7E0']].map(([t, cc], i) => <span key={t} style={{width: 32, height: 32, borderRadius: 16, background: cc, color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: i ? -10 : 0, border: '2px solid #212227'}}>{t}</span>)}
-              <span style={{color: LBL, fontSize: 13, fontWeight: 600}}>+2</span>
-              <span style={{background: '#2C2E34', border: `1px solid ${HAIR}`, color: TXT, fontSize: 18, fontWeight: 600, padding: '10px 18px', borderRadius: 9, marginLeft: 10}}>⇪ {compartilhar}</span>
+              {pessoas.filter((t) => !t.startsWith('+')).map((t, i) => [t, ['#E0806E', '#6EA7E0', '#C9A35A'][i % 3]]).map(([t, cc], i) => <span key={t} style={{width: 32, height: 32, borderRadius: 16, background: cc, color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: i ? -10 : 0, border: '2px solid #212227'}}>{t}</span>)}
+              {pessoas.filter((t) => t.startsWith('+')).map((t) => <span key={t} style={{color: LBL, fontSize: 13, fontWeight: 600}}>{t}</span>)}
+              {compartilhar && <span style={{background: '#2C2E34', border: `1px solid ${HAIR}`, color: TXT, fontSize: 18, fontWeight: 600, padding: '10px 18px', borderRadius: 9, marginLeft: 10}}>⇪ {compartilhar}</span>}
             </div>
             {/* trilho lateral */}
             <div style={{position: 'absolute', left: 0, top: 77, width: 58, bottom: 300, borderRight: `1px solid ${HAIR}`, background: '#1E1F24'}}>
@@ -147,7 +159,7 @@ export const Cena18: React.FC<Cena18Props> = ({
                 </div>
               ))}
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 34, fontSize: 19}}>
-                <span style={{color: LBL, fontWeight: 500}}>Qualidade</span>
+                <span style={{color: LBL, fontWeight: 500}}>{rotuloQualidade}</span>
                 <span style={{display: 'flex', alignItems: 'center', gap: 16}}>
                   <span style={{position: 'relative', width: 150, height: 5, borderRadius: 3, background: '#44464d'}}><span style={{position: 'absolute', left: 0, top: 0, bottom: 0, width: '78%', background: azul, borderRadius: 3}} /><span style={{position: 'absolute', left: '78%', top: -7, width: 18, height: 18, borderRadius: 9, background: '#fff', marginLeft: -9}} /></span>
                   <span style={{color: TXT, fontWeight: 600}}>{qualidade}</span>
@@ -176,6 +188,7 @@ export const Cena18: React.FC<Cena18Props> = ({
                 <div key={'b' + i} style={{position: 'absolute', left: x, top: 186, width: w - 8, height: 52, borderRadius: 6, background: '#1f4f43', overflow: 'hidden', padding: '6px 4px', boxSizing: 'border-box'}}><Onda w={w - 16} seed={i * 5 + 2} /></div>
               ))}
             </div>
+            </>)}
             {/* clique: anel e ondulação */}
             {frame >= qClique && (
               <>
@@ -190,7 +203,7 @@ export const Cena18: React.FC<Cena18Props> = ({
           </svg>
         </div>
         {/* pílula do passo */}
-        {pil > 0.01 && (
+        {passoTexto !== '' && pil > 0.01 && (
           <div style={{position: 'absolute', left: 540, top: 1150, transform: `translate(-50%, -50%) scale(${pil})`, display: 'flex', alignItems: 'center', gap: 14, background: '#fff', borderRadius: 40, padding: '12px 30px 12px 12px', boxShadow: '0 10px 30px rgba(0,0,0,0.25)', whiteSpace: 'nowrap'}}>
             <span style={{width: 40, height: 40, borderRadius: 20, background: '#121417', color: '#fff', fontWeight: 700, fontSize: 21, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${num})`}}>{passoNumero}</span>
             <span style={{fontWeight: 600, fontSize: 30, color: '#121417'}}>{passoTexto}</span>

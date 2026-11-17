@@ -55,12 +55,20 @@ PS.forEach((p, i) => {
 acusa(`de ${PS.length} palavras com buraco`, buracos, 'ponha a palavra numa página de PEDACOS');
 
 const ex = exibicoes();
-const curtos = [];
-for (const e of ex) {
-	if (e.ate - e.de < 1.5) curtos.push(`"${e.nome}" ${f2(e.ate - e.de)} s`);
-	for (const i of e.is) if (e.ate - PS[i].de < 0.4) curtos.push(`"${PS[i].texto}" em "${e.nome}" só ${f2(e.ate - PS[i].de)} s`);
-}
-acusa('páginas ou palavras abaixo do tempo de leitura (página 1,5 s, palavra 0,4 s)', curtos, 'junte a página curta com a vizinha do mesmo trecho, ou segure-a (3º campo da página)');
+const curtos = [], semSaida = [];
+ex.forEach((e, j) => {
+	const dur = e.ate - e.de, ant = ex[j - 1];
+	// fala rápida (piloto rosto-telas, 2026-11-17): o fim de um trecho que não cabe junto com a página anterior do MESMO
+	// trecho em 2 linhas (G12) e não tem outra divisão vai a aviso de 1,2 a 1,5 s (G9: a legenda fica o tempo da fala)
+	const preso = dur >= 1.2 && ant && !/[.?!:;…]["”»)]*$/.test(ant.texto) && (ant.texto + ' ' + e.texto).length > 52;
+	if (dur < 1.5) (preso ? semSaida : curtos).push(`"${e.nome}" ${f2(dur)} s`);
+	e.is.forEach((i, k) => {
+		const min = k === e.is.length - 1 && dur >= 1.5 ? 0.25 : 0.4; // a última de uma página que já ficou 1,5 s não é palavra solta (como no rosto-telas)
+		if (e.ate - PS[i].de < min) curtos.push(`"${PS[i].texto}" em "${e.nome}" só ${f2(e.ate - PS[i].de)} s (mín. ${min})`);
+	});
+});
+acusa('páginas ou palavras abaixo do tempo de leitura (página 1,5 s, palavra 0,4 s; a última de página de 1,5 s, 0,25 s)', curtos, 'junte a página curta com a vizinha do mesmo trecho, ou segure-a (3º campo da página)');
+if (semSaida.length) console.log(`aviso: ${semSaida.length} página(s) de 1,2 a 1,5 s no fim de um trecho que não cabe em 2 linhas junto com a anterior (fala rápida; confira nos quadros se lê): ${semSaida.join(', ')}`);
 
 const vezes = PS.map(() => 0);
 ex.forEach((e) => e.is.forEach((i) => vezes[i]++));
@@ -74,9 +82,15 @@ for (const e of ex) {
 	const ws = e.texto.split(' ');
 	ws.slice(0, -1).forEach((w, k) => {
 		const p = /[.,?!:;]["”»)]*$/.exec(w);
+		// G9 (dono, 2026-11-07): subtrecho (até a vírgula) curto demais para ler sozinho junta com o vizinho do MESMO
+		// trecho; a vírgula dentro da página só vale quando um dos dois lados, separado, ficaria abaixo de 1,5 s
+		if (p && p[0].startsWith(',')) {
+			const corte = PS[e.is[k + 1]].de - 1 / FPS;
+			if (corte - e.de < 1.5 || e.ate - corte < 1.5) return;
+		}
 		// G12 (dono, 2026-11-05): um bloco por vez, também no gancho. A pergunta e a resposta dela entram em páginas
 		// seguidas (a resposta substitui a pergunta), nunca empilhadas na mesma página
-		if (p) forma.push(`"${e.nome}": "${w}" fecha um trecho e "${ws[k + 1]}" começa outro na mesma página (G11/G14)`);
+		if (p) forma.push(`"${e.nome}": "${w}" fecha um ${p[0].startsWith(',') ? 'subtrecho que já se lê sozinho' : 'trecho'} e "${ws[k + 1]}" começa outro na mesma página (G11/G14)`);
 	});
 }
 acusa('páginas fora da forma', forma, 'quebre a página no ponto/vírgula; legenda até 2 linhas, bloco até 4');

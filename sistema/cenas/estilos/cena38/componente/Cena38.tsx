@@ -8,7 +8,7 @@ import {loadFont} from '@remotion/google-fonts/Nunito';
 const {fontFamily} = loadFont('normal', {weights: ['800'], subsets: ['latin', 'latin-ext']});
 
 export type Cena38Props = {
-  rotulo?: string; // o único rótulo (pílula)
+  rotulo?: string; // o único rótulo (pílula), a palavra dita; vazio = sem pílula
   corCristal?: [string, string, string]; // aceso, meio, sombra
   corInterior?: [string, string]; // laranja, amarelo
   corEspaco?: [string, string];
@@ -31,7 +31,7 @@ const STARS = Array.from({length: 90}, (_, i) => ({x: rnd(i) * W, y: rnd(i + 99)
 const DOTS = Array.from({length: 160}, (_, i) => ({x: rnd(i + 500) * W, y: 560 + rnd(i + 900) * 790, r: 1 + rnd(i + 40) * 1.8}));
 
 export const Cena38: React.FC<Cena38Props> = ({
-  rotulo = 'Núcleo da IA',
+  rotulo = '',
   corCristal = ['#FF5FB2', '#E2369A', '#6F1A7E'],
   corInterior = ['#F36A23', '#FACB22'],
   corEspaco = ['#140C40', '#2A1E78'],
@@ -256,7 +256,7 @@ export const Cena38: React.FC<Cena38Props> = ({
           </g>
 
           {/* pílula do rótulo */}
-          <g transform={`translate(${410} ${236}) scale(${pill})`} opacity={pill > 0.02 ? 1 : 0}>
+          <g transform={`translate(${410} ${236}) scale(${pill})`} opacity={pill > 0.02 && rotulo ? 1 : 0}>
             <rect x={-20} y={-38} width={rotulo.length * 27 + 90} height={76} rx={38} fill="#1A1150" />
             <circle cx={22} cy={0} r={11} fill="#FACB22" />
             <text x={46} y={16} fontFamily={fontFamily} fontWeight={800} fontSize={46} fill="#FFFFFF">{rotulo}</text>

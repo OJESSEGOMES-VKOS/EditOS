@@ -1,7 +1,8 @@
 import React from 'react';
-import {C, DISPLAY, DIVISA, E, MIN_PAGINA, NOVO, P, T, blocoDe, noCelular, noEditor, pDividido, tw, usePrevias, useT} from './tema';
+import {C, DISPLAY, DIVISA, E, LIVRES, MIN_PAGINA, NOVO, P, T, blocoDe, naLivreCheia, noCelular, noEditor, pDividido, tw, usePrevias, useT} from './tema';
 import {PAGINAS as PAG_ED} from './Editor';
 import {PAG_CEL} from './Cenas';
+import {PAG_LIVRES} from './Livres';
 import {queixoTela} from './Rosto';
 
 /**
@@ -18,6 +19,7 @@ type Pagina = {pal: Pal[]; de: number; ate: number};
 
 export {MIN_PAGINA}; // a chave do vídeo novo mora em src/tema.ts
 const MAX_LETRAS = 40; // ~2 linhas na caixa da legenda
+const MAX_PILULA = 54; // 2 linhas na pílula: texto de 758 px a 56 px, Geist 800 medida no render (~0,47 em por letra; conta 0,5)
 const LER_PALAVRA = 0.4; // cada palavra fica pelo menos isso depois de aparecer...
 const LER_ULTIMA = 0.25; // ...menos a última de uma página que já ficou MIN_PAGINA na tela (não é palavra solta)
 
@@ -27,6 +29,8 @@ type Zona = {de: number; ate: number; ids: Set<number>};
 const ZONAS: Zona[] = [
 	[T.editor, PAG_ED],
 	[T.celular, PAG_CEL],
+	// as telas livres cheias: o título é o texto dito, como no editor (entra no `de`, devolve no `sai`)
+	...PAG_LIVRES.filter((x) => x.pags.length).map((x) => [{de: x.L.de, devolve: x.L.sai}, x.pags]),
 ].flatMap(([s, pags]) => {
 	const sc = s as {de: number; devolve: number} | null;
 	const pg = pags as {pal: Pal[]; de: number}[];
@@ -38,7 +42,7 @@ const naZona = (t: number) => ZONAS.some((z) => t >= z.de && t < z.ate);
 /** vídeo novo: os instantes em que a página tem de quebrar (cortes de enquadramento, entrada e saída do dividido) */
 const QUEBRAS = [
 	...T.blocos.slice(1),
-	...[T.modelos, T.previas, T.prompt].flatMap((s) => (s ? [s.de, s.sai] : [])),
+	...[T.modelos, T.previas, T.prompt, ...LIVRES.filter((L) => L.modo === 'dividido')].flatMap((s) => (s ? [s.de, s.sai] : [])),
 	...ZONAS.flatMap((z) => [z.de, z.ate]),
 ].sort((x, y) => x - y);
 
@@ -62,12 +66,14 @@ const otimo = (ps: Pal[]): Pagina[] => {
 		const seg = ps[ps.indexOf(ult) + 1];
 		const duro = Math.min(seg ? seg.de : Infinity, ...ZONAS.filter((z) => z.de > ult.de).map((z) => z.de), Math.max(P.duracao, ult.ate));
 		const q = QUEBRAS.find((x) => x > ult.de) ?? Infinity;
+		// trecho todo dentro de uma tela dividida: a página mora na pílula, que cabe mais letras em 2 linhas
+		const maxLetras = pDividido((tr[0].de + ult.ate) / 2, false) > 0.5 ? MAX_PILULA : MAX_LETRAS;
 		const fimTrecho = (a: number) => Math.min(duro, Math.max(Math.min(q, ult.ate + 1), tr[a].de + MIN_PAGINA, ult.de + LER_PALAVRA));
 		const fimDe = (a: number, b: number) => (b + 1 < n ? tr[b + 1].de : fimTrecho(a));
 		const custo = (a: number, b: number) => {
 			const fim = fimDe(a, b);
 			const dur = fim - tr[a].de;
-			let c = tr.slice(a, b + 1).map((p) => p.texto).join(' ').length > MAX_LETRAS ? 1000 : 0;
+			let c = tr.slice(a, b + 1).map((p) => p.texto).join(' ').length > maxLetras ? 1000 : 0;
 			if (dur < MIN_PAGINA) c += 10 + (MIN_PAGINA - dur) * 20;
 			for (let i = a; i <= b; i++) {
 				const fica = fim - tr[i].de;
@@ -115,7 +121,7 @@ export const paginar = (ps: Pal[], max = 3): Pagina[] => {
 export const PAGINAS = paginar(P.palavras);
 /** a página e o lugar da legenda no tempo t (null: sem legenda; no editor e no celular o título no topo é o texto dito) */
 export const legendaEm = (t: number, previas: boolean) => {
-	if (NOVO ? naZona(t) : noEditor(t) || noCelular(t)) return null;
+	if (NOVO ? naZona(t) : noEditor(t) || noCelular(t) || naLivreCheia(t)) return null;
 	const i = PAGINAS.findIndex((g) => t >= g.de && t < g.ate);
 	if (i < 0) return null;
 	// vídeo novo: o lugar é da página inteira (decidido no meio dela), não pula de lugar no meio da leitura

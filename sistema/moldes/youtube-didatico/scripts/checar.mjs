@@ -7,7 +7,12 @@
 // - conta no gelo (LISTA): cada item >= 1 s + 3 palavras/s depois de entrar, a conta inteira >= 1 s + 3 palavras/s, 1 a 5
 //   itens na ordem da fala, e o rosto no cartão (POSE.cartao) durante a conta;
 // - nada atravessa um corte seco (chave de câmera sem transição ou troca da montagem);
+// - telas livres (LIVRES): registradas em src/telas/index.ts, de < ate, o rosto no cartão (POSE.cartao) durante a tela,
+//   nenhuma outra tela de gelo por cima, o texto delas >= 1 s + 3 palavras/s, nada atravessa corte, e nunca o mesmo
+//   texto de FRASES, TITULOS ou do pedido na mesma hora (G26);
+// - a soma das telas (grade, conta, livres, reels, montagem) fica em até 1/3 do vídeo (sem prévias): a pessoa é a base;
 // - a duração cobre a fala.
+// Também grava src/tempos.json com as telas livres do plano (o tools/clone.py lê de lá quais telas livres o vídeo usa).
 // Sem legenda corrida neste modelo; as posições são as do desenho (modelos/youtube-didatico/youtube-didatico.md, seção 5), por isso a zona segura não é medida aqui.
 // No fim, imprime o comando da trilha com os toques deste plano.
 import {build} from 'esbuild';
@@ -35,7 +40,7 @@ try {
 }
 if (!P) process.exit(1);
 
-const {LISTA = null, ATRAS, FRASES, TITULOS, GRADE, GRADES, MONTAGEM, REEL, ESTE, PREVIAS, CTA, DURACAO_Q, PS, chaves} = P;
+const {LISTA = null, LIVRES = [], ATRAS, FRASES, TITULOS, GRADE, GRADES, MONTAGEM, REEL, ESTE, PREVIAS, CTA, DURACAO_Q, PS, chaves} = P;
 const FPS = 30;
 const fim = DURACAO_Q / FPS;
 const erros = [];
@@ -99,10 +104,58 @@ const conferir = (previas) => {
 			if (!ch || ch[1].w !== 370) break;
 		}
 	}
+	// telas livres: a tela de gelo inventada para a fala nova
+	const reg = fs.existsSync('src/telas/index.ts') ? new Set(fs.readFileSync('src/telas/index.ts', 'utf-8').replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '').match(/\b[A-Z]\w*\b/g) ?? []) : new Set();
+	const gelo = [...GRADES.map((g) => ['a grade', g.de, g.ate]), ...(LISTA ? [['a conta', LISTA.de, LISTA.ate]] : []), ...(REEL ? [['a tela de reels', REEL.de, REEL.ate]] : []), ...(previas && PREVIAS ? [['as prévias', PREVIAS.de, PREVIAS.ate]] : [])];
+	const textosNa = (de, ate) => [
+		...FRASES.filter((f) => f.de < ate && de < f.ate).flatMap((f) => [...f.linha1, ...f.linha2].map((p) => p[0])),
+		...TITULOS.filter((d) => d.de < ate && de < d.ate).flatMap((d) => d.linhas),
+		...(CTA && CTA.de < ate ? [CTA.antes, CTA.chave[0], CTA.depois[0]] : []),
+	].join(' ');
+	const lim = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9%]+/g, ' ').trim();
+	LIVRES.forEach((L, k) => {
+		const nome = `livre ${k} (${L.comp})`;
+		if (!reg.has(L.comp)) erros.push(`${nome}: a tela "${L.comp}" não está registrada em src/telas/index.ts`);
+		if (!(L.de < L.ate)) { erros.push(`${nome}: o "de" (${L.de}) tem de vir antes do "ate" (${L.ate})`); return; }
+		for (const [o, a, b] of gelo) if (a < L.ate && L.de < b) erros.push(`${modo}: ${nome} (${L.de.toFixed(2)}-${L.ate.toFixed(2)} s) cai em cima d${o.slice(0, 1) === 'a' ? '' : 'e '}${o} (${a.toFixed(2)}-${b.toFixed(2)} s): uma tela de gelo por vez`);
+		for (const o of LIVRES.slice(k + 1)) if (o.de < L.ate && L.de < o.ate) erros.push(`${nome} e a livre ${o.comp} ficam na tela ao mesmo tempo: uma tela de gelo por vez`);
+		for (const x of [L.de + 0.4, (L.de + L.ate) / 2, L.ate - 0.05]) {
+			const ch = chaves(previas).filter(([t]) => t <= x).pop();
+			if (!ch || ch[1].w !== 370) { erros.push(`${modo}: ${nome} (${L.de.toFixed(2)}-${L.ate.toFixed(2)} s) pede o rosto no cartão: uma chave [${L.de.toFixed(2)}, POSE.cartao, 0.38, true] e nenhuma outra pose até ${L.ate.toFixed(2)} s`); break; }
+		}
+		const txt = Object.values(L.textos ?? {}).join(' ').trim();
+		const ini = Math.min(L.de, ...Object.values(L.em ?? {}).filter((v) => typeof v === 'number' && v >= L.de));
+		if (txt) {
+			const precisa = Math.max(1.33, 1 + n(txt) / 3);
+			const ok = L.ate - ini >= precisa - 0.01;
+			linha(`${nome} "${txt}"`, ini, L.ate, precisa, ok);
+			if (!ok) erros.push(`${modo}: ${nome}: o texto "${txt}" fica ${(L.ate - ini).toFixed(2)} s (precisa de ${precisa.toFixed(2)} s): segure a tela até uma palavra depois`);
+			// cada texto que entra na palavra dele (em.<mesma chave>) fica pelo menos 1 s + 3 palavras/s (rótulo: 1,33 s)
+			for (const [k2, x] of Object.entries(L.textos ?? {})) {
+				const t0 = L.em?.[k2];
+				if (typeof t0 !== 'number' || !x.trim()) continue;
+				const p2 = 1 + n(x) / 3;
+				if (L.ate - t0 < p2 - 0.01) erros.push(`${modo}: ${nome}: "${x}" entra em ${t0.toFixed(2)} s e fica só ${(L.ate - t0).toFixed(2)} s (precisa de ${p2.toFixed(2)} s): segure a tela ou junte com o texto de antes`);
+			}
+			const outro = lim(textosNa(L.de, L.ate));
+			const repete = Object.values(L.textos ?? {}).filter((x) => lim(x).length > 2 && ` ${outro} `.includes(` ${lim(x)} `));
+			if (repete.length) erros.push(`${nome} escreve ${repete.map((x) => `"${x}"`).join(', ')} e a frase, o título ou o pedido mostram o mesmo na mesma hora (G26)`);
+		} else linha(nome, L.de, L.ate, 0, true);
+		for (const [nm, v] of Object.entries(L.em ?? {})) if (typeof v === 'number' && (v < L.de - 0.01 || v >= L.ate)) erros.push(`${nome}: em.${nm} (${v.toFixed(2)} s) fora da tela (${L.de.toFixed(2)}-${L.ate.toFixed(2)} s)`);
+		const c = cortes.filter((x) => L.de < x && x < L.ate - 1e-6);
+		if (c.length) erros.push(`${modo}: ${nome} atravessa o corte seco em ${c.map((x) => x.toFixed(2)).join(', ')} s`);
+	});
+	if (!previas) {
+		const telas = [...GRADES.map((g) => g.ate - g.de), ...(LISTA ? [LISTA.ate - LISTA.de] : []), ...(REEL ? [REEL.ate - REEL.de] : []), ...LIVRES.map((L) => L.ate - L.de), ...(MONTAGEM ? [MONTAGEM.planos[MONTAGEM.planos.length - 1][1] - MONTAGEM.planos[0][0]] : [])].reduce((s, x) => s + x, 0);
+		console.log(`  telas (grade, conta, livres, reels, montagem): ${telas.toFixed(1)} s de ${fim.toFixed(1)} s (${Math.round((100 * telas) / fim)}%; até 33%)`);
+		if (telas > fim / 3 + 0.05) erros.push(`as telas somam ${Math.round((100 * telas) / fim)}% do vídeo (até 1/3): a pessoa é a base; tela só onde a fala precisa da coisa para ser entendida`);
+	}
 };
 conferir(false);
 if (PREVIAS) conferir(true);
 const ultima = PS[PS.length - 1].end;
+// para o tools/clone.py: quais telas livres o plano usa (o bloco do plano é TypeScript; o clone.py lê as livres daqui)
+fs.writeFileSync('src/tempos.json', JSON.stringify({_leia: 'Gravado por scripts/checar.mjs: as telas livres do plano, para o tools/clone.py. Não editar à mão.', livres: LIVRES.map((L) => ({comp: L.comp, de: L.de, ate: L.ate}))}, null, 1) + '\n');
 if (fim < ultima) erros.push(`a duração (${fim.toFixed(2)} s) corta a fala, que acaba em ${ultima.toFixed(2)} s`);
 
 console.log(erros.length ? 'PROBLEMAS:\n  ' + erros.join('\n  ') : 'sem problemas');

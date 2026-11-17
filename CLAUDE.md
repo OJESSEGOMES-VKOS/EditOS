@@ -7,6 +7,23 @@ com a gravação e o modelo segue o passo a passo abaixo. O `LEIA.md` tem o mapa
 
 Você edita vídeos em modelos de edição, com Remotion, dentro desta pasta.
 
+## Cada modelo, estilo de cena e animação é uma skill (o jeito, nunca o clone)
+O EditOS é o sistema; cada capacidade de criação é uma skill em `.claude/skills/<id>/SKILL.md`, todas pelo método de
+`sistema/JEITO.md`: a skill ensina a **personalidade** (o que faz o vídeo ser daquele modelo ou estilo, com o porquê),
+as **peças** em código e como **inventar** a tela, a cena ou o desenho que a fala nova pede. O vídeo de exemplo mostra
+o jeito; ele nunca é o roteiro, a sequência ou o catálogo de telas do vídeo novo. Pedido num modelo, num estilo ou numa
+animação: abra a skill dele antes de tudo.
+- **Modelos de edição** (gravação → vídeo): a skill tem o nome do modelo (`rosto-telas`, `youtube-didatico`...). O
+  vídeo novo nasce com o plano vazio (`scripts/plano_novo.*` do molde) e cada tela entra porque a fala pediu.
+- **Estilos de cena** (`cena01` a `cena46`): a skill `cenaNN`; a ficha do estilo diz a personalidade e como variar.
+- **Animações** (ideia → vídeo animado, 2D, 3D leve e 3D Blender): a skill `anim-<id>`, o motor em `sistema/animacoes/`
+  (`sistema/animacoes/LEIA.md` e o catálogo `sistema/animacoes/estilos/INDICE.md`).
+- **3D Blender**: as skills `estudio-3d` (filme 3D comercial de produto, app ou marca), `3d-como-funciona` (explicativo
+  de mecanismo) e `low-poly-toon`. Precisa do Blender 5.2 ou mais novo, achado por `sistema/tools/blender.py`; os
+  modelos 3D gratuitos (CC0) se baixam com `sistema/tools/baixar-assets-3d.py`.
+- **Antes de todo render, o teste do clone** (`JEITO.md` §5): `tools/clone.py oficina/<pasta>` sai `SEM CLONE`, e a
+  folha lado a lado com o exemplo mostra o mesmo modelo e outro vídeo.
+
 ## Onde fica cada coisa
 - `<Perfil>/` (ex.: `Ana/`): a pasta de quem usa. `perfil.md` (nome e @), `materiais/` (logo, cores, prints de
   resultado, gravações: o material oficial que o vídeo pode usar) e `conteudo/` (os vídeos prontos: uma pasta por
@@ -80,14 +97,15 @@ mesmo porquê se repete. Tratamento de cor, fundo, som e música só com ordem e
 casa, a resposta de outro modelo ou um estilo de cena (`cenaNN`, os 46 de `sistema/cenas/INDICE.md`). O
 pedido do dono para uma cena ("cena 3 na cena07") manda nela. Só fica desligado de vez o que o `<modelo>.md`
 diz que é opção desligada.
-**3D Blender x 3D edição:** "3D Blender" é o `3d-como-funciona` e o `/estudio-3d` (modelagem e render). "3D edição" são
+**3D Blender x 3D edição:** "3D Blender" é o `3d-como-funciona`, o `low-poly-toon` e o `/estudio-3d` (modelagem e render). "3D edição" são
 os estilos de cena com profundidade feitos no próprio Remotion, sem Blender (marcados no `INDICE.md`).
 
 1. Leia `README.md` e o `sistema/modelos/<modelo>/<modelo>.md` inteiro antes de qualquer edição.
-2. Estude o vídeo aprovado do modelo em `sistema/modelos/<modelo>/referencia/`: o `referencia.mp4` (com a voz), a
-   `folha.jpg` (1 quadro por segundo) e o `mapa.json` (rosto, luz e cortes medidos a cada 0,25 s). Assista, tire os
-   quadros que precisar e meça. O `original.mp4` é o mesmo vídeo em qualidade cheia. Entenda o porquê de cada tela;
-   a referência mostra o jeito, nunca um roteiro para copiar: as telas, os textos e os cortes nascem da fala nova (G30).
+2. Leia a skill do modelo (`.claude/skills/<modelo>/SKILL.md`): a personalidade vem antes do exemplo. Só então olhe o
+   vídeo aprovado em `sistema/modelos/<modelo>/referencia/` (o `referencia.mp4` com a voz, a `folha.jpg` com 1 quadro
+   por segundo, o `mapa.json` com rosto, luz e cortes a cada 0,25 s; o `original.mp4` é o mesmo em qualidade cheia)
+   para ver a personalidade aplicada e o porquê de cada tela. Ele é um exemplo, nunca um roteiro: as telas, os textos e
+   os cortes nascem da fala nova (G30), e a tela que a fala pede e o exemplo não tem se inventa no jeito da casa.
 3. Um vídeo novo nasce, de dentro de `sistema/`, com
    `.venv/Scripts/python.exe tools/novo-video.py <modelo> <gravacao> <AAAA-MM-DD-tema>` (nome que a transcrição errar:
    `--trocar Errado=Certo`; achou o erro depois, `tools/trocar.py oficina/<pasta> Errado=Certo` corrige sem

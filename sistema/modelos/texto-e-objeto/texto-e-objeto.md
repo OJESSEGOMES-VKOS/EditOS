@@ -100,20 +100,33 @@ diz. Aqui **o texto é o design**: grande, em tamanhos misturados, e não uma le
 
 ## 5. Os heróis (o objeto que faz o que a frase diz)
 
-- Um objeto por vez, no centro ou embaixo do bloco, sempre crescendo, girando ou se montando.
-- Os que se repetem no modelo:
-  - a **faísca** do Claude, branca ou laranja (2 s, 8 s, 22 s);
-  - **setas convergindo** no objeto (9 s a 10 s);
-  - **feixe de luz** ligando um objeto a outro (o arquivo .mp4 e a faísca, 4 s);
-  - **mira de gravação** com cantos e "REC" (7 s);
-  - **campo de prompt** digitando a frase, Inter 700, 70 px, creme (11 s a 14 s);
-  - **pilha numerada** de pastas (17 s);
-  - **grade de vídeos** que se enche até o número, com o número em Inter 900, 400 px, laranja (18 s a 19 s);
-  - **órbita**: tópicos entrando um a um num arco em volta do centro, Geist Mono 32 px (23 s);
-  - **fichas** creme (Inter 700, 38 px, raio 20) ligadas por linhas tracejadas a um centro (25 s a 27 s);
-  - **guias** de zona segura num celular desenhado (28 s a 30 s);
-  - **barra de dados** enchendo até 100%, com régua e o número em Geist Mono 60 px (35 s a 38 s);
-  - **mostrador** com o ponteiro andando (39 s a 40 s).
+- Um objeto por vez, no centro ou embaixo do bloco, sempre crescendo, girando ou se montando, cada movimento preso a
+  uma palavra dita. O herói é o **verbo da frase acontecendo com a coisa que ela nomeia**.
+- **Os heróis do aprovado são exemplos, com o porquê** (o nome entre crases é o do código, `<Heroi comp="Nome" />`).
+  Num vídeo novo cada um só volta quando a fala nova diz a mesma coisa que fez ele existir; o normal num tema novo é
+  o herói novo (a skill `.claude/skills/texto-e-objeto/SKILL.md`, "A invenção").
+
+  | Herói | No aprovado | Por quê (a fala que fez ele existir) |
+  |---|---|---|
+  | `Cem` a **faísca** que cresce | 2 s | "pelo Claude Code": a faísca é o símbolo do Claude |
+  | `Arquivo` o .mp4 e o **feixe** até a faísca | 4 s | "gravei e mandei o arquivo": o arquivo viaja |
+  | `Mira` cantos de gravação e "REC" | 7 s | "o que você está vendo aqui": o próprio quadro |
+  | `Converge` **setas convergindo** na faísca | 9 s | "foi ele que decidiu": tudo aponta para quem decide |
+  | `Prompt` o **campo** digitando a frase (escreve "Claude") | 11 s a 14 s | "chegar ao Claude e edita esse vídeo para mim": um pedido a uma IA |
+  | `Pastas` a **pilha numerada** | 17 s | "o método que nós desenvolvemos": um método em etapas |
+  | `Cento` a **grade** que enche até o número | 18 s a 19 s | "analisando mais de 160 vídeos": um número de coisas |
+  | `Frame` "frame" com quadros reais nas letras | 20 s | "frame por frame": a palavra vira a imagem |
+  | `Orbita` tópicos num **arco** (os do aprovado são fixos) | 23 s | "através disso, nós desenvolvemos": o que saiu da análise |
+  | `Fichas` **fichas** ligadas a um centro (regras fixas) | 25 s a 27 s | "muitas regras" |
+  | `Guias` **guias** de zona segura num celular | 28 s a 30 s | "algumas dessas regras aplicadas": a regra na tela |
+  | `Carimbo` "TESTE #01" | 32 s | "apenas um teste" |
+  | `Um` "01" gigante em contorno | 34 s | "do primeiro vídeo" |
+  | `Barra` a **barra** que enche até 100% | 35 s a 38 s | "após todo o desenvolvimento": algo que chega ao fim |
+  | `Dial` o **mostrador** com o ponteiro | 39 s a 40 s | "calibrando" |
+  | `Assinatura` a foto num anel e o @ | 42 s a 45 s | "já me segue aqui": o pedido de seguir |
+- **O herói novo** (a tela livre): `src/telas/<Nome>.tsx` da pasta do vídeo, desenhado com o kit de `src/kit.tsx`
+  (`Palco`, `cores`, `naTela`, `diz`, `surge`, `cresce`, `mola`, `Faisca`) e registrado em `src/telas/index.ts`. Formas
+  simples e cheias (traço grosso de ponta redonda, retângulo de canto redondo), sem texto ou só o texto dito.
 - **O herói segue as cores do fundo da própria tela.** Ele recebe a tela (`({c})`) e pinta com `cores(c.fundo)`: no
   escuro, `acento` laranja e `fg` creme; no laranja, `acento` creme e `fg` tinta. Nunca cor fixa: herói pintado para um
   fundo some no outro.
@@ -168,25 +181,32 @@ Os padrões vêm do `src/Root.tsx`: `{voz: false, arroba: '', foto: '', arquivo:
 
 Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do vídeo".
 
+0. **Leia a skill** `.claude/skills/texto-e-objeto/SKILL.md` (a personalidade, as peças e a invenção do herói novo).
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py texto-e-objeto <gravacao.mp4> <AAAA-MM-DD-tema>`.
    A gravação pode ser você falando: só a voz entra. Isso cria `oficina/<AAAA-MM-DD-tema>/`, a voz em `public/voz.wav` e a
-   fala transcrita em `src/palavras.json`. Ao carregar, o molde para de propósito e diz a primeira palavra do plano que a
-   fala nova não tem.
-   Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
+   fala transcrita em `src/palavras.json`. **O plano nasce vazio** (o `scripts/plano_novo.tsx` entra no lugar do bloco O
+   PLANO de `src/Cenas.tsx`): uma tela escura sem texto, e o `cobertura.mjs` reprova até o plano ser montado pela fala.
+   Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui, todos num `--trocar` só:
+   `--trocar Cloud=Claude Earthshot=earshot`.
 2. **Escreva o `plano.md`** na pasta do vídeo, frase a frase sobre `src/palavras.json`: uma tela por ideia (1,5 a 2,5 s),
-   cortando nas pausas ou, na fala corrida, nas viradas de ideia (seção 6), começando no escuro e o fundo alternando, quais palavras viram grandes, cursivas ou com efeito, e o herói de cada tela.
-3. **Monte o plano em `src/Cenas.tsx`** (na pasta do vídeo):
+   cortando nas pausas ou, na fala corrida, nas viradas de ideia (seção 6), começando no escuro e o fundo alternando,
+   quais palavras viram grandes, cursivas ou com efeito, e o herói de cada tela com a palavra dita entre aspas que pediu
+   ele e o porquê (o `tools/clone.py` cobra essa linha).
+3. **Monte O PLANO em `src/Cenas.tsx`** (na pasta do vídeo), só entre as linhas `O PLANO` e `fim do plano`:
    - `CENAS`: uma entrada por tela, `{id, fundo: 'E' | 'L', topo, linhas: [{txt, tam, fonte?, peso?, acento?, efeito?}],
      heroi?, alinha?, iris?}`. As linhas são **as palavras ditas, na ordem**: o tempo de cada palavra vem da fala
-     sozinho. Palavra com `~` na frente é enfeite (não dita). `fonte: 'script'` é a cursiva, `'serif'` a serifa;
-     `efeito: {'palavra': 'corta' | 'sublinha' | 'moldura' | 'anel'}`.
-   - Os heróis: os do vídeo aprovado foram feitos para aquele roteiro. Faça os que a fala nova pede, presos às palavras
-     por `w('palavra', n)` ou `naTela(c, 'palavra')`, com as cores de `cores(c.fundo)` (seção 5). Tela sem herói: tire o
-     `heroi:`.
-   - `FRAME_FOTOS`: seus quadros (`ffmpeg -ss <segundo> -i base/fala.mp4 -frames:v 1 -q:v 3 public/quadros/f600.jpg`) ou
-     `null`.
-4. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo) até sair `APROVADO`. Ele confere as palavras dos
-   heróis, tela de pelo menos 1,5 s, palavra de pelo menos 0,4 s, até 4 linhas e a zona segura, e diz o arquivo e a linha.
+     sozinho. Palavra com `~` na frente é enfeite (não dita). `fonte: CURSIVA` é a cursiva, `SERIFA` a serifa;
+     `efeito: {'palavra': CORTA | SUBLINHA | MOLDURA | ANEL}`; `alinha: ESQ`. Os estilos vão pelo nome, nunca entre
+     aspas (o `tools/clone.py` lê as aspas do plano como texto de tela).
+   - O herói: `heroi: <Heroi comp="Nome" />`. Um da casa (seção 5, só com o mesmo porquê) ou o herói novo em
+     `src/telas/<Nome>.tsx`, registrado em `src/telas/index.ts`, preso às palavras por `naTela(c, 'palavra')`, com as
+     cores de `cores(c.fundo)` e dentro do `<Palco>`. Tela sem herói: tire o `heroi:`.
+   - `FRAME_FOTOS` (só se a fala pede o herói `Frame`): seus quadros (`ffmpeg -ss <segundo> -i base/fala.mp4 -frames:v 1
+     -q:v 3 public/quadros/f600.jpg`) ou `null`.
+4. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo) até sair `APROVADO`. Ele reprova o plano
+   vazio e confere as palavras dos heróis usados (os da casa e os de `src/telas/`, que precisam estar registrados), tela
+   de pelo menos 1,5 s, palavra de pelo menos 0,4 s, até 4 linhas e a zona segura, e diz o arquivo e a linha.
+   **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (da raiz) até `SEM CLONE`.
 5. **Som:** refaça a lista `cortes` e os efeitos de `scripts/som.py` com as mesmas palavras e rode
    `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo). Sai `public/trilha.wav`. `--cama` liga a música.
 6. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 2 5 9` (na pasta do vídeo). Com o

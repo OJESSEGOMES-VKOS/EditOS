@@ -46,9 +46,12 @@ Uma pessoa falando para a câmera, no vídeo normal, com a tipografia de trailer
 - **Transições de textura:** desfoque, flash branco e chicote. Nunca deslize (8 s, 15 s, 24 s).
 - **Fecho com o comando:** Comenta “PALAVRA” (27 s a 29 s), quando a fala tem comando.
 
-**O repertório de telas (cada uma com o seu porquê):**
+**O repertório: exemplos do aprovado, cada um com o seu porquê.** A skill `.claude/skills/trailer/SKILL.md` diz a
+personalidade e como montar o destaque que a fala nova pede. Os destaques do aprovado ("MODELOS", "VÍDEO", "EDIÇÃO", o
+contador de 100%) são daquela fala: num vídeo novo, o destaque é a palavra forte da fala nova. O modelo não tem tela
+livre (ilustração, objeto, interface): tudo na tela é a própria fala em tipografia.
 
-| Tela | Usada na referência porque | Usar quando a fala nova tiver o mesmo porquê |
+| Peça (exemplo) | Usada na referência porque | Usar quando a fala nova tiver o mesmo porquê |
 |---|---|---|
 | Bloco de destaque de 3 vozes | marca o assunto principal da frase (o termo protagonista, M3-8) | o trecho tiver um termo protagonista ligado ao tema (G17) |
 | Contador vermelho | o gancho diz um número (100%) | a fala disser um número que é o fato principal |
@@ -163,9 +166,12 @@ o `mixar.sh` com o 3º argumento `-` (sai só a voz).
 
 Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do vídeo".
 
+0. **Leia a skill** `.claude/skills/trailer/SKILL.md` (a personalidade, as peças e a invenção do destaque).
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py trailer <gravacao.mp4> <AAAA-MM-DD-tema>`.
    Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`), mede o rosto (`src/rosto.json`) e
-   leva o rosto ao tamanho e à altura do modelo, sem mexer na cor (G6). Nome que a transcrição errar (ex.: "Cloud" no
+   leva o rosto ao tamanho e à altura do modelo, sem mexer na cor (G6). **O plano nasce vazio:** o bloco O PLANO de
+   `src/Reel.tsx` vem do `scripts/plano_novo.tsx` do molde (a gravação num plano só, sem destaque, transição, abertura
+   nem fecho, com a lista comentada das peças), nunca com o plano do aprovado. Nome que a transcrição errar (ex.: "Cloud" no
    lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir), ou no campo `text` do
    `src/palavras.json`, sem mexer nos tempos. Na dúvida sobre o que a pessoa disse, pergunte a ela.
 2. **Escreva o `plano.md`** na pasta do vídeo, trecho a trecho sobre `src/palavras.json` (G14, G28): onde cortar, quais
@@ -185,8 +191,14 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
      fala, `camera` = o plano que se ajusta para ele caber; o bloco que começa num corte nasce no corte: `de: T.x`; o
      `ate` é o começo da página seguinte, `c(i, 'palavra')`).
    - `PEDACOS`: a legenda, `[índice da 1ª palavra, 'texto / 2ª linha']`, cobrindo toda palavra fora dos destaques.
+   - As vozes do bloco vão pelo nome da letra, sem aspas: `inter` (Inter Tight), `playfair` (Playfair itálica), `anton`
+     e `antonVermelha` (Anton); entre aspas no plano, só o que é dito.
 4. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo) até sair `APROVADO`. Ele confere as regras
    das seções 4, 5 e 8 e diz o arquivo, a linha e o que mexer.
+   **O teste do clone:** no plano de cenas (`cenas.json` → `tools/decupar.py oficina/<v> --plano`, ou o `plano.md`), a
+   linha de cada cena com peça diz o nome dela como está no plano (`BLOCOS`, `ABERTURA`, `FECHO_DEF`) e a palavra dita
+   entre aspas que pediu ela. Depois `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até sair `SEM CLONE`, e a
+   folha de quadros ao lado da `referencia/folha.jpg`: mesmo modelo, outro vídeo.
 5. **Som:** só a voz (G6). As listas do PLANO DO SOM no topo de `scripts/som.py` ficam vazias, a não ser com ordem
    explícita.
 6. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 5 10` (na pasta do vídeo).
@@ -200,7 +212,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e `2`), a janela em
 `PREVIAS` e o render com `--props='{"previas":true}'`, sem nome de modelo na tela (G33).
 
-## 10. O plano do vídeo aprovado (exemplo, não roteiro)
+## 10. O plano do vídeo aprovado (exemplo, não roteiro; ele fica no molde, o vídeo novo nasce sem ele)
 
 Feito antes das regras de 2026-11-05: tratamento quente, 4 destaques, tela de respiro e a legenda embaixo dos
 destaques. Serve para ver cada tela no seu porquê, não como sequência a repetir (G30).

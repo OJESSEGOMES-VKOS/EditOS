@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: as peças da casa que o plano liga (cada uma é uma linha PECA = ...; no bloco O PLANO de src/Reel.tsx; desligada = a linha não existe) e o texto que cada uma escreve fixo no código, quando é usada. Nenhuma peça do autoridade escreve texto fixo: o texto vem do plano (a fala).",
+ "telas": ["TITULOS", "TELAS", "PAINEIS", "LISTA", "CELULAR", "CTA", "FLASH"],
+ "fixos": {}
+}

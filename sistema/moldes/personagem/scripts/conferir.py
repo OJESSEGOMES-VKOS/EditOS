@@ -9,11 +9,14 @@ uso: ../../.venv/Scripts/python.exe scripts/conferir.py   (sai 1 se algo falhar)
 - texto na tela: nenhum travessão, nenhum nome de modelo (as etiquetas das prévias vêm da prop e ficam fora da conta).
 Partes opcionais (fixo, previas, fade_q, marcas) só são conferidas se existirem no plano.
 """
-import json, math, re, sys, unicodedata
+import json, math, re, subprocess, sys, unicodedata
 from pathlib import Path
 from PIL import ImageFont
 
 AQUI = Path(__file__).resolve().parent.parent
+# o plano mora no bloco O PLANO de scripts/plano.py: gera o src/tempos.json antes de conferir
+if subprocess.run([sys.executable, str(AQUI / 'scripts' / 'plano.py')]).returncode:
+    sys.exit(1)
 BRUTO = (AQUI / 'src' / 'tempos.json').read_text(encoding='utf-8')
 T = json.loads(BRUTO)
 PS = json.loads((AQUI / 'src' / 'palavras.json').read_text(encoding='utf-8'))
@@ -48,9 +51,8 @@ if plano != fala:
     k = next((i for i, (a, b) in enumerate(zip(plano, fala)) if a != b), min(len(plano), len(fala)))
     pare(f"src/tempos.json foi feito para outra fala (campo \"fala\", linha {LF}): na palavra {k + 1} o plano tem "
          f"\"{plano[k] if k < len(plano) else '(fim)'}\" e src/palavras.json tem \"{fala[k] if k < len(fala) else '(fim)'}\".\n"
-         f"Refaça o plano sobre a fala nova: \"cenas\" (linha {LC}), \"blocos\" (linha {LB}), "
-         f"\"fixo\", \"marcas\", \"texto\" e \"duracao_q\" em src/tempos.json, as ilustrações em src/Cenas.tsx (modelos/personagem/personagem.md §9),\n"
-         f"e cole no campo \"fala\" o texto da fala nova: {' '.join(p['text'] for p in PS)}")
+         f"Refaça o plano sobre a fala nova no bloco O PLANO de scripts/plano.py, que gera o src/tempos.json "
+         f"(personagem.md §9), e rode este conferidor de novo.")
 n = len(PS)
 fora = []
 for b in T['blocos']:

@@ -14,6 +14,7 @@ const Demo: React.FC = () => (
       {rotulo: 'MUDAR QUANDO QUISER', a: 'Sim', b: 'Não', vence: 'a'},
       {rotulo: 'PATRIMÔNIO EM 10 ANOS', a: 0, b: 214000, vence: 'b'},
     ]}
+    formato={(v) => `R$ ${Math.round(v).toLocaleString('pt-BR')}`}
     width={1080}
     height={1350}
   />

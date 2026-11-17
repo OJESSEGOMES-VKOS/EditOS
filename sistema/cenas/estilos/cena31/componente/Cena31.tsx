@@ -7,11 +7,13 @@ import {loadFont} from '@remotion/google-fonts/Manrope';
 const {fontFamily: MANROPE} = loadFont('normal', {weights: ['500', '700', '800'], subsets: ['latin']});
 
 export type Cena31Props = {
-  marca?: string;
-  plano?: string;
-  preco?: string;
-  periodo?: string;
-  beneficios?: string[]; // até 3
+  marca: string;
+  plano: string;
+  preco: string;
+  periodo?: string; // ex.: "/mês"; vazio quando a fala não diz
+  beneficios?: string[]; // 0 a 3, os que a fala cita
+  rodapeFrente?: string[]; // a linha pequena espaçada da frente (1 ou 2 pedaços); vazio = sem linha
+  viradaEm?: number; // quadro em que o cartão vira (padrão 30 * duracao/150): ponha na palavra do preço ou do plano
   corDestaque?: string;
   width?: number;
   height?: number;
@@ -28,8 +30,8 @@ const Face: React.FC<{t: string; children?: React.ReactNode; style?: React.CSSPr
     background: '#15171A', ...style}}>{children}</div>
 );
 
-const Cena: React.FC<Required<Omit<Cena31Props, 'width' | 'height' | 'beneficios'>>> = ({marca, plano, preco, periodo, corDestaque, duracao}) => {
-  const frame = useCurrentFrame();
+const Cena: React.FC<Required<Omit<Cena31Props, 'width' | 'height' | 'beneficios' | 'viradaEm'>> & {d0: number}> = ({marca, plano, preco, periodo, rodapeFrente, corDestaque, duracao, d0}) => {
+  const frame = useCurrentFrame() - d0;
   const {fps} = useVideoConfig();
   const s = duracao / 150;
   const flip = spring({frame: frame - 30 * s, fps, config: {damping: 14, stiffness: 95, mass: 0.9}});
@@ -98,7 +100,7 @@ const Cena: React.FC<Required<Omit<Cena31Props, 'width' | 'height' | 'beneficios
             {reflexo(brilho1, 1)}
             <div style={{position: 'absolute', left: 56, top: 52}}>{marcaEl(40)}</div>
             <div style={{position: 'absolute', left: 58, right: 58, bottom: 50, display: 'flex', justifyContent: 'space-between', fontFamily: MANROPE, fontWeight: 700, fontSize: 18, letterSpacing: 6, color: 'rgba(243,245,247,0.75)'}}>
-              <span>MEMBRO</span><span>DESDE 2026</span>
+              {rodapeFrente.map((t, i) => <span key={i}>{t}</span>)}
             </div>
           </Face>
           <Face t={`rotateY(180deg) translateZ(${T / 2}px)`}>
@@ -117,11 +119,13 @@ const Cena: React.FC<Required<Omit<Cena31Props, 'width' | 'height' | 'beneficios
 };
 
 export const Cena31: React.FC<Cena31Props> = ({
-  marca = 'Norte',
-  plano = 'Pro',
-  preco = 'R$ 29',
-  periodo = '/mês',
-  beneficios = ['Projetos ilimitados', 'Suporte prioritário', 'Cancele quando quiser'],
+  marca,
+  plano,
+  preco,
+  periodo = '',
+  beneficios = [],
+  rodapeFrente = [],
+  viradaEm,
   corDestaque = '#FF5A1F',
   width = 1080,
   height = 1350,
@@ -131,16 +135,17 @@ export const Cena31: React.FC<Cena31Props> = ({
   const {fps} = useVideoConfig();
   const s = duracao / 150;
   const k = Math.min(width / 1080, height / 1350);
+  const d0 = viradaEm === undefined ? 0 : viradaEm - 30 * s; // desloca a coreografia inteira para a palavra da virada
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse 70% 55% at 50% 42%, #F4F5F7 0%, #EEF0F3 45%, #E0E3E8 100%)', overflow: 'hidden'}}>
       <div style={{position: 'absolute', left: '50%', top: '50%', width: 1080, height: 1350, marginLeft: -540, marginTop: -675, transform: `scale(${k})`}}>
         <CameraMotionBlur shutterAngle={200} samples={8}>
-          <Cena marca={marca} plano={plano} preco={preco} periodo={periodo} corDestaque={corDestaque} duracao={duracao} />
+          <Cena marca={marca} plano={plano} preco={preco} periodo={periodo} rodapeFrente={rodapeFrente} corDestaque={corDestaque} duracao={duracao} d0={d0} />
         </CameraMotionBlur>
         <div style={{position: 'absolute', top: 820, left: 0, right: 0, display: 'flex', justifyContent: 'center'}}>
           <div>
             {beneficios.slice(0, 3).map((b, i) => {
-              const t0 = (68 + i * 8) * s;
+              const t0 = (68 + i * 8) * s + d0;
               const pop = spring({frame: frame - t0, fps, config: {damping: 10, stiffness: 240}});
               const tick = interpolate(frame, [t0 + 3, t0 + 9], [24, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
               const sobe = spring({frame: frame - t0 - 2, fps, config: {damping: 18, stiffness: 180}});

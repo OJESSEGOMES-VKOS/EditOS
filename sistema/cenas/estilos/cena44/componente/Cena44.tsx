@@ -10,8 +10,8 @@ const oswald = loadOswald('normal', {weights: ['600'], subsets: ['latin', 'latin
 const rubik = loadRubik('normal', {weights: ['800'], subsets: ['latin', 'latin-ext']}).fontFamily;
 
 export type Cena44Props = {
-  rotulo?: string;
-  horaAntes?: [string, string];
+  rotulo?: string; // uma palavra dita, em caixa alta espaçada; sem ela, nenhum rótulo
+  horaAntes?: [string, string]; // o relógio de virar só aparece se a fala tem hora ou número que vira
   horaDepois?: [string, string];
   corRoupa?: string;
   corContorno?: string;
@@ -31,9 +31,9 @@ const NEAR = [[60, 640, 90], [150, 600, 70], [220, 660, 80], [300, 590, 60], [36
 const WINS = NEAR.flatMap(([x, y, w], b) => Array.from({length: 6}, (_, k) => ({x: x + 10 + (k % 3) * (w / 3.2), y: y + 16 + Math.floor(k / 3) * 30, c: b % 3})));
 
 export const Cena44: React.FC<Cena44Props> = ({
-  rotulo = 'PRAZO',
-  horaAntes = ['21', '59'],
-  horaDepois = ['22', '00'],
+  rotulo,
+  horaAntes,
+  horaDepois,
   corRoupa = '#2B6470',
   corContorno = '#FF5A44',
   width = W,
@@ -160,14 +160,14 @@ export const Cena44: React.FC<Cena44Props> = ({
             <path d="M220 1046 L220 1300 M520 1046 L520 1300" stroke="#0C070F" strokeWidth="16" />
 
             {/* relógio de virar */}
-            <g transform={`translate(0 ${-hop * 10})`}>
+            {horaAntes && horaDepois ? <g transform={`translate(0 ${-hop * 10})`}>
               <rect x="652" y="790" width="314" height="236" rx="16" fill="#241A27" />
               <path d="M652 806 Q652 790 668 790 L950 790 Q966 790 966 806" stroke="#FFB98A" strokeWidth="5" fill="none" />
               <rect x="668" y="1012" width="282" height="10" fill="#E9DFC9" opacity="0.6" />
               <Page x={670} digit={horaAntes[0]} next={horaDepois[0]} flip={flipH} />
               <Page x={820} digit={horaAntes[1]} next={horaDepois[1]} flip={flipM} />
               <circle cx="809" cy="900" r="6" fill="#111015" /><circle cx="809" cy="940" r="6" fill="#111015" />
-            </g>
+            </g> : null}
 
             {/* notebook (de lado) com brilho frio */}
             <path d="M560 1016 L700 1016" stroke="#0B080D" strokeWidth="10" />
@@ -234,9 +234,9 @@ export const Cena44: React.FC<Cena44Props> = ({
           </g>
 
           {/* rótulo */}
-          <g transform={`translate(540 72) scale(${label})`} opacity={label > 0.02 ? 1 : 0}>
+          {rotulo ? <g transform={`translate(540 72) scale(${label})`} opacity={label > 0.02 ? 1 : 0}>
             <text x="0" y="16" textAnchor="middle" fontFamily={oswald} fontWeight={600} fontSize={46} letterSpacing={18} fill="#FFF1E6" filter="url(#n44glow)" style={{textShadow: '0 0 12px rgba(255,90,68,0.6)'}}>{rotulo}</text>
-          </g>
+          </g> : null}
 
           <rect width={W} height={H} fill="url(#n44vig)" />
           <rect width={W} height={H} filter="url(#n44grain)" />

@@ -6,11 +6,11 @@ import {loadFont} from '@remotion/google-fonts/PlusJakartaSans';
 
 const {fontFamily} = loadFont('normal', {weights: ['400', '500', '600'], subsets: ['latin', 'latin-ext']});
 
-export type Linha = {titulo: string; rotulo: string; icone: 'cor' | 'camera' | 'texto'};
+export type Linha = {titulo: string; rotulo: string; icone?: 'cor' | 'camera' | 'texto'}; // sem ícone: a inicial do título
 export type FrostedGlassProps = {
   placeholder?: string;
-  busca?: string;
-  linhas?: Linha[];
+  busca: string; // o que a fala "pesquisa" (a letra encolhe sozinha se passar de ~30 letras)
+  linhas: Linha[]; // 1 a 4 resultados, ditos ou pedidos pela fala; a altura da linha se ajusta
   escolhida?: number; // índice da linha selecionada no fim
   largura?: number;
   altura?: number;
@@ -76,14 +76,10 @@ const vidro = (raio: number): React.CSSProperties => ({
 });
 
 export const FrostedGlass: React.FC<FrostedGlassProps> = ({
-  placeholder = 'Pesquise ou pergunte qualquer coisa',
-  busca = 'meus vídeos com cara premium',
-  linhas = [
-    {titulo: 'Cor de cinema', rotulo: 'Cor', icone: 'cor'},
-    {titulo: 'Câmera lenta e suave', rotulo: 'Câmera', icone: 'camera'},
-    {titulo: 'Títulos limpos e mínimos', rotulo: 'Tipografia', icone: 'texto'},
-  ],
-  escolhida = 1,
+  placeholder = 'Pesquisar',
+  busca,
+  linhas,
+  escolhida = 0,
   largura,
   altura,
   fotoFundo,
@@ -115,7 +111,8 @@ export const FrostedGlass: React.FC<FrostedGlassProps> = ({
   const barH = 150;
   const barY = interpolate(sobe, [0, 1], [650, 440]);
   const painelTop = 440 + barH + 22;
-  const linhaH = 128;
+  const linhaH = Math.min(128, 432 / Math.max(1, linhas.length)); // até 3 linhas no tamanho cheio, 4 apertadas
+  const tamBusca = Math.max(34, Math.min(46, 46 * 30 / Math.max(1, busca.length)));
   const painelH = linhas.length * linhaH + 36;
 
   // destaque: passa pela linha 0 e estica até a escolhida; borda da frente rígida, de trás macia
@@ -141,7 +138,7 @@ export const FrostedGlass: React.FC<FrostedGlassProps> = ({
         {/* barra de busca */}
         <div style={{position: 'absolute', left: (1080 - barW) / 2, top: barY, width: barW, height: barH, ...vidro(48), transform: `scale(${entra})`, display: 'flex', alignItems: 'center', gap: 22, padding: '0 46px', zIndex: 2}}>
           <svg width={36} height={36} viewBox="0 0 24 24" fill="none" stroke={T} strokeWidth={2.4}><circle cx={10.5} cy={10.5} r={6.5} /><path d="M15.5 15.5L20 20" strokeLinecap="round" /></svg>
-          <div style={{fontSize: 46, fontWeight: 500, whiteSpace: 'pre', textShadow: '0 1px 6px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center'}}>
+          <div style={{fontSize: tamBusca, fontWeight: 500, whiteSpace: 'pre', textShadow: '0 1px 6px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center'}}>
             {digitadas === 0 && <span style={{display: 'inline-block', width: 3, height: 52, background: CARET, opacity: caretOn ? 1 : 0, marginRight: 4}} />}
             <span style={{opacity: digitadas === 0 ? 0.62 : 1}}>{digitadas === 0 ? placeholder : busca.slice(0, digitadas)}</span>
             {digitadas > 0 && <span style={{display: 'inline-block', width: 3, height: 52, background: CARET, opacity: caretOn ? 1 : 0, marginLeft: 3}} />}
@@ -155,7 +152,7 @@ export const FrostedGlass: React.FC<FrostedGlassProps> = ({
               const cai = spring({frame: f - fimDigitacao - 6 - i * 3, fps, config: {damping: 10, stiffness: 160}});
               return (
                 <div key={i} style={{position: 'absolute', left: 36, right: 36, top: 18 + i * linhaH, height: linhaH, display: 'flex', alignItems: 'center', gap: 28, transform: `translateY(${(1 - cai) * -60}px)`, opacity: cai > 0.02 ? 1 : 0}}>
-                  <div style={{width: 64, height: 64, borderRadius: 16, background: 'rgba(255,255,255,0.16)', border: '1.5px solid rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Icone tipo={l.icone} /></div>
+                  <div style={{width: 64, height: 64, borderRadius: 16, background: 'rgba(255,255,255,0.16)', border: '1.5px solid rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{l.icone ? <Icone tipo={l.icone} /> : <span style={{fontSize: 30, fontWeight: 600}}>{Array.from(l.titulo)[0]}</span>}</div>
                   <div style={{flex: 1, textShadow: '0 1px 6px rgba(0,0,0,0.25)'}}>
                     <div style={{fontSize: 41, fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1.1}}>{l.titulo}</div>
                     <div style={{fontSize: 29, fontWeight: 500, opacity: 0.65, lineHeight: 1.2}}>{l.rotulo}</div>

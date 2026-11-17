@@ -1,5 +1,7 @@
 // Checador do documental-dados (modelos/documental-dados/documental-dados.md). uso: node scripts/checar.mjs  (sai 1 se reprovar)
-// Lê o plano de verdade (src/plano.json, pelo src/Reel.tsx; para logo se o plano não for desta fala) e confere:
+// Lê o plano de verdade (src/plano.ts, pelo src/Reel.tsx; para logo se o plano não for desta fala), grava a cópia
+// src/plano.json (lida pelo scripts/som.py) e confere:
+//  - o dado é deste vídeo: src/dados.json com a fala de outro vídeo (o do exemplo, que veio com o molde) reprova;
 //  - número na tela = número falado (G10 e decisão do dono): cada contador declara o "dito", que tem de estar na fala
 //    terminando na palavra onde o contador para, e valer exatamente o número mostrado; contagem de 1 a 2,5 s;
 //  - legenda: todas as palavras, em ordem, uma vez só; bloco de no máx. 3 palavras numa linha, >= 0,4 s (0,5 s com 3), nunca
@@ -20,7 +22,7 @@ fs.mkdirSync(path.dirname(tmp), {recursive: true});
 let M;
 try {
 	await build({
-		stdin: {contents: "export * from './src/Reel.tsx';", resolveDir: process.cwd(), loader: 'ts'},
+		stdin: {contents: "export * from './src/Reel.tsx'; export {default as PLANO_FONTE} from './src/plano.ts';", resolveDir: process.cwd(), loader: 'ts'},
 		bundle: true, platform: 'node', format: 'esm', outfile: tmp, logLevel: 'error', jsx: 'automatic', loader: {'.json': 'json'},
 		plugins: [{name: 'stub', setup(b) {
 			b.onResolve({filter: /^(@remotion\/google-fonts\/.*|remotion)$/}, (a) => ({path: a.path, namespace: 'stub'}));
@@ -34,10 +36,13 @@ try {
 	fs.rmSync(tmp, {force: true});
 }
 if (!M) process.exit(1);
-const {SEM_APAGAO, legMin, PS, TELAS, LEGENDA, APAGAO, CREDITO, DURACAO, FPS, CORPO, Y, ZONA, FAMILIA, EVENTOS_BARRAS, EVENTOS_CAMERA, EVENTOS_MARCAS, EVENTOS_DOC, EXTRAS, limpa, fmt} = M;
+const {PLANO_FONTE, DADOS_DE_OUTRO, SEM_APAGAO, legMin, PS, TELAS, LEGENDA, APAGAO, CREDITO, DURACAO, FPS, CORPO, Y, ZONA, FAMILIA, EVENTOS_BARRAS, EVENTOS_CAMERA, EVENTOS_MARCAS, EVENTOS_DOC, EXTRAS, limpa, fmt} = M;
 
 const erros = [];
 const ok = [];
+// a cópia do plano para o som.py (o JSON larga o que o plano não usa)
+fs.writeFileSync('src/plano.json', JSON.stringify(PLANO_FONTE, null, 1) + '\n');
+if (DADOS_DE_OUTRO) erros.push('src/dados.json é de outro vídeo (o campo "fala" dele não é esta fala): troque pelo dado desta fala, com as fontes, ou esvazie os itens (documental-dados.md §8)');
 const Q = 2 / FPS + 1e-6;
 
 /* ---------- número falado (pt-BR por extenso ou em algarismo) */
@@ -115,7 +120,8 @@ for (const [i, t] of TELAS.entries()) {
 		if (/—/.test(s)) erros.push(`tela ${i + 1}: travessão`);
 	}
 }
-if (TELAS[0].de > 0.001) erros.push('a 1ª tela entra depois do quadro 0: o gancho fica escrito desde o começo');
+if (!TELAS.length) erros.push('o plano não tem telas: o gancho fica escrito desde o quadro 0 (scripts/plano_novo.ts diz como)');
+else if (TELAS[0].de > 0.001) erros.push('a 1ª tela entra depois do quadro 0: o gancho fica escrito desde o começo');
 for (const y of [Y.rotulo, Y.titulo, Y.legenda, Y.credito]) if (y < ZONA.topo || y > ZONA.base) erros.push(`camada em y ${y}, fora de 250-1500`);
 
 /* ---------- imagem viva */

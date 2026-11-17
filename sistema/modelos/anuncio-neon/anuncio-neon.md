@@ -81,9 +81,24 @@ aponta quando fogem (em vídeo curto o número oscila, por isso ele avisa), e o 
 - **Respiro claro:** `#F3FBF7` com manchas suaves da cor da marca e listras a 2,4%. Entra sempre em corte seco.
 - **Profundidade:** o objeto principal nítido, os outros desfocados na frente ou atrás (6 s, 20 s).
 
-## 4. Os objetos (o repertório de telas)
+## 4. Os objetos: a gramática é a assinatura, as telas do aprovado são exemplos
 
-Cada frase vira um objeto. Escolha o que **representa o ato** que a fala diz, no instante da palavra.
+**A assinatura do modelo é a gramática, não a lista de telas:** a cor do anúncio sobre o preto listrado, respiros
+claros em corte seco, objetos de vidro e neon que fazem o que a frase diz, presos à palavra; vermelho só no ruim; a
+legenda inteira numa altura só, em linhas fina e forte; a pílula só no termo protagonista e no fecho. A skill
+`.claude/skills/anuncio-neon/SKILL.md` escreve essa personalidade regra a regra.
+
+**Tela que a fala pede e o aprovado não tem é uma tela nova** (o normal num anúncio novo): desenhada com o kit de
+`src/kit.tsx` (`Fundo`, `Palco`, `Entra`, `IconeVidro`, `Placa`, `Telinha`, `Aneis`, `Particulas`, `Risco`, `Glitch`,
+`GL`, `G`; cores só de `C`) em `src/telas/<Nome>.tsx` da pasta do vídeo, registrada em `src/telas/index.ts` e ligada no
+plano por `livre(comp='Nome', ...)` (seção 9). Ela nunca mora no molde.
+
+As telas 1 a 10 abaixo são **exemplos do aprovado** (S1 a S10), cada uma com o porquê dela: a fala do aprovado dizia
+"100%" (o play que vira número), "criado" (o editor na placa), "vários modelos" (o leque), "qualquer tipo de vídeo" (a
+órbita de ícones), "Instagram agora" (o celular), "apenas um" (a telinha que cresce), "duas prévias" (o avanço
+rápido), "outros modelos de edição" (as pílulas), "usar" (o interruptor) e "comenta edição" (o fecho). Uma delas só
+volta quando a fala nova tem o mesmo porquê (G30, G19). Cada frase vira um objeto: escolha o que **representa o ato**
+que a fala diz, no instante da palavra.
 
 1. **Play nos anéis que vira número** (0 s a 2 s): botão de vidro na cor da marca no centro de anéis concêntricos, e o
    número dito conta no lugar dele ("99%" em 1 s, "100%" em 2 s).
@@ -108,8 +123,9 @@ direita, item por item; **símbolo de proibido** sobre o que é ruim; **dor em g
 vermelho, sempre no escuro); **notificações empilhadas** caindo rápido; **botão com cadeado que destrava**;
 **gráfico que cresce** com o valor contando; **fluxo** com setas revelando ganhos um por um; **pirâmide** de degraus;
 **fecho em neon** com uma promessa por tela; **marca se montando** no fim, parada 2 a 3 s. Tela nova se desenha em
-`src/cenas.tsx` como `export const S11: React.FC<TelaProps> = ...` (o próximo número livre) e passa a valer como id de
-cena no plano; o `src/Reel.tsx` acha sozinho todo export `S<n>`.
+`src/telas/<Nome>.tsx` da pasta do vídeo (`export const Nome: TelaNova = ({c}) => ...`, com `c.de` e `c.ate` em
+segundos), entra no registro `src/telas/index.ts` e passa a valer como id de cena no plano; o `src/Reel.tsx` acha
+sozinho as telas da casa (`S<n>` de `src/cenas.tsx`) e as registradas.
 
 **Nunca se inventa produto.** As telas são desenhos genéricos feitos para ilustrar o que a fala diz (blocos, ícones,
 barras, uma telinha de vídeo), sem nome, número, preço, cliente, taxa, selo ou logo falsos. Quando a fala mostra o
@@ -197,23 +213,35 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 
 1. **A narração vira vídeo** (o `novo-video.py` pede um vídeo): se você tem só o áudio,
    `ffmpeg -f lavfi -i color=c=black:s=1080x1920:r=30 -i narracao.wav -shortest -c:v libx264 -pix_fmt yuv420p -c:a aac narracao.mp4`.
+0. **Leia a skill** `.claude/skills/anuncio-neon/SKILL.md` (a personalidade, as peças e a invenção).
 2. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py anuncio-neon <narracao.mp4> <AAAA-MM-DD-tema>`.
    Isso copia o molde, grava `public/voz.wav` e transcreve a fala em `src/palavras.json`.
-   Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
+   Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude Earthshot=earshot`
+   (vários depois de um `--trocar` só). **O plano nasce vazio:** o bloco O PLANO de `scripts/plano.py` vem do
+   `scripts/plano_novo.py` do molde (nenhuma cena, bloco ou marca do aprovado). O vídeo é preto com a voz e o
+   `conferir.py` diz "PLANO VAZIO" até o plano existir.
 3. **Defina a identidade do anúncio:** em `src/tema.ts`, troque a linha `export const C: Paleta = PADRAO;` por
    `export const C: Paleta = gira(PADRAO, '#RRGGBB');` com a cor da marca de quem anuncia (seção 7: nunca inventada;
    sem marca, uma cor própria do anúncio que não seja a do aprovado). É o único lugar: o vídeo inteiro troca. O
    vermelho `#FF2A2A` continua só para o ruim.
-4. **Monte O PLANO em `src/tempos.json`** (na pasta do vídeo), sobre `src/palavras.json`. O molde para de propósito
-   enquanto o plano não bater com a fala nova e diz o que refazer.
-   - `"fala"`: o texto da fala nova (o checador imprime pronto para colar).
+4. **Monte O PLANO no bloco marcado de `scripts/plano.py`** (na pasta do vídeo), sobre `src/palavras.json`, e rode
+   `../../.venv/Scripts/python.exe scripts/plano.py`: ele grava `src/tempos.json` (nunca edite o JSON à mão). As ajudas
+   prendem tudo à fala: `i('palavra', n)` (índice da n-ésima vez que ela é dita; "E" conta também "é" e "e"),
+   `ids(a, b)`, `p('palavra', n)` (uma marca), `ini('palavra', n)` e `fim('palavra', n)` (quadros), `q(s)`. Use as
+   constantes (`CORTE`, `BORRAO`, `IRIS`, `ESCURO`, `CLARO`, `PILULA`, `CONTADOR`), nunca a palavra entre aspas.
+   - **As cenas:** a tela da casa numa linha com o nome dela, `S9 = cena('S9', de_q, ate_q, CORTE, fundo=CLARO)`; a
+     tela nova, `Nome = livre(comp='Nome', de_q=..., ate_q=..., entrada=BORRAO, fundo=ESCURO)`, desenhada em
+     `src/telas/Nome.tsx` e registrada em `src/telas/index.ts`. Depois `cenas = [...]` na ordem. As chaves abaixo são as
+     do `src/tempos.json` que o `plano.py` grava.
+   - `"fala"`: sai sozinha de `src/palavras.json` (não escreva `fala = ...` no bloco).
    - `"duracao_q"`: em quadros, ao menos o fim da última palavra. `"escurece"` e `"virada"`.
    - `"acordes"`: a lista de onde a trilha troca de acorde, cada item em segundos (`0.0`) ou id de cena (`"S3"`, o
      início dela). Cada item começa um acorde novo da sequência, e o último é sempre o acorde do fecho. Sem a lista, um
      acorde por cena.
-   - `"cenas"`: cada uma com `id` (uma tela de `src/cenas.tsx`), `de_q`, `ate_q`, `fundo` (`escuro` ou `claro`) e
-     `entrada` (`corte`, `borrao` ou `iris`). A última é o fecho. As telas S1 a S10 encenam a fala do vídeo aprovado;
-     para a fala nova, redesenhe cada tela em `src/cenas.tsx` com o objeto que representa a frase (seção 4).
+   - `"cenas"`: cada uma com `id` (S1 a S10 da casa, ou o nome da tela nova), `de_q`, `ate_q`, `fundo` (`escuro` ou
+     `claro`) e `entrada` (`corte`, `borrao` ou `iris`). A última é o fecho. As telas S1 a S10 encenam a fala do vídeo
+     aprovado: uma só entra com o mesmo porquê (seção 4); para o resto da fala nova, a tela nova em `src/telas/` com o
+     objeto que representa a frase (nunca em `src/cenas.tsx`, que é o aprovado).
    - `"previas"`: `{"de_q", "ate_q"}`, ou tire a chave.
    - `"marcas"`: `"nome": [índice, "palavra"]`, os instantes que as telas (`marca("nome")`) e o som usam. O nome é
      livre. Toda marca toca um tique leve no tempo dela; os nomes do aprovado (`inicio`, `cem`, `clipe1`…, `usar`,
@@ -223,9 +251,12 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
      `y`, `marca` e `tipo` (`contador` ou `pilula`).
 5. **Confira as regras:** `../../.venv/Scripts/python.exe scripts/conferir.py` (na pasta do vídeo) até sair `0 erros`.
    Ele confere que o plano é desta fala, que toda palavra aparece uma vez, nasce no tempo e fica 0,4 s, blocos de 1,5 s
-   e até 4 linhas, zona segura, legenda numa altura só e um bloco por vez (G12), pílula só no último bloco da cena ou
-   no fecho e no máximo 2 fora dele (regra antiga que o checador ainda cobra; a régua agora é a G17/G28), pílulas do mesmo tamanho, nenhum trecho de 2,5 s sem evento, nenhum
-   travessão e nenhum nome de modelo.
+   e até 4 linhas, zona segura, legenda numa altura só e um bloco por vez (G12), pílulas do mesmo tamanho (onde
+   destacar é a G17/G28, decidida no plano), nenhum trecho de 2,5 s sem evento, nenhum travessão e nenhum nome de
+   modelo; e que cada tela nova existe em `src/telas/`, está registrada, tem as marcas que pede e não escreve cor em hex.
+5b. **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (da raiz) até `SEM CLONE`, com o
+   `plano.md` dizendo, na linha de cada cena, o nome da tela (`Ouvido`, `S10`...) e a palavra dita entre aspas que pediu
+   ela. Depois a folha lado a lado com `referencia/folha.jpg`: mesmo modelo, outro vídeo (e outra cor).
 6. **Som** (som: confirmar com o dono se continua padrão, G6): `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo). Grava
    `public/trilha.wav` e `public/efeitos.wav` a partir do plano. Os efeitos vêm ligados, então rode sempre que o plano
    mudar.
@@ -245,7 +276,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e `2`).
 
-## 10. O plano do vídeo aprovado (para comparar)
+## 10. O plano do vídeo aprovado (exemplo de onde cada tela caiu e por quê; não é sequência para copiar)
 
 | Tempo | Fala | Cena / transição | Na tela |
 |---|---|---|---|

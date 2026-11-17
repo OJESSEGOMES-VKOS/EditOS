@@ -1,0 +1,2655 @@
+[
+  {
+    "id": "estudio_premium",
+    "nome": "Estúdio premium minimalista",
+    "conceito": "O produto sozinho num vazio grafite, esculpido por luzes grandes e macias, como nos filmes de produto de grande marca de tecnologia.",
+    "quando_usar": "Lançamento de eletrônico, app com aparelho na mão, SaaS que quer parecer hardware de luxo acessível. Quando o desenho do objeto já é bonito e o trabalho é sair da frente dele (é o que a Buck disse sobre o Pixel 4a).",
+    "status": "calibrado pelo Claude Code (Blender 5.2.2, RTX 3050)",
+    "paleta": {
+      "fundo": "#25272B",
+      "apoio": "#8C9096",
+      "acento": "#3D7BE0",
+      "extras": [
+        "#F2F1EE",
+        "#0F1012"
+      ]
+    },
+    "nota_paleta": "O fundo não é preto: grafite 15% de luminância deixa a silhueta escura do produto se separar. O acento é a cor do produto ou da marca, e só aparece no produto e numa palavra do texto.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "alumínio anodizado",
+        "base_color": "#9DA1A8",
+        "roughness": 0.32,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Anisotropic 0,4; chanfro 0,6 mm em escala real; microrranhura por Noise escala 800 na Roughness (0,28 a 0,36)"
+      },
+      {
+        "nome": "vidro frontal da tela",
+        "base_color": "#0B0C0E",
+        "roughness": 0.04,
+        "metallic": 0.0,
+        "coat_weight": 1.0,
+        "transmission_weight": 0.0,
+        "ior": 1.52,
+        "outros": "Coat Roughness 0,02; tela por Emission Strength 1,0 (nunca acima no AgX)"
+      },
+      {
+        "nome": "cerâmica fosca do fundo",
+        "base_color": "#25272B",
+        "roughness": 0.85,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Specular IOR Level 0,3 para o piso não espelhar as luzes"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal (softbox)",
+        "tipo": "AREA retangular",
+        "tamanho_m": 1.2,
+        "azimute_graus": 40,
+        "elevacao_graus": 35,
+        "energia_rel": 1.0,
+        "temperatura_k": 5600,
+        "spread_graus": 70
+      },
+      {
+        "nome": "contorno",
+        "tipo": "AREA retangular 0,15 x 1,0",
+        "tamanho_m": 1.0,
+        "azimute_graus": 150,
+        "elevacao_graus": 20,
+        "energia_rel": 0.8,
+        "temperatura_k": 6500,
+        "spread_graus": 60
+      },
+      {
+        "nome": "preenchimento",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": -60,
+        "elevacao_graus": 10,
+        "energia_rel": 0.25,
+        "temperatura_k": 5200,
+        "spread_graus": 120
+      },
+      {
+        "nome": "gradiente do fundo",
+        "tipo": "SPOT 40°",
+        "tamanho_m": 0.3,
+        "azimute_graus": 180,
+        "elevacao_graus": 60,
+        "energia_rel": 0.35,
+        "temperatura_k": 5000,
+        "spread_graus": 40
+      }
+    ],
+    "nota_luz": "Referência: celular 147 mm a 0,7 m, principal 10 a 15 W (watts absolutos, alinhados com a tabela do cap 05 §4.1: 9,8 W a 0,75 m) (ver 00 · Padrões da casa). Grade 60 a 75° na principal. Fundo afastado 1,3× a altura do produto, iluminado só pelo spot que desenha um halo atrás do produto.",
+    "camera": {
+      "lentes_mm": [
+        85,
+        100,
+        135
+      ],
+      "fstop": 4.0,
+      "movimentos": "Dolly lento de 3 a 5% do quadro por segundo, órbita de no máximo 25° em 4 s, push-in final de 8%. Nunca giro de 360°."
+    },
+    "movimento": {
+      "curva": "Bézier com saída lenta: alças 0,6 na entrada e 0,9 na saída (ease-out longo)",
+      "timing_quadros_30fps": "Revelação 36 a 48 quadros; giro de produto 60 a 90 quadros; respiro parado de 12 quadros antes do logo",
+      "overshoot": "Não. Assentamento com 2% de desaceleração extra, nunca quique."
+    },
+    "transicao": "Corte seco no ponto de maior velocidade do giro (match cut de rotação), ou passagem do produto tapando a lente (wipe por objeto).",
+    "tipografia": "Inter (OFL) ou Geist (OFL): títulos em 600, caixa mista, tracking -2%; legenda em Inter 500, 50 a 60 px em 1080 (mínimo absoluto 44 px, cap 08 §6.1), tracking 0 (ver 00 · Padrões da casa). Uma frase por tela.",
+    "som": "Eletrônica ambiente minimalista, 90 a 100 BPM, piano processado ou sintetizador de onda senoidal. Foley preciso: clique de botão, deslize de alumínio, um 'whoosh' de ar a cada giro (nada de impacto de trailer).",
+    "funciona_em": "Eletrônico, app, SaaS, relógio, fone, cosmético de embalagem rígida, logo de empresa de tecnologia.",
+    "evitar_em": "Comida e bebida (o vazio grafite esfria o apetite) e serviço local de pessoa para pessoa (fica frio e distante).",
+    "erro_classico": "Virar 'estúdio branco infinito': fundo claro, luz por todos os lados, produto sem sombra. Sinal visual: histograma colado na direita, borda do produto sumindo no fundo, contraste abaixo de 0,20 no qa.py (LAVADO).",
+    "referencias": [
+      {
+        "titulo": "Apple, Introducing iPhone Air (Newsroom, 2025)",
+        "url": "https://www.apple.com/newsroom/2025/09/introducing-iphone-air-a-powerful-new-iphone-with-a-breakthrough-design/"
+      },
+      {
+        "titulo": "ManvsMachine, Apple iMac Pro Behind The Scenes (Vimeo)",
+        "url": "https://vimeo.com/260280672"
+      },
+      {
+        "titulo": "Tendril, Figure 02 (filme de produto com fundo austero)",
+        "url": "https://tendril.studio/work/figure02/"
+      }
+    ],
+    "transicao_chave": "match_cut_giro",
+    "familia_acento": "azul",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "funciona",
+      "serviço": "com ajuste",
+      "eletrônico": "funciona",
+      "cosmético": "funciona",
+      "bebida": "com ajuste",
+      "comida": "evitar",
+      "moda": "com ajuste",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "luxo_escuro",
+    "nome": "Luxo escuro",
+    "conceito": "Preto profundo, ouro contido e um contorno fino que desenha a silhueta como fio de luz.",
+    "quando_usar": "Perfume, relógio, bebida destilada, joia, cartão premium, escritório de advocacia ou consultoria de alto ticket. Quando a sensação é 'raro e caro'.",
+    "status": "calibrado pelo Claude Code (Blender 5.2.2, RTX 3050)",
+    "paleta": {
+      "fundo": "#0B0A09",
+      "apoio": "#2A2622",
+      "acento": "#C9A45C",
+      "extras": [
+        "#E8D9B5",
+        "#5A4A32"
+      ]
+    },
+    "nota_paleta": "Preto morno (vermelho levemente acima do azul) parece veludo; preto azulado parece tela desligada. Ouro nunca saturado: #C9A45C é latão escovado, não amarelo.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - High Contrast",
+      "exposicao": -0.3
+    },
+    "materiais": [
+      {
+        "nome": "ouro escovado",
+        "base_color": "#D9B26A",
+        "roughness": 0.22,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Anisotropic 0,6, Anisotropic Rotation por textura radial; chanfro 0,4 mm"
+      },
+      {
+        "nome": "vidro de frasco grosso",
+        "base_color": "#FFFFFF",
+        "roughness": 0.02,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 1.0,
+        "ior": 1.5,
+        "outros": "Paredes com espessura real de 4 a 6 mm; líquido interno com IOR 1,36 e Base Color #E9C98B"
+      },
+      {
+        "nome": "laca preta",
+        "base_color": "#0A0A0A",
+        "roughness": 0.08,
+        "metallic": 0.0,
+        "coat_weight": 1.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Coat Roughness 0,03; Coat IOR 1,5"
+      },
+      {
+        "nome": "veludo do apoio",
+        "base_color": "#1A1512",
+        "roughness": 0.9,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Sheen Weight 0,8, Sheen Tint #6B5A44, Sheen Roughness 0,3"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "contorno esquerdo (strip)",
+        "tipo": "AREA retangular 0,1 x 1,2",
+        "tamanho_m": 1.2,
+        "azimute_graus": -130,
+        "elevacao_graus": 15,
+        "energia_rel": 1.0,
+        "temperatura_k": 3800,
+        "spread_graus": 60
+      },
+      {
+        "nome": "contorno direito (strip)",
+        "tipo": "AREA retangular 0,1 x 1,2",
+        "tamanho_m": 1.2,
+        "azimute_graus": 135,
+        "elevacao_graus": 15,
+        "energia_rel": 0.8,
+        "temperatura_k": 4200,
+        "spread_graus": 60
+      },
+      {
+        "nome": "principal recortada",
+        "tipo": "SPOT 25° com borda 0,3",
+        "tamanho_m": 0.05,
+        "azimute_graus": 30,
+        "elevacao_graus": 45,
+        "energia_rel": 0.6,
+        "temperatura_k": 3200,
+        "spread_graus": 25
+      },
+      {
+        "nome": "bandeiras pretas",
+        "tipo": "planos pretos 0,6 x 1,2 (Base Color #000000, Roughness 1)",
+        "tamanho_m": 0.6,
+        "azimute_graus": 90,
+        "elevacao_graus": 0,
+        "energia_rel": 0.0,
+        "temperatura_k": 0,
+        "spread_graus": 0
+      }
+    ],
+    "nota_luz": "Energia baixa: a calibração do Claude Code mostrou que o primeiro chute estourou 28% da imagem; use os watts absolutos da tabela do cap 05 §4.1 e, se partir de um chute próprio, comece 2 a 3 stops abaixo (× 0,15 a 0,35) e confira no `qa.py` (ver 00 · Padrões da casa). As bandeiras pretas a ±90° são o que cria a linha escura no meio do vidro e fazem o contorno aparecer.",
+    "camera": {
+      "lentes_mm": [
+        100,
+        135
+      ],
+      "fstop": 2.0,
+      "movimentos": "Deslize lateral (truck) de 10 cm em 5 s com o contorno 'correndo' na superfície; tilt-up lento revelando o rótulo; foco mudando do detalhe para o produto inteiro (rack focus de 24 quadros).",
+      "nota_fstop": "f-stop pela tabela 3.3 do cap 04; o número desta ficha vale só para o fundo fora de foco quando o produto inteiro cabe na faixa nítida calculada (ver 00 · Padrões da casa)"
+    },
+    "movimento": {
+      "curva": "Bézier muito suave, alças longas (0,8/0,8); quase linear no meio",
+      "timing_quadros_30fps": "Planos de 90 a 150 quadros; revelação por luz (o contorno acende em 30 quadros)",
+      "overshoot": "Não. Luxo não quica."
+    },
+    "transicao": "Fusão por escuro: o quadro apaga até 5% de luminância em 12 quadros e o próximo nasce de um fio de contorno.",
+    "tipografia": "Cormorant Garamond (OFL) ou Bodoni Moda (OFL) em 500, caixa alta, tracking +12 a +18%; corpo em Jost (OFL) 300. Ouro só no logotipo.",
+    "som": "Cordas graves e piano esparso, 60 a 72 BPM, ou eletrônica lenta com sub-grave. Texturas: tilintar de vidro, tampa magnética, respiração de ambiente grande. Silêncio de 0,5 s antes do logo.",
+    "funciona_em": "Perfume, relógio, joia, bebida destilada, cartão e banco premium, advocacia, logo de marca de alto padrão.",
+    "evitar_em": "App popular, comida de entrega, produto infantil, SaaS de produtividade (promete exclusividade onde o cliente quer facilidade).",
+    "erro_classico": "'Escuro sem intenção': tudo afundado, herói sem contorno, ouro virando marrom. Sinal: qa.py acusa AFUNDADO ou ESCURO, silhueta do produto some no fundo, ouro sem um ponto de brilho.",
+    "referencias": [
+      {
+        "titulo": "Hornet, La Mer Global Holiday Campaign",
+        "url": "https://www.hellohornet.com/projects/la-mer---global-holiday-campaign"
+      },
+      {
+        "titulo": "Chanel Bleu de Chanel, 3D CGI Perfume Animation (Behance)",
+        "url": "https://www.behance.net/gallery/127909887/Chanel-Bleu-De-Chanel-3D-CGI-Perfume-Animation"
+      },
+      {
+        "titulo": "Bang & Olufsen, Beolab 28 (Vimeo)",
+        "url": "https://vimeo.com/557990749"
+      }
+    ],
+    "transicao_chave": "fusao_escuro",
+    "familia_acento": "laranja",
+    "matriz": {
+      "app": "evitar",
+      "SaaS": "com ajuste",
+      "serviço": "funciona",
+      "eletrônico": "funciona",
+      "cosmético": "funciona",
+      "bebida": "funciona",
+      "comida": "evitar",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "pop_candy",
+    "nome": "Pop candy / brinquedo",
+    "conceito": "Cores de bala, formas gordinhas e brilho de plástico injetado: o produto vira brinquedo que dá vontade de apertar.",
+    "quando_usar": "App de consumo, fintech jovem, bebida e snack, marca para público de 16 a 30 anos, lançamento de função divertida.",
+    "status": "calibrado pelo Claude Code (Blender 5.2.2, RTX 3050)",
+    "paleta": {
+      "fundo": "#FFB8D2",
+      "apoio": "#7A5CFF",
+      "acento": "#FFE14D",
+      "extras": [
+        "#3DDC97",
+        "#FF5A36"
+      ]
+    },
+    "nota_paleta": "Fundo saturado médio (nunca branco) e acento complementar. Regra: no máximo 3 matizes por quadro; o quarto e o quinto ficam para outros planos.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Punchy",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "plástico brilhante",
+        "base_color": "#7A5CFF",
+        "roughness": 0.25,
+        "metallic": 0.0,
+        "coat_weight": 0.3,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Coat Roughness 0,1; Subsurface Weight 0,05 com raio 2 mm (dá aspecto de bala); chanfro generoso de 8 a 12% do lado"
+      },
+      {
+        "nome": "borracha macia",
+        "base_color": "#FF5A36",
+        "roughness": 0.6,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Sheen Weight 0,2; Specular IOR Level 0,35"
+      },
+      {
+        "nome": "gel translúcido",
+        "base_color": "#3DDC97",
+        "roughness": 0.1,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.6,
+        "ior": 1.4,
+        "outros": "Subsurface Weight 0,3; bom para gotas e botões"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal grande",
+        "tipo": "AREA",
+        "tamanho_m": 2.0,
+        "azimute_graus": 35,
+        "elevacao_graus": 50,
+        "energia_rel": 1.0,
+        "temperatura_k": 6000,
+        "spread_graus": 75
+      },
+      {
+        "nome": "preenchimento",
+        "tipo": "AREA",
+        "tamanho_m": 2.0,
+        "azimute_graus": -70,
+        "elevacao_graus": 20,
+        "energia_rel": 0.5,
+        "temperatura_k": 6500,
+        "spread_graus": 120
+      },
+      {
+        "nome": "contorno",
+        "tipo": "AREA",
+        "tamanho_m": 0.8,
+        "azimute_graus": 160,
+        "elevacao_graus": 30,
+        "energia_rel": 0.6,
+        "temperatura_k": 7000,
+        "spread_graus": 60
+      }
+    ],
+    "nota_luz": "Proporção principal:preenchimento de 2:1 (não 4:1): sombras suaves e coloridas. Fundo recebe a cor por bounce; mantenha o fundo 1,2× afastado para a sombra de contato não sumir.",
+    "camera": {
+      "lentes_mm": [
+        35,
+        50
+      ],
+      "fstop": 5.6,
+      "movimentos": "Câmera com 'pulo': push-in rápido de 12 quadros com assentamento, pan em chicote (whip pan) entre objetos, leve inclinação holandesa de 5°."
+    },
+    "movimento": {
+      "curva": "Ease-in-out forte com overshoot e assentamento elástico (2 oscilações)",
+      "timing_quadros_30fps": "Antecipação 4 a 6 quadros, ação 8 a 12, overshoot 4, assentamento 8; ciclos de 'squash' de 6 quadros",
+      "overshoot": "Sim: 8 a 12% da distância (acima de 12% vira desenho animado, cap 04) (ver 00 · Padrões da casa), squash and stretch de 10% no volume."
+    },
+    "transicao": "Objeto que cresce e enche a tela com a cor do fundo do próximo plano (cut por cor cheia), ou 'pop' com escala 0 para 1,1 para 1 em 10 quadros.",
+    "tipografia": "Fredoka (OFL) ou Baloo 2 (OFL) em 700, caixa baixa, tracking -1%; números em Unbounded (OFL) 800.",
+    "som": "Pop eletrônico ou funk melódico, 110 a 125 BPM. Foley de brinquedo: 'boing', estalo de bolha, marimba, plástico batendo. Cada 'pop' visual tem um som.",
+    "funciona_em": "App, fintech, snack, bebida, cosmético jovem, embalagem, logo de marca jovem.",
+    "evitar_em": "Advocacia, saúde séria, luxo, B2B pesado (diminui a credibilidade e soa infantil).",
+    "erro_classico": "'Arco-íris sem regra': 6 cores no mesmo quadro e tudo saturado igual, sem hierarquia. Sinal: o olho não acha o herói em 0,5 s; o produto tem a mesma saturação do fundo.",
+    "referencias": [
+      {
+        "titulo": "Ordinary Folk, Introducing Spline",
+        "url": "https://www.ordinaryfolk.co/project/introducing-spline"
+      },
+      {
+        "titulo": "Ordinary Folk, Equilibrium (formas geométricas com material tátil)",
+        "url": "https://www.ordinaryfolk.co/project/equilibrium"
+      },
+      {
+        "titulo": "Buck, Nike White Hot",
+        "url": "https://buck.co/work/nike-white-hot"
+      }
+    ],
+    "transicao_chave": "cor_cheia_pop",
+    "familia_acento": "amarelo",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "com ajuste",
+      "serviço": "evitar",
+      "eletrônico": "com ajuste",
+      "cosmético": "funciona",
+      "bebida": "funciona",
+      "comida": "funciona",
+      "moda": "com ajuste",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "diorama_isometrico",
+    "nome": "Diorama isométrico",
+    "conceito": "Um pedaço de mundo recortado numa base, visto de cima em ângulo fixo, onde o serviço ou o app acontece em miniatura.",
+    "quando_usar": "Explicar processo (do pedido à entrega), serviço local, SaaS com várias etapas, logística, imobiliária, clínica. Quando o produto é invisível e precisa de um cenário.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#F3E9DC",
+      "apoio": "#7FB7A4",
+      "acento": "#F26B3A",
+      "extras": [
+        "#2F4858",
+        "#F6C85F"
+      ]
+    },
+    "nota_paleta": "Fundo neutro quente atrás da base; a base é o 30% (verde de maquete), e o acento marca o caminho do processo (o pedido, o carro, o cursor).",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "base de maquete",
+        "base_color": "#7FB7A4",
+        "roughness": 0.7,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Chanfro 1,5% do lado da base; corte lateral em #5E8C7C para mostrar 'terra'"
+      },
+      {
+        "nome": "prédios e móveis foscos",
+        "base_color": "#F7F1E8",
+        "roughness": 0.65,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Variação de 3% de cor por objeto (Object Info > Random)"
+      },
+      {
+        "nome": "vidro de janela",
+        "base_color": "#BFD9E6",
+        "roughness": 0.1,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Opaco com Roughness baixa (evita custo de transmissão em centenas de janelas)"
+      },
+      {
+        "nome": "elemento de destaque",
+        "base_color": "#F26B3A",
+        "roughness": 0.35,
+        "metallic": 0.0,
+        "coat_weight": 0.2,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Emission Strength 0,3 só no item que está 'agindo'"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "sol",
+        "tipo": "SUN, ângulo 2°",
+        "tamanho_m": 0.0,
+        "azimute_graus": 45,
+        "elevacao_graus": 50,
+        "energia_rel": 1.0,
+        "temperatura_k": 5400,
+        "spread_graus": 0
+      },
+      {
+        "nome": "céu",
+        "tipo": "World cor #BFD9F2, força 0,3",
+        "tamanho_m": 0.0,
+        "azimute_graus": 0,
+        "elevacao_graus": 90,
+        "energia_rel": 0.3,
+        "temperatura_k": 7500,
+        "spread_graus": 0
+      },
+      {
+        "nome": "preenchimento frontal",
+        "tipo": "AREA",
+        "tamanho_m": 3.0,
+        "azimute_graus": -20,
+        "elevacao_graus": 30,
+        "energia_rel": 0.15,
+        "temperatura_k": 6000,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Sol a 45° de azimute dá sombra para trás e para a direita em todos os blocos, o que lê como 'manhã'. Sol entre 2 e 4 em força Strength; teste com o qa.py antes de subir. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        85,
+        135
+      ],
+      "fstop": 11.0,
+      "movimentos": "Ortográfica (Orthographic Scale do tamanho da base × 1,3) ou perspectiva de 85 mm a 35° de elevação e 45° de azimute. Movimento: travelling lateral sobre o diorama seguindo o acento; zoom-in ortográfico de 20%.",
+      "dof_ligado": false,
+      "nota_fstop": "85 a 135 mm, ou ortográfica; DoF desligado (cap 01 §8.2) (ver 00 · Padrões da casa)"
+    },
+    "movimento": {
+      "curva": "Ease-in-out médio; peças entram de baixo com overshoot leve",
+      "timing_quadros_30fps": "Montagem do diorama: peças em cascata com 2 a 3 quadros de defasagem, cada uma 10 quadros; ação principal 45 a 60 quadros",
+      "overshoot": "Leve: 5% na entrada das peças, zero no movimento de câmera."
+    },
+    "transicao": "A base gira 90° e revela o próximo cômodo, ou a câmera sobe e o diorama vira peça de um diorama maior (zoom-out de escala).",
+    "tipografia": "Manrope (OFL) em 700 para títulos, caixa mista, tracking -1%; rótulos em Manrope 500 dentro de etiquetas 3D com chanfro.",
+    "som": "Indie pop leve ou lo-fi, 95 a 110 BPM, com glockenspiel e palmas. Foley de miniatura: cliques, encaixe de peça, motor pequeno.",
+    "funciona_em": "Serviço, SaaS, app de entrega, imobiliária, clínica, logística, explicação de processo.",
+    "evitar_em": "Perfume, joia, moda (miniatura tira o peso do objeto de desejo) e revelação de logo curta (não dá tempo de ler o mundo).",
+    "erro_classico": "'Maquete de vitrine sem vida': tudo estático, mesma cor, nenhum caminho. Sinal: o espectador não sabe para onde olhar; nenhum elemento com acento se movendo.",
+    "referencias": [
+      {
+        "titulo": "Anton Egorov, Live Digital Diorama 3D Animation Loop (Behance)",
+        "url": "https://www.behance.net/gallery/165424867/Live-Digital-Diorama-3D-Animation-Loop"
+      },
+      {
+        "titulo": "Roman Klco, Isometric Rooms (Behance)",
+        "url": "https://www.behance.net/gallery/107678093/Isometric-Rooms"
+      },
+      {
+        "titulo": "80.lv, Cozy Assembling Bakery Diorama Animation Made in Blender",
+        "url": "https://80.lv/articles/cozy-assembling-bakery-diorama-animation-made-in-blender"
+      }
+    ],
+    "transicao_chave": "giro_base",
+    "familia_acento": "laranja",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "funciona",
+      "serviço": "funciona",
+      "eletrônico": "com ajuste",
+      "cosmético": "evitar",
+      "bebida": "com ajuste",
+      "comida": "com ajuste",
+      "moda": "evitar",
+      "embalagem": "com ajuste",
+      "logo": "evitar"
+    }
+  },
+  {
+    "id": "argila",
+    "nome": "Argila macia (clay)",
+    "conceito": "Tudo parece modelado à mão em massinha fosca: bordas gordas, marca de dedo, cor de giz pastel.",
+    "quando_usar": "Serviço humano (psicologia, escola, clínica infantil, consultoria pequena), app de bem-estar, explicação de conceito abstrato com carinho.",
+    "status": "calibrado pelo Claude Code (Blender 5.2.2, RTX 3050)",
+    "paleta": {
+      "fundo": "#E9D8C4",
+      "apoio": "#9DB8A0",
+      "acento": "#E2725B",
+      "extras": [
+        "#F2C14E",
+        "#6C7A9C"
+      ]
+    },
+    "nota_paleta": "Pastéis com saturação de 30 a 45%, nunca branco puro. O fundo é a mesma massa em tom de areia; o acento é terracota.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "None",
+      "exposicao": 0.0,
+      "nota_look": "None é idêntico a AgX - Base Contrast (medido no cap 08) (ver 00 · Padrões da casa)"
+    },
+    "materiais": [
+      {
+        "nome": "massinha",
+        "base_color": "#E2725B",
+        "roughness": 0.75,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.4,
+        "outros": "Subsurface Weight 0,15, Subsurface Radius (3, 1,5, 1) mm, Subsurface Scale 0,01; Normal por Noise escala 40 força 0,05 (marca de dedo)"
+      },
+      {
+        "nome": "massinha do fundo",
+        "base_color": "#E9D8C4",
+        "roughness": 0.85,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.4,
+        "outros": "Mesma receita, Subsurface Weight 0,08"
+      },
+      {
+        "nome": "detalhe brilhante",
+        "base_color": "#2E2A27",
+        "roughness": 0.3,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.45,
+        "outros": "Olhos e botões: único ponto de brilho da cena"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": 40,
+        "elevacao_graus": 45,
+        "energia_rel": 1.0,
+        "temperatura_k": 5000,
+        "spread_graus": 70
+      },
+      {
+        "nome": "preenchimento",
+        "tipo": "AREA",
+        "tamanho_m": 2.0,
+        "azimute_graus": -60,
+        "elevacao_graus": 15,
+        "energia_rel": 0.4,
+        "temperatura_k": 5600,
+        "spread_graus": 120
+      },
+      {
+        "nome": "contorno",
+        "tipo": "AREA",
+        "tamanho_m": 0.6,
+        "azimute_graus": 160,
+        "elevacao_graus": 35,
+        "energia_rel": 0.5,
+        "temperatura_k": 6000,
+        "spread_graus": 60
+      }
+    ],
+    "nota_luz": "Calibrado pelo Claude Code: energia baixa (watts absolutos da tabela do cap 05 §4.1; chute próprio começa 2 a 3 stops abaixo, × 0,15 a 0,35) (ver 00 · Padrões da casa) e fundo afastado e mais escuro. A sombra de contato é o que vende 'objeto real em cima da mesa'.",
+    "camera": {
+      "lentes_mm": [
+        50,
+        65
+      ],
+      "fstop": 4.0,
+      "movimentos": "Câmera quase parada com tremor de 0,05 a 0,15° de pico, ciclo de 30 a 45 q, com `strength = radians(pico) / 0,33` (cap 04 §5.5) (stop motion), push-in de 6% em 3 s. Opcional: animar em 'dois' (pose a cada 2 quadros: 15 poses por segundo a 30 fps) (ver 00 · Padrões da casa)."
+    },
+    "movimento": {
+      "curva": "Pose a pose com interpolação Constant (stepped) em 2s, ou Bézier com squash",
+      "timing_quadros_30fps": "Poses a cada 2 quadros; ação 18 a 30 quadros; antecipação 6 quadros",
+      "overshoot": "Sim, com squash de 8% e stretch de 12%."
+    },
+    "transicao": "Morph de massinha: a forma de um plano se deforma até virar a forma do próximo (shape key de 20 a 30 quadros).",
+    "tipografia": "Nunito (OFL) 800 ou Fredoka (OFL) 600, caixa mista, tracking 0; texto pode virar objeto 3D de massinha com chanfro de 15%.",
+    "som": "Acústico leve: ukulele, xilofone, assobio, 90 a 105 BPM. Foley de massinha (squish), madeira, papel.",
+    "funciona_em": "Serviço, app de bem-estar, educação, comida (biscoito, padaria), embalagem artesanal, logo de marca acolhedora.",
+    "evitar_em": "Eletrônico premium, luxo, SaaS técnico de segurança (passa fragilidade).",
+    "erro_classico": "'Plástico de CG pintado de pastel': aspereza uniforme 0,5, sem subsuperfície, arestas vivas. Sinal: reflexo especular nítido em superfície que devia ser massinha, borda dura de 90°.",
+    "referencias": [
+      {
+        "titulo": "Buck, Instacart Fresh (formas simples com realismo tátil)",
+        "url": "https://buck.co/work/instacart-fresh"
+      },
+      {
+        "titulo": "Gianluca Squillace, Clay Render Breakdown (ArtStation, artigo 80.lv)",
+        "url": "https://www.artstation.com/artwork/aGKqz9"
+      },
+      {
+        "titulo": "80.lv, Breakdown: Rendering 3D Clay Models in Marmoset Toolbag",
+        "url": "https://80.lv/articles/breakdown-rendering-3d-clay-models-in-marmoset-toolbag"
+      }
+    ],
+    "transicao_chave": "morph",
+    "familia_acento": "vermelho",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "com ajuste",
+      "serviço": "funciona",
+      "eletrônico": "evitar",
+      "cosmético": "com ajuste",
+      "bebida": "com ajuste",
+      "comida": "funciona",
+      "moda": "evitar",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "vidro_cromo",
+    "nome": "Vidro e cromo",
+    "conceito": "Superfícies que só existem pelo que refletem: vidro grosso, cromo espelhado e faixas de luz desenhando as bordas.",
+    "quando_usar": "Interface de app em camadas de vidro, IA, fintech, produto com vidro ou metal polido, revelação de logo tecnológico.",
+    "status": "calibrado pelo Claude Code (Blender 5.2.2, RTX 3050)",
+    "paleta": {
+      "fundo": "#0E1116",
+      "apoio": "#5B6B7F",
+      "acento": "#7CE0FF",
+      "extras": [
+        "#E6EEF5",
+        "#2B3440"
+      ]
+    },
+    "nota_paleta": "Vidro não tem cor própria: a paleta mora no que ele reflete. Por isso o fundo é escuro e as faixas de luz (strips) são o desenho.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "vidro grosso",
+        "base_color": "#FFFFFF",
+        "roughness": 0.0,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 1.0,
+        "ior": 1.5,
+        "outros": "Espessura real (Solidify 4 a 8 mm); Thin Film opcional 0; chanfro 1 mm (é ali que a luz desenha)"
+      },
+      {
+        "nome": "vidro fosco (frosted)",
+        "base_color": "#F2F6FA",
+        "roughness": 0.25,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 1.0,
+        "ior": 1.45,
+        "outros": "Para cartões de interface; Roughness 0,2 a 0,35"
+      },
+      {
+        "nome": "cromo",
+        "base_color": "#E8EAEC",
+        "roughness": 0.05,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Base Color nunca #FFFFFF; Roughness 0,03 a 0,08"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "faixa esquerda (strip)",
+        "tipo": "AREA retangular 0,08 x 1,5",
+        "tamanho_m": 1.5,
+        "azimute_graus": -110,
+        "elevacao_graus": 10,
+        "energia_rel": 1.0,
+        "temperatura_k": 6500,
+        "spread_graus": 60
+      },
+      {
+        "nome": "faixa direita (strip)",
+        "tipo": "AREA retangular 0,08 x 1,5",
+        "tamanho_m": 1.5,
+        "azimute_graus": 115,
+        "elevacao_graus": 10,
+        "energia_rel": 0.9,
+        "temperatura_k": 6500,
+        "spread_graus": 60
+      },
+      {
+        "nome": "topo (softbox)",
+        "tipo": "AREA",
+        "tamanho_m": 1.0,
+        "azimute_graus": 0,
+        "elevacao_graus": 80,
+        "energia_rel": 0.4,
+        "temperatura_k": 6000,
+        "spread_graus": 70
+      },
+      {
+        "nome": "bandeiras pretas",
+        "tipo": "planos pretos 1,0 x 1,5 a ±80°",
+        "tamanho_m": 1.0,
+        "azimute_graus": 80,
+        "elevacao_graus": 0,
+        "energia_rel": 0.0,
+        "temperatura_k": 0,
+        "spread_graus": 0
+      }
+    ],
+    "nota_luz": "Calibração do Claude Code: bandeiras pretas laterais são obrigatórias, senão o vidro some (reflete fundo claro e vira bolha cinza). Cycles com vidro ~7 s por quadro a 540x960 na RTX 3050.",
+    "camera": {
+      "lentes_mm": [
+        50,
+        85
+      ],
+      "fstop": 2.8,
+      "movimentos": "Órbita curta (15 a 20°) para as faixas correrem nas bordas; slide lateral através de camadas de vidro (parallax); foco que passa de uma camada a outra.",
+      "nota_fstop": "f-stop pela tabela 3.3 do cap 04; o número desta ficha vale só para o fundo fora de foco quando o produto inteiro cabe na faixa nítida calculada (ver 00 · Padrões da casa)"
+    },
+    "movimento": {
+      "curva": "Ease-in-out preciso (alças 0,5/0,5), deslocamentos curtos",
+      "timing_quadros_30fps": "Camadas de interface entram com 3 quadros de defasagem, 14 quadros cada; giro de 20° em 45 quadros",
+      "overshoot": "Mínimo: 2 a 3% nas camadas de UI; zero no vidro sólido."
+    },
+    "transicao": "Refração: o próximo plano aparece distorcido através de um bloco de vidro que atravessa a tela (wipe refrativo de 15 quadros).",
+    "tipografia": "Space Grotesk (OFL) 500 ou Sora (OFL) 600, caixa mista, tracking -2%; números em JetBrains Mono (OFL).",
+    "som": "Eletrônica limpa, 100 a 115 BPM, pads com reverb longo. Foley de vidro (tink), deslize de cromo, 'shimmer' agudo filtrado.",
+    "funciona_em": "App, SaaS, fintech, eletrônico, perfume, logo tecnológico.",
+    "evitar_em": "Comida, moda têxtil, serviço local acolhedor (fica frio) e cena com luz de todos os lados (vidro sem contraste).",
+    "erro_classico": "'Vidro bolha cinza': vidro sem espessura, sem bandeira preta, refletindo um mundo uniforme. Sinal: nenhuma linha escura dentro do vidro, borda do objeto invisível.",
+    "referencias": [
+      {
+        "titulo": "Tendril, Hublot The Arsham Droplet (titânio, safira, vidro mineral)",
+        "url": "https://tendril.studio/work/arsham-droplet"
+      },
+      {
+        "titulo": "Bang & Olufsen, Beosound Theatre (Vimeo)",
+        "url": "https://vimeo.com/746646949"
+      },
+      {
+        "titulo": "Twenty75, Design Movements: 3D Chrome Art",
+        "url": "https://www.twenty75.com/projects/3d-chrome/"
+      }
+    ],
+    "transicao_chave": "wipe_refrativo",
+    "familia_acento": "ciano",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "funciona",
+      "serviço": "com ajuste",
+      "eletrônico": "funciona",
+      "cosmético": "funciona",
+      "bebida": "com ajuste",
+      "comida": "evitar",
+      "moda": "com ajuste",
+      "embalagem": "com ajuste",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "organico_liquido",
+    "nome": "Orgânico e líquido",
+    "conceito": "O produto nasce de um líquido em movimento: ondas, gotas, coroas de respingo e superfícies que escorrem.",
+    "quando_usar": "Bebida, cosmético líquido (sérum, óleo), limpeza, refrigerante, café. Quando o atributo é 'fresco', 'hidratante' ou 'sabor'.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#0F3B3A",
+      "apoio": "#5FB8A6",
+      "acento": "#F4E9C1",
+      "extras": [
+        "#E0F2EE",
+        "#123230"
+      ]
+    },
+    "nota_paleta": "O líquido carrega a cor da marca; o fundo é a versão escura dessa cor (mesma matiz, luminância 15%). Acento creme para brilhos e texto.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Punchy",
+      "exposicao": -0.2
+    },
+    "materiais": [
+      {
+        "nome": "água / bebida",
+        "base_color": "#FFFFFF",
+        "roughness": 0.0,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 1.0,
+        "ior": 1.333,
+        "outros": "Volume Absorption densidade 2 a 8 com a cor da bebida; nunca tingir a Base Color de líquido transparente"
+      },
+      {
+        "nome": "creme / sérum",
+        "base_color": "#F4E9C1",
+        "roughness": 0.2,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.45,
+        "outros": "Subsurface Weight 0,6, Subsurface Radius (4, 3, 2) mm"
+      },
+      {
+        "nome": "lata alumínio",
+        "base_color": "#C8CCD0",
+        "roughness": 0.18,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Condensação: gotas instanciadas com transmissão IOR 1,333"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "contraluz principal",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": 170,
+        "elevacao_graus": 25,
+        "energia_rel": 1.0,
+        "temperatura_k": 6000,
+        "spread_graus": 75
+      },
+      {
+        "nome": "lateral de recorte",
+        "tipo": "AREA retangular 0,2 x 1,2",
+        "tamanho_m": 1.2,
+        "azimute_graus": -100,
+        "elevacao_graus": 20,
+        "energia_rel": 0.6,
+        "temperatura_k": 6500,
+        "spread_graus": 60
+      },
+      {
+        "nome": "frontal suave",
+        "tipo": "AREA",
+        "tamanho_m": 2.0,
+        "azimute_graus": 20,
+        "elevacao_graus": 15,
+        "energia_rel": 0.25,
+        "temperatura_k": 5600,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Líquido se ilumina por trás: a contraluz é a principal. Frontal baixo só para não perder o rótulo. Simulação de fluido cara: prefira geometria animada (onda por Displace e Wave Texture) para 6 a 15 s. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        100,
+        135
+      ],
+      "fstop": 2.8,
+      "movimentos": "Alta velocidade simulada: tempo desacelerado (o respingo dura 60 quadros), câmera parada ou dolly-in lento de 4%."
+    },
+    "movimento": {
+      "curva": "Física desacelerada; câmera em ease-out longo",
+      "timing_quadros_30fps": "Respingo 45 a 75 quadros (câmera lenta 4 a 8×); onda contínua com período de 90 quadros",
+      "overshoot": "O líquido pode passar do ponto e voltar (coroa de respingo); a câmera não."
+    },
+    "transicao": "Onda que cobre a lente e limpa revelando o próximo plano (wipe líquido de 18 quadros), ou gota em close cuja superfície reflete o próximo plano.",
+    "tipografia": "Outfit (OFL) 500 ou DM Sans (OFL) 500, caixa baixa, tracking 0; textos com movimento de 'flutuar' de 4 px.",
+    "som": "Downtempo ou house orgânico 100 a 118 BPM. Foley de líquido gravado (gole, bolha, respingo), abertura de lata, gelo.",
+    "funciona_em": "Bebida, cosmético, limpeza, comida líquida (café, iogurte), embalagem.",
+    "evitar_em": "SaaS e serviço sem relação com líquido (vira metáfora gratuita) e eletrônico (sugere estrago).",
+    "erro_classico": "'Água de gelatina': líquido com Base Color colorida e sem volume, parecendo vidro sólido. Sinal: respingo sem gotículas separadas, borda sem refração.",
+    "referencias": [
+      {
+        "titulo": "Buck, Truly Flavor Films (simulação líquida abstrata)",
+        "url": "https://buck.co/work/truly-flavor-films"
+      },
+      {
+        "titulo": "Buck, Pepsi Black (captura de líquido e CG)",
+        "url": "https://buck.co/work/pepsi-black"
+      },
+      {
+        "titulo": "Six N. Five, Flow",
+        "url": "https://sixnfive.com/projects/flow/"
+      }
+    ],
+    "transicao_chave": "wipe_liquido",
+    "familia_acento": "amarelo",
+    "matriz": {
+      "app": "evitar",
+      "SaaS": "evitar",
+      "serviço": "evitar",
+      "eletrônico": "evitar",
+      "cosmético": "funciona",
+      "bebida": "funciona",
+      "comida": "funciona",
+      "moda": "evitar",
+      "embalagem": "funciona",
+      "logo": "com ajuste"
+    }
+  },
+  {
+    "id": "brutalista_tech",
+    "nome": "Brutalista tech",
+    "conceito": "Hardware cru: concreto, alumínio fresado, grade de pontos, tipografia monoespaçada e luz de oficina.",
+    "quando_usar": "Gadget com personalidade, ferramenta para desenvolvedor, SaaS de infraestrutura, marca que quer parecer engenharia honesta.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#D9D7D2",
+      "apoio": "#3A3A38",
+      "acento": "#FF3B1F",
+      "extras": [
+        "#F5F4F0",
+        "#1A1A19"
+      ]
+    },
+    "nota_paleta": "Cinza de concreto claro, grafite e um vermelho de botão de emergência (só em 1 elemento por quadro). Nada de gradiente.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - High Contrast",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "concreto",
+        "base_color": "#BDBAB3",
+        "roughness": 0.88,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Bump por Noise escala 120 força 0,15 e furos por Voronoi; chanfro 2 mm quebrado"
+      },
+      {
+        "nome": "alumínio fresado",
+        "base_color": "#A7AAAD",
+        "roughness": 0.35,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Anisotropic 0,8 com rotação por textura circular (marca de fresa)"
+      },
+      {
+        "nome": "plástico técnico",
+        "base_color": "#F5F4F0",
+        "roughness": 0.5,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Specular IOR Level 0,4; peça transparente opcional com Transmission 1,0 e Roughness 0,3"
+      },
+      {
+        "nome": "LED / matriz de pontos",
+        "base_color": "#FF3B1F",
+        "roughness": 0.4,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Emission Strength 1,0 em pontos de 0,8 mm"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal dura",
+        "tipo": "AREA",
+        "tamanho_m": 0.3,
+        "azimute_graus": 60,
+        "elevacao_graus": 40,
+        "energia_rel": 1.0,
+        "temperatura_k": 5000,
+        "spread_graus": 50
+      },
+      {
+        "nome": "rebate frio",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": -50,
+        "elevacao_graus": 10,
+        "energia_rel": 0.2,
+        "temperatura_k": 6500,
+        "spread_graus": 120
+      },
+      {
+        "nome": "contorno",
+        "tipo": "AREA retangular 0,1 x 1",
+        "tamanho_m": 1.0,
+        "azimute_graus": 170,
+        "elevacao_graus": 20,
+        "energia_rel": 0.5,
+        "temperatura_k": 6000,
+        "spread_graus": 60
+      }
+    ],
+    "nota_luz": "Principal pequena (0,3 m) para sombra definida; fill fraco 5:1. A sombra dura é parte do desenho brutalista. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        35,
+        50,
+        100
+      ],
+      "fstop": 8.0,
+      "movimentos": "Cortes secos entre planos frontais, laterais e de cima (vistas de desenho técnico); travelling lateral mecânico com velocidade constante; explodido do produto (exploded view)."
+    },
+    "movimento": {
+      "curva": "Linear ou ease curto (alças 0,2): mecânico de propósito",
+      "timing_quadros_30fps": "Movimentos em múltiplos de 6 quadros (6, 12, 24); explodido 36 quadros com defasagem de 2 por peça",
+      "overshoot": "Não. Paradas secas, com 1 quadro de 'tranco'."
+    },
+    "transicao": "Corte seco no beat; ou wipe de grade: o quadro é varrido por uma matriz de pontos que acende e apaga (8 quadros).",
+    "tipografia": "Space Mono (OFL) ou JetBrains Mono (OFL) 400 caixa alta tracking +5%; título em Doto (OFL, matriz de pontos) ou Archivo (OFL) 800 condensado.",
+    "som": "Eletrônica minimal/IDM 120 a 128 BPM, glitch controlado. Foley de máquina: relé, trava, clique de teclado mecânico, zumbido de 50 Hz.",
+    "funciona_em": "Eletrônico, SaaS técnico, app de desenvolvedor, ferramenta, embalagem industrial, logo de startup de hardware.",
+    "evitar_em": "Cosmético, comida, serviço de cuidado, moda delicada (frieza e aspereza afastam).",
+    "erro_classico": "'Concreto de stock': textura repetida visível, tudo cinza sem acento, luz chapada. Sinal: padrão repetindo a cada 50 cm, nenhum vermelho no quadro, sombra mole.",
+    "referencias": [
+      {
+        "titulo": "Nothing Phone (3) Trailer (YouTube oficial)",
+        "url": "https://www.youtube.com/watch?v=kLmCLaj7NxQ"
+      },
+      {
+        "titulo": "Yonick Studio, Nothing 3a Pro (conceito de lançamento)",
+        "url": "https://yonick.studio/work/nothing-3a-pro"
+      },
+      {
+        "titulo": "Tendril, IBM z17",
+        "url": "https://tendril.studio/work/ibm-z17"
+      }
+    ],
+    "transicao_chave": "corte_seco_grade",
+    "familia_acento": "vermelho",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "funciona",
+      "serviço": "com ajuste",
+      "eletrônico": "funciona",
+      "cosmético": "evitar",
+      "bebida": "com ajuste",
+      "comida": "evitar",
+      "moda": "com ajuste",
+      "embalagem": "com ajuste",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "macro_cinematografico",
+    "nome": "Macro cinematográfico",
+    "conceito": "A câmera encosta no produto: textura, fibra, gota, engrenagem, com foco raso e luz rasante revelando detalhe que o olho não vê.",
+    "quando_usar": "Provar qualidade de fabricação: relógio, cosmético (textura de creme), comida (crocância), tecido, eletrônico (porta, botão, lente).",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#141210",
+      "apoio": "#6B5B4D",
+      "acento": "#E8B04A",
+      "extras": [
+        "#F0E6D8",
+        "#2A2420"
+      ]
+    },
+    "nota_paleta": "Fundo quase preto porque o desfoque precisa de escuro para o bokeh aparecer; a paleta vem do material do produto.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": -0.2
+    },
+    "materiais": [
+      {
+        "nome": "metal usinado",
+        "base_color": "#B9B2A8",
+        "roughness": 0.28,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Microrranhura obrigatória (Noise escala 2000 na Roughness 0,22 a 0,34); chanfro 0,2 mm"
+      },
+      {
+        "nome": "textura de creme",
+        "base_color": "#F0E6D8",
+        "roughness": 0.35,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.45,
+        "outros": "Subsurface Weight 0,5; Displacement real (Subdivision + Displace 0,5 mm)"
+      },
+      {
+        "nome": "poeira e fiapo",
+        "base_color": "#FFFFFF",
+        "roughness": 0.9,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Partículas de 0,05 mm, 30 a 80 por plano, só em contraluz"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "rasante",
+        "tipo": "AREA retangular 0,05 x 0,4",
+        "tamanho_m": 0.4,
+        "azimute_graus": 80,
+        "elevacao_graus": 8,
+        "energia_rel": 1.0,
+        "temperatura_k": 4500,
+        "spread_graus": 45
+      },
+      {
+        "nome": "contraluz",
+        "tipo": "SPOT 20°",
+        "tamanho_m": 0.02,
+        "azimute_graus": 170,
+        "elevacao_graus": 20,
+        "energia_rel": 0.7,
+        "temperatura_k": 5600,
+        "spread_graus": 20
+      },
+      {
+        "nome": "rebate",
+        "tipo": "AREA",
+        "tamanho_m": 0.5,
+        "azimute_graus": -40,
+        "elevacao_graus": 20,
+        "energia_rel": 0.1,
+        "temperatura_k": 5000,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Em macro, a luz rasante (elevação 5 a 10°) é que revela relevo. Escala real importa: o DOF de Cycles depende da distância em metros; modele em escala 1:1. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        100,
+        135,
+        180
+      ],
+      "fstop": 2.8,
+      "movimentos": "Slider de 2 a 4 cm em 5 s, rack focus de 30 quadros, rotação de produto 10° muito lenta. Câmera a 8 a 20 cm do objeto.",
+      "nota_fstop": "f-stop pela tabela 3.3 do cap 04; o número desta ficha vale só para o fundo fora de foco quando o produto inteiro cabe na faixa nítida calculada (ver 00 · Padrões da casa)"
+    },
+    "movimento": {
+      "curva": "Quase linear com ease nas pontas (alças 0,3)",
+      "timing_quadros_30fps": "Planos de 90 a 120 quadros; rack focus 24 a 36 quadros",
+      "overshoot": "Não."
+    },
+    "transicao": "Desfoque total (foco vai a zero em 10 quadros) e o próximo plano nasce desfocado e entra em foco; ou match cut de forma (gota vira lente).",
+    "tipografia": "Fraunces (OFL) 400 itálico para frases curtas, ou Instrument Serif (OFL); dados técnicos em IBM Plex Mono (OFL) 400, tracking +3%.",
+    "som": "Ambiente minimal 70 a 85 BPM ou sem batida; foley ampliado: tique de relógio, estalo de crocância, fricção de tecido gravada de perto.",
+    "funciona_em": "Relógio, eletrônico, cosmético, comida, bebida, moda (tecido), embalagem premium.",
+    "evitar_em": "SaaS e serviço (não há superfície para mostrar) e logo (macro de letra só funciona com logo físico).",
+    "erro_classico": "'Macro sem escala': objeto modelado em escala errada, então o desfoque fica de maquete (tilt-shift sem querer) ou some. Sinal: tudo nítido a 2 cm da lente, ou o produto inteiro parece brinquedo.",
+    "referencias": [
+      {
+        "titulo": "Tendril, Hublot MP-10 (macro com luz dramática)",
+        "url": "https://tendril.studio/work/mp-10"
+      },
+      {
+        "titulo": "Michael Sapryhin, 3D product animation ELYSIUM Perfume (Behance)",
+        "url": "https://www.behance.net/gallery/106660823/3D-product-design-animation-ELYSIUM-PERFUME"
+      },
+      {
+        "titulo": "ManvsMachine, Nike Flyknit (Vimeo)",
+        "url": "https://vimeo.com/162826208"
+      }
+    ],
+    "transicao_chave": "desfoque",
+    "familia_acento": "laranja",
+    "matriz": {
+      "app": "evitar",
+      "SaaS": "evitar",
+      "serviço": "evitar",
+      "eletrônico": "funciona",
+      "cosmético": "funciona",
+      "bebida": "funciona",
+      "comida": "funciona",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "evitar"
+    }
+  },
+  {
+    "id": "papel_recorte",
+    "nome": "Papel e recorte",
+    "conceito": "Camadas de cartolina recortada, empilhadas com sombra dura entre elas, como um teatro de papel iluminado pelo sol.",
+    "quando_usar": "Serviço local, educação, ONG, comida artesanal, marca com história de origem, explicação passo a passo com calor humano.",
+    "status": "[testado no bpy 5.2.2 Cycles CPU, nuvem]",
+    "paleta": {
+      "fundo": "#CDB894",
+      "apoio": "#E3D3B6",
+      "acento": "#E2553F",
+      "extras": [
+        "#F2B33D",
+        "#2F5D62"
+      ]
+    },
+    "nota_paleta": "Kraft e creme como base (são cor de papel de verdade), acento terracota e amarelo mostarda. Testado: com fundo creme claro (#F4EBDD) e rebate forte a imagem lavou.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": -0.3
+    },
+    "materiais": [
+      {
+        "nome": "cartolina",
+        "base_color": "#F2B33D",
+        "roughness": 0.92,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Subsurface Weight 0,05 (luz atravessando a borda); espessura real 0,5 mm (Solidify); Bump por Noise escala 300 força 0,03 (fibra)"
+      },
+      {
+        "nome": "papel kraft do fundo",
+        "base_color": "#CDB894",
+        "roughness": 0.95,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Specular IOR Level 0,2"
+      },
+      {
+        "nome": "papel colorido de acento",
+        "base_color": "#E2553F",
+        "roughness": 0.95,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Borda com corte levemente irregular (Displace 0,2 mm)"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "sol duro",
+        "tipo": "SUN, ângulo 1,5°",
+        "tamanho_m": 0.0,
+        "azimute_graus": 55,
+        "elevacao_graus": 38,
+        "energia_rel": 1.0,
+        "temperatura_k": 5200,
+        "spread_graus": 0
+      },
+      {
+        "nome": "rebate",
+        "tipo": "AREA",
+        "tamanho_m": 1.2,
+        "azimute_graus": -60,
+        "elevacao_graus": 15,
+        "energia_rel": 0.12,
+        "temperatura_k": 6500,
+        "spread_graus": 120
+      },
+      {
+        "nome": "céu",
+        "tipo": "World #DDE6F0 força 0,08",
+        "tamanho_m": 0.0,
+        "azimute_graus": 0,
+        "elevacao_graus": 90,
+        "energia_rel": 0.04,
+        "temperatura_k": 7500,
+        "spread_graus": 0
+      }
+    ],
+    "nota_luz": "Valores da prova na nuvem: sol Strength 2,2; rebate 1,2 W a 0,8 m; World 0,08. Com rebate 4 W e World 0,25 a imagem lavou (qa caseiro: contraste p95-p5 caiu, saturação média 0,10). Corrigido para saturação 0,25.",
+    "camera": {
+      "lentes_mm": [
+        35,
+        50
+      ],
+      "fstop": 8.0,
+      "movimentos": "Frontal e plana (camadas paralelas ao sensor), travelling lateral para parallax entre camadas, push-in através de camadas como cortina."
+    },
+    "movimento": {
+      "curva": "Stepped com pose a cada 2 quadros (15 poses por segundo a 30 fps) para parecer stop motion (ver 00 · Padrões da casa); ou ease-out com leve 'flap' de papel",
+      "timing_quadros_30fps": "Camadas entram com 3 quadros de defasagem; dobra de papel 12 a 18 quadros",
+      "overshoot": "Leve (4%) com dobra; papel balança e assenta."
+    },
+    "transicao": "Uma camada de papel desliza e cobre o quadro (wipe de cartolina com sombra), ou dobradura (fold) de 15 quadros.",
+    "tipografia": "Bricolage Grotesque (OFL) 700 ou Caveat (OFL) para anotação à mão; caixa mista, tracking 0; letras recortadas em papel com sombra de 2 mm.",
+    "som": "Folk acústico ou indie com palmas, 95 a 110 BPM. Foley de papel: rasgo, dobra, tesoura, papel deslizando.",
+    "funciona_em": "Serviço, educação, comida, embalagem, app de nicho acolhedor, logo de marca artesanal.",
+    "evitar_em": "Eletrônico premium, perfume, fintech séria (parece barato ou improvisado).",
+    "erro_classico": "'Papel de plástico': Roughness 0,5, sem espessura, sem sombra entre camadas. Sinal: brilho especular no papel, camadas coladas sem sombra, borda perfeita de vetor.",
+    "referencias": [
+      {
+        "titulo": "Buck, Lily's Gummy Bears (mundo de papel em 3D)",
+        "url": "https://buck.co/work/lilys-gummy-bears"
+      },
+      {
+        "titulo": "Buck, Sherwin-Williams Paint Chips",
+        "url": "https://buck.co/work/sherwin-williams"
+      },
+      {
+        "titulo": "80.lv, Surreal Papercraft-Style World Made in Blender",
+        "url": "https://80.lv/articles/check-out-this-surreal-papercraft-style-world-made-in-blender"
+      }
+    ],
+    "transicao_chave": "wipe_papel",
+    "familia_acento": "vermelho",
+    "matriz": {
+      "app": "com ajuste",
+      "SaaS": "com ajuste",
+      "serviço": "funciona",
+      "eletrônico": "evitar",
+      "cosmético": "com ajuste",
+      "bebida": "com ajuste",
+      "comida": "funciona",
+      "moda": "com ajuste",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "retrofuturo",
+    "nome": "Retrofuturo",
+    "conceito": "O futuro como foi imaginado entre 1970 e 2000: cromo aerografado, horizonte em degradê, formas de nave e capa de disco.",
+    "quando_usar": "Lançamento com nostalgia, música, games, tênis, bebida energética, evento, app que quer parecer 'clássico instantâneo'.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#2B1B3D",
+      "apoio": "#F2709C",
+      "acento": "#FFD36E",
+      "extras": [
+        "#5FC3E4",
+        "#0E0A16"
+      ]
+    },
+    "nota_paleta": "Degradê de pôr do sol no horizonte (roxo para rosa para amarelo) e cromo refletindo esse céu. Evite neon verde (é outro mundo).",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Punchy",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "cromo aerografado",
+        "base_color": "#E6E1EA",
+        "roughness": 0.12,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Reflete World com gradiente; chanfros gordos (5 a 8% do lado) para pegar o céu"
+      },
+      {
+        "nome": "plástico de época",
+        "base_color": "#F2709C",
+        "roughness": 0.4,
+        "metallic": 0.0,
+        "coat_weight": 0.3,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Coat Roughness 0,2"
+      },
+      {
+        "nome": "chão de grade",
+        "base_color": "#0E0A16",
+        "roughness": 0.6,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Linhas de grade com Emission Strength 0,8 cor #F2709C"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "céu em gradiente",
+        "tipo": "World: Gradient Texture #2B1B3D para #F2709C para #FFD36E, força 0,6",
+        "tamanho_m": 0.0,
+        "azimute_graus": 180,
+        "elevacao_graus": 5,
+        "energia_rel": 1.0,
+        "temperatura_k": 0,
+        "spread_graus": 0
+      },
+      {
+        "nome": "sol baixo",
+        "tipo": "SUN, ângulo 3°",
+        "tamanho_m": 0.0,
+        "azimute_graus": 175,
+        "elevacao_graus": 6,
+        "energia_rel": 0.6,
+        "temperatura_k": 3500,
+        "spread_graus": 0
+      },
+      {
+        "nome": "preenchimento frontal",
+        "tipo": "AREA",
+        "tamanho_m": 2.0,
+        "azimute_graus": 10,
+        "elevacao_graus": 20,
+        "energia_rel": 0.2,
+        "temperatura_k": 6500,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "O World com gradiente é a luz principal (é o que o cromo reflete). Sol rasante atrás cria contorno quente. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        24,
+        35,
+        85
+      ],
+      "fstop": 5.6,
+      "movimentos": "Dolly-in frontal em direção ao horizonte, órbita heroica de baixo para cima (câmera a 10 cm do chão olhando para cima), zoom óptico rápido de época (zoom de 35 para 85 mm em 20 quadros)."
+    },
+    "movimento": {
+      "curva": "Ease-in-out clássico com pequeno overshoot",
+      "timing_quadros_30fps": "Planos de 45 a 60 quadros; logo entra em 20 quadros com brilho (glint) de 8 quadros",
+      "overshoot": "Leve (5%) nos objetos; o glint é o 'impacto'."
+    },
+    "transicao": "Brilho em estrela (glint) que estoura e limpa o quadro em 6 quadros, ou linhas de varredura (scanline wipe).",
+    "tipografia": "Monoton (OFL) ou Righteous (OFL) para títulos, caixa alta, tracking +8%; texto corrido em Outfit (OFL) 400. Letras com bisel cromado só no logo.",
+    "som": "Synthwave/outrun 100 a 118 BPM, bateria eletrônica com reverb gated, arpejo de sintetizador analógico. Foley de fita (rebobinar), 'zap' de laser suave.",
+    "funciona_em": "Tênis, games, bebida, evento, música, app de entretenimento, logo com apelo nostálgico.",
+    "evitar_em": "Saúde, advocacia, B2B sério e luxo contemporâneo (soa fantasia e kitsch).",
+    "erro_classico": "'Pôster de synthwave genérico': sol listrado, grade roxa e palmeira em tudo. Sinal: o produto é intercambiável; a cena seria a mesma sem ele.",
+    "referencias": [
+      {
+        "titulo": "Buck, Spotify Premium (ilustrações aerografadas estilo capa dos anos 70)",
+        "url": "https://buck.co/work/spotify-premium"
+      },
+      {
+        "titulo": "Creative Review, Air Max Day '18 by ManvsMachine (estética anos 90)",
+        "url": "https://www.creativereview.co.uk/air-max-day-18-by-manvsmachine/"
+      },
+      {
+        "titulo": "Florian Renner, Retrowave (Vimeo, Cinema 4D)",
+        "url": "https://vimeo.com/117890578"
+      }
+    ],
+    "transicao_chave": "glint",
+    "familia_acento": "laranja",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "com ajuste",
+      "serviço": "evitar",
+      "eletrônico": "com ajuste",
+      "cosmético": "com ajuste",
+      "bebida": "funciona",
+      "comida": "com ajuste",
+      "moda": "funciona",
+      "embalagem": "com ajuste",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "neon_noturno",
+    "nome": "Neon noturno",
+    "conceito": "Cidade molhada à noite: fontes de luz coloridas que aparecem no quadro, reflexo no chão e névoa leve.",
+    "quando_usar": "App de entrega noturna, bar, energético, games, moda urbana, tênis, evento, fintech jovem.",
+    "status": "calibrado pelo Claude Code (Blender 5.2.2, RTX 3050)",
+    "paleta": {
+      "fundo": "#07080F",
+      "apoio": "#1F2A4A",
+      "acento": "#FF2E88",
+      "extras": [
+        "#29E3FF",
+        "#FFB547"
+      ]
+    },
+    "nota_paleta": "Dois neons complementares (magenta e ciano) e um âmbar de poste. O fundo é preto azulado; a cor vem só das fontes visíveis.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Punchy",
+      "exposicao": -0.3
+    },
+    "materiais": [
+      {
+        "nome": "tubo de neon",
+        "base_color": "#FF2E88",
+        "roughness": 0.3,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Emission Strength 1,0 (no AgX a cor desbota acima de ~1,3); tubo de vidro externo opcional"
+      },
+      {
+        "nome": "asfalto molhado",
+        "base_color": "#121317",
+        "roughness": 0.15,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Roughness variando 0,05 a 0,5 por Noise (poças); Normal com Noise fino"
+      },
+      {
+        "nome": "metal pintado",
+        "base_color": "#2A2F3A",
+        "roughness": 0.4,
+        "metallic": 0.6,
+        "coat_weight": 0.3,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Coat Roughness 0,1"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "neon magenta (fonte visível)",
+        "tipo": "AREA retangular 0,04 x 1,2 ou malha emissiva",
+        "tamanho_m": 1.2,
+        "azimute_graus": -120,
+        "elevacao_graus": 20,
+        "energia_rel": 1.0,
+        "temperatura_k": 0,
+        "spread_graus": 90
+      },
+      {
+        "nome": "neon ciano (fonte visível)",
+        "tipo": "AREA retangular 0,04 x 1,0",
+        "tamanho_m": 1.0,
+        "azimute_graus": 110,
+        "elevacao_graus": 15,
+        "energia_rel": 0.8,
+        "temperatura_k": 0,
+        "spread_graus": 90
+      },
+      {
+        "nome": "poste âmbar",
+        "tipo": "SPOT 35°",
+        "tamanho_m": 0.1,
+        "azimute_graus": 30,
+        "elevacao_graus": 70,
+        "energia_rel": 0.5,
+        "temperatura_k": 2700,
+        "spread_graus": 35
+      },
+      {
+        "nome": "névoa",
+        "tipo": "Volume Scatter em cubo, densidade 0,3 (sutil) a 1,0 (forte) em cena de mesa; 0,01 a 0,03 só em cenário de 5 m ou mais (cap 05 §9.1) (ver 00 · Padrões da casa)",
+        "tamanho_m": 0.0,
+        "azimute_graus": 0,
+        "elevacao_graus": 0,
+        "energia_rel": 0.0,
+        "temperatura_k": 0,
+        "spread_graus": 0
+      }
+    ],
+    "nota_luz": "Calibrado pelo Claude Code. Emissão do neon em 1,0; o brilho do quadro vem do reflexo no chão molhado, não de subir a energia. Névoa baixa senão o contraste some.",
+    "camera": {
+      "lentes_mm": [
+        24,
+        35,
+        50
+      ],
+      "fstop": 1.8,
+      "movimentos": "Steadicam simulada (tremor de 0,05 a 0,15° de pico, ciclo de 30 a 45 q, com `strength = radians(pico) / 0,33`, cap 04 §5.5), travelling lateral rente ao chão para o reflexo correr, bokeh grande de luzes de fundo.",
+      "nota_fstop": "f-stop pela tabela 3.3 do cap 04; o número desta ficha vale só para o fundo fora de foco quando o produto inteiro cabe na faixa nítida calculada (ver 00 · Padrões da casa)"
+    },
+    "movimento": {
+      "curva": "Ease-out com aceleração de entrada (whip) e cortes no beat",
+      "timing_quadros_30fps": "Planos curtos de 20 a 40 quadros; flicker de neon de 2 quadros em 1 de cada 3 cortes",
+      "overshoot": "Pouco (3%); energia vem do corte, não do quique."
+    },
+    "transicao": "Flash de luz neon (2 quadros a 80% de branco tingido) ou passagem de carro/objeto escuro em primeiro plano.",
+    "tipografia": "Chakra Petch (OFL) 600 ou Unbounded (OFL) 700, caixa alta, tracking +6%; título pode ser neon 3D com tubo de 8 mm.",
+    "som": "Trap, phonk ou synthwave escura, 130 a 150 BPM (ou 70 em meio tempo). Foley: chuva, zumbido de reator de neon, carro passando, poça.",
+    "funciona_em": "App, games, bebida energética, moda urbana, tênis, evento, logo de marca noturna.",
+    "evitar_em": "Cosmético natural, comida saudável, serviço infantil, advocacia (passa perigo e noite).",
+    "erro_classico": "'Tudo neon': 10 tubos de 5 cores, emissão alta, quadro rosa uniforme. Sinal: cor desbotada perto do branco, sem área preta de verdade, herói sem contorno próprio.",
+    "referencias": [
+      {
+        "titulo": "Hornet, 5 Gum: Overstimulate Your Senses",
+        "url": "https://www.hellohornet.com/projects/5-gum---overstimulate-your-senses"
+      },
+      {
+        "titulo": "Visual Scientist, NEON NIGHT (Behance)",
+        "url": "https://www.behance.net/gallery/62430835/NEON-NIGHT"
+      },
+      {
+        "titulo": "Ordinary Folk, Nightdrive",
+        "url": "https://www.ordinaryfolk.co/project/nightdrive"
+      }
+    ],
+    "transicao_chave": "flash_neon",
+    "familia_acento": "rosa",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "com ajuste",
+      "serviço": "evitar",
+      "eletrônico": "funciona",
+      "cosmético": "com ajuste",
+      "bebida": "funciona",
+      "comida": "com ajuste",
+      "moda": "funciona",
+      "embalagem": "com ajuste",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "natureza_sol",
+    "nome": "Natureza e luz do sol",
+    "conceito": "Luz de janela ou de fim de tarde atravessando folhas e persiana, sombras desenhadas no produto, materiais naturais.",
+    "quando_usar": "Cosmético natural, café, comida, bebida, casa e decoração, clínica, bem-estar, serviço de cuidado.",
+    "status": "calibrado pelo Claude Code (Blender 5.2.2, RTX 3050)",
+    "paleta": {
+      "fundo": "#E8DCC8",
+      "apoio": "#8A9A6B",
+      "acento": "#D9822B",
+      "extras": [
+        "#F6F1E7",
+        "#4A3F35"
+      ]
+    },
+    "nota_paleta": "Pedra clara, verde sálvia e âmbar de sol. A cor do sol (3200 a 4300 K) contra sombra levemente azulada é o que dá vida.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "None",
+      "exposicao": 0.0,
+      "nota_look": "None é idêntico a AgX - Base Contrast (medido no cap 08) (ver 00 · Padrões da casa)"
+    },
+    "materiais": [
+      {
+        "nome": "pedra / travertino",
+        "base_color": "#E2D6C2",
+        "roughness": 0.75,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Bump por Noise escala 60 força 0,1; poros por Voronoi"
+      },
+      {
+        "nome": "madeira clara",
+        "base_color": "#C9A57A",
+        "roughness": 0.55,
+        "metallic": 0.0,
+        "coat_weight": 0.1,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Textura CC0 (ex.: Poly Haven); chanfro 1 mm"
+      },
+      {
+        "nome": "folha",
+        "base_color": "#6E8A4E",
+        "roughness": 0.45,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Subsurface Weight 0,3 ou Translucent mix 0,4 (folha acesa por trás)"
+      },
+      {
+        "nome": "vidro âmbar",
+        "base_color": "#FFFFFF",
+        "roughness": 0.02,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 1.0,
+        "ior": 1.5,
+        "outros": "Volume Absorption cor #B5651D densidade 15"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "sol",
+        "tipo": "SUN, ângulo 0,5 a 1,5°",
+        "tamanho_m": 0.0,
+        "azimute_graus": 60,
+        "elevacao_graus": 25,
+        "energia_rel": 1.0,
+        "temperatura_k": 4000,
+        "spread_graus": 0
+      },
+      {
+        "nome": "gobo (persiana ou folhas)",
+        "tipo": "planos recortados entre sol e produto",
+        "tamanho_m": 0.0,
+        "azimute_graus": 60,
+        "elevacao_graus": 25,
+        "energia_rel": 0.0,
+        "temperatura_k": 0,
+        "spread_graus": 0
+      },
+      {
+        "nome": "céu / rebate frio",
+        "tipo": "AREA",
+        "tamanho_m": 2.5,
+        "azimute_graus": -60,
+        "elevacao_graus": 30,
+        "energia_rel": 0.15,
+        "temperatura_k": 7500,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Calibrado pelo Claude Code como 'luz natural (persiana)'. view_layer.update() antes de ler a direção do sol por script. A sombra do gobo é o desenho do quadro.",
+    "camera": {
+      "lentes_mm": [
+        50,
+        85
+      ],
+      "fstop": 2.8,
+      "movimentos": "Câmera quase parada; o movimento é da luz (gobo de folhas balançando 2 a 3° a 0,3 Hz); dolly-in lento de 5%.",
+      "nota_fstop": "f-stop pela tabela 3.3 do cap 04; o número desta ficha vale só para o fundo fora de foco quando o produto inteiro cabe na faixa nítida calculada (ver 00 · Padrões da casa)"
+    },
+    "movimento": {
+      "curva": "Senoide suave para folhas; ease-out longo para produto",
+      "timing_quadros_30fps": "Planos de 90 a 150 quadros; sombra de folha com ciclo de 60 a 90 quadros",
+      "overshoot": "Não."
+    },
+    "transicao": "Passagem de sombra (uma nuvem ou folha grande escurece o quadro em 10 quadros e o próximo nasce iluminado) ou fusão de 15 quadros.",
+    "tipografia": "Fraunces (OFL) 300 a 500 com eixo 'soft', caixa mista, tracking -1%; corpo em DM Sans (OFL) 400.",
+    "som": "Acústico/folk com violão dedilhado, 70 a 90 BPM; ambiente de pássaros distantes, vento, xícara na mesa.",
+    "funciona_em": "Cosmético, comida, bebida, serviço de cuidado, clínica, casa, moda natural, embalagem sustentável.",
+    "evitar_em": "Games, fintech noturna, SaaS de segurança (calma demais para urgência).",
+    "erro_classico": "'Sol de meio-dia chapado': sol alto a 70°, sem gobo, sombra curta embaixo do objeto. Sinal: produto sem desenho de luz, sombra preta curta, cena parecendo foto de catálogo.",
+    "referencias": [
+      {
+        "titulo": "Aesop, Harvest Campaign (Vimeo)",
+        "url": "https://vimeo.com/461743318"
+      },
+      {
+        "titulo": "Buck, 7UP (CG com luz de sol quente)",
+        "url": "https://buck.co/work/7up"
+      },
+      {
+        "titulo": "Six N. Five, The Japanese Garden",
+        "url": "https://sixnfive.com/projects/the-japanese-garden/"
+      }
+    ],
+    "transicao_chave": "passagem_sombra",
+    "familia_acento": "laranja",
+    "matriz": {
+      "app": "com ajuste",
+      "SaaS": "com ajuste",
+      "serviço": "funciona",
+      "eletrônico": "com ajuste",
+      "cosmético": "funciona",
+      "bebida": "funciona",
+      "comida": "funciona",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "com ajuste"
+    }
+  },
+  {
+    "id": "holografico",
+    "nome": "Holográfico e iridescente",
+    "conceito": "Superfícies que mudam de cor conforme o ângulo, como bolha de sabão, CD ou película holográfica, sobre fundo escuro arroxeado.",
+    "quando_usar": "Cosmético jovem, IA, cripto, música, moda Y2K, lançamento 'mágico', embalagem especial.",
+    "status": "[testado no bpy 5.2.2 Cycles CPU, nuvem]",
+    "paleta": {
+      "fundo": "#141226",
+      "apoio": "#2A2048",
+      "acento": "#C4C8D0",
+      "extras": [
+        "#FF59C7",
+        "#4DE6FF",
+        "#B7FF8A"
+      ]
+    },
+    "nota_paleta": "O acento é prata neutro: as cores do arco-íris nascem do filme fino (thin film), não da Base Color. Fundo roxo escuro para as faixas coloridas saltarem.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Punchy",
+      "exposicao": 0.8
+    },
+    "materiais": [
+      {
+        "nome": "metal holográfico",
+        "base_color": "#C4C8D0",
+        "roughness": 0.12,
+        "metallic": 1.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Thin Film Thickness variando 250 a 750 nm (Noise escala 3 > Map Range), Thin Film IOR 2,0. Filme uniforme dá um tom só; é a variação que vira faixa de arco-íris"
+      },
+      {
+        "nome": "bolha / vidro iridescente",
+        "base_color": "#E9E4F2",
+        "roughness": 0.05,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 1.0,
+        "ior": 1.45,
+        "outros": "Thin Film Thickness 380 nm, Thin Film IOR 1,33"
+      },
+      {
+        "nome": "piso",
+        "base_color": "#0D0B16",
+        "roughness": 0.85,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Specular IOR Level 0,08 (piso não pode espelhar os contornos)"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal",
+        "tipo": "AREA",
+        "tamanho_m": 0.5,
+        "azimute_graus": 55,
+        "elevacao_graus": 50,
+        "energia_rel": 1.0,
+        "temperatura_k": 6500,
+        "spread_graus": 45
+      },
+      {
+        "nome": "tiras laterais (strip)",
+        "tipo": "AREA retangular 0,05 x 0,5, light linking só no herói",
+        "tamanho_m": 0.5,
+        "azimute_graus": -75,
+        "elevacao_graus": 8,
+        "energia_rel": 0.85,
+        "temperatura_k": 6500,
+        "spread_graus": 90
+      },
+      {
+        "nome": "contorno magenta",
+        "tipo": "AREA cor (1,0, 0,35, 0,85), light linking só no herói",
+        "tamanho_m": 0.25,
+        "azimute_graus": 150,
+        "elevacao_graus": 20,
+        "energia_rel": 2.3,
+        "temperatura_k": 0,
+        "spread_graus": 30
+      },
+      {
+        "nome": "contorno ciano",
+        "tipo": "AREA cor (0,3, 0,9, 1,0), light linking só no herói",
+        "tamanho_m": 0.25,
+        "azimute_graus": -140,
+        "elevacao_graus": 20,
+        "energia_rel": 2.0,
+        "temperatura_k": 0,
+        "spread_graus": 30
+      }
+    ],
+    "nota_luz": "Prova na nuvem (herói de 12 cm, luzes a 0,35 a 0,6 m): principal 6 W, tiras 5 W, contornos 14 e 12 W, World #2A2048 força 0,25, exposição +0,8. Sem light linking os contornos lavaram o piso da frente (o feixe atravessa o herói e cai no chão); Light.diffuse_factor = 0 não resolveu no Cycles, light linking resolveu.",
+    "camera": {
+      "lentes_mm": [
+        85,
+        100
+      ],
+      "fstop": 2.8,
+      "movimentos": "Órbita lenta de 30 a 40° (a cor só muda se o ângulo muda), rotação do próprio objeto em 90 quadros, push-in de 6%.",
+      "nota_fstop": "f-stop pela tabela 3.3 do cap 04; o número desta ficha vale só para o fundo fora de foco quando o produto inteiro cabe na faixa nítida calculada (ver 00 · Padrões da casa)"
+    },
+    "movimento": {
+      "curva": "Ease-in-out suave; rotação contínua com velocidade constante no meio",
+      "timing_quadros_30fps": "Giro de 45° em 60 a 90 quadros; brilho percorre a superfície em 30 quadros",
+      "overshoot": "Não no objeto; leve (4%) em elementos gráficos."
+    },
+    "transicao": "Varredura de cor: uma faixa iridescente atravessa o quadro e troca o plano (12 quadros), ou dissolve por filme fino (o objeto vira bolha e estoura).",
+    "tipografia": "Syne (OFL) 700 a 800, caixa alta, tracking +4%; ou Unbounded (OFL) 500. Texto em prata neutro, nunca em degradê arco-íris.",
+    "som": "Hyperpop suave ou eletrônica etérea 120 a 140 BPM; texturas de 'shimmer', sinos, vidro friccionado.",
+    "funciona_em": "Cosmético, app, moda, embalagem especial, música, logo de marca jovem ou de tecnologia.",
+    "evitar_em": "Comida, serviço tradicional, advocacia, B2B industrial (parece efeito gratuito).",
+    "erro_classico": "'Degradê arco-íris pintado': textura de gradiente na Base Color em vez de filme fino. Sinal: as cores não mudam quando a câmera gira; o objeto parece adesivo.",
+    "referencias": [
+      {
+        "titulo": "Six N. Five, Holo-Scandinavian",
+        "url": "https://sixnfive.com/projects/holo-scandinavian/"
+      },
+      {
+        "titulo": "assetpro.design, 3D Iridescent HD Shapes (Behance)",
+        "url": "https://www.behance.net/gallery/188630181/3D-Iridescent-HD-Shapes"
+      },
+      {
+        "titulo": "Maryna Polonska, Animated Iridescent Gradients v.3 (Behance)",
+        "url": "https://www.behance.net/gallery/163777045/Animated-Iridescent-Gradients-v3"
+      }
+    ],
+    "transicao_chave": "varredura_cor",
+    "familia_acento": "neutro",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "com ajuste",
+      "serviço": "evitar",
+      "eletrônico": "com ajuste",
+      "cosmético": "funciona",
+      "bebida": "com ajuste",
+      "comida": "evitar",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "editorial_revista",
+    "nome": "Editorial de revista",
+    "conceito": "O quadro é uma página de revista de moda: grid tipográfico forte, muito espaço vazio, produto fotografado como capa.",
+    "quando_usar": "Moda, cosmético, marca pessoal, consultoria criativa, agência, lançamento de coleção, SaaS de criadores.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#EFEBE4",
+      "apoio": "#1C1B19",
+      "acento": "#C23B22",
+      "extras": [
+        "#B9B1A4",
+        "#FFFFFF"
+      ]
+    },
+    "nota_paleta": "Papel off-white, tinta preta e um vermelho editorial só para um número ou uma palavra. A cor vem do produto fotografado.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "fundo de papel fotográfico",
+        "base_color": "#EFEBE4",
+        "roughness": 0.9,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Ciclorama com curva de raio 40 cm; Specular IOR Level 0,2"
+      },
+      {
+        "nome": "tecido do produto",
+        "base_color": "#C23B22",
+        "roughness": 0.8,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Sheen Weight 0,5, Sheen Roughness 0,4"
+      },
+      {
+        "nome": "tipografia 3D",
+        "base_color": "#1C1B19",
+        "roughness": 0.6,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Extrusão 2 a 4% da altura da letra, chanfro 0,5%"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "beauty dish (principal)",
+        "tipo": "AREA disco",
+        "tamanho_m": 0.55,
+        "azimute_graus": 10,
+        "elevacao_graus": 40,
+        "energia_rel": 1.0,
+        "temperatura_k": 5600,
+        "spread_graus": 60
+      },
+      {
+        "nome": "rebate abaixo",
+        "tipo": "AREA",
+        "tamanho_m": 1.0,
+        "azimute_graus": 0,
+        "elevacao_graus": -20,
+        "energia_rel": 0.3,
+        "temperatura_k": 5600,
+        "spread_graus": 120
+      },
+      {
+        "nome": "recorte do fundo",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": 180,
+        "elevacao_graus": 30,
+        "energia_rel": 0.5,
+        "temperatura_k": 6000,
+        "spread_graus": 75
+      }
+    ],
+    "nota_luz": "Luz frontal alta de moda (beauty dish) com sombra curta embaixo do queixo do produto; o fundo recebe luz própria para ficar 0,5 stop acima do produto. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        85,
+        135
+      ],
+      "fstop": 5.6,
+      "movimentos": "Quadros fixos compostos como página (produto no terço, texto na coluna); cortes rápidos em sequência de 'virar página'; zoom digital de 3% em 2 s."
+    },
+    "movimento": {
+      "curva": "Ease-out forte nos textos (entra rápido, assenta devagar); objeto quase parado",
+      "timing_quadros_30fps": "Cada 'página' dura 30 a 45 quadros; texto entra em 8 a 10 quadros com máscara de linha",
+      "overshoot": "Não. Elegância vem da parada exata."
+    },
+    "transicao": "Virar página (page turn) 10 quadros, ou corte seco com o grid tipográfico permanecendo fixo enquanto a imagem troca.",
+    "tipografia": "Instrument Serif (OFL) ou Playfair Display (OFL) em tamanhos grandes, caixa mista, tracking -3%; apoio em Inter (OFL) 500 caixa alta tracking +10%, 11 a 13 px.",
+    "som": "House minimal ou jazz eletrônico, 115 a 122 BPM; foley de flash de câmera, obturador, virar página.",
+    "funciona_em": "Moda, cosmético, perfume, marca pessoal, agência, consultoria, embalagem premium, logo.",
+    "evitar_em": "App de utilidade, comida de entrega, B2B técnico (vira pose sem informação).",
+    "erro_classico": "'Texto por cima de tudo': tipografia sem grid, pequena e centralizada, competindo com o produto. Sinal: margem desigual, mais de 2 famílias, linha de texto sobre a área de maior detalhe.",
+    "referencias": [
+      {
+        "titulo": "Buck, Amazon Echo Buds (tipografia expressiva e mundo surreal)",
+        "url": "https://buck.co/work/amazon-echo-buds"
+      },
+      {
+        "titulo": "Vucko, Spotify Wrapped 2024",
+        "url": "https://vucko.co/work/spotify-wrapped-2024"
+      },
+      {
+        "titulo": "Buck, Meta Connect 23 (tipografia expressiva com objetos 3D)",
+        "url": "https://buck.co/work/meta-connect-23"
+      }
+    ],
+    "transicao_chave": "virar_pagina",
+    "familia_acento": "vermelho",
+    "matriz": {
+      "app": "com ajuste",
+      "SaaS": "com ajuste",
+      "serviço": "funciona",
+      "eletrônico": "com ajuste",
+      "cosmético": "funciona",
+      "bebida": "com ajuste",
+      "comida": "com ajuste",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "tatil_textil",
+    "nome": "Tátil e têxtil",
+    "conceito": "Tudo é macio: feltro, veludo, tricô, espuma. Luz rasante mostra a penugem e dá vontade de tocar.",
+    "quando_usar": "Moda, calçado, casa, colchão, produto de bebê, fone com almofada, marca de conforto, serviço de cuidado.",
+    "status": "[testado no bpy 5.2.2 Cycles CPU, nuvem]",
+    "paleta": {
+      "fundo": "#A89A88",
+      "apoio": "#7A8C6E",
+      "acento": "#6E2E3A",
+      "extras": [
+        "#D9E3CF",
+        "#E8B7C0"
+      ]
+    },
+    "nota_paleta": "Tons terrosos médios. Testado: fundo bege claro (#D8CFC2) com preenchimento 3 W ficou lavado; descer o fundo para #A89A88 e o preenchimento para 1 W resolveu.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": -0.2
+    },
+    "materiais": [
+      {
+        "nome": "feltro",
+        "base_color": "#7A8C6E",
+        "roughness": 0.95,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Sheen Weight 1,0, Sheen Tint #D9E3CF, Sheen Roughness 0,35; Bump por Noise escala 400 força 0,2"
+      },
+      {
+        "nome": "veludo",
+        "base_color": "#6E2E3A",
+        "roughness": 0.9,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Sheen Weight 1,0, Sheen Tint #E8B7C0, Sheen Roughness 0,25"
+      },
+      {
+        "nome": "tricô",
+        "base_color": "#B5A795",
+        "roughness": 0.9,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Geometria de laçada instanciada ou textura com Displacement; Sheen 0,6"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal rasante",
+        "tipo": "AREA",
+        "tamanho_m": 0.8,
+        "azimute_graus": 70,
+        "elevacao_graus": 18,
+        "energia_rel": 1.0,
+        "temperatura_k": 4300,
+        "spread_graus": 65
+      },
+      {
+        "nome": "contorno",
+        "tipo": "AREA",
+        "tamanho_m": 0.4,
+        "azimute_graus": 160,
+        "elevacao_graus": 30,
+        "energia_rel": 0.7,
+        "temperatura_k": 5600,
+        "spread_graus": 60
+      },
+      {
+        "nome": "preenchimento",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": -50,
+        "elevacao_graus": 10,
+        "energia_rel": 0.07,
+        "temperatura_k": 4800,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Prova na nuvem (herói de 12 cm, luzes a 0,6 a 0,9 m): principal 14 W, contorno 10 W, preenchimento 1 W, World 0,05. A penugem (sheen) só aparece na borda com luz rasante e contorno; com luz frontal o tecido vira plástico fosco.",
+    "camera": {
+      "lentes_mm": [
+        85,
+        100
+      ],
+      "fstop": 4.0,
+      "movimentos": "Slider lento, close de textura, objeto sendo pressionado (afundar 8% e voltar)."
+    },
+    "movimento": {
+      "curva": "Ease-in-out macio com assentamento lento (soft body ou shape key)",
+      "timing_quadros_30fps": "Afundar 10 quadros, voltar 20 quadros; tecido cai em 30 a 45 quadros (simulação de tecido)",
+      "overshoot": "Leve, amortecido: 3% e um único retorno."
+    },
+    "transicao": "Tecido que cai e cobre a câmera (cloth wipe de 20 quadros) ou corte por textura (close de fibra vira o fundo do próximo plano).",
+    "tipografia": "Jost (OFL) 400 ou Quicksand (OFL) 600, caixa baixa, tracking +2%; texto bordado opcional (Displacement de ponto).",
+    "som": "Lo-fi ou R&B lento, 75 a 90 BPM; foley de tecido gravado perto, almofada, zíper.",
+    "funciona_em": "Moda, calçado, casa, cosmético de cuidado, produto infantil, fone, embalagem de presente.",
+    "evitar_em": "SaaS, fintech, eletrônico de alta precisão (macio vira sinônimo de impreciso).",
+    "erro_classico": "'Tecido sem penugem': Roughness 0,5 e sheen zero, luz de frente. Sinal: borda do objeto escura e dura em vez de clarear.",
+    "referencias": [
+      {
+        "titulo": "Tendril, Cash App (texturas fofas e espumosas)",
+        "url": "https://tendril.studio/work/cashapp"
+      },
+      {
+        "titulo": "ManvsMachine, Flyknit (página do projeto)",
+        "url": "https://mvsm.com/project/flyknit"
+      },
+      {
+        "titulo": "Buck, Woolmark",
+        "url": "https://buck.co/work/woolmark"
+      }
+    ],
+    "transicao_chave": "wipe_tecido",
+    "familia_acento": "vermelho",
+    "matriz": {
+      "app": "com ajuste",
+      "SaaS": "evitar",
+      "serviço": "com ajuste",
+      "eletrônico": "com ajuste",
+      "cosmético": "funciona",
+      "bebida": "evitar",
+      "comida": "com ajuste",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "com ajuste"
+    }
+  },
+  {
+    "id": "fitas_ribbons",
+    "nome": "Fitas e formas doces (ribbons)",
+    "conceito": "Fitas largas e curvas de material sedoso que dançam em volta do produto ou do logo e guiam o olhar.",
+    "quando_usar": "Revelação de logo, vinheta de marca, lançamento de sistema operacional ou app, cosmético, chocolate, presente.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#1B2A4A",
+      "apoio": "#5B7BD5",
+      "acento": "#FFC2A1",
+      "extras": [
+        "#A7C7FF",
+        "#F4F1FF"
+      ]
+    },
+    "nota_paleta": "Fundo de uma matiz, fitas em degradê dentro da mesma família e um acento quente na fita líder.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "fita sedosa",
+        "base_color": "#5B7BD5",
+        "roughness": 0.3,
+        "metallic": 0.0,
+        "coat_weight": 0.2,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Sheen Weight 0,4; Anisotropic 0,3 seguindo a direção da fita; espessura 1 a 2% da largura (Solidify)"
+      },
+      {
+        "nome": "fita translúcida",
+        "base_color": "#A7C7FF",
+        "roughness": 0.2,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.5,
+        "ior": 1.45,
+        "outros": "Subsurface Weight 0,2 em vez de transmissão total (renderiza mais rápido)"
+      },
+      {
+        "nome": "fita líder",
+        "base_color": "#FFC2A1",
+        "roughness": 0.25,
+        "metallic": 0.0,
+        "coat_weight": 0.3,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Coat Roughness 0,1"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": 30,
+        "elevacao_graus": 45,
+        "energia_rel": 1.0,
+        "temperatura_k": 5600,
+        "spread_graus": 70
+      },
+      {
+        "nome": "contraluz",
+        "tipo": "AREA",
+        "tamanho_m": 1.0,
+        "azimute_graus": 170,
+        "elevacao_graus": 30,
+        "energia_rel": 0.8,
+        "temperatura_k": 7000,
+        "spread_graus": 60
+      },
+      {
+        "nome": "rebate colorido",
+        "tipo": "AREA cor #FFC2A1",
+        "tamanho_m": 2.0,
+        "azimute_graus": -70,
+        "elevacao_graus": 0,
+        "energia_rel": 0.2,
+        "temperatura_k": 0,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Contraluz forte para a borda fina das fitas brilhar. Fitas por Curve com Bevel + Twist animado ou Geometry Nodes Curve to Mesh com perfil retangular. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        35,
+        50,
+        85
+      ],
+      "fstop": 4.0,
+      "movimentos": "Câmera segue a fita líder (follow path) e para no produto; órbita de 40° com fitas passando em primeiro plano desfocadas."
+    },
+    "movimento": {
+      "curva": "Bézier com fluxo contínuo; fita com 'follow-through' (a ponta chega 6 a 10 quadros depois da base)",
+      "timing_quadros_30fps": "Varredura de fita 30 a 45 quadros; laço final em 20 quadros; logo assenta em 12",
+      "overshoot": "Sim na ponta da fita (8%), não no produto."
+    },
+    "transicao": "A fita atravessa a lente e cobre a tela (ribbon wipe de 14 quadros), ou se enrola e vira a forma do logo.",
+    "tipografia": "Sora (OFL) 500 ou Lexend (OFL) 500, caixa mista, tracking -1%; logo pode ser escrito pela fita (curva seguindo o traço).",
+    "som": "Pop orquestral leve ou eletrônica melódica, 100 a 112 BPM; 'swish' de seda acompanhando cada passagem, harpa e sinos.",
+    "funciona_em": "Logo, vinheta, app, SaaS (lançamento), cosmético, chocolate, embalagem de presente.",
+    "evitar_em": "Industrial, advocacia, comida salgada (doce demais para o tom).",
+    "erro_classico": "'Macarrão de fita': muitas fitas sem líder, cruzando sem direção, cobrindo o produto. Sinal: o produto aparece menos de 50% do tempo; fitas com espessura zero piscando.",
+    "referencias": [
+      {
+        "titulo": "Six N. Five, Windows 11 Background",
+        "url": "https://sixnfive.com/projects/windows-11/"
+      },
+      {
+        "titulo": "FEDEX RIBBONS (Behance)",
+        "url": "https://www.behance.net/gallery/50059907/FEDEX-RIBBONS"
+      },
+      {
+        "titulo": "Jared Koenigshofer, Redshift Ribbons (Procedural) (Behance)",
+        "url": "https://www.behance.net/gallery/193448179/Redshift-Ribbons-(Procedural)"
+      }
+    ],
+    "transicao_chave": "wipe_fita",
+    "familia_acento": "laranja",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "funciona",
+      "serviço": "com ajuste",
+      "eletrônico": "com ajuste",
+      "cosmético": "funciona",
+      "bebida": "com ajuste",
+      "comida": "com ajuste",
+      "moda": "com ajuste",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "arquitetonico_luz_dura",
+    "nome": "Arquitetônico com luz dura",
+    "conceito": "O produto como escultura num espaço de arquitetura mínima: paredes de gesso, arcos, escadas e uma faixa de sol dura cortando a parede.",
+    "quando_usar": "Perfume, bolsa, móvel, imobiliária, clínica de estética, escritório de arquitetura, marca de moda adulta, consultoria premium.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#E4D7C5",
+      "apoio": "#B98B6E",
+      "acento": "#2F3A2F",
+      "extras": [
+        "#F3ECE2",
+        "#7C5A44"
+      ]
+    },
+    "nota_paleta": "Gesso quente, terracota e um verde-escuro de planta ou de produto. A sombra é a quarta cor: azulada por causa do céu.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": -0.2
+    },
+    "materiais": [
+      {
+        "nome": "gesso / reboco",
+        "base_color": "#E4D7C5",
+        "roughness": 0.9,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Bump por Noise escala 30 força 0,08; cantos com chanfro 3 mm"
+      },
+      {
+        "nome": "pedra polida",
+        "base_color": "#B98B6E",
+        "roughness": 0.25,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Veio por Wave Texture distorcida"
+      },
+      {
+        "nome": "produto (exemplo couro)",
+        "base_color": "#2F3A2F",
+        "roughness": 0.55,
+        "metallic": 0.0,
+        "coat_weight": 0.15,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Sheen Weight 0,2; costura com Bump"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "sol de janela",
+        "tipo": "SUN, ângulo 0,5°",
+        "tamanho_m": 0.0,
+        "azimute_graus": -55,
+        "elevacao_graus": 30,
+        "energia_rel": 1.0,
+        "temperatura_k": 4500,
+        "spread_graus": 0
+      },
+      {
+        "nome": "recorte de janela (gobo)",
+        "tipo": "parede com abertura retangular ou arco entre sol e cena",
+        "tamanho_m": 0.0,
+        "azimute_graus": -55,
+        "elevacao_graus": 30,
+        "energia_rel": 0.0,
+        "temperatura_k": 0,
+        "spread_graus": 0
+      },
+      {
+        "nome": "céu de preenchimento",
+        "tipo": "World #BFD3E6 força 0,15 + AREA",
+        "tamanho_m": 3.0,
+        "azimute_graus": 30,
+        "elevacao_graus": 40,
+        "energia_rel": 0.1,
+        "temperatura_k": 8000,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Uma única fonte dura e uma abertura de arquitetura desenhando a forma da luz na parede. Sol com ângulo de 0,5° para borda nítida. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        35,
+        50
+      ],
+      "fstop": 8.0,
+      "movimentos": "Composição simétrica frontal, dolly lento para a frente atravessando um vão, time-lapse de sol (a faixa de luz anda 30 cm em 4 s até encontrar o produto)."
+    },
+    "movimento": {
+      "curva": "Linear para a luz (time-lapse); ease-out longo para a câmera",
+      "timing_quadros_30fps": "Faixa de sol cruza o quadro em 90 a 120 quadros; planos de 120 quadros",
+      "overshoot": "Não."
+    },
+    "transicao": "A faixa de sol varre o quadro e o próximo plano é revelado onde ela passa (wipe de luz), ou corte por arco (a câmera atravessa um arco e muda de sala).",
+    "tipografia": "Libre Caslon Display (OFL) ou Cormorant (OFL) 500, caixa mista, tracking 0; apoio em Work Sans (OFL) 400 caixa alta tracking +12%.",
+    "som": "Neoclássico ou ambiente com piano e reverb de sala grande, 60 a 80 BPM; passos em pedra, vento em corredor.",
+    "funciona_em": "Perfume, moda, móvel, imobiliária, clínica de estética, consultoria, logo premium, cosmético.",
+    "evitar_em": "App de entrega, games, snack (lento e contemplativo demais).",
+    "erro_classico": "'Sala de render de arquitetura': luz de todos os lados, sem gobo, paredes brancas puras. Sinal: nenhuma sombra desenhada na parede, parede em 100% de branco.",
+    "referencias": [
+      {
+        "titulo": "Six N. Five, Umbral",
+        "url": "https://sixnfive.com/projects/umbral/"
+      },
+      {
+        "titulo": "Tendril, Alo Handbag (luz e sombra em ambiente mínimo)",
+        "url": "https://tendril.studio/work/alo-handbag"
+      },
+      {
+        "titulo": "Buck, Microsoft Copilot+ PCs (luz inspirada em James Turrell)",
+        "url": "https://buck.co/work/microsoft-copilot-pcs"
+      }
+    ],
+    "transicao_chave": "wipe_luz",
+    "familia_acento": "neutro",
+    "matriz": {
+      "app": "evitar",
+      "SaaS": "com ajuste",
+      "serviço": "funciona",
+      "eletrônico": "com ajuste",
+      "cosmético": "funciona",
+      "bebida": "com ajuste",
+      "comida": "evitar",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  },
+  {
+    "id": "color_block",
+    "nome": "Monocromático color block",
+    "conceito": "Uma cor domina tudo: fundo, apoio, objetos e luz em variações tonais da mesma matiz, e o produto é a única exceção.",
+    "quando_usar": "Linha de produto com variações de cor, campanha de cor nova, app que muda tema, logo com cor proprietária forte, cosmético por tom.",
+    "status": "[testar no Blender]",
+    "paleta": {
+      "fundo": "#2F6FDE",
+      "apoio": "#1F4FA8",
+      "acento": "#F5F2EA",
+      "extras": [
+        "#5C8EF0",
+        "#163B7D"
+      ]
+    },
+    "nota_paleta": "60% e 30% são a mesma matiz (azul) com luminâncias diferentes; o acento é um neutro claro ou o próprio produto. Troque a matiz por produto, mantendo a regra.",
+    "cor": {
+      "view_transform": "AgX",
+      "look": "AgX - Medium High Contrast",
+      "exposicao": 0.0
+    },
+    "materiais": [
+      {
+        "nome": "fosco tonal",
+        "base_color": "#2F6FDE",
+        "roughness": 0.7,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Specular IOR Level 0,35; formas de apoio com chanfro 4%"
+      },
+      {
+        "nome": "brilhante tonal",
+        "base_color": "#1F4FA8",
+        "roughness": 0.15,
+        "metallic": 0.0,
+        "coat_weight": 0.5,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Coat Roughness 0,05: a diferença fosco/brilho substitui a diferença de cor"
+      },
+      {
+        "nome": "produto em contraste",
+        "base_color": "#F5F2EA",
+        "roughness": 0.4,
+        "metallic": 0.0,
+        "coat_weight": 0.0,
+        "transmission_weight": 0.0,
+        "ior": 1.5,
+        "outros": "Ou o material real do produto"
+      }
+    ],
+    "luz": [
+      {
+        "nome": "principal",
+        "tipo": "AREA",
+        "tamanho_m": 1.5,
+        "azimute_graus": 40,
+        "elevacao_graus": 40,
+        "energia_rel": 1.0,
+        "temperatura_k": 5600,
+        "spread_graus": 70
+      },
+      {
+        "nome": "contorno",
+        "tipo": "AREA",
+        "tamanho_m": 0.6,
+        "azimute_graus": 160,
+        "elevacao_graus": 25,
+        "energia_rel": 0.6,
+        "temperatura_k": 5600,
+        "spread_graus": 60
+      },
+      {
+        "nome": "preenchimento tonal",
+        "tipo": "AREA cor da matiz (ex. #5C8EF0)",
+        "tamanho_m": 2.0,
+        "azimute_graus": -60,
+        "elevacao_graus": 10,
+        "energia_rel": 0.25,
+        "temperatura_k": 0,
+        "spread_graus": 120
+      }
+    ],
+    "nota_luz": "Luz branca na principal (senão o produto também tinge), preenchimento na cor do mundo. AgX desatura cores muito intensas perto do branco: mantenha o fundo com luminância média. [testar no Blender]",
+    "camera": {
+      "lentes_mm": [
+        50,
+        85
+      ],
+      "fstop": 5.6,
+      "movimentos": "Composição gráfica plana, câmera frontal; troca de cor do mundo inteiro no corte; push-in curto de 5%."
+    },
+    "movimento": {
+      "curva": "Ease-in-out médio, formas de apoio com pequeno overshoot",
+      "timing_quadros_30fps": "Troca de cor do mundo em 8 a 12 quadros; ação 24 a 36 quadros",
+      "overshoot": "Leve (5%) nas formas; zero no produto."
+    },
+    "transicao": "Troca de cor cheia: o mundo inteiro muda de matiz em 10 quadros mantendo a composição (color swap), ideal para mostrar variações.",
+    "tipografia": "Archivo (OFL) 800 ou Big Shoulders Display (OFL) 800, caixa alta, tracking -2%; texto no tom mais escuro da matiz.",
+    "som": "Pop eletrônico com batida seca 105 a 120 BPM; cada troca de cor marcada por um 'stab' de sintetizador.",
+    "funciona_em": "Eletrônico com variação de cor, cosmético por tom, app, bebida por sabor, embalagem, logo, moda.",
+    "evitar_em": "Serviço de confiança (advocacia, saúde) quando a cor não é da marca; comida natural (cor única artificial).",
+    "erro_classico": "'Tudo da mesma luminância': fundo, apoio e objetos no mesmo valor, sumindo uns nos outros. Sinal: imagem em preto e branco vira cinza uniforme; o produto não se separa.",
+    "referencias": [
+      {
+        "titulo": "Buck, Oura: Ring True to You (ambientes tom sobre tom)",
+        "url": "https://buck.co/work/oura-ring-true-to-you"
+      },
+      {
+        "titulo": "Buck, Google Pixel 4a (cor simples e foco no aparelho)",
+        "url": "https://buck.co/work/google-pixel-4a"
+      },
+      {
+        "titulo": "Ordinary Folk, Colorscope: Green (CNN, 2D monocromático)",
+        "url": "https://www.ordinaryfolk.co/project/cnn-green"
+      }
+    ],
+    "transicao_chave": "troca_cor",
+    "familia_acento": "neutro",
+    "matriz": {
+      "app": "funciona",
+      "SaaS": "funciona",
+      "serviço": "evitar",
+      "eletrônico": "funciona",
+      "cosmético": "funciona",
+      "bebida": "funciona",
+      "comida": "com ajuste",
+      "moda": "funciona",
+      "embalagem": "funciona",
+      "logo": "funciona"
+    }
+  }
+]

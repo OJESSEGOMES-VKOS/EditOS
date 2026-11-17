@@ -8,9 +8,10 @@ import {loadFont} from '@remotion/google-fonts/Mansalva';
 const {fontFamily} = loadFont('normal', {weights: ['400'], subsets: ['latin', 'latin-ext']});
 
 export type Cena45Props = {
-  legenda?: string;
-  palavraDia?: string;
-  diaFinal?: number;
+  legenda?: string; // a frase manuscrita do topo ("Sua vida de..."), como foi dita; sem ela, nada no topo
+  palavraDia?: string; // a palavra da folha do calendário
+  diaFinal?: number; // o calendário só aparece com este número (as folhas arrancam do 1 até ele)
+  copos?: number; // quantos copos voam pra pilha; 0 = sem pilha
   corParede?: string;
   corMoletom?: [string, string];
   width?: number;
@@ -22,13 +23,13 @@ const INK = '#33201C';
 const BRICK = '#9A443C';
 const cl = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
-const N_CUPS = 13;
 const CUP_H = 52;
 
 export const Cena45: React.FC<Cena45Props> = ({
-  legenda = 'Sua vida de fundador',
-  palavraDia = 'DIA',
-  diaFinal = 100,
+  legenda,
+  palavraDia = '',
+  diaFinal,
+  copos = 0,
   corParede = '#B2B392',
   corMoletom = ['#5B8E86', '#4A776F'],
   width = W,
@@ -40,7 +41,10 @@ export const Cena45: React.FC<Cena45Props> = ({
   const hold = f >= 120;
 
   // folhas arrancadas: devagar, depois corrida que acelera e freia
-  const last = diaFinal - 1;
+  const N_CUPS = copos;
+  const temCal = diaFinal !== undefined;
+  const df = diaFinal ?? 1;
+  const last = df - 1;
   const tearT = (k: number) => {
     if (k === 1) return 26;
     if (k === 2) return 36;
@@ -49,7 +53,7 @@ export const Cena45: React.FC<Cena45Props> = ({
   };
   let day = 1;
   for (let k = 1; k <= last; k++) if (f >= tearT(k)) day = k + 1;
-  const final = day >= diaFinal;
+  const final = day >= df;
   const punch = spring({frame: f - 75, fps: 30, config: {damping: 7, stiffness: 200, mass: 0.6}});
 
   // rosto: determinado -> preocupado -> careta
@@ -116,7 +120,7 @@ export const Cena45: React.FC<Cena45Props> = ({
           <g filter="url(#p45marker)" strokeLinecap="round" strokeLinejoin="round">
             {/* legenda escrita à mão */}
             <clipPath id="p45write"><rect x="0" y="40" width={W * writeIn} height="120" /></clipPath>
-            <text x={W / 2} y="128" textAnchor="middle" fontFamily={fontFamily} fontSize={78} fill={INK} clipPath="url(#p45write)">{legenda}</text>
+            {legenda ? <text x={W / 2} y="128" textAnchor="middle" fontFamily={fontFamily} fontSize={78} fill={INK} clipPath="url(#p45write)">{legenda}</text> : null}
 
             {/* mesa */}
             <rect x="-20" y="1050" width={W + 40} height="40" fill="#CDBD95" stroke={INK} strokeWidth="9" />
@@ -126,7 +130,7 @@ export const Cena45: React.FC<Cena45Props> = ({
             ))}
 
             {/* calendário na parede */}
-            <g transform="translate(225 300)">
+            {temCal ? <g transform="translate(225 300)">
               <path d="M0 -110 L-40 -66 M0 -110 L40 -66" stroke={INK} strokeWidth="6" fill="none" />
               <circle cx="0" cy="-112" r="8" fill={INK} />
               {/* folhas restantes por baixo */}
@@ -144,7 +148,7 @@ export const Cena45: React.FC<Cena45Props> = ({
                   </g>
                 );
               })}
-            </g>
+            </g> : null}
 
             {/* pilha de copos (balança) */}
             <g transform={`rotate(${swayKick} 870 1050)`}>

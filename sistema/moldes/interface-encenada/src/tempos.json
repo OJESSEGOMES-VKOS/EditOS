@@ -1,0 +1,13 @@
+{
+ "_leia": "Gerado por scripts/cobertura.mjs a partir do plano de src/tema.ts, para o tools/clone.py. Não editar à mão.",
+ "livres": [],
+ "modelos": {
+  "de": 5.180000000000001
+ },
+ "previas": {
+  "de": 14.44
+ },
+ "comenta": {
+  "de": 26.69
+ }
+}

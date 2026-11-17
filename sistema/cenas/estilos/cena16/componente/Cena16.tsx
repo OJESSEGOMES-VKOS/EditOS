@@ -10,23 +10,28 @@ const {fontFamily: MONO} = loadMono('normal', {weights: ['400', '500', '600'], s
 export type Cena16Props = {
   width?: number;
   height?: number;
-  empresa?: string;
+  // textos e série vêm da fala e da fonte real (sem padrão: os da demo ficam no demo.tsx)
+  empresa?: string; // quem é dono do dado (vazio: só a marquinha)
   letraMiuda?: string; // linha de cima à direita
-  rotulo?: string; // rótulo acima do número
-  prefixo?: string; // "R$"
-  unidade?: string; // "bi"
+  rotulo: string; // rótulo acima do número
+  prefixo?: string; // "R$" (vazio: sem prefixo)
+  unidade?: string; // "bi", "mil", "%"
   casas?: number;
-  serie?: number[]; // um valor por mês, do primeiro mês do eixo
-  anoInicial?: number;
-  mesesEixo?: number; // total de meses do eixo (inclui os não informados)
-  indiceEvento?: number;
-  eventoData?: string;
-  eventoTitulo?: string;
+  serie: number[]; // um valor por mês, do primeiro mês do eixo (série real com fonte)
+  anoInicial: number;
+  mesesEixo?: number; // total de meses do eixo (inclui os não informados); padrão: o tamanho da série
+  indiceEvento: number;
+  eventoData: string;
+  eventoTitulo: string;
   eventoLinha?: string;
-  delta?: string;
+  delta: string;
   deltaTexto?: string;
-  fonte?: string;
+  fonte: string;
   periodo?: string;
+  teto?: number; // valor do topo do eixo; padrão: 1,15 x o maior da série
+  marcas?: number[]; // valores com linha de grade; padrão: 4 marcas redondas até o teto
+  sufixoEixo?: string; // letra depois dos valores do eixo ("B")
+  queda?: boolean; // o chip aponta para baixo (▼) quando a fala é de queda
   meses?: string[];
   acento?: string;
   /** quadro em que a linha chega ao fim (a 30 fps) */
@@ -35,41 +40,30 @@ export type Cena16Props = {
 
 const MESES_PT = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
 
-const serieDemo = (() => {
-  const v: number[] = [];
-  let seed = 7;
-  const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
-  for (let i = 0; i < 81; i++) {
-    let x: number;
-    if (i <= 50) x = 0.3 + (i / 50) ** 1.35 * 0.7;
-    else x = 1.0 + (1 - Math.exp(-(i - 50) / 13)) * 3.6;
-    x += (rnd() - 0.5) * (i > 50 ? 0.32 : 0.04);
-    v.push(Math.max(0.25, x));
-  }
-  v[80] = 4.2;
-  return v;
-})();
-
 export const Cena16: React.FC<Cena16Props> = ({
   width = 1080,
   height = 1350,
-  empresa = 'VERANA PAY',
-  letraMiuda = 'VOLUME · MENSAL · ANUALIZADO · R$',
-  rotulo = 'Volume anual de pagamentos',
-  prefixo = 'R$',
-  unidade = 'bi',
+  empresa = '',
+  letraMiuda = '',
+  rotulo,
+  prefixo = '',
+  unidade = '',
   casas = 1,
-  serie = serieDemo,
-  anoInicial = 2019,
-  mesesEixo = 84,
-  indiceEvento = 50,
-  eventoData = 'MAR 2023',
-  eventoTitulo = 'Cartão Verana chega',
-  eventoLinha = 'O volume dobra em cinco meses',
-  delta = '321%',
-  deltaTexto = 'desde o lançamento do cartão',
-  fonte = 'FONTE: DADOS ILUSTRATIVOS',
-  periodo = 'JAN 2019 A SET 2025',
+  serie,
+  anoInicial,
+  mesesEixo: mesesEixoProp,
+  indiceEvento,
+  eventoData,
+  eventoTitulo,
+  eventoLinha = '',
+  delta,
+  deltaTexto = '',
+  fonte,
+  periodo = '',
+  teto,
+  marcas,
+  sufixoEixo = '',
+  queda = false,
   meses = MESES_PT,
   acento = '#FF5B1F',
   fimLinha = 102,
@@ -78,6 +72,7 @@ export const Cena16: React.FC<Cena16Props> = ({
   const {fps} = useVideoConfig();
   const k = Math.min(width / 1080, height / 1350);
   const n = serie.length;
+  const mesesEixo = mesesEixoProp ?? n;
   const ev = indiceEvento;
 
   // posição da ponta (índice fracionário do mês): já se move no quadro 0, freia no evento, acelera a subida, assenta no fim
@@ -103,7 +98,9 @@ export const Cena16: React.FC<Cena16Props> = ({
 
   // geometria do gráfico (no palco)
   const X0 = 95, X1 = 975, Y0 = 680, Y1 = 1140;
-  const maxV = 5;
+  const maxV = teto ?? Math.max(...serie) * 1.15;
+  const passo = (() => { const b = 10 ** Math.floor(Math.log10(maxV / 4)); return [1, 2, 2.5, 5, 10].map((m) => m * b).find((p) => maxV / p <= 4.5) ?? b * 10; })();
+  const grade = marcas ?? Array.from({length: Math.floor(maxV / passo)}, (_, i) => +((i + 1) * passo).toFixed(6));
   const yOf = (v: number) => Y1 - Math.sqrt(v / maxV) * (Y1 - Y0);
   const xOf = (i: number) => X0 + (i / (mesesEixo - 1)) * (X1 - X0);
 
@@ -165,7 +162,7 @@ export const Cena16: React.FC<Cena16Props> = ({
         </div>
         {/* chip delta + data viva */}
         <div style={{position: 'absolute', left: 95, top: 580, display: 'flex', alignItems: 'center', gap: 22, transform: `scale(${chip})`, transformOrigin: 'left center', opacity: chip > 0.01 ? 1 : 0}}>
-          <div style={{background: acento, color: '#0A0B0D', fontFamily: MONO, fontWeight: 600, fontSize: 24, padding: '6px 14px', borderRadius: 4}}>▲ {delta}</div>
+          <div style={{background: acento, color: '#0A0B0D', fontFamily: MONO, fontWeight: 600, fontSize: 24, padding: '6px 14px', borderRadius: 4}}>{queda ? '▼' : '▲'} {delta}</div>
           <div style={{fontSize: 26, color: '#C9CDD2', fontWeight: 500}}>{deltaTexto}</div>
         </div>
         <div style={{position: 'absolute', right: 105, top: 584, fontFamily: MONO, fontSize: 22, letterSpacing: 2, display: 'flex', alignItems: 'center', gap: 12, color: BRANCO}}>
@@ -183,10 +180,10 @@ export const Cena16: React.FC<Cena16Props> = ({
               <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(255,255,255,0.07)" strokeWidth="4" />
             </pattern>
           </defs>
-          {[1, 2, 3, 5].map((v) => (
+          {grade.map((v) => (
             <g key={v}>
               <line x1={X0} x2={X1} y1={yOf(v)} y2={yOf(v)} stroke="rgba(255,255,255,0.07)" />
-              <text x={X1 + 18} y={yOf(v) + 6} fill={CINZA} fontFamily={MONO} fontSize={17}>{v}{unidade === 'bi' ? 'B' : ''}</text>
+              <text x={X1 + 18} y={yOf(v) + 6} fill={CINZA} fontFamily={MONO} fontSize={17}>{String(v).replace('.', ',')}{sufixoEixo}</text>
             </g>
           ))}
           {anos.map((a, i) => (

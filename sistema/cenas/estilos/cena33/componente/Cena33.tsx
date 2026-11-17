@@ -6,8 +6,9 @@ import {loadFont} from '@remotion/google-fonts/Figtree';
 const {fontFamily: FIGTREE} = loadFont('normal', {weights: ['700'], subsets: ['latin']});
 
 export type Cena33Props = {
-  resultado?: string;
-  camadas?: [string, string, string];
+  resultado: string; // a pílula da ponta: o que todo mundo vê
+  camadas: string[]; // 1 a 4, de cima para baixo, como a fala diz
+  tempos?: number[]; // quadro em que cada camada acende (na palavra dela); padrão: espalhadas entre 38 e 64
   width?: number;
   height?: number;
   duracao?: number;
@@ -61,8 +62,9 @@ const corMar = (y: number) => {
 };
 
 export const Cena33: React.FC<Cena33Props> = ({
-  resultado = 'O resultado',
-  camadas = ['Tentativas que falharam', 'Noites viradas', 'O sistema'],
+  resultado,
+  camadas,
+  tempos,
   width = 1080,
   height = 1350,
   duracao = 150,
@@ -120,8 +122,12 @@ export const Cena33: React.FC<Cena33Props> = ({
     );
   };
   const tela = (wy: number) => (wy - cy) * S + 675;
-  const fatias = [300, 620];
-  const tFatia = [52 * s, 64 * s];
+  // camadas: posição no gelo (y do mundo), linha de corte entre elas e o tempo de cada uma
+  const n = Math.max(1, Math.min(4, camadas.length));
+  const yCam = n === 3 ? [140, 460, 800] : n === 1 ? [460] : [...Array(n)].map((_, i) => 140 + (i * 660) / (n - 1));
+  const tCam = [...Array(n)].map((_, i) => tempos?.[i] ?? (n === 3 ? [38, 52, 64][i] : n === 1 ? 46 : 38 + (i * 26) / (n - 1)) * s);
+  const fatias = n === 3 ? [300, 620] : yCam.slice(1).map((y, i) => (y + yCam[i]) / 2);
+  const tFatia = tCam.slice(1);
 
   const contorno = (wy: number, prog: number) => {
     const r = raioEm(wy) * 1.03;
@@ -133,7 +139,7 @@ export const Cena33: React.FC<Cena33Props> = ({
   return (
     <AbsoluteFill style={{overflow: 'hidden', background: '#205A93'}}>
       <div style={{position: 'absolute', left: '50%', top: '50%', width: 1080, height: 1350, marginLeft: -540, marginTop: -675, transform: `scale(${k})`}}>
-        <svg width={1080} height={1350} style={{position: 'absolute', inset: 0}}>
+        <svg width={1080} height={1350} style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
           <defs>
             <linearGradient id="ceu33" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#CFE5F4" /><stop offset="1" stopColor="#F2F8FC" /></linearGradient>
             <linearGradient id="mar33" gradientUnits="userSpaceOnUse" x1="0" y1={tela(0)} x2="0" y2={tela(960)}>
@@ -142,8 +148,10 @@ export const Cena33: React.FC<Cena33Props> = ({
             <clipPath id="cima33"><rect x={0} y={-10} width={1080} height={Math.max(0, agua + 10)} /></clipPath>
             <clipPath id="baixo33"><rect x={0} y={agua} width={1080} height={Math.max(0, 1360 - agua)} /></clipPath>
           </defs>
-          <rect x={0} y={0} width={1080} height={Math.max(0, agua)} fill="url(#ceu33)" />
-          <rect x={0} y={agua} width={1080} height={Math.max(0, 1350 - agua)} fill="url(#mar33)" />
+          {/* céu e mar passam da borda do palco: em 9:16 e 16:9 não sobra faixa de outra cor */}
+          <rect x={-2000} y={-3000} width={5080} height={3000 + Math.min(0, agua)} fill="#CFE5F4" />
+          <rect x={-2000} y={0} width={5080} height={Math.max(0, agua)} fill="url(#ceu33)" />
+          <rect x={-2000} y={agua} width={5080} height={Math.max(0, 1350 - agua) + 3000} fill="url(#mar33)" />
           <g clipPath="url(#cima33)">
             {tris.map((t, i) => <polygon key={i} points={pts(t.P)} fill={rgb(mix(sombra, gelo, Math.pow(t.lam, 0.7)))} stroke={rgb(mix(sombra, gelo, Math.pow(t.lam, 0.7)))} strokeWidth={0.6} />)}
           </g>
@@ -156,11 +164,11 @@ export const Cena33: React.FC<Cena33Props> = ({
             })}
           </g>
           {/* superfície fosca logo abaixo da linha (a "cortina" que sobe) */}
-          <rect x={0} y={agua} width={1080} height={70 * S} fill="url(#fosco33)" />
+          <rect x={-2000} y={agua} width={5080} height={70 * S} fill="url(#fosco33)" />
           <defs>
             <linearGradient id="fosco33" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E6F6FB" stopOpacity={0.55} /><stop offset="1" stopColor="#E6F6FB" stopOpacity={0} /></linearGradient>
           </defs>
-          <line x1={0} x2={1080} y1={agua} y2={agua} stroke="#fff" strokeWidth={4} />
+          <line x1={-2000} x2={3080} y1={agua} y2={agua} stroke="#fff" strokeWidth={4} />
           {fatias.map((wy, i) => {
             const prog = interpolate(frame, [tFatia[i], tFatia[i] + 12 * s], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
             const y = tela(wy);
@@ -173,9 +181,7 @@ export const Cena33: React.FC<Cena33Props> = ({
           })}
         </svg>
         {pill(resultado, proj([75, -120, 0])[0] + 30, tela(-120), null, 'esq')}
-        {pill(camadas[0], proj([0, 140, 0])[0], tela(140), 38 * s)}
-        {pill(camadas[1], proj([0, 460, 0])[0], tela(460), 52 * s)}
-        {pill(camadas[2], proj([0, 800, 0])[0], tela(800), 64 * s)}
+        {camadas.slice(0, n).map((c, i) => pill(c, proj([0, yCam[i], 0])[0], tela(yCam[i]), tCam[i]))}
       </div>
     </AbsoluteFill>
   );

@@ -2,12 +2,14 @@ import React from 'react';
 import {AbsoluteFill, Audio, staticFile} from 'remotion';
 import {Previas, cenaEm, fundoCreme, montaCenas, useT} from './tema';
 import {CENA_COMP} from './Cenas';
+import {LivreCena} from './Livres';
 import {Legenda} from './Legenda';
 
 /** arroba: o @ sem o "@" nas telas de Instagram (vazio esconde); foto: arquivo em public/ do avatar (vazio esconde) */
 export type Props = {voz: boolean; previas: boolean; nomesPrevias: [string, string]; arroba?: string; foto?: string};
 
-/** interface-encenada: uma cena por vez, corte seco entre modos (MODELO §5); a legenda por cima; a voz uma vez só */
+/** interface-encenada: uma cena por vez, corte seco entre modos (MODELO §5); a legenda por cima; a voz uma vez só.
+ * A cena é uma tela da casa (CENA_COMP, pelo id) ou uma tela livre (src/telas/ da pasta do vídeo, pelo plano). */
 export const VitrineDinamico01: React.FC<Props> = ({voz, previas = false, nomesPrevias = ['', ''], arroba = '', foto = ''}) => {
 	const {t} = useT();
 	const cenas = React.useMemo(() => montaCenas(previas), [previas]);
@@ -16,7 +18,7 @@ export const VitrineDinamico01: React.FC<Props> = ({voz, previas = false, nomesP
 	return (
 		<Previas.Provider value={{previas, nomesPrevias, arroba, foto}}>
 			<AbsoluteFill style={c.modo === 'rosto' ? {background: '#000'} : fundoCreme}>
-				<Cena />
+				{c.livre ? <LivreCena L={c.livre} ate={c.ate} /> : <Cena />}
 				<Legenda />
 				{voz && <Audio src={staticFile('voz.wav')} />}
 			</AbsoluteFill>

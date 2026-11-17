@@ -2,7 +2,7 @@
 
 **Você grava. O assistente edita.**
 
-Você grava um vídeo no celular, escolhe um dos 19 modelos de edição e pede. O assistente (Claude Code ou Codex) entrega o vídeo pronto, com legenda, cortes, telas animadas e som. Você não precisa saber editar.
+Você grava um vídeo no celular, escolhe um dos 20 modelos de edição e pede. O assistente (Claude Code ou Codex) entrega o vídeo pronto, com legenda, cortes, telas animadas e som. Você não precisa saber editar. Também dá pra pedir um vídeo animado (45 estilos de animação, 2D e 3D) ou um filme 3D, sem gravar nada.
 
 Criado por **Jessé Gomes ([@OJESSEGOMES](https://instagram.com/ojessegomes))**.
 
@@ -15,7 +15,7 @@ O EditOS vem em duas versões. O motor é o mesmo; muda só se vem com os modelo
 
 | | 🎬 **Completo** | 🧱 **Cru** |
 |---|---|---|
-| O que vem | o sistema + os 19 modelos prontos + os 46 estilos de cena | o sistema + os 46 estilos de cena, sem nenhum modelo |
+| O que vem | o sistema + os 20 modelos prontos + os 46 estilos de cena + os 45 estilos de animação + o 3D | o sistema + os 46 estilos de cena + os 45 estilos de animação + o 3D, sem nenhum modelo |
 | Para quem | quer editar já, nos estilos prontos | quer criar os próprios estilos do zero (`/criar-modelo`) |
 
 Abra o **Claude Code** ou o **Codex** numa pasta vazia do seu computador e cole a frase da versão que você quer:
@@ -68,11 +68,34 @@ Você só usa as duas pastas com o seu nome. O resto é com o assistente.
 
 ---
 
-## Os 19 modelos (versão completa)
+## Cada modelo é uma skill: o jeito, nunca uma cópia
 
-| 🙋 Com você aparecendo | 🎨 Sem ninguém na tela (só voz) | 📣 Anúncio |
-|---|---|---|
-| rosto-telas · youtube-didatico · autoridade · interface-encenada · trailer · prova-print · especialista · pregacao · pagina-de-livro · minidocumentario · imagem-por-palavra · corte-palestra | texto-e-objeto · motion-ouro · vetor-minimo · personagem · documental-dados | anuncio-canvas · anuncio-neon |
+Cada modelo, estilo de cena e estilo de animação funciona como uma skill do EditOS. A skill ensina ao assistente a
+personalidade do estilo (as cores, as letras, o ritmo, como cada tela entra e sai, e o porquê de cada coisa) e como
+criar a tela que a sua fala pede. O vídeo de exemplo de cada modelo mostra o jeito, mas não é um roteiro: o seu vídeo
+sai com a cara do modelo e com as telas, os textos e os cortes do que **você** falou. Antes de entregar, o assistente
+confere que o vídeo não é uma cópia do exemplo.
+
+## Os 20 modelos (versão completa)
+
+| 🙋 Com você aparecendo | 🎨 Sem ninguém na tela (só voz) | 📣 Anúncio | 🧊 3D |
+|---|---|---|---|
+| rosto-telas · youtube-didatico · autoridade · interface-encenada · trailer · prova-print · especialista · pregacao · pagina-de-livro · minidocumentario · imagem-por-palavra · corte-palestra | texto-e-objeto · motion-ouro · vetor-minimo · personagem · documental-dados | anuncio-canvas · anuncio-neon | 3d-como-funciona |
+
+## Os 45 estilos de animação
+
+Conte uma ideia e o assistente faz o vídeo animado inteiro: roteiro, voz (a sua gravada, de IA ou nenhuma),
+desenho e animação. Quadro de giz, rabisco de caderno, rabisco de nanquim, papel recortado, pixel de
+videogame, neon, vitral, mesa de jogo, tipografia, maquete isométrica, massinha 3D e outros. O catálogo está em
+`sistema/animacoes/estilos/INDICE.md`. Peça, por exemplo: *"faz um vídeo de 40 segundos sobre como a abelha faz o mel,
+no quadro de giz"*.
+
+## O 3D
+
+Para filme 3D de verdade (produto, app, marca, "como funciona por dentro"), o EditOS usa o **Blender**, que é
+gratuito (blender.org). Ele só é preciso para o 3D: o assistente instala com a sua licença quando você pedir o
+primeiro vídeo 3D. Os modelos 3D gratuitos (licença CC0) são baixados das fontes oficiais na primeira vez. Skills:
+`estudio-3d` (comercial 3D), `3d-como-funciona` (explicativo de mecanismo) e `low-poly-toon` (desenho 3D leve).
 
 Os modelos `especialista`, `imagem-por-palavra`, `corte-palestra` e `documental-dados` ainda estão em prova: funcionam, mas seguem sendo refinados.
 

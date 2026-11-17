@@ -4,14 +4,14 @@ import {loadFont} from '@remotion/google-fonts/InterTight';
 import PRESENTES from './presentes.json';
 import {
 	BLOCOS, CORES_PLANO, DURACAO, ESTILOS, HEROI, ESTILO_PASSO, FIXO, FLASHES, FPS, IMGS, LEG_LH, LEG_PX, NEGATIVOS, ORIGEM, PALETA_PLANO,
-	PICO_ALT, PICO_PX, PLANOS, PONTES, PS, ZONA, ZOOM, ZW, blocosEm, passoDe, picoTexto, subEm, entra, escrita, geometria, largLeg, largPico, paletaDe, planoEm,
+	PICO_ALT, PICO_PX, PLANOS, PONTES, PS, Y1, ZONA, ZOOM, ZW, blocosEm, passoDe, picoTexto, subEm, entra, escrita, geometria, largLeg, largPico, paletaDe, planoEm,
 	type Bloco, type CoresSoltas, type Paleta, type Plano, type Trat,
 } from './modelo';
 
 /**
  * Molde do imagem-por-palavra (../../modelos/imagem-por-palavra/imagem-por-palavra.md): a imagem troca a cada 1 a 3 palavras por
  * baixo de uma legenda pequena e fixa que acumula a frase; a cada ~6 s um pico tipográfico; um som por evento.
- * O plano do vídeo é src/plano.json (+ src/imagens.json, a lista palavra -> imagem); a lógica é src/modelo.ts.
+ * O plano do vídeo é o bloco O PLANO de src/plano.ts (+ src/imagens.json, a lista palavra -> imagem); a lógica é src/modelo.ts.
  * A gravação entra como foi gravada (G6): estilos, duotone, negativo e grão só nas imagens e cartões.
  */
 export {DURACAO, FPS};
@@ -90,11 +90,19 @@ const movimento = (mov: string | undefined, u: number) => {
 		default: return `scale(${1.0 + 0.08 * u})`;
 	}
 };
-const Foto: React.FC<{id: string; u: number; mov?: string; trat?: Trat}> = ({id, u, mov, trat}) => (
-	<AbsoluteFill style={{overflow: 'hidden', background: '#000'}}>
-		<Img src={src(id)} style={{width: 1080, height: 1920, objectFit: 'cover', transform: movimento(mov, u), filter: filtro(trat)}} />
-	</AbsoluteFill>
-);
+const Foto: React.FC<{id: string; u: number; mov?: string; trat?: Trat}> = ({id, u, mov, trat}) =>
+	IMGS[id].caber ? (
+		// print, logo ou documento (caber): inteiro, sem cortar, num quadro acima da legenda; anda do mesmo jeito
+		<AbsoluteFill style={{overflow: 'hidden', background: '#000'}}>
+			<div style={{position: 'absolute', left: ZONA.esq, width: ZW, top: ZONA.topo, height: Y1 - 40 - ZONA.topo, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: movimento(mov, u)}}>
+				<Img src={src(id)} style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 18, boxShadow: '0 24px 70px rgba(0,0,0,0.6)', filter: filtro(trat)}} />
+			</div>
+		</AbsoluteFill>
+	) : (
+		<AbsoluteFill style={{overflow: 'hidden', background: '#000'}}>
+			<Img src={src(id)} style={{width: 1080, height: 1920, objectFit: 'cover', transform: movimento(mov, u), filter: filtro(trat)}} />
+		</AbsoluteFill>
+	);
 
 /** sem a imagem: o efeito tipográfico no lugar (o fundo troca preto/creme, a legenda continua por cima, ícones-pontuação) */
 const Tipografico: React.FC<{p: Plano; t: number; pal: Paleta}> = ({p, t, pal}) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import {C, CENAS, FIXOS, G, P, SANS, SERIF, cenaEm, iw, tw, useT} from './tema';
+import {C, CENAS, CHAVE_IDS, FIXOS, G, P, SANS, SERIF, cenaEm, tw, useT} from './tema';
 import type {Modo} from './tema';
 
 /**
@@ -10,16 +10,17 @@ import type {Modo} from './tema';
  */
 type Pal = {texto: string; de: number; ate: number; i: number};
 type Pedaco = {pal: Pal[]; de: number; ate: number; cheio?: boolean};
-/* ---------------------------------------------------------------- o plano da legenda (refazer num vídeo novo) */
-/** palavras-chave (o termo protagonista: número, nome da ferramenta, o objeto da prova): serifa itálica azul */
-export const CHAVE = new Set([iw('modelos'), iw('claude', 2), iw('instagram'), iw('prévias'), iw('modelos', 3), iw('aprender'), iw('dm')]);
+/* ---------------------------------------------------------------- os ajustes da legenda */
+/** palavras-chave (o termo protagonista: número, nome da ferramenta, o objeto da prova): serifa itálica azul. Vêm do plano
+ * (chave() no bloco O PLANO de src/tema.ts) */
+export const CHAVE = new Set(CHAVE_IDS);
 /** as palavras que um texto fixo já mostra (o título do gancho, o contador, o comando do fecho; FIXOS em src/tema.ts): a
  * legenda não repete (PV4: um elemento por ideia na tela) */
 export const FIXO = new Set(FIXOS.flatMap((x) => x.ids));
 export const MIN_PEDACO = 1.5;
 /** quanto antes da 1ª palavra o pedaço pode nascer apagado, quando a legenda está vazia (s) */
 export const ANTECIPA = 0.5;
-/* ---------------------------------------------------------------- fim do plano */
+/* ---------------------------------------------------------------- fim dos ajustes */
 
 export const LUGAR = {topo: G.legenda, palco: G.legendaPalco, esq: 60, dir: 140, fonte: 66, chave: 1.22};
 export const topoDe = (modo: Modo) => (modo === 'palco' ? LUGAR.palco : LUGAR.topo);

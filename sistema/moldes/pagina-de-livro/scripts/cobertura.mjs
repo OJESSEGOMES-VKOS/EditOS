@@ -62,7 +62,8 @@ const ex = exibicoes();
 const curtos = [], longos = [];
 for (const e of ex) {
 	if (e.ate - e.de < MIN_PEDACO - 1e-6) curtos.push(`"${e.nome}" ${(e.ate - e.de).toFixed(2)} s`);
-	for (let i = e.i0; i < e.i0 + e.n; i++) if (e.ate - PB[i].start < MIN_PALAVRA - 1e-6) curtos.push(`"${PB[i].text}" em "${e.nome}" só ${(e.ate - PB[i].start).toFixed(2)} s`);
+	// a última de um pedaço que já ficou 1,5 s pode ter 0,25 s (não é palavra solta; a mesma régua do rosto-telas, fala rápida)
+	for (let i = e.i0; i < e.i0 + e.n; i++) if (e.ate - PB[i].start < (i === e.i0 + e.n - 1 && e.ate - e.de >= MIN_PEDACO - 1e-6 ? 0.25 : MIN_PALAVRA) - 1e-6) curtos.push(`"${PB[i].text}" em "${e.nome}" só ${(e.ate - PB[i].start).toFixed(2)} s`);
 	if (e.linhas > MAX_LINHAS) longos.push(`"${e.nome}" ${e.linhas} linhas`);
 }
 const vezes = PB.map(() => 0);

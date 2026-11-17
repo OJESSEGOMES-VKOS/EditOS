@@ -16,7 +16,11 @@
 // 14) PV4: nenhuma palavra/ideia em dois elementos ao mesmo tempo (título, contador, comando, legenda);
 // 15) PV5: nenhum texto fixo pendurado: sai até 1 s depois da última palavra dele e não passa da cena (só o comando do fecho fica);
 // 16) PV6/PV8: no cartão de câmera a cabeça inteira (topo medido no recorte) sai da moldura, sem bater na legenda, rosto centrado;
-// 17) PV7: a câmera que segue o rosto é lenta e sem tremida (velocidade, tranco e vaivém do caminho alisado).
+// 17) PV7: a câmera que segue o rosto é lenta e sem tremida (velocidade, tranco e vaivém do caminho alisado);
+// 18) as telas: toda cena de tela mostra uma tela livre registrada em src/telas/index.ts ou uma tela da casa ligada no
+//     plano (`<tela> = true`); o texto escrito numa tela livre é dito (G19) e não está na legenda na mesma hora (G26/PV4);
+//     as telas livres entram nas regras de contador, grifo e print com origem como as da casa. No fim grava
+//     src/tempos.json (o resumo do plano para o tools/clone.py: as telas livres e as da casa, com o início de cada uma).
 import {build} from 'esbuild';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,14 +31,33 @@ const SRC = path.join(MOLDE, 'src');
 const PB = JSON.parse(fs.readFileSync(path.join(SRC, 'palavras.json'), 'utf8'));
 const limpa = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9%]/g, '');
 const fmt = (x) => x.toFixed(2).replace('.', ',');
-const FONTES = fs.readdirSync(SRC).filter((f) => /\.tsx?$/.test(f)).map((f) => ({f: `src/${f}`, txt: fs.readFileSync(path.join(SRC, f), 'utf8')}));
+const TELAS_DIR = path.join(SRC, 'telas');
+const DE_TELAS = fs.existsSync(TELAS_DIR) ? fs.readdirSync(TELAS_DIR).filter((f) => /\.tsx$/.test(f)).map((f) => ({f: `src/telas/${f}`, txt: fs.readFileSync(path.join(TELAS_DIR, f), 'utf8')})) : [];
+const FONTES = [...fs.readdirSync(SRC).filter((f) => /\.tsx?$/.test(f)).map((f) => ({f: `src/${f}`, txt: fs.readFileSync(path.join(SRC, f), 'utf8')})), ...DE_TELAS];
 const falhas = [];
 const falha = (regra, msg) => falhas.push(`[${regra}] ${msg}`);
 
-// 1. palavras do plano
+// 1. palavras do plano. As telas da casa (src/Cenas.tsx, presas à fala do aprovado) só contam quando o plano as liga
+// (`<tela> = true` no bloco do plano de src/tema.ts): desligadas, elas nem são desenhadas.
+const TEMA_TXT = FONTES.find((x) => x.f === 'src/tema.ts').txt;
+const _ini = TEMA_TXT.split('\n').findIndex((l) => /^\s*\/\/.*O PLANO/.test(l));
+const _fim = TEMA_TXT.split('\n').findIndex((l, i) => i > _ini && /fim do plano/i.test(l));
+const LIGADAS = new Set(TEMA_TXT.split('\n').slice(_ini + 1, _fim).map((l) => l.replace(/\/\/.*$/, '').match(/^\s*(\w+)\s*=\s*true\b/)?.[1]).filter(Boolean));
+const CENAS_TXT = FONTES.find((x) => x.f === 'src/Cenas.tsx').txt;
+const CASA_COMP = Object.fromEntries([...(CENAS_TXT.match(/const DA_CASA[^=]*=\s*\{([^}]*)\}/)?.[1] ?? '').matchAll(/(\w+):\s*(\w+)/g)].map((m) => [m[2], m[1]]));
+const linhaDeCasaDesligada = (() => {
+	// para cada linha de src/Cenas.tsx: o componente da casa em que ela está (const Nome: React.FC ...), se ele está desligado
+	let atual = null;
+	return CENAS_TXT.split('\n').map((l) => {
+		const m = l.match(/^(?:export )?const (\w+)\s*[:=]/);
+		if (m) atual = m[1];
+		return atual in CASA_COMP && !LIGADAS.has(CASA_COMP[atual]);
+	});
+})();
 for (const {f, txt} of FONTES)
 	txt.split('\n').forEach((l, i) => {
 		if (/^\s*(\/\/|\*|\/\*\*)/.test(l)) return;
+		if (f === 'src/Cenas.tsx' && linhaDeCasaDesligada[i]) return;
 		for (const m of l.matchAll(/\bi?w\('([^'$]+)'(?:,\s*(\d+))?\)/g)) {
 			const n = Number(m[2] ?? 1);
 			const tem = PB.filter((p) => limpa(p.text) === limpa(m[1])).length;
@@ -54,7 +77,7 @@ const tmp = path.join(TMP, `cobertura-pf01-${process.pid}.mjs`);
 let R;
 try {
 	await build({
-		stdin: {contents: "export * from './src/Legenda.tsx'; export {DURACAO, FPS, CENAS, TITULO, FIXOS, CONTADORES, G, R, CAMINHO} from './src/tema.ts';", resolveDir: MOLDE, loader: 'ts'},
+		stdin: {contents: "export * from './src/Legenda.tsx'; export {DURACAO, FPS, CENAS, TITULO, FIXOS, CONTADORES, G, R, CAMINHO, CASA} from './src/tema.ts';", resolveDir: MOLDE, loader: 'ts'},
 		bundle: true, platform: 'node', format: 'esm', outfile: tmp, logLevel: 'silent', jsx: 'automatic', loader: {'.json': 'json'}, absWorkingDir: MOLDE,
 		plugins: [{name: 'stub', setup(b) {
 			b.onResolve({filter: /^@remotion\/google-fonts/}, (a) => ({path: a.path, namespace: 'stub'}));
@@ -69,7 +92,7 @@ try {
 	fs.rmSync(tmp, {force: true});
 }
 if (!R) process.exit(1);
-const {exibicoes, FIXO, LUGAR, DURACAO, FPS, CENAS, TITULO, FIXOS, CONTADORES, G, R: RM, CAMINHO} = R;
+const {exibicoes, FIXO, LUGAR, DURACAO, FPS, CENAS, TITULO, FIXOS, CONTADORES, G, R: RM, CAMINHO, CASA} = R;
 const ZONA = {esq: 60, dir: 940, topo: 250, base: 1500};
 const ex = exibicoes();
 const cenaDe = (t) => CENAS.find((c) => t >= c.de && t < c.ate) ?? CENAS[CENAS.length - 1];
@@ -124,7 +147,7 @@ for (const [k, fonte, fator] of TITULO ? [['linha1', 84, 0.56], ['linha2', 108, 
 
 // 9. contador para no número dito
 const NUM = {um: 1, uma: 1, dois: 2, duas: 2, tres: 3, quatro: 4, cinco: 5, seis: 6, sete: 7, oito: 8, nove: 9, dez: 10, cem: 100};
-const cenasTxt = FONTES.find((x) => x.f === 'src/Cenas.tsx').txt;
+const cenasTxt = [FONTES.find((x) => x.f === 'src/Cenas.tsx').txt, ...DE_TELAS.map((x) => x.txt)].join('\n');
 for (const k of CONTADORES) {
 	const dito = limpa(PB[k.ids[0]].text);
 	const num = /^\d+%?$/.test(dito) ? Number(dito.replace('%', '')) : NUM[dito];
@@ -218,6 +241,43 @@ if (temPalco) {
 	if (acc > 120) falha('PV7', `a câmera dá tranco de ${Math.round(acc)} px/s² (máx. 120)`);
 	if (vaivem / DURACAO > 0.35) falha('PV7', `a câmera troca de sentido ${vaivem} vezes em ${fmt(DURACAO)} s: tremendo (máx. 1 a cada ~3 s)`);
 	console.log(`câmera: até ${Math.round(vMax)} px/s, tranco até ${Math.round(acc)} px/s², ${vaivem} trocas de sentido`);
+}
+
+// 18. as telas: livre registrada ou da casa ligada; texto da tela livre dito e fora da legenda na mesma hora
+const semComent = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/[^\n]*/g, '$1');
+const regTxt = fs.existsSync(path.join(TELAS_DIR, 'index.ts')) ? semComent(fs.readFileSync(path.join(TELAS_DIR, 'index.ts'), 'utf8')) : '';
+const LIVRES = new Set((regTxt.match(/TELAS\s*=\s*\{([^}]*)\}/)?.[1] ?? '').split(',').map((x) => x.split(':')[0].trim()).filter(Boolean));
+const DA_CASA = new Set(Object.keys(CASA));
+const FALA = new Set(PB.map((p) => limpa(p.text)).filter(Boolean));
+for (const c of CENAS) {
+	if (c.modo === 'pessoa' || c.modo === 'rosto') continue;
+	if (LIVRES.has(c.tela)) {
+		const arq = DE_TELAS.find((x) => x.f === `src/telas/${c.tela}.tsx`);
+		if (!arq) {
+			falha('telas', `a tela livre ${c.tela} está registrada, mas não existe src/telas/${c.tela}.tsx`);
+			continue;
+		}
+		const textos = [...semComent(arq.txt).matchAll(/>\s*([^<>{}\n]*[A-Za-zÀ-ú0-9][^<>{}\n]*)\s*</g)].map((m) => m[1].trim()).filter((x) => x && !/=>|&&|\|\||;|[()[\]]/.test(x));
+		for (const tx of textos) {
+			const fora = tx.split(/\s+/).map(limpa).filter((x) => x && !FALA.has(x));
+			if (fora.length) falha('G19', `src/telas/${c.tela}.tsx escreve "${tx}", e a fala não diz "${fora.join(', ')}": texto na tela só o que é dito (o print real não conta, é a prova)`);
+			const fa = fichas(tx);
+			const junto = ex.filter((e) => Math.min(e.ate, c.ate) - Math.max(e.de, c.de) > 1 / FPS && [...fichas(e.texto)].some((x) => fa.has(x)));
+			if (junto.length) falha('G26/PV4', `a tela ${c.tela} escreve "${tx}" e a legenda "${junto[0].texto}" diz o mesmo na mesma hora: deixe a legenda contar e a tela mostrar a prova`);
+		}
+	} else if (DA_CASA.has(c.tela)) {
+		if (!CASA[c.tela]) falha('telas', `a cena ${c.id} usa a tela da casa ${c.tela} sem a linha \`${c.tela} = true\` no plano`);
+	} else falha('telas', `a cena ${c.id} (${c.modo}) mostra a tela "${c.tela}", que não é livre registrada em src/telas/index.ts nem da casa`);
+}
+// o resumo do plano para o tools/clone.py (sistema/JEITO.md §5): as telas livres e as da casa, com o início de cada uma
+{
+	const resumo = {_leia: 'Gerado por scripts/cobertura.mjs para o tools/clone.py: as telas do plano (src/tema.ts). Não editar à mão.', livres: [], fala: {palavras: PB.length, fim: PB[PB.length - 1].end}};
+	for (const c of CENAS) {
+		if (!c.tela) continue;
+		if (LIVRES.has(c.tela)) resumo.livres.push({comp: c.tela, modo: c.modo, de: c.de, sai: c.ate});
+		else if (DA_CASA.has(c.tela)) resumo[c.tela] = {de: c.de, ate: c.ate};
+	}
+	fs.writeFileSync(path.join(SRC, 'tempos.json'), JSON.stringify(resumo, null, 1) + '\n');
 }
 
 const modos = {};

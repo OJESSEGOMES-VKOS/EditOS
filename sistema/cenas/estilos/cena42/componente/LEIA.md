@@ -4,6 +4,6 @@
 Pensado num palco 1080x1350 que escala para cobrir qualquer tamanho (`width`/`height`): em 9:16 corta as laterais,
 em 16:9 corta em cima e embaixo. A linha do tempo é de 150 quadros e estica com `durationInFrames`.
 
-**Props:** rotulo, corCabelo, corCeu, width, height.
+**Props:** `rotulo` (a pergunta dita, em caixa alta; sem ele, nenhum rótulo), `corCabelo`, `corCeu`, `width`, `height`. O cenário e a história (ponto de ônibus, vento, celular riscado) são da demo e moram no código: para uma fala nova, copie e redesenhe o palco, os objetos e as poses (`../cena42.md`, Como variar). Os textos da demo estão em `textos-demo.json`.
 
 **Conferido:** traço fino com tremor (boil a cada 3 quadros, parado no fim), palco de lado, rajada com objetos cada vez mais rápidos e traços de velocidade, mãos na cabeça, celular com X vermelho em dois traços, dar de ombros.

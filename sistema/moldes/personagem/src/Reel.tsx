@@ -2,7 +2,7 @@
 import React from 'react';
 import {AbsoluteFill, Audio, getStaticFiles, staticFile, useCurrentFrame} from 'remotion';
 import {Defs} from './Boneco';
-import {E, T, tw} from './base';
+import {E, T, desenho, tw} from './base';
 import {CENAS, Fixo, Legenda, Previas} from './Cenas';
 import {Grao} from './Grao';
 
@@ -14,7 +14,7 @@ export type Props = {previas: boolean; nomesPrevias: [string, string]; musica: b
 const pare = (msg: string): never => {
 	throw new Error(`\n\n[personagem] ${msg}\n`);
 };
-for (const c of T.cenas) if (!CENAS[c.id]) pare(`a cena "${c.id}" de src/tempos.json não está desenhada em src/Cenas.tsx (CENAS). Desenhe-a ou use uma que existe: ${Object.keys(CENAS).join(', ')}.`);
+for (const c of T.cenas) if (!CENAS[desenho(c.id)]) pare(`a cena "${c.id}" de src/tempos.json não está desenhada em src/Cenas.tsx (CENAS). Desenhe-a ou use uma que existe: ${Object.keys(CENAS).join(', ')}.`);
 const ARQUIVOS = new Set(getStaticFiles().map((a) => a.name.replace(/\\/g, '/')));
 const COMO = {
 	'voz.wav': 'rode tools/novo-video.py com a gravação da narração',
@@ -34,7 +34,7 @@ export const VitrineYoutubeDark01: React.FC<Props> = ({previas = false, nomesPre
 	if (previas && T.previas) (precisa('previa1.mp4'), precisa('previa2.mp4'));
 	const f = useCurrentFrame();
 	const c = T.cenas.find((k) => f >= k.de_q && f < k.ate_q) ?? T.cenas[T.cenas.length - 1];
-	const Cena = CENAS[c.id];
+	const Cena = CENAS[desenho(c.id)];
 	return (
 		<AbsoluteFill style={{background: '#060606', overflow: 'hidden'}}>
 			<Defs f={f} />

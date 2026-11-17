@@ -1,0 +1,12 @@
+{
+ "_leia": "Para tools/clone.py: as telas da casa que o plano liga (a variável no bloco O PLANO de src/tema.ts) e o texto que cada uma escreve fixo no código (src/Cenas.tsx), quando ela é usada. src/tempos.json (as telas ligadas e as livres) é gravado pelo scripts/cobertura.mjs: rode ele antes do clone.py.",
+ "telas": ["gancho", "criado", "modelos", "instagram", "nome", "previas", "outros", "comenta"],
+ "fixos": {
+  "gancho": ["100%"],
+  "criado": ["Claude Code", "2026-10-10-vitrine/", "base/fala.mp4", "BRIEF.md", "interface-encenada/", "videos /"],
+  "modelos": ["a diferença", "estudio-2d / modelos /", "interface-encenada", "rosto-telas", "trailer", "pregacao", "autoridade", "pagina-de-livro", "minidocumentario", "youtube-didatico", "reel 9:16", "youtube 16:9", "podcast", "pregação"],
+  "nome": ["interface-encenada", "minidocumentario", "rosto-telas", "youtube-didatico", "pagina-de-livro"],
+  "outros": ["outros modelos", "de edição", "nos seus vídeos", "rosto-telas", "trailer", "pregacao", "autoridade", "interface-encenada", "youtube-didatico", "Claude", "/interface-encenada", "seu-video.mp4", "Digite / para comandos"],
+  "previas": ["3x"]
+ }
+}

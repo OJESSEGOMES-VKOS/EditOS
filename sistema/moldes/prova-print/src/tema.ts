@@ -39,6 +39,7 @@ export const C = {
 	amarelo: '#FDFC76', // só a palavra do pedido (ref1 35,5 s)
 	branco: '#FFFFFF',
 	grifo: 'rgba(2,132,253,0.30)', // marca-texto azul (ref1 6,75 s)
+	grifoRuim: 'rgba(230,40,40,0.32)', // marca-texto vermelho: só o defeito, no problema → solução (ref3 18,5 s)
 };
 
 const sans = loadSans('normal', {weights: ['500', '600', '700', '800'], subsets: ['latin']});
@@ -114,58 +115,96 @@ export const iw = (texto: string, n = 1) => {
 };
 export const w = (texto: string, n = 1) => P.palavras[iw(texto, n)].de;
 
-/* ---------------------------------------------------------------- o plano: uma cena por frase (refazer num vídeo novo) */
+/* ---------------------------------------------------------------- as peças do plano (o vocabulário; o plano mesmo vem depois) */
 /** corte seco 2 quadros antes da palavra que abre a cena */
 const corte = (t: number) => t - 0.06;
 /** 'pessoa' = o vídeo normal (a gravação inteira, fundo real, sem zoom nem camada): o modo padrão, a maior parte do vídeo (G6).
  * 'palco' (cartão de câmera com a cabeça recortada) só com a prop fundo: 'recorte' */
 export type Modo = 'pessoa' | 'palco' | 'vitrine' | 'capitulo' | 'rosto';
-export type Cena = {id: string; modo: Modo; de: number; ate: number; fecho?: boolean};
-/** [id, modo, início, fecho?] — o título-promessa é TITULO (abaixo), só na cena dele */
-/* G6: a maior parte é 'pessoa' (o vídeo normal); a vitrine (a prova) entra só onde a fala afirma algo que tem prova e
- * fecha uma cena forte (a frase acaba no ponto). Nunca uma tela por frase. */
-const base = (): [string, Modo, number, boolean?][] => [
-	['abre', 'pessoa', 0], // Esse vídeo está sendo 100% editado pelo Claude. Ele foi criado justamente para te mostrar a diferença entre vários modelos que eu criei e melhorei para editar
-	['editar', 'vitrine', corte(w('qualquer'))], // qualquer tipo de vídeo usando o Claude.  (fim de cena forte, com a prova: o About)
-	['instagram', 'pessoa', corte(w('inclusive'))], // Inclusive, se você estiver no Instagram agora, você está vendo apenas um desses modelos. Eu posso até colocar duas prévias rápidas aqui em cima,
-	['tres', 'vitrine', corte(w('aceleradas'))], // aceleradas em três vezes.  (fim de cena forte, o número: contador)
-	['mas', 'rosto', corte(w('mas'))], // Mas se você quiser realmente ver  (a virada: rosto fechado, a mesma gravação)
-	['ver', 'pessoa', corte(w('outros'))], // outros modelos de edição como esse e aprender a como usar isso nos seus vídeos,
-	['comenta', 'rosto', corte(w('comenta')), true], // comenta edição aqui embaixo que eu vou te mandar na sua DM agora.
-];
-/* O plano da vitrine aprovada em 2026-11-03 (antes da G6), para refazê-la: troque o corpo de base() por este, faça titulo()
- * devolver {cena: 'gancho', linha1: '100% editado', linha2: 'pelo Claude', de: 0.25} e renderize com fundo: 'recorte'.
- *	['gancho', 'palco', 0], ['criado', 'vitrine', corte(w('ele'))], ['modelos', 'palco', corte(w('diferença'))],
- *	['editar', 'vitrine', corte(w('qualquer'))], ['vendo', 'vitrine', corte(w('inclusive'))], ['previas', 'palco', corte(w('eu', 2))],
- *	['tres', 'vitrine', corte(w('aceleradas'))], ['mas', 'rosto', corte(w('mas'))], ['outros', 'palco', corte(w('outros'))],
- *	['aprender', 'vitrine', corte(w('e', 2))], ['comenta', 'rosto', corte(w('comenta')), true],
- */
+const PESSOA = 'pessoa' as const, VITRINE = 'vitrine' as const, ROSTO = 'rosto' as const, CAPITULO = 'capitulo' as const, PALCO = 'palco' as const;
+void PALCO; void CAPITULO; void VITRINE; void ROSTO;
+/** a tela do fecho (rosto fechado com o comando do pedido): o 3º item da linha da cena */
+const FECHO = 'fecho';
+export type Cena = {id: string; modo: Modo; de: number; ate: number; tela?: string; fecho?: boolean};
+/** uma linha do plano: [modo, início, tela?]. A tela é o nome de uma tela livre (src/telas/, a que a fala nova pede), o id de
+ * uma tela da casa ligada (as do aprovado, abaixo) ou FECHO. Cena 'pessoa' e 'rosto' (emoção) não têm tela. */
+type Linha = [Modo, number, string?];
 /** o título-promessa (uma linha preta + uma linha em itálico na caixa azul): palavras ditas, até 16 letras cada. Só na cena
  * do gancho, e só num palco (opção, fundo: 'recorte'); some no corte dela (PV5); enquanto ele está na tela, as palavras
  * dele não vão para a legenda (PV4). Padrão (G12): null, o gancho vai na legenda, num bloco só. */
 type Titulo = {cena: string; linha1: string; linha2: string; de: number};
+/** contador (PV1, G10): [tela da cena, palavras do número como foram ditas (a 1ª é o número), início, valor, sufixo, y] */
+type ContadorPlano = [string, string[], number, number, string, number];
+/** o comando fixo do fecho: chamada pequena em serifa ("comenta") + a palavra do pedido entre aspas, as duas ditas */
+type Comando = {palavras: string[]; chamada: string; pedido: string};
+/* as telas da casa: as do vídeo aprovado, com os prints do repositório do EditOS (public/prova-*.png). Exemplos com o
+ * porquê (prova-print.md §10), não catálogo: uma só liga com a linha `<tela> = true` dentro do plano (a que o tools/clone.py
+ * lê) e o mesmo porquê na fala nova. Sem a linha, desligada. */
+let gancho = false, criado = false, modelos = false, editar = false, vendo = false, previas = false, tres = false, outros = false, aprender = false;
+
+// ================================================================ O PLANO (num vídeo novo nasce de scripts/plano_novo.ts; refazer sobre a fala nova)
+/* G6: a maior parte é PESSOA (o vídeo normal); a vitrine (a prova real) entra só no trecho que afirma algo com prova
+ * ligada ao tema (G28). Nunca uma tela por frase. */
+const base = (): Linha[] => [
+	[PESSOA, 0], // Esse vídeo está sendo 100% editado pelo Claude. Ele foi criado justamente para te mostrar a diferença entre vários modelos que eu criei e melhorei para editar
+	[VITRINE, corte(w('qualquer')), 'editar'], // qualquer tipo de vídeo usando o Claude.  (a prova: o About do EditOS)
+	[PESSOA, corte(w('inclusive'))], // Inclusive, se você estiver no Instagram agora, você está vendo apenas um desses modelos. Eu posso até colocar duas prévias rápidas aqui em cima,
+	[VITRINE, corte(w('aceleradas')), 'tres'], // aceleradas em três vezes.  (o número: contador)
+	[ROSTO, corte(w('mas'))], // Mas se você quiser realmente ver  (a virada: rosto fechado, a mesma gravação)
+	[PESSOA, corte(w('outros'))], // outros modelos de edição como esse e aprender a como usar isso nos seus vídeos,
+	[ROSTO, corte(w('comenta')), FECHO], // comenta edição aqui embaixo que eu vou te mandar na sua DM agora.
+];
+editar = true // "usando o Claude": o About do repositório diz "Modelos de edição de vídeo para o Claude Code"
+tres = true // "três vezes": o README e o contador
+/* A vitrine aprovada em 2026-11-03 (antes da G6), para refazê-la: base() com [PALCO, 0, 'gancho'], [VITRINE, corte(w('ele')), 'criado'],
+ * [PALCO, corte(w('diferença')), 'modelos'], [VITRINE, corte(w('qualquer')), 'editar'], [VITRINE, corte(w('inclusive')), 'vendo'],
+ * [PALCO, corte(w('eu', 2)), 'previas'], [VITRINE, corte(w('aceleradas')), 'tres'], [ROSTO, corte(w('mas'))], [PALCO, corte(w('outros')), 'outros'],
+ * [VITRINE, corte(w('e', 2)), 'aprender'], [ROSTO, corte(w('comenta')), FECHO]; as telas ligadas; titulo() com
+ * {cena: 'gancho', linha1: '100% editado', linha2: 'pelo Claude', de: 0.25}; render com fundo: 'recorte'. */
 const titulo = (): Titulo | null => null;
-/** contadores (PV1, G10): o número dito sobe até ele e fica até o corte; as palavras dele não vão para a legenda (PV4).
- * [cena, palavras do número como foram ditas (a 1ª é o número), início, valor, sufixo, y] */
-const contadores = (): [string, string[], number, number, string, number][] => [
+const contadores = (): ContadorPlano[] => [
 	['tres', ['três', 'vezes'], w('três') - 0.64, 3, ' vezes', 560], // chega no 3 junto com "três"
 ];
-/** o comando fixo do fecho ("comenta" + a palavra do pedido entre aspas): fica até o fim, é o pedido (herança §2) */
-const comando = () => ({cena: 'comenta', palavras: ['comenta', 'edição'], texto: 'comenta “EDIÇÃO”'});
-/* ---------------------------------------------------------------- fim do plano */
+const comando = (): Comando | null => ({palavras: ['comenta', 'edição'], chamada: 'comenta', pedido: '“EDIÇÃO”'});
+/** palavras-chave da legenda (o termo protagonista: número, nome da ferramenta, o objeto da prova): serifa itálica azul */
+const chave = (): number[] => [iw('modelos'), iw('claude', 2), iw('instagram'), iw('prévias'), iw('modelos', 3), iw('aprender'), iw('dm')];
+// ================================================================ fim do plano
 
+/** as telas da casa ligadas no plano (src/Cenas.tsx só desenha as ligadas) */
+export const CASA: Record<string, boolean> = {gancho, criado, modelos, editar, vendo, previas, tres, outros, aprender};
+export const CHAVE_IDS = chave();
 export const montaCenas = (): Cena[] => {
 	const b = base();
-	return b.map(([id, modo, de, fecho], i) => ({id, modo, de: i ? de : 0, ate: i + 1 < b.length ? b[i + 1][2] : DURACAO, fecho}));
+	return b.map(([modo, de, tela], i) => ({
+		id: tela && tela !== FECHO ? tela : `${modo}${i + 1}`,
+		modo,
+		de: i ? de : 0,
+		ate: i + 1 < b.length ? b[i + 1][1] : DURACAO,
+		tela: tela && tela !== FECHO ? tela : undefined,
+		fecho: tela === FECHO,
+	}));
 };
 export const CENAS = montaCenas();
+{
+	const ids = CENAS.map((c) => c.id);
+	const dup = ids.find((x, k) => ids.indexOf(x) !== k);
+	if (dup) throw new Error(`a tela "${dup}" aparece em duas cenas de base() (src/tema.ts): cada tela é de uma cena só (a mesma prova em outro estado vira outra tela)`);
+	CENAS.forEach((c, k) => {
+		if (k && c.de <= CENAS[k - 1].de + 0.3) throw new Error(`a cena ${k + 1} de base() começa em ${c.de.toFixed(2)} s, antes ou colada na anterior (${CENAS[k - 1].de.toFixed(2)} s): a palavra é outra ocorrência? w('palavra', n) conta todas as vezes que ela é dita, com e sem acento ("e" e "é")`);
+	});
+	for (const c of CENAS) {
+		if ((c.modo === 'pessoa' || c.modo === 'rosto') && c.tela) throw new Error(`a cena ${c.id} é '${c.modo}' e tem tela: pessoa e rosto não levam tela (tire o 3º item da linha)`);
+		if (c.modo !== 'pessoa' && c.modo !== 'rosto' && !c.tela) throw new Error(`a cena ${c.id} ('${c.modo}') não diz qual tela mostra: o 3º item da linha é o nome da tela livre (src/telas/) ou da tela da casa ligada`);
+		if (c.fecho && c.modo !== 'rosto') throw new Error('o FECHO é de cena ROSTO (rosto fechado com o comando do pedido)');
+	}
+}
 if (CENAS.some((c) => c.modo === 'palco') && typeof (R as {topo?: number}).topo !== 'number')
 	throw new Error("src/rosto_med.json sem o topo da cabeça: o palco (cartão de câmera, opção fundo: 'recorte') precisa da pessoa recortada (PV8). Rode QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py e carregue de novo, ou troque o palco por 'pessoa' (G6).");
 export const cenaEm = (t: number) => CENAS.find((c) => t >= c.de && t < c.ate) ?? CENAS[CENAS.length - 1];
 export const cenaAnterior = (c: Cena) => CENAS[CENAS.indexOf(c) - 1];
 const cenaId = (id: string) => {
 	const c = CENAS.find((x) => x.id === id);
-	if (!c) throw new Error(`o plano cita a cena "${id}", que não existe em base() (src/tema.ts)`);
+	if (!c) throw new Error(`o plano cita a tela "${id}", que não está em nenhuma cena de base() (src/tema.ts)`);
 	return c;
 };
 /** índice da 1ª vez que a palavra é dita dentro da cena */
@@ -186,12 +225,13 @@ export const CONTADORES = contadores().map(([cena, pal, de, valor, sufixo, y]) =
 	return {cena, de, ate: c.ate, valor, sufixo, y, ids: pal.map((p) => iwNa(p, c))};
 });
 const _c = comando();
-const _cc = cenaId(_c.cena);
-export const COMANDO = {..._c, ids: _c.palavras.map((p) => iwNa(p, _cc))};
+const _cc = CENAS.find((c) => c.fecho);
+if (_c && !_cc) throw new Error('comando() existe, mas nenhuma cena de base() é o FECHO: [ROSTO, corte(w(...)), FECHO]');
+export const COMANDO = _c && _cc ? {..._c, texto: `${_c.chamada} ${_c.pedido}`, ids: _c.palavras.map((p) => iwNa(p, _cc))} : null;
 export const FIXOS: Fixo[] = [
 	...(TITULO ? [{nome: 'título', texto: `${TITULO.linha1} ${TITULO.linha2}`, ids: TITULO.ids, de: TITULO.de, ate: TITULO.ate}] : []),
 	...CONTADORES.map((k) => ({nome: `contador ${k.valor}${k.sufixo}`, texto: `${k.valor}${k.sufixo}`, ids: k.ids, de: k.de, ate: k.ate})),
-	{nome: 'comando do fecho', texto: COMANDO.texto, ids: COMANDO.ids, de: P.palavras[COMANDO.ids[0]].de, ate: DURACAO, fecho: true},
+	...(COMANDO ? [{nome: 'comando do fecho', texto: COMANDO.texto, ids: COMANDO.ids, de: P.palavras[COMANDO.ids[0]].de, ate: DURACAO, fecho: true}] : []),
 ];
 
 /** fundo (G6, 2026-11-05): 'real' (padrão) = a gravação crua com o fundo real; 'desfoque' = desfoque leve só no fundo, a

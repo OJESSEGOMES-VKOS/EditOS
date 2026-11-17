@@ -21,6 +21,25 @@ export type Tempos = Omit<typeof TJ, 'editor' | 'modelos' | 'celular' | 'previas
 	silencio: Tela<'silencio'>;
 	titulos: {editor: {i0: number; grupos: number[]} | null; celular: {i0: number; grupos: number[]} | null; marcas?: string[]};
 	fala?: {palavras: number; fim: number};
+	/** as telas livres do vídeo (src/telas/, escritas na pasta do vídeo); o aprovado não tem nenhuma */
+	livres?: Livre[];
+};
+/**
+ * Tela livre: a tela que a fala nova pede e o aprovado não tem, feita com o kit da casa (src/ui.tsx) e registrada em
+ * src/telas/index.ts. modo 'dividido': painel marfim em cima, rosto embaixo, legenda na pílula. modo 'cheia': tela marfim
+ * inteira, o título no topo é o texto dito (titulo = 1ª palavra e grupos, como no editor), o rosto some ou mora numa
+ * moldura (rosto = {x, y, w}, 9:16). em: os instantes (palavras ditas) que a tela usa; textos: o que ela escreve.
+ */
+export type Livre = {
+	comp: string;
+	modo: 'dividido' | 'cheia';
+	de: number;
+	sai: number;
+	em?: Record<string, number>;
+	textos?: Record<string, string>;
+	dados?: Record<string, unknown>;
+	titulo?: {i0: number; grupos: number[]} | null;
+	rosto?: {x: number; y: number; w: number} | null;
 };
 const T = TJ as unknown as Tempos;
 const R = RJ as typeof RJ & {fala?: {palavras: number; fim: number}};
@@ -110,11 +129,17 @@ export type Previas = {previas: boolean; nomesPrevias: [string, string]; arroba:
 export const PreviasCtx = React.createContext<Previas>({previas: false, nomesPrevias: ['', ''], arroba: '', foto: ''});
 export const usePrevias = () => React.useContext(PreviasCtx);
 
-/** telas divididas (M05): os modelos, as prévias (só com previas) e o prompt. Saída = começa no `sai` e leva 0,4 s */
+/** as telas livres do vídeo (vazio no aprovado) */
+export const LIVRES: Livre[] = T.livres ?? [];
+/** quanto uma tela livre cheia está na tela (entra 0,35 s antes do `de`, as camadas saem no `sai`, como o editor) */
+export const vidaLivre = (t: number, L: Livre) => Math.min(tw(t, L.de - 0.35, L.de + 0.05, 0, 1, E.inOut), 1 - tw(t, L.sai - 0.05, L.sai + 0.2, 0, 1, E.in));
+
+/** telas divididas (M05): os modelos, as prévias (só com previas), o prompt e as livres divididas. Saída = começa no `sai` e leva 0,4 s */
 const divididos = (previas: boolean): [number, number][] => [
 	...(T.modelos ? ([[T.modelos.de, T.modelos.sai]] as [number, number][]) : []),
 	...(previas && T.previas ? ([[T.previas.de, T.previas.sai]] as [number, number][]) : []),
 	...(T.prompt ? ([[T.prompt.de, T.prompt.sai]] as [number, number][]) : []),
+	...LIVRES.filter((L) => L.modo === 'dividido').map((L) => [L.de, L.sai] as [number, number]),
 ];
 export const pDividido = (t: number, previas: boolean) => {
 	let p = 0;
@@ -126,6 +151,7 @@ export const DIVISA = 960;
 /** fases em que o rosto mora dentro de uma moldura (editor, celular) e o título no topo é o texto dito */
 export const noEditor = (t: number) => !!T.editor && t >= T.editor.de - 0.4 && t < T.editor.devolve + 0.3;
 export const noCelular = (t: number) => !!T.celular && t >= T.celular.de - 0.05 && t < T.celular.devolve + 0.3;
+export const naLivreCheia = (t: number) => LIVRES.some((L) => L.modo === 'cheia' && t >= L.de - 0.35 && t < L.sai + 0.3);
 
 export const SOMBRA = '0 18px 40px rgba(60,48,30,0.16), 0 2px 6px rgba(60,48,30,0.10)';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Freeze, OffthreadVideo, staticFile} from 'remotion';
-import {DIVISA, E, R, T, blocoDe, pDividido, tw, usePrevias, useT} from './tema';
+import {DIVISA, E, LIVRES, R, T, blocoDe, pDividido, tw, usePrevias, useT} from './tema';
 
 /**
  * O vídeo da fala, uma moldura que muda conforme o modo de tela:
@@ -68,6 +68,12 @@ export const Rosto: React.FC = () => {
 	q = mix(q, janela(PREVIA.x, PREVIA.y, PREVIA.w, 16), pe);
 	const pc = ce ? Math.min(tw(t, ce.de, ce.de + 0.45, 0, 1, E.inOut), 1 - tw(t, ce.devolve, ce.devolve + 0.55, 0, 1, E.inOut)) : 0;
 	q = mix(q, janela(CEL.x, CEL.y, CEL.w, 34), pc);
+	// tela livre cheia com moldura (rosto: {x, y, w}): o rosto mora nela, como na prévia do editor
+	for (const L of LIVRES) {
+		if (L.modo !== 'cheia' || !L.rosto) continue;
+		const pl = Math.min(tw(t, L.de - 0.4, L.de + 0.05, 0, 1, E.inOut), 1 - tw(t, L.sai, L.sai + 0.55, 0, 1, E.inOut));
+		if (pl > 0) q = mix(q, janela(L.rosto.x, L.rosto.y, L.rosto.w, 26), pl);
+	}
 	const z = zoom(t);
 	const r = R.trechos[k];
 	const ultimo = Math.floor(T.video_fim * T.fps) - 1;

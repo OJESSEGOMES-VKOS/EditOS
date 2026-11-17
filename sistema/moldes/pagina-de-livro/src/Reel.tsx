@@ -62,12 +62,38 @@ const de = (i: number, lista = 'CORTE') => {
 const c = (i: number, lista = 'CORTE') => de(i, lista) - 0.06;
 const fr = (s: number) => Math.round(s * FPS);
 
+type Plano = {de: number; zoom: number; fx: number; fy: number; pb?: boolean; previas?: boolean};
+/* ---------------------------------------------------------------- definição do texto */
+type Al = 'esq' | 'dir' | 'meio';
+type Parte = {txt: string; voz: Voz};
+type LinhaP = {k: 'p'; i0: number; partes: Parte[]; al: Al};
+type Tom = 'azul' | 'vermelho' | 'branco';
+type LinhaK = {k: 'chave'; txt: string; i: number; t0: number; cor: Tom; al: Al; casar?: boolean; cap?: number; rapida?: boolean};
+type Linha = LinhaP | LinhaK;
+/* bloco = destaque (palavra gigante + pequenas). legenda = texto padrão, só em LEG_Y ou LEG_Y2. */
+type Bloco = {tipo: 'bloco'; de: number; ate: number; x: number; largura?: number; ladoDir?: boolean; top: number; linhas: Linha[]};
+type Legenda = {tipo: 'legenda'; de: number; ate: number; pos: 1 | 2; linhas: LinhaP[]};
+type Peca = (Bloco | Legenda) & {prev?: Partial<Bloco> & {pos?: 1 | 2}};
+
+const p = (txt: string, voz: Voz = 'p'): Parte => ({txt, voz});
+const P = (i0: number, al: Al, ...partes: Parte[]): LinhaP => ({k: 'p', i0, al, partes});
+const K = (txt: string, i: number, cor: Tom, al: Al, o: Partial<LinhaK> = {}): LinhaK => ({k: 'chave', txt, i, t0: de(i, 'PECAS'), cor, al, ...o});
+const antes = (i: number) => de(i, 'PECAS') - 0.03;
+const ler = (i: number) => de(i, 'PECAS') + 0.4; // a última palavra de um pedaço fica pelo menos 0,4 s
+
+/* os nomes do plano (sem aspas, para o plano só ter entre aspas o que é dito): o tipo da peça, o alinhamento da linha e a
+ * cor pelo sentido (azul = o que se busca, vermelho = o que dói, branco = a resposta neutra; pagina-de-livro.md §4) */
+const bloco = 'bloco' as const, legenda = 'legenda' as const;
+const esq: Al = 'esq', dir: Al = 'dir', meio: Al = 'meio';
+const azul: Tom = 'azul', vermelho: Tom = 'vermelho', branco: Tom = 'branco';
+
 /* ================================================================ O PLANO (preso à fala; num vídeo novo, refazer CORTE,
- * PLANOS, CHICOTE, PECAS e os eventos de scripts/trilha.py). Os números são índices de palavras de src/palavras.json. */
+ * PLANOS, CHICOTE e PECAS, até a linha do fim, e os eventos de scripts/trilha.py). Os números são índices de palavras de
+ * src/palavras.json. Um vídeo novo nasce com este bloco vazio (scripts/plano_novo.tsx, aplicado pelo
+ * tools/novo-video.py); o que está aqui é o plano do vídeo aprovado (exemplo). */
 /* ---------------------------------------------------------------- planos: corte só com motivo
  * pb: o close extremo em P&B com clarões (uma vez, no trecho de custo); previas: o plano onde moram as prévias (com a
  * prop previas, a câmera desce e as prévias entram em cima). Sem plano marcado, não há P&B nem janela de prévias. */
-type Plano = {de: number; zoom: number; fx: number; fy: number; pb?: boolean; previas?: boolean};
 const CORTE = {
 	b: c(20), // "que eu criei": close, a caminho do fim de cena forte QUALQUER
 	c: c(34), // "Inclusive": virada
@@ -85,6 +111,49 @@ const PLANOS: Plano[] = [
 	{de: CORTE.f, zoom: 1.45, fx: 0.72, fy: 0.31}, // F médio, rosto à direita (blocos à esquerda)
 	{de: CORTE.g, zoom: 1.25, fx: 0.5, fy: 0.3}, // G médio centrado
 ];
+/* chicote de 1 quadro na entrada da chamada; null desliga */
+const CHICOTE = CORTE.g as number | null;
+/* G12 (dono, 2026-11-05): a maior parte do vídeo é o vídeo normal com a legenda no lugar padrão (LEG_Y), um bloco por
+ * vez. Palavra gigante só no gancho, no fim de cena forte (a frase fecha no ponto com a fala de impacto) e no comando
+ * final; nunca uma por frase. O aprovado tinha mais quatro (DIFERENÇA/MODELOS, APENAS, TRÊS VEZES, EDIÇÃO, APRENDER). */
+const PECAS: Peca[] = [
+	/* A: abertura (o gancho) */
+	{tipo: bloco, de: 0, ate: antes(8), x: 0.87, ladoDir: true, top: 0.357, linhas: [
+		P(0, dir, p('esse vídeo está sendo')),
+		K('100%', 4, azul, esq, {casar: true}),
+		P(5, dir, p('editado pelo')),
+		K('CLAUDE', 7, branco, dir, {cap: 0.072, rapida: true}),
+	]},
+	{tipo: legenda, de: antes(8), ate: antes(13), pos: 1, linhas: [P(8, esq, p('Ele foi criado')), P(11, dir, p('justamente para', 'b'))]},
+	{tipo: legenda, de: antes(13), ate: CORTE.b, pos: 1, linhas: [P(13, esq, p('te mostrar a diferença')), P(17, dir, p('entre vários modelos', 'b'))]},
+	/* B: close; o fim de cena forte da 1ª frase longa ("...qualquer tipo de vídeo usando o Claude.") */
+	{tipo: legenda, de: CORTE.b, ate: CORTE.b + 1.53, pos: 1, linhas: [P(20, esq, p('que eu criei e'), p('melhorei', 'b'))]},
+	{tipo: bloco, de: antes(25), ate: CORTE.c, x: 0.5, largura: 600, top: 0.6, linhas: [
+		P(25, meio, p('para editar')),
+		K('QUALQUER', 27, azul, meio, {casar: true}),
+		P(28, meio, p('tipo de vídeo usando o Claude')),
+	]},
+	/* C: aberto */
+	{tipo: legenda, de: CORTE.c, ate: CORTE.d, pos: 1, linhas: [P(34, esq, p('Inclusive, se você estiver')), P(38, dir, p('no Instagram agora', 'b'))]},
+	/* D: close extremo (o P&B é opção, prop pb); só a legenda: o destaque da cena vizinha (QUALQUER) já foi o da vez */
+	{tipo: legenda, de: CORTE.d, ate: CORTE.e, pos: 1, linhas: [P(41, esq, p('você está vendo apenas')), P(45, dir, p('um desses modelos.', 'b'))]},
+	/* E: janela das prévias (com prévias a câmera desce e a legenda vai para LEG_Y2) */
+	{tipo: legenda, de: CORTE.e, ate: ler(57), pos: 1, prev: {pos: 2}, linhas: [P(48, esq, p('Eu posso até colocar duas')), P(53, dir, p('prévias rápidas aqui em cima', 'b'))]},
+	{tipo: legenda, de: ler(57), ate: CORTE.f, pos: 1, prev: {pos: 2}, linhas: [P(58, esq, p('aceleradas em')), P(60, dir, p('três vezes.', 'b'))]},
+	/* F: o convite, só legenda */
+	{tipo: legenda, de: CORTE.f, ate: antes(70), pos: 1, linhas: [P(62, esq, p('Mas se você quiser')), P(66, dir, p('realmente ver outros modelos', 'b'))]},
+	{tipo: legenda, de: antes(70), ate: antes(76), pos: 1, linhas: [P(70, esq, p('de edição como esse')), P(74, dir, p('e aprender', 'b'))]},
+	{tipo: legenda, de: antes(76), ate: CORTE.g, pos: 1, linhas: [P(76, esq, p('a como usar isso')), P(80, dir, p('nos seus vídeos', 'b'))]},
+	/* G: chamada. Fixo só o comando (comenta "EDIÇÃO"), o resto na legenda corrida em LEG_Y2 */
+	{tipo: bloco, de: CORTE.g, ate: DURACAO, x: 0.5, largura: 520, top: LEG_Y / H, linhas: [
+		P(83, meio, p('comenta')),
+		K('“EDIÇÃO”', 84, azul, meio, {casar: true}),
+	]},
+	{tipo: legenda, de: antes(85), ate: DURACAO, pos: 2, linhas: [P(85, esq, p('aqui embaixo que eu vou')), P(90, dir, p('te mandar na sua'), p('DM', 'b'), p('agora.'))]},
+];
+
+/* ================================================================ fim do plano */
+
 const I_PREV = PLANOS.findIndex((p) => p.previas); // -1: sem janela de prévias
 export const CORTES = PLANOS.slice(1).map((p) => p.de);
 const CORTES_F = CORTES.map(fr);
@@ -104,8 +173,6 @@ const ROSTO_PLANO = PLANOS.map((p, i) => {
 /* a janela das prévias: o plano marcado com previas, até o corte seguinte */
 const JANELA_PREVIAS = I_PREV < 0 ? null : {de: PLANOS[I_PREV].de, ate: I_PREV + 1 < PLANOS.length ? PLANOS[I_PREV + 1].de : DURACAO};
 export const PREVIAS = JANELA_PREVIAS;
-/* chicote de 1 quadro na entrada da chamada; null desliga */
-const CHICOTE = CORTE.g as number | null;
 const DESCE = 560; // com prévias, a câmera dele desce para abrir o terço de cima
 
 const camera = (f: number, previas: boolean) => {
@@ -156,63 +223,6 @@ const useFontes = () => {
 	}, [h]);
 	return ok;
 };
-
-/* ---------------------------------------------------------------- definição do texto */
-type Al = 'esq' | 'dir' | 'meio';
-type Parte = {txt: string; voz: Voz};
-type LinhaP = {k: 'p'; i0: number; partes: Parte[]; al: Al};
-type Tom = 'azul' | 'vermelho' | 'branco';
-type LinhaK = {k: 'chave'; txt: string; i: number; t0: number; cor: Tom; al: Al; casar?: boolean; cap?: number; rapida?: boolean};
-type Linha = LinhaP | LinhaK;
-/* bloco = destaque (palavra gigante + pequenas). legenda = texto padrão, só em LEG_Y ou LEG_Y2. */
-type Bloco = {tipo: 'bloco'; de: number; ate: number; x: number; largura?: number; ladoDir?: boolean; top: number; linhas: Linha[]};
-type Legenda = {tipo: 'legenda'; de: number; ate: number; pos: 1 | 2; linhas: LinhaP[]};
-type Peca = (Bloco | Legenda) & {prev?: Partial<Bloco> & {pos?: 1 | 2}};
-
-const p = (txt: string, voz: Voz = 'p'): Parte => ({txt, voz});
-const P = (i0: number, al: Al, ...partes: Parte[]): LinhaP => ({k: 'p', i0, al, partes});
-const K = (txt: string, i: number, cor: Tom, al: Al, o: Partial<LinhaK> = {}): LinhaK => ({k: 'chave', txt, i, t0: de(i, 'PECAS'), cor, al, ...o});
-const antes = (i: number) => de(i, 'PECAS') - 0.03;
-const ler = (i: number) => de(i, 'PECAS') + 0.4; // a última palavra de um pedaço fica pelo menos 0,4 s
-
-/* G12 (dono, 2026-11-05): a maior parte do vídeo é o vídeo normal com a legenda no lugar padrão (LEG_Y), um bloco por
- * vez. Palavra gigante só no gancho, no fim de cena forte (a frase fecha no ponto com a fala de impacto) e no comando
- * final; nunca uma por frase. O aprovado tinha mais quatro (DIFERENÇA/MODELOS, APENAS, TRÊS VEZES, EDIÇÃO, APRENDER). */
-const PECAS: Peca[] = [
-	/* A: abertura (o gancho) */
-	{tipo: 'bloco', de: 0, ate: antes(8), x: 0.87, ladoDir: true, top: 0.357, linhas: [
-		P(0, 'dir', p('esse vídeo está sendo')),
-		K('100%', 4, 'azul', 'esq', {casar: true}),
-		P(5, 'dir', p('editado pelo')),
-		K('CLAUDE', 7, 'branco', 'dir', {cap: 0.072, rapida: true}),
-	]},
-	{tipo: 'legenda', de: antes(8), ate: antes(13), pos: 1, linhas: [P(8, 'esq', p('Ele foi criado')), P(11, 'dir', p('justamente para', 'b'))]},
-	{tipo: 'legenda', de: antes(13), ate: CORTE.b, pos: 1, linhas: [P(13, 'esq', p('te mostrar a diferença')), P(17, 'dir', p('entre vários modelos', 'b'))]},
-	/* B: close; o fim de cena forte da 1ª frase longa ("...qualquer tipo de vídeo usando o Claude.") */
-	{tipo: 'legenda', de: CORTE.b, ate: CORTE.b + 1.53, pos: 1, linhas: [P(20, 'esq', p('que eu criei e'), p('melhorei', 'b'))]},
-	{tipo: 'bloco', de: antes(25), ate: CORTE.c, x: 0.5, largura: 600, top: 0.6, linhas: [
-		P(25, 'meio', p('para editar')),
-		K('QUALQUER', 27, 'azul', 'meio', {casar: true}),
-		P(28, 'meio', p('tipo de vídeo usando o Claude')),
-	]},
-	/* C: aberto */
-	{tipo: 'legenda', de: CORTE.c, ate: CORTE.d, pos: 1, linhas: [P(34, 'esq', p('Inclusive, se você estiver')), P(38, 'dir', p('no Instagram agora', 'b'))]},
-	/* D: close extremo (o P&B é opção, prop pb); só a legenda: o destaque da cena vizinha (QUALQUER) já foi o da vez */
-	{tipo: 'legenda', de: CORTE.d, ate: CORTE.e, pos: 1, linhas: [P(41, 'esq', p('você está vendo apenas')), P(45, 'dir', p('um desses modelos.', 'b'))]},
-	/* E: janela das prévias (com prévias a câmera desce e a legenda vai para LEG_Y2) */
-	{tipo: 'legenda', de: CORTE.e, ate: ler(57), pos: 1, prev: {pos: 2}, linhas: [P(48, 'esq', p('Eu posso até colocar duas')), P(53, 'dir', p('prévias rápidas aqui em cima', 'b'))]},
-	{tipo: 'legenda', de: ler(57), ate: CORTE.f, pos: 1, prev: {pos: 2}, linhas: [P(58, 'esq', p('aceleradas em')), P(60, 'dir', p('três vezes.', 'b'))]},
-	/* F: o convite, só legenda */
-	{tipo: 'legenda', de: CORTE.f, ate: antes(70), pos: 1, linhas: [P(62, 'esq', p('Mas se você quiser')), P(66, 'dir', p('realmente ver outros modelos', 'b'))]},
-	{tipo: 'legenda', de: antes(70), ate: antes(76), pos: 1, linhas: [P(70, 'esq', p('de edição como esse')), P(74, 'dir', p('e aprender', 'b'))]},
-	{tipo: 'legenda', de: antes(76), ate: CORTE.g, pos: 1, linhas: [P(76, 'esq', p('a como usar isso')), P(80, 'dir', p('nos seus vídeos', 'b'))]},
-	/* G: chamada. Fixo só o comando (comenta "EDIÇÃO"), o resto na legenda corrida em LEG_Y2 */
-	{tipo: 'bloco', de: CORTE.g, ate: DURACAO, x: 0.5, largura: 520, top: LEG_Y / H, linhas: [
-		P(83, 'meio', p('comenta')),
-		K('“EDIÇÃO”', 84, 'azul', 'meio', {casar: true}),
-	]},
-	{tipo: 'legenda', de: antes(85), ate: DURACAO, pos: 2, linhas: [P(85, 'esq', p('aqui embaixo que eu vou')), P(90, 'dir', p('te mandar na sua'), p('DM', 'b'), p('agora.'))]},
-];
 
 /* conferências: o texto bate com a fala (sem maiúscula, acento nem pontuação); nada atravessa corte */
 const palavrasDe = (l: Linha) => (l.k === 'p' ? l.partes.flatMap((q) => q.txt.split(' ')) : l.txt.split(' '));

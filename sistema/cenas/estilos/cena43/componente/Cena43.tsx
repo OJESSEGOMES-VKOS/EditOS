@@ -8,10 +8,10 @@ import {loadFont} from '@remotion/google-fonts/SourceSans3';
 const {fontFamily} = loadFont('normal', {weights: ['400'], subsets: ['latin', 'latin-ext']});
 
 export type Cena43Props = {
-  anoInicial?: number;
+  anoInicial?: number; // o número rola de anoInicial até anoFinal; sem anoFinal, a legenda é só a frase
   anoFinal?: number;
-  rotuloAno?: string;
-  frase?: string;
+  rotuloAno?: string; // a palavra antes do número, como foi dita ("Ano", "Daqui a")
+  frase: string; // a linha da legenda, a fala resumida
   width?: number;
   height?: number;
 };
@@ -35,10 +35,10 @@ const STREAM =
   'M745 885 L784 814 L815 798 L843 780 L870 761 L894 741 L915 719 L933 697 L949 674 L961 650 L970 626 L976 602 L978 578 L978 554 L973 530 L966 507 L955 485 L941 463 L924 443 L905 423 L882 405 L857 389 L829 374 L799 361 L767 350 L734 340 L699 333 L663 327 L625 324 L588 323 L550 324 L511 327 L473 332 L436 339 L399 348 L363 359 L329 372 L296 386 L265 402 L237 420 L210 439 L186 459 L165 481 L147 503 L131 526 L119 550 L110 574 L104 598 L102 622 L102 646 L107 670 L114 693 L125 715 L139 737 L156 757 L175 777 L198 795 L223 811 L251 826 L281 839 L313 850 L346 860 L381 867 L417 873 L455 876 L492 877 L530 876 L569 873 L607 868 L644 861 L681 852 L717 841 L751 828 L784 814';
 
 export const Cena43: React.FC<Cena43Props> = ({
-  anoInicial = 972280615,
-  anoFinal = 1000000000,
-  rotuloAno = 'Ano',
-  frase = 'Um buraco negro errante alcança a estrela',
+  anoInicial,
+  anoFinal,
+  rotuloAno = '',
+  frase,
   width = W,
   height = H,
 }) => {
@@ -52,7 +52,8 @@ export const Cena43: React.FC<Cena43Props> = ({
   const stretch = interpolate(f, [0, 38], [1, 1.5], cl);
   const tear = interpolate(f, [38, 46], [0, 1], cl);
   const stream = interpolate(f, [40, 112], [0.04, 1], {...cl, easing: Easing.inOut(Easing.quad)});
-  const year = interpolate(f, [0, 40], [anoInicial, anoFinal], {...cl, easing: Easing.out(Easing.cubic)});
+  const temAno = anoFinal !== undefined;
+  const year = temAno ? interpolate(f, [0, 40], [anoInicial ?? anoFinal, anoFinal], {...cl, easing: Easing.out(Easing.cubic)}) : 0;
   const lineIn = interpolate(f, [66, 84], [0, 1], cl);
   const knot = 1 - tear * 0.45;
 
@@ -63,7 +64,7 @@ export const Cena43: React.FC<Cena43Props> = ({
   };
 
   const s = Math.max(width / W, height / H);
-  const caption = `${rotuloAno} ${fmt(year)}`;
+  const caption = temAno ? `${rotuloAno} ${fmt(year)}`.trim() : '';
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
       <div style={{position: 'absolute', width: W, height: H, left: (width - W * s) / 2, top: (height - H * s) / 2, transform: `scale(${s})`, transformOrigin: '0 0'}}>
@@ -159,7 +160,7 @@ export const Cena43: React.FC<Cena43Props> = ({
             <tspan>{caption}</tspan>
             {lineIn > 0 && (
               <tspan opacity={lineIn}>
-                {'   |   '}
+                {temAno ? '   |   ' : ''}
                 {frase}
               </tspan>
             )}

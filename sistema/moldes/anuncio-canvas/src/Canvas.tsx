@@ -1,7 +1,9 @@
 import React from 'react';
 import {AbsoluteFill, Audio, staticFile} from 'remotion';
 import {C, DURACAO, E as EZ, P as PAL, SANS, existe, mola, pare, rnd, seq, tw, useT, w, wf} from './tema';
-import {Bolha, Celular, G, Glitch, IconeVidro, ImgOuTela, Linha, MarcaTexto, Notif, Pilula, Risco, Simbolo, Wordmark, BRILHO_TEXTO, brilho, hexA} from './ui';
+import {Bolha, G, Glitch, IconeVidro, ImgOuTela, Linha, MarcaTexto, Notif, Pilula, Risco, Simbolo, Wordmark, BRILHO_TEXTO, brilho, hexA} from './ui';
+import {Fone, Neon, frente} from './kit';
+import {TELAS} from './telas';
 
 /**
  * anuncio-canvas v5 (as regras: modelos/anuncio-canvas/anuncio-canvas.md); o tema é o do anúncio aprovado.
@@ -20,8 +22,146 @@ import {Bolha, Celular, G, Glitch, IconeVidro, ImgOuTela, Linha, MarcaTexto, Not
 const W = 1080, H = 1920, P = 1000;
 const cl = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 
-/* ---------------------------------------------------------------- O PLANO: a fala para a qual ele foi feito (o roteiro.txt dito) */
+/* ---------------------------------------------------------------- o que o plano usa sem escrever texto na tela */
+type Tom = 'marca' | 'dor' | 'noite' | 'claro';
+/** os tons do fundo (§4). O plano escreve TOM.dor, nunca a palavra solta: o tools/clone.py lê as palavras do plano */
+const TOM: Record<Tom, Tom> = {marca: 'marca', dor: 'dor', noite: 'noite', claro: 'claro'};
+/** o lado do balão: entra (recebido) ou sai (enviado) */
+const LADO = {entra: 'in', sai: 'out'} as const;
+/** as cores do texto (§5): forte e fino, no escuro e no claro, todas da paleta C de src/tema.ts */
+const B = '#fff', T = C.tinta, SUB = C.fino2, SUBC = C.finoC, FINO = C.fino, FINOC = C.finoC2;
+/** o começo vazio: a fala inteira como foi transcrita e uma frase por ponto final (troque pela lista do plano) */
+const FALA_DITA = PAL.palavras.map((p) => p.texto).join(' ');
+const porPonto = (tom: Tom): [number, number, Tom][] => {
+	const r: [number, number, Tom][] = [];
+	let a = 0;
+	PAL.palavras.forEach((p, i) => {
+		if (/[.?!]$/.test(p.texto) || i === PAL.palavras.length - 1) (r.push([a, i, tom]), (a = i + 1));
+	});
+	return r;
+};
+
+// O PLANO: a fala, as frases, a virada e a coreografia deste vídeo (tools/novo-video.py troca este bloco pelo
+// scripts/plano_novo.tsx num vídeo novo; tools/clone.py compara o bloco com o do aprovado). O bloco acaba na linha de fechamento abaixo da Coreografia.
+/* a fala para a qual ele foi feito (o roteiro.txt dito) */
 const FALA = 'Sua agenda ainda vive no meio das mensagens? O cliente pede horário às onze da noite. Você responde de manhã, e ele já marcou em outro lugar. Outro confirma e, no dia, não aparece. É uma hora parada que ninguém paga. Agora tem o Marcaí. Você manda o seu link e o cliente marca sozinho. Escolhe o serviço, o horário e paga o sinal no Pix. A confirmação chega na hora. Um dia antes, o lembrete vai sozinho. E quem já pagou o sinal não esquece. De manhã, você abre o painel e vê o dia inteiro. Doze atendimentos, todos confirmados. Sem parar o corte pra responder mensagem. Pra salão, barbearia e estúdio de estética. Teste grátis por catorze dias. Marcaí. Marcou, tá marcado.';
+/* ---------------------------------------------------------------- as frases (índices de palavras.json) */
+export const FRASES: [number, number, Tom][] = [
+	[0, 7, TOM.marca], [8, 15, TOM.noite], [16, 26, TOM.claro], [27, 33, TOM.dor], [34, 40, TOM.dor], [41, 44, TOM.marca],
+	[45, 54, TOM.claro], [55, 65, TOM.marca], [66, 70, TOM.claro], [71, 77, TOM.marca], [78, 85, TOM.claro], [86, 96, TOM.marca],
+	[97, 100, TOM.marca], [101, 107, TOM.claro], [108, 114, TOM.marca], [115, 119, TOM.marca], [120, 123, TOM.marca],
+];
+/** a frase em que o produto aparece (a virada: entra sempre por chicote); null = o anúncio não tem virada */
+export const VIRADA: number | null = 5;
+/* ---------------------------------------------------------------- a coreografia: cada elemento no seu lugar */
+const Coreografia: React.FC = () => {
+	const {t} = useT();
+	return (
+		<>
+			{/* 0. Sua agenda ainda vive no meio das mensagens? */}
+			<El k={0} x={-60} y={-140}><L de={0.1} txt="Sua agenda" tam={124} cor={B} peso={800} /></El>
+			<El k={0} x={70} y={0}><L de={0.6} txt="ainda vive no meio das" tam={56} cor={SUB} peso={400} /></El>
+			<El k={0} x={0} y={140}><Pilula texto="mensagens?" de={w('mensagens?')} tam={96} /></El>
+			<El k={0} x={-300} y={-520} z={-260} rot={-6}><Pop de={w('mensagens?') + 0.05}><Bolha texto="oi, tem horário hoje?" lado={LADO.entra} tam={40} /></Pop></El>
+			<El k={0} x={320} y={460} z={-320} rot={5}><Pop de={w('mensagens?') + 0.15}><Bolha texto="consegue 18h?" lado={LADO.entra} tam={40} /></Pop></El>
+
+			{/* 1. O cliente pede horário às onze da noite. */}
+			<El k={1} x={-40} y={-300}><L de={2.7} txt="O cliente pede horário" tam={60} cor={FINO} peso={400} /></El>
+			<El k={1} x={-120} y={-150}><Pop de={w('pede') - 0.1}><Bolha texto="Oi! Tem horário amanhã?" lado={LADO.entra} tam={46} hora="23:47" /></Pop></El>
+			<El k={1} x={40} y={110}><Tela comp="Hora2347" /></El>
+			<El k={1} x={0} y={320}><L de={3.8} txt="às onze da noite." tam={64} cor={B} /></El>
+
+			{/* 2. Você responde de manhã, e ele já marcou em outro lugar. */}
+			<El k={2} x={0} y={-330}><L de={5.0} txt="Você responde de manhã," tam={60} cor={T} peso={600} /></El>
+			<El k={2} x={120} y={-150}><Pop de={w('responde') - 0.05}><div style={{position: 'relative'}}><Bolha texto="Bom dia! Tenho às 10h, pode ser?" lado={LADO.sai} claro tam={42} hora="08:12" checks /><Risco de={w('lugar.') + 0.05} espessura={10} /></div></Pop></El>
+			<El k={2} x={-110} y={30}><Pop de={w('marcou') - 0.05}><Bolha texto="Ah, já marquei em outro lugar." lado={LADO.entra} claro tam={42} hora="08:40" /></Pop></El>
+			<El k={2} x={0} y={250}><L de={6.4} txt="e ele já marcou" tam={56} cor={SUBC} peso={400} /></El>
+			<El k={2} x={0} y={350}><L de={7.3} txt="em outro lugar." tam={104} cor={T} peso={800} /></El>
+
+			{/* 3. Outro confirma e, no dia, não aparece. */}
+			<El k={3} x={-150} y={-300}><L de={8.2} txt="Outro confirma" tam={60} cor={FINO} peso={400} /></El>
+			<El k={3} x={120} y={-80}><Tela comp="Data15" /></El>
+			<El k={3} x={0} y={260}>{t > w('não') - 0.05 ? <Glitch texto="não aparece" de={w('não')} tam={116} /> : <span />}</El>
+
+			{/* 4. É uma hora parada que ninguém paga. */}
+			<El k={4} x={60} y={-150}><Tela comp="Relogio" /></El>
+			<El k={4} x={-30} y={190}><L de={11.1} txt="É uma hora parada que" tam={70} cor={B} /></El>
+			<El k={4} x={0} y={300}>{t >= w('ninguém') - 0.04 ? <Glitch texto="ninguém paga." de={w('ninguém')} tam={96} peso={500} cor="#FF7A7A" /> : <span />}</El>
+
+			{/* 5. Agora tem o Marcaí. */}
+			<El k={5} x={0} y={-300}><L de={13.4} txt="Agora tem o" tam={64} cor={FINO} peso={400} /></El>
+			<El k={5} x={0} y={-20}>{(() => { const m = w('marcaí.'); const kk = mola(t, m - 0.12, {damping: 12, stiffness: 110, mass: 0.9}); return <div style={{opacity: Math.min(1, kk * 1.8), transform: `scale(${0.3 + 0.7 * kk})`}}><IconeVidro tam={300} giroY={(1 - kk) * -140 + Math.sin(t * 1.4) * 10}>{G.cal(170)}</IconeVidro></div>; })()}</El>
+			<El k={5} x={0} y={280}><div style={{filter: `drop-shadow(0 0 30px ${hexA(C.v, 0.6)})`}}><Wordmark tam={150} texto="marcaı" letras={tw(t, w('marcaí.'), w('marcaí.') + 0.4, 0, 6, (x) => x)} /></div></El>
+
+			{/* 6. Você manda o seu link e o cliente marca sozinho. */}
+			<El k={6} x={-120} y={-420}><L de={14.8} txt="Você manda o seu" tam={62} cor={T} peso={600} /></El>
+			<El k={6} x={-40} y={-310}><L de={15.6} txt="link" tam={130} cor={C.vFundo} peso={800} /></El>
+			<El k={6} x={60} y={-140}><Tela comp="Campo" /></El>
+			<El k={6} x={-180} y={190} z={40}><Fone src="reserva.png" larg={360} de={w('cliente', 2) - 0.1} giro={-22} /></El>
+			<El k={6} x={230} y={180}><L de={15.9} txt="e o cliente" tam={52} cor={SUBC} peso={400} /></El>
+			<El k={6} x={230} y={260}><L de={16.6} txt="marca sozinho." tam={78} cor={T} peso={800} /></El>
+
+			{/* 7. Escolhe o serviço, o horário e paga o sinal no Pix. */}
+			<El k={7} x={-90} y={40} z={30}><Fone src="reserva.png" larg={520} de={w('escolhe') - 0.25} giro={-12} /></El>
+			<El k={7} x={260} y={-440}><Pilula texto="serviço" de={w('serviço,')} tam={70} solida /></El>
+			<El k={7} x={290} y={-110}><Pilula texto="horário" de={w('horário', 2)} tam={70} solida /></El>
+			<El k={7} x={250} y={230}><Pilula texto="sinal no Pix" de={w('sinal')} tam={70} solida /></El>
+
+			{/* 8. A confirmação chega na hora. */}
+			<El k={8} x={0} y={-420}><L de={20.4} txt="A confirmação" tam={64} cor={T} peso={600} /></El>
+			<El k={8} x={0} y={-310}><L de={21.4} txt="chega na hora." tam={104} cor={T} peso={800} extra={(i) => (i >= 1 ? <MarcaTexto de={w('na') + 0.05 + (i - 1) * 0.12} cor={C.v} /> : null)} /></El>
+			<El k={8} x={130} y={160} z={20}><Fone src="confirmado.png" larg={380} de={w('confirmação') - 0.3} giro={-24} /></El>
+			<El k={8} x={-230} y={240} z={60}>{(() => { const c = w('confirmação'); const kc = mola(t, c, {damping: 11, stiffness: 160}); return <div style={{opacity: Math.min(1, kc * 2), transform: `scale(${0.3 + 0.7 * kc})`}}><IconeVidro tam={220} giroY={(1 - kc) * 90 + Math.sin(t * 1.5) * 8}>{G.check(140, '#fff', tw(t, c + 0.1, c + 0.4, 0, 1))}</IconeVidro></div>; })()}</El>
+
+			{/* 9. Um dia antes, o lembrete vai sozinho. */}
+			<El k={9} x={-40} y={-430}><L de={22.4} txt="Um dia antes," tam={104} cor={B} peso={800} /></El>
+			{[0, 1].map((i) => (
+				<El key={i} k={9} x={30 - i * 40} y={-160 + i * 200} z={i * -40} rot={i ? 2 : -1.5}><Pop de={w('lembrete') + i * 0.22}><Notif titulo="Marcaí · Lembrete" texto={i ? 'Amanhã, 10:30 · Corte feminino com Bia.' : 'Amanhã, 14:30 · Corte + barba com Teo.'} larg={760} /></Pop></El>
+			))}
+			<El k={9} x={60} y={300}><L de={23.5} txt="o lembrete vai" tam={58} cor={FINO} peso={400} /></El>
+			<El k={9} x={60} y={400}><L de={24.1} txt="sozinho." tam={116} cor={B} peso={800} glow={C.v} /></El>
+
+			{/* 10. E quem já pagou o sinal não esquece. */}
+			<El k={10} x={-40} y={-200}><Tela comp="SinalPago" /></El>
+			<El k={10} x={30} y={110}><L de={24.9} txt="E quem já pagou o sinal" tam={58} cor={FINOC} peso={500} /></El>
+			<El k={10} x={0} y={220}><L de={26.0} txt="não esquece." tam={124} cor={T} peso={800} extra={(i) => (i === 1 ? <MarcaTexto de={w('esquece.') + 0.08} cor={C.v} /> : null)} /></El>
+
+			{/* 11. De manhã, você abre o painel e vê o dia inteiro. */}
+			<El k={11} x={-60} y={-470}><L de={26.9} txt="De manhã, você abre o" tam={54} cor={FINO} peso={400} /></El>
+			<El k={11} x={-60} y={-370}><L de={28.1} txt="painel" tam={120} cor={B} peso={800} glow={C.v} /></El>
+			<El k={11} x={80} y={40} z={-40}><Tela comp="PainelImg" /></El>
+			<El k={11} x={40} y={430}><L de={28.6} txt="e vê o dia inteiro." tam={84} cor={B} peso={800} /></El>
+
+			{/* 12. Doze atendimentos, todos confirmados. */}
+			<El k={12} x={0} y={-130}><Tela comp="Doze" /></El>
+			<El k={12} x={0} y={260}><L de={30.1} txt="atendimentos," tam={62} cor={FINO} peso={400} /></El>
+			<El k={12} x={0} y={360}><L de={30.9} txt="todos confirmados." tam={96} cor={B} peso={800} glow={C.v} /></El>
+
+			{/* 13. Sem parar o corte pra responder mensagem. */}
+			<El k={13} x={130} y={-300}>{(() => { const c = w('corte'); const snip = t > c - 0.05 ? Math.abs(Math.sin((t - c + 0.05) * 14)) * (t < c + 0.7 ? 1 : 0) : 0.15; return <Pop de={w('sem') - 0.05}><div style={{transform: `rotate(${-20 + (t - c) * 6}deg)`, filter: 'drop-shadow(0 18px 30px rgba(80,40,180,0.25))'}}>{G.tesoura(260, C.vFundo, snip)}</div></Pop>; })()}</El>
+			<El k={13} x={-30} y={60}><L de={32.4} txt="Sem parar o corte" tam={96} cor={T} peso={800} /></El>
+			<El k={13} x={40} y={180}><div style={{position: 'relative'}}><L de={33.5} txt="pra responder mensagem." tam={62} cor={FINOC} peso={500} /><Risco de={wf('mensagem.') - 0.1} espessura={9} dur={0.2} /></div></El>
+
+			{/* 14. Pra salão, barbearia e estúdio de estética. (cada nicho num ponto diferente) */}
+			<El k={14} x={-40} y={-520}><L de={34.9} txt="Pra" tam={56} cor={SUB} peso={400} /></El>
+			<El k={14} x={-210} y={-270}><Neon de={w('salão,')} cor={C.vClaro} ic={G.secador} txt="salão" /></El>
+			<El k={14} x={190} y={30}><Neon de={w('barbearia')} cor={C.ambar} ic={G.navalha} txt="barbearia" /></El>
+			<El k={14} x={-120} y={380}><Neon de={w('estúdio')} cor={C.ciano} ic={G.brilho} txt="estética" sub="estúdio de" /></El>
+
+			{/* 15. Teste grátis por catorze dias. */}
+			<El k={15} x={0} y={60}><Tela comp="Botao" /></El>
+			<El k={15} x={140} y={-130}>{(() => { const c = w('catorze'); const kb = mola(t, c - 0.04, {damping: 11, stiffness: 180}); return <div style={{opacity: Math.min(1, kb * 2), transform: `scale(${0.6 + 0.4 * kb}) rotate(${Math.sin((t - c) * 3) * 2}deg)`, background: '#fff', color: C.tinta, fontFamily: SANS, fontWeight: 800, fontSize: 66, letterSpacing: '-0.03em', padding: '18px 40px', borderRadius: 36, boxShadow: `0 0 50px ${hexA(C.v, 0.5)}`}}>por 14 dias</div>; })()}</El>
+
+			{/* 16. Marcaí. Marcou, tá marcado. (fica até o fim) */}
+			<El k={16} x={0} y={-120} fica><Tela comp="Marca" /></El>
+			<El k={16} x={0} y={260} fica><L de={40.6} txt="Marcou, tá marcado." tam={70} cor={B} peso={600} /></El>
+			<El k={16} x={0} y={420} fica>{(() => { const kr = tw(t, wf('marcado.') + 0.2, wf('marcado.') + 0.6, 0, 1); return <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 42, color: C.vClaro, opacity: kr, filter: kr < 1 ? `blur(${(1 - kr) * 10}px)` : undefined}}>Teste grátis por 14 dias</div>; })()}</El>
+		</>
+	);
+};
+
+// fim do plano
+
 {
 	const limpa = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 	const plano = FALA.split(/\s+/).map(limpa).filter(Boolean);
@@ -36,16 +176,7 @@ const FALA = 'Sua agenda ainda vive no meio das mensagens? O cliente pede horár
 	}
 }
 
-/* ---------------------------------------------------------------- as frases (índices de palavras.json) */
-type Tom = 'marca' | 'dor' | 'noite' | 'claro';
-const FRASES: [number, number, Tom][] = [
-	[0, 7, 'marca'], [8, 15, 'noite'], [16, 26, 'claro'], [27, 33, 'dor'], [34, 40, 'dor'], [41, 44, 'marca'],
-	[45, 54, 'claro'], [55, 65, 'marca'], [66, 70, 'claro'], [71, 77, 'marca'], [78, 85, 'claro'], [86, 96, 'marca'],
-	[97, 100, 'marca'], [101, 107, 'claro'], [108, 114, 'marca'], [115, 119, 'marca'], [120, 123, 'marca'],
-];
-/** a frase em que o produto aparece (a virada: entra sempre por chicote) */
-const VIRADA = 5;
-if (!(VIRADA > 0 && VIRADA < FRASES.length - 1)) pare(`VIRADA em src/Canvas.tsx é ${VIRADA}: tem de ser o índice (em FRASES) da frase em que o produto aparece, entre 1 e ${FRASES.length - 2} (nem a primeira nem o fecho).`);
+if (VIRADA !== null && !(VIRADA > 0 && VIRADA < FRASES.length - 1)) pare(`VIRADA em src/Canvas.tsx é ${VIRADA}: tem de ser o índice (em FRASES) da frase em que o produto aparece, entre 1 e ${FRASES.length - 2} (nem a primeira nem o fecho), ou null.`);
 FRASES.forEach(([a, b], k) => {
 	const antes = k ? FRASES[k - 1][1] + 1 : 0;
 	if (a !== antes || b < a || b >= PAL.palavras.length)
@@ -112,7 +243,7 @@ const montar = () => {
 		ks.push(kf);
 		fk.push(kf);
 	});
-	const a = ks[0], b = ks[1], z = ks[ks.length - 1], y2 = ks[ks.length - 2];
+	const a = ks[0], b = ks[1] ?? {...a, x: a.x + 600}, z = ks[ks.length - 1], y2 = ks[ks.length - 2] ?? {...z, x: z.x - 600}; // com uma frase só (o começo vazio) inventa o vizinho
 	ks.unshift({t: -1.2, x: a.x - (b.x - a.x) * 0.45, y: a.y - (b.y - a.y) * 0.45, d: a.d + 120, roll: a.roll - 2, ease: 1});
 	ks.push({t: DURACAO + 1.5, x: z.x + (z.x - y2.x) * 0.25, y: z.y + (z.y - y2.y) * 0.25, d: z.d + 160, roll: z.roll + 1, ease: 1});
 	return {ks, fk};
@@ -142,10 +273,6 @@ const camera = (t: number) => ({
 });
 
 /* ---------------------------------------------------------------- o elemento solto no canvas */
-const frente = (t: number, de: number, cfg = {}) => {
-	const k = mola(t, de, {damping: 15, stiffness: 150, ...cfg});
-	return {opacity: Math.min(1, k * 2), transform: `scale(${0.7 + 0.3 * k})`, filter: k < 0.7 ? `blur(${(0.7 - k) * 22}px)` : undefined} as React.CSSProperties;
-};
 /** um elemento: preso ao keyframe da frase k, deslocado (x, y) em px de tela, na profundidade z.
  *  Some devagar (desfoca) um tempo depois da frase acabar, se ainda estiver no quadro. */
 const El: React.FC<{k: number; x: number; y: number; z?: number; rot?: number; fica?: boolean; children: React.ReactNode}> = ({k, x, y, z = 0, rot = 0, fica, children}) => {
@@ -222,17 +349,6 @@ const Campo: React.FC = () => {
 		</div>
 	);
 };
-const Fone: React.FC<{src: string; larg: number; de: number; giro?: number}> = ({src, larg, de, giro = -18}) => {
-	const {t} = useT();
-	const k = mola(t, de, {damping: 18, stiffness: 80, mass: 1});
-	return (
-		<div style={{perspective: 2200}}>
-			<div style={{transform: `translateY(${(1 - k) * 260}px) rotateX(${8 - 4 * k}deg) rotateY(${giro + 8 * k + Math.sin(t * 0.7) * 3}deg)`, opacity: Math.min(1, k * 2)}}>
-				<Celular src={src} larg={larg} />
-			</div>
-		</div>
-	);
-};
 const SinalPago: React.FC = () => {
 	const {t} = useT();
 	const p = w('pagou');
@@ -284,18 +400,6 @@ const Doze: React.FC = () => {
 		</div>
 	);
 };
-const Neon: React.FC<{de: number; cor: string; ic: (s: number, c: string) => React.ReactNode; txt: string; sub?: string}> = ({de, cor, ic, txt, sub}) => {
-	const {t} = useT();
-	const p = t - (de - 0.06);
-	const flick = p < 0.22 ? (rnd(Math.floor(p * 60)) > 0.45 ? 1 : 0.25) : 1;
-	return (
-		<div style={{...frente(t, de - 0.06), display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: t < de - 0.06 ? 0 : flick}}>
-			<div style={{filter: `drop-shadow(0 0 14px ${cor}) drop-shadow(0 0 36px ${cor})`}}>{ic(180, cor)}</div>
-			{sub && <div style={{fontFamily: SANS, fontWeight: 400, fontSize: 52, color: '#fff', textShadow: brilho(cor, 0.5)}}>{sub}</div>}
-			<div style={{fontFamily: SANS, fontWeight: 700, fontSize: 120, letterSpacing: '-0.04em', color: '#fff', lineHeight: 1, ...(BRILHO_TEXTO ? {textShadow: `0 0 10px ${cor}, 0 0 30px ${cor}, 0 0 70px ${cor}`, WebkitTextStroke: `3px ${cor}`} : {})}}>{txt}</div>
-		</div>
-	);
-};
 const Botao: React.FC = () => {
 	const {t} = useT();
 	const clique = w('grátis') + 0.12;
@@ -322,112 +426,16 @@ const Marca: React.FC = () => {
 	);
 };
 
-/* ---------------------------------------------------------------- a coreografia: cada elemento no seu lugar */
-const B = '#fff', T = C.tinta, SUB = C.fino2, SUBC = C.finoC, FINO = C.fino, FINOC = C.finoC2;
-const Coreografia: React.FC = () => {
-	const {t} = useT();
-	return (
-		<>
-			{/* 0. Sua agenda ainda vive no meio das mensagens? */}
-			<El k={0} x={-60} y={-140}><L de={0.1} txt="Sua agenda" tam={124} cor={B} peso={800} /></El>
-			<El k={0} x={70} y={0}><L de={0.6} txt="ainda vive no meio das" tam={56} cor={SUB} peso={400} /></El>
-			<El k={0} x={0} y={140}><Pilula texto="mensagens?" de={w('mensagens?')} tam={96} /></El>
-			<El k={0} x={-300} y={-520} z={-260} rot={-6}><Pop de={w('mensagens?') + 0.05}><Bolha texto="oi, tem horário hoje?" lado="in" tam={40} /></Pop></El>
-			<El k={0} x={320} y={460} z={-320} rot={5}><Pop de={w('mensagens?') + 0.15}><Bolha texto="consegue 18h?" lado="in" tam={40} /></Pop></El>
-
-			{/* 1. O cliente pede horário às onze da noite. */}
-			<El k={1} x={-40} y={-300}><L de={2.7} txt="O cliente pede horário" tam={60} cor={FINO} peso={400} /></El>
-			<El k={1} x={-120} y={-150}><Pop de={w('pede') - 0.1}><Bolha texto="Oi! Tem horário amanhã?" lado="in" tam={46} hora="23:47" /></Pop></El>
-			<El k={1} x={40} y={110}><Hora2347 /></El>
-			<El k={1} x={0} y={320}><L de={3.8} txt="às onze da noite." tam={64} cor={B} /></El>
-
-			{/* 2. Você responde de manhã, e ele já marcou em outro lugar. */}
-			<El k={2} x={0} y={-330}><L de={5.0} txt="Você responde de manhã," tam={60} cor={T} peso={600} /></El>
-			<El k={2} x={120} y={-150}><Pop de={w('responde') - 0.05}><div style={{position: 'relative'}}><Bolha texto="Bom dia! Tenho às 10h, pode ser?" lado="out" claro tam={42} hora="08:12" checks /><Risco de={w('lugar.') + 0.05} espessura={10} /></div></Pop></El>
-			<El k={2} x={-110} y={30}><Pop de={w('marcou') - 0.05}><Bolha texto="Ah, já marquei em outro lugar." lado="in" claro tam={42} hora="08:40" /></Pop></El>
-			<El k={2} x={0} y={250}><L de={6.4} txt="e ele já marcou" tam={56} cor={SUBC} peso={400} /></El>
-			<El k={2} x={0} y={350}><L de={7.3} txt="em outro lugar." tam={104} cor={T} peso={800} /></El>
-
-			{/* 3. Outro confirma e, no dia, não aparece. */}
-			<El k={3} x={-150} y={-300}><L de={8.2} txt="Outro confirma" tam={60} cor={FINO} peso={400} /></El>
-			<El k={3} x={120} y={-80}><Data15 /></El>
-			<El k={3} x={0} y={260}>{t > w('não') - 0.05 ? <Glitch texto="não aparece" de={w('não')} tam={116} /> : <span />}</El>
-
-			{/* 4. É uma hora parada que ninguém paga. */}
-			<El k={4} x={60} y={-150}><Relogio /></El>
-			<El k={4} x={-30} y={190}><L de={11.1} txt="É uma hora parada que" tam={70} cor={B} /></El>
-			<El k={4} x={0} y={300}>{t >= w('ninguém') - 0.04 ? <Glitch texto="ninguém paga." de={w('ninguém')} tam={96} peso={500} cor="#FF7A7A" /> : <span />}</El>
-
-			{/* 5. Agora tem o Marcaí. */}
-			<El k={5} x={0} y={-300}><L de={13.4} txt="Agora tem o" tam={64} cor={FINO} peso={400} /></El>
-			<El k={5} x={0} y={-20}>{(() => { const m = w('marcaí.'); const kk = mola(t, m - 0.12, {damping: 12, stiffness: 110, mass: 0.9}); return <div style={{opacity: Math.min(1, kk * 1.8), transform: `scale(${0.3 + 0.7 * kk})`}}><IconeVidro tam={300} giroY={(1 - kk) * -140 + Math.sin(t * 1.4) * 10}>{G.cal(170)}</IconeVidro></div>; })()}</El>
-			<El k={5} x={0} y={280}><div style={{filter: `drop-shadow(0 0 30px ${hexA(C.v, 0.6)})`}}><Wordmark tam={150} texto="marcaı" letras={tw(t, w('marcaí.'), w('marcaí.') + 0.4, 0, 6, (x) => x)} /></div></El>
-
-			{/* 6. Você manda o seu link e o cliente marca sozinho. */}
-			<El k={6} x={-120} y={-420}><L de={14.8} txt="Você manda o seu" tam={62} cor={T} peso={600} /></El>
-			<El k={6} x={-40} y={-310}><L de={15.6} txt="link" tam={130} cor={C.vFundo} peso={800} /></El>
-			<El k={6} x={60} y={-140}><Campo /></El>
-			<El k={6} x={-180} y={190} z={40}><Fone src="reserva.png" larg={360} de={w('cliente', 2) - 0.1} giro={-22} /></El>
-			<El k={6} x={230} y={180}><L de={15.9} txt="e o cliente" tam={52} cor={SUBC} peso={400} /></El>
-			<El k={6} x={230} y={260}><L de={16.6} txt="marca sozinho." tam={78} cor={T} peso={800} /></El>
-
-			{/* 7. Escolhe o serviço, o horário e paga o sinal no Pix. */}
-			<El k={7} x={-90} y={40} z={30}><Fone src="reserva.png" larg={520} de={w('escolhe') - 0.25} giro={-12} /></El>
-			<El k={7} x={260} y={-440}><Pilula texto="serviço" de={w('serviço,')} tam={70} solida /></El>
-			<El k={7} x={290} y={-110}><Pilula texto="horário" de={w('horário', 2)} tam={70} solida /></El>
-			<El k={7} x={250} y={230}><Pilula texto="sinal no Pix" de={w('sinal')} tam={70} solida /></El>
-
-			{/* 8. A confirmação chega na hora. */}
-			<El k={8} x={0} y={-420}><L de={20.4} txt="A confirmação" tam={64} cor={T} peso={600} /></El>
-			<El k={8} x={0} y={-310}><L de={21.4} txt="chega na hora." tam={104} cor={T} peso={800} extra={(i) => (i >= 1 ? <MarcaTexto de={w('na') + 0.05 + (i - 1) * 0.12} cor={C.v} /> : null)} /></El>
-			<El k={8} x={130} y={160} z={20}><Fone src="confirmado.png" larg={380} de={w('confirmação') - 0.3} giro={-24} /></El>
-			<El k={8} x={-230} y={240} z={60}>{(() => { const c = w('confirmação'); const kc = mola(t, c, {damping: 11, stiffness: 160}); return <div style={{opacity: Math.min(1, kc * 2), transform: `scale(${0.3 + 0.7 * kc})`}}><IconeVidro tam={220} giroY={(1 - kc) * 90 + Math.sin(t * 1.5) * 8}>{G.check(140, '#fff', tw(t, c + 0.1, c + 0.4, 0, 1))}</IconeVidro></div>; })()}</El>
-
-			{/* 9. Um dia antes, o lembrete vai sozinho. */}
-			<El k={9} x={-40} y={-430}><L de={22.4} txt="Um dia antes," tam={104} cor={B} peso={800} /></El>
-			{[0, 1].map((i) => (
-				<El key={i} k={9} x={30 - i * 40} y={-160 + i * 200} z={i * -40} rot={i ? 2 : -1.5}><Pop de={w('lembrete') + i * 0.22}><Notif titulo="Marcaí · Lembrete" texto={i ? 'Amanhã, 10:30 · Corte feminino com Bia.' : 'Amanhã, 14:30 · Corte + barba com Teo.'} larg={760} /></Pop></El>
-			))}
-			<El k={9} x={60} y={300}><L de={23.5} txt="o lembrete vai" tam={58} cor={FINO} peso={400} /></El>
-			<El k={9} x={60} y={400}><L de={24.1} txt="sozinho." tam={116} cor={B} peso={800} glow={C.v} /></El>
-
-			{/* 10. E quem já pagou o sinal não esquece. */}
-			<El k={10} x={-40} y={-200}><SinalPago /></El>
-			<El k={10} x={30} y={110}><L de={24.9} txt="E quem já pagou o sinal" tam={58} cor={FINOC} peso={500} /></El>
-			<El k={10} x={0} y={220}><L de={26.0} txt="não esquece." tam={124} cor={T} peso={800} extra={(i) => (i === 1 ? <MarcaTexto de={w('esquece.') + 0.08} cor={C.v} /> : null)} /></El>
-
-			{/* 11. De manhã, você abre o painel e vê o dia inteiro. */}
-			<El k={11} x={-60} y={-470}><L de={26.9} txt="De manhã, você abre o" tam={54} cor={FINO} peso={400} /></El>
-			<El k={11} x={-60} y={-370}><L de={28.1} txt="painel" tam={120} cor={B} peso={800} glow={C.v} /></El>
-			<El k={11} x={80} y={40} z={-40}><PainelImg /></El>
-			<El k={11} x={40} y={430}><L de={28.6} txt="e vê o dia inteiro." tam={84} cor={B} peso={800} /></El>
-
-			{/* 12. Doze atendimentos, todos confirmados. */}
-			<El k={12} x={0} y={-130}><Doze /></El>
-			<El k={12} x={0} y={260}><L de={30.1} txt="atendimentos," tam={62} cor={FINO} peso={400} /></El>
-			<El k={12} x={0} y={360}><L de={30.9} txt="todos confirmados." tam={96} cor={B} peso={800} glow={C.v} /></El>
-
-			{/* 13. Sem parar o corte pra responder mensagem. */}
-			<El k={13} x={130} y={-300}>{(() => { const c = w('corte'); const snip = t > c - 0.05 ? Math.abs(Math.sin((t - c + 0.05) * 14)) * (t < c + 0.7 ? 1 : 0) : 0.15; return <Pop de={w('sem') - 0.05}><div style={{transform: `rotate(${-20 + (t - c) * 6}deg)`, filter: 'drop-shadow(0 18px 30px rgba(80,40,180,0.25))'}}>{G.tesoura(260, C.vFundo, snip)}</div></Pop>; })()}</El>
-			<El k={13} x={-30} y={60}><L de={32.4} txt="Sem parar o corte" tam={96} cor={T} peso={800} /></El>
-			<El k={13} x={40} y={180}><div style={{position: 'relative'}}><L de={33.5} txt="pra responder mensagem." tam={62} cor={FINOC} peso={500} /><Risco de={wf('mensagem.') - 0.1} espessura={9} dur={0.2} /></div></El>
-
-			{/* 14. Pra salão, barbearia e estúdio de estética. (cada nicho num ponto diferente) */}
-			<El k={14} x={-40} y={-520}><L de={34.9} txt="Pra" tam={56} cor={SUB} peso={400} /></El>
-			<El k={14} x={-210} y={-270}><Neon de={w('salão,')} cor={C.vClaro} ic={G.secador} txt="salão" /></El>
-			<El k={14} x={190} y={30}><Neon de={w('barbearia')} cor={C.ambar} ic={G.navalha} txt="barbearia" /></El>
-			<El k={14} x={-120} y={380}><Neon de={w('estúdio')} cor={C.ciano} ic={G.brilho} txt="estética" sub="estúdio de" /></El>
-
-			{/* 15. Teste grátis por catorze dias. */}
-			<El k={15} x={0} y={60}><Botao /></El>
-			<El k={15} x={140} y={-130}>{(() => { const c = w('catorze'); const kb = mola(t, c - 0.04, {damping: 11, stiffness: 180}); return <div style={{opacity: Math.min(1, kb * 2), transform: `scale(${0.6 + 0.4 * kb}) rotate(${Math.sin((t - c) * 3) * 2}deg)`, background: '#fff', color: C.tinta, fontFamily: SANS, fontWeight: 800, fontSize: 66, letterSpacing: '-0.03em', padding: '18px 40px', borderRadius: 36, boxShadow: `0 0 50px ${hexA(C.v, 0.5)}`}}>por 14 dias</div>; })()}</El>
-
-			{/* 16. Marcaí. Marcou, tá marcado. (fica até o fim) */}
-			<El k={16} x={0} y={-120} fica><Marca /></El>
-			<El k={16} x={0} y={260} fica><L de={40.6} txt="Marcou, tá marcado." tam={70} cor={B} peso={600} /></El>
-			<El k={16} x={0} y={420} fica>{(() => { const kr = tw(t, wf('marcado.') + 0.2, wf('marcado.') + 0.6, 0, 1); return <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 42, color: C.vClaro, opacity: kr, filter: kr < 1 ? `blur(${(1 - kr) * 10}px)` : undefined}}>Teste grátis por 14 dias</div>; })()}</El>
-		</>
-	);
+/** CASA: as telas do aprovado, exemplos com o porquê (anuncio-canvas.md §4). Só voltam num vídeo novo quando a fala
+ *  nova diz a mesma coisa que fez elas existirem lá; as que escrevem texto fixo (23:47, "Sinal pago", "Teste grátis",
+ *  o "marcaı") só com esse texto dito. TELAS: as do vídeo (src/telas/). No plano, as duas entram por <Tela comp="Nome" />. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CASA: Record<string, React.FC<any>> = {Hora2347, Data15, Relogio, Campo, SinalPago, PainelImg, Doze, Botao, Marca};
+export const NOMES_TELAS = {casa: Object.keys(CASA), video: Object.keys(TELAS)};
+const Tela: React.FC<{comp: string; [k: string]: unknown}> = ({comp, ...resto}) => {
+	const X = TELAS[comp] ?? CASA[comp];
+	if (!X) return pare(`a Coreografia pede <Tela comp="${comp}" />, que não existe: desenhe src/telas/${comp}.tsx com o kit (src/kit.tsx) e registre em src/telas/index.ts, ou use uma da casa (${Object.keys(CASA).join(', ')}).`);
+	return <X {...resto} />;
 };
 
 /* ---------------------------------------------------------------- o fundo, no tempo */

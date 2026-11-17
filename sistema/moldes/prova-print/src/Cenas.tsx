@@ -1,13 +1,16 @@
 import React from 'react';
-import {Img, OffthreadVideo, staticFile} from 'remotion';
-import {C, CONTADORES, G, Props, SANS, SERIF, TITULO, cenaAnterior, cenaEm, mola, useT, w} from './tema';
+import {OffthreadVideo, staticFile} from 'remotion';
+import {C, CASA, COMANDO, G, P, Props, SANS, SERIF, cenaEm, mola, useT, w} from './tema';
 import type {Cena} from './tema';
-import {Card, Contador, FundoVitrine, Pessoa, Prova, RostoFechado, RostoPalco, Titulo} from './ui';
+import {ContadorDa, ImgFundo, Palco, Pessoa, Prova, RostoFechado, Vitrine} from './ui';
+import {TELAS} from './telas';
 
 /**
- * As cenas do vídeo, uma por frase (prova-print.md §9). Os prints de prova moram em public/ com a origem em
- * public/ORIGEM.md (G25: print real, nunca interface inventada). Coordenadas de vista e grifo em px do print.
- * Num vídeo novo: troque os prints, as vistas, os grifos (na palavra exata) e os contadores (no número exato dito).
+ * As telas do vídeo (prova-print.md §9). Cena 'pessoa' é o vídeo normal; 'rosto' é o rosto fechado (com FECHO, o comando
+ * do pedido); as outras mostram uma TELA: uma tela livre (src/telas/, a prova que a fala nova pede, com o kit de src/ui.tsx)
+ * ou uma tela da casa ligada no plano. As telas da casa abaixo são as do vídeo aprovado: exemplos com o porquê, presos aos
+ * prints do repositório do EditOS (public/prova-*.png, origem em public/ORIGEM.md). Num vídeo novo elas só voltam com a
+ * linha `<tela> = true` no plano e o mesmo porquê na fala; o normal é a tela livre com o print real do vídeo novo (G25).
  */
 const PV = {
 	readme: {src: 'prova-readme.png', larg: 1320},
@@ -16,45 +19,7 @@ const PV = {
 	passos: {src: 'prova-passos.png', larg: 1320},
 };
 
-/* ---------------------------------------------------------------- os quatro modos (o palco e a vitrine) */
-/** palco claro: o título-promessa só na cena dele (PV5), o card da prova (mais alto quando não há título) e o cartão de câmera
- * embaixo com a cabeça saindo da moldura (PV8). A legenda vem por cima, em Reel.tsx. */
-const cardDo = (c: Cena) => (c.id === TITULO?.cena ? G.cardPalcoTitulo : G.cardPalco);
-const Palco: React.FC<{c: Cena; children: React.ReactNode}> = ({c, children}) => {
-	const primeiro = c.de === 0;
-	return (
-		<>
-			{c.id === TITULO?.cena && <Titulo />}
-			<Card caixa={cardDo(c)} de={primeiro ? 0.25 : c.de}>
-				{children}
-			</Card>
-			<RostoPalco />
-		</>
-	);
-};
-/** o contador da cena (CONTADORES em src/tema.ts) */
-const ContadorDa: React.FC<{c: Cena}> = ({c}) => (
-	<>
-		{CONTADORES.filter((k) => k.cena === c.id).map((k, i) => (
-			<Contador key={i} de={k.de} ate={k.ate} valor={k.valor} sufixo={k.sufixo} y={k.y} />
-		))}
-	</>
-);
-/** vitrine escura: o card grande sobre o próprio conteúdo desfocado, sem rosto; vindo de outra vitrine, desliza com borrão */
-const Vitrine: React.FC<{c: Cena; fundo: React.ReactNode; children: React.ReactNode}> = ({c, fundo, children}) => {
-	const ant = cenaAnterior(c);
-	return (
-		<>
-			<FundoVitrine>{fundo}</FundoVitrine>
-			<Card caixa={G.cardVitrine} de={c.de} deLado={ant?.modo === 'vitrine'}>
-				{children}
-			</Card>
-		</>
-	);
-};
-const ImgFundo: React.FC<{src: string}> = ({src}) => <Img src={staticFile(src)} style={{width: '100%', height: '100%', objectFit: 'cover'}} />;
-
-/* ---------------------------------------------------------------- as cenas da vitrine (refazer num vídeo novo) */
+/* ---------------------------------------------------------------- as telas da casa (as do aprovado: exemplos com o porquê) */
 /** gancho: o título-promessa diz a frase (as palavras dele saem da legenda, PV4); o card mostra a prova (o README real) com o
  * grifo na frase que diz o mesmo. Sem contador aqui: o número já está no título (PV4: um elemento por ideia) */
 const Gancho: React.FC<{c: Cena}> = ({c}) => (
@@ -161,7 +126,6 @@ const Tres: React.FC<{c: Cena}> = ({c}) => {
 		</>
 	);
 };
-const Mas: React.FC<{c: Cena}> = ({c}) => <RostoFechado de={c.de} />;
 const Outros: React.FC<{c: Cena}> = ({c}) => (
 	<Palco c={c}>
 		<Prova
@@ -184,18 +148,22 @@ const Aprender: React.FC<{c: Cena}> = ({c}) => (
 		</div>
 	</Vitrine>
 );
-/** fecho (E11): rosto fechado, "comenta" pequeno em serifa itálica e a palavra do pedido entre aspas, grande, amarela,
- * SEM brilho (G16). Fixo só o comando; o resto da fala segue na legenda. */
-const Comenta: React.FC<{c: Cena}> = ({c}) => {
+/* ---------------------------------------------------------------- as cenas de rosto (servem a qualquer fala) */
+/** rosto fechado da emoção (a dor, o benefício, a virada): só o punch-in */
+const Emocao: React.FC<{c: Cena}> = ({c}) => <RostoFechado de={c.de} />;
+/** fecho (E11): rosto fechado; a chamada pequena em serifa itálica e a palavra do pedido entre aspas, grande, amarela,
+ * SEM brilho (G16), as duas ditas (comando() no plano). Fixo só o comando; o resto da fala segue na legenda. */
+const Fecho: React.FC<{c: Cena}> = ({c}) => {
 	const {t} = useT();
-	const a = mola(t, w('comenta'), {damping: 15});
-	const b = mola(t, w('edição', 2), {damping: 13});
+	if (!COMANDO) return <RostoFechado de={c.de} fecho />;
+	const a = mola(t, P.palavras[COMANDO.ids[0]].de, {damping: 15});
+	const b = mola(t, P.palavras[COMANDO.ids[COMANDO.ids.length - 1]].de, {damping: 13});
 	return (
 		<>
 			<RostoFechado de={c.de} fecho />
 			<div style={{position: 'absolute', left: 60, width: 880, top: 958, textAlign: 'center'}}>
-				<div style={{fontFamily: SERIF, fontSize: 64, lineHeight: '60px', color: C.branco, opacity: Math.min(1, a * 1.5), transform: `translateY(${(1 - a) * 14}px)`, textShadow: '0 6px 48px rgba(0,0,0,0.5)'}}>comenta</div>
-				<div style={{fontFamily: SANS, fontWeight: 800, fontSize: 100, lineHeight: '108px', letterSpacing: '-0.03em', color: C.amarelo, opacity: Math.min(1, b * 1.5), transform: `scale(${0.7 + 0.3 * b})`, textShadow: '0 6px 48px rgba(0,0,0,0.45)'}}>“EDIÇÃO”</div>
+				<div style={{fontFamily: SERIF, fontSize: 64, lineHeight: '60px', color: C.branco, opacity: Math.min(1, a * 1.5), transform: `translateY(${(1 - a) * 14}px)`, textShadow: '0 6px 48px rgba(0,0,0,0.5)'}}>{COMANDO.chamada}</div>
+				<div style={{fontFamily: SANS, fontWeight: 800, fontSize: 100, lineHeight: '108px', letterSpacing: '-0.03em', color: C.amarelo, opacity: Math.min(1, b * 1.5), transform: `scale(${0.7 + 0.3 * b})`, textShadow: '0 6px 48px rgba(0,0,0,0.45)'}}>{COMANDO.pedido}</div>
 			</div>
 		</>
 	);
@@ -204,8 +172,8 @@ const Comenta: React.FC<{c: Cena}> = ({c}) => {
 /** a pessoa (G12): toda cena de modo 'pessoa' é o vídeo normal; a legenda vem por cima, no lugar de sempre */
 export const CenaPessoa: React.FC<{c: Cena}> = () => <Pessoa />;
 
-/** as cenas com tela própria, pelo id. As de palco (gancho, modelos, previas, outros) só rodam com fundo: 'recorte' */
-export const CENA_COMP: Record<string, React.FC<{c: Cena}>> = {
+/** as telas da casa (as do aprovado), pelo nome. As de palco (gancho, modelos, previas, outros) só rodam com fundo: 'recorte' */
+const DA_CASA: Record<string, React.FC<{c: Cena}>> = {
 	gancho: Gancho,
 	criado: Criado,
 	modelos: Modelos,
@@ -213,9 +181,20 @@ export const CENA_COMP: Record<string, React.FC<{c: Cena}>> = {
 	vendo: Vendo,
 	previas: Previas,
 	tres: Tres,
-	mas: Mas,
 	outros: Outros,
 	aprender: Aprender,
-	comenta: Comenta,
+};
+/** o que desenha a cena: pessoa, rosto (emoção ou fecho), a tela livre registrada em src/telas/index.ts ou a tela da casa
+ * ligada no plano (`<tela> = true`). Tela que não é nenhuma das duas para com o que fazer. */
+export const telaDe = (c: Cena): React.FC<{c: Cena}> => {
+	if (c.modo === 'pessoa') return CenaPessoa;
+	if (c.modo === 'rosto') return c.fecho ? Fecho : Emocao;
+	const livre = (TELAS as Record<string, React.FC<{c: Cena}>>)[c.tela ?? ''];
+	if (livre) return livre;
+	if (c.tela && DA_CASA[c.tela]) {
+		if (!CASA[c.tela]) throw new Error(`a cena ${c.id} usa a tela da casa "${c.tela}" (do aprovado, com os prints do EditOS) sem ligar: ponha \`${c.tela} = true\` no plano (src/tema.ts) só se a fala nova tiver o mesmo porquê; o normal é uma tela livre em src/telas/ com o print real deste vídeo`);
+		return DA_CASA[c.tela];
+	}
+	throw new Error(`a tela "${c.tela}" da cena ${c.id} não existe: escreva src/telas/${c.tela}.tsx e registre em src/telas/index.ts (skill prova-print, "A invenção")`);
 };
 export {cenaEm};

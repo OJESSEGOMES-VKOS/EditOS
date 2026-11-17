@@ -30,7 +30,7 @@ const limpa = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').
 		const j = k >= 0 ? k : Math.min(plano.length, fala.length);
 		pare(
 			`O plano não bate com a fala. src/tempos.json foi feito para outra fala: na palavra ${j + 1} o plano tem "${plano[j] ?? '(fim)'}" e src/palavras.json tem "${fala[j] ?? '(fim)'}". ` +
-				'Refaça "cenas", "blocos", "fixo", "marcas", "texto" e "duracao_q" em src/tempos.json e as ilustrações em src/Cenas.tsx sobre a fala nova (modelos/personagem/personagem.md §9), e cole o texto da fala nova no campo "fala" (linha 2).',
+				'O src/tempos.json é gerado pelo bloco O PLANO de scripts/plano.py: refaça o bloco sobre a fala nova (modelos/personagem/personagem.md §9) e rode ../../.venv/Scripts/python.exe scripts/conferir.py, que gera e confere.',
 		);
 	}
 	const n = PS.length;
@@ -51,6 +51,8 @@ export const marca = (nome: string) => {
 };
 export const txt = (i: number) => (T.texto as Record<string, string>)[String(i)] ?? PS[i].text.toUpperCase();
 export const cena = (id: string) => T.cenas.find((c) => c.id === id)!;
+/** o desenho de uma cena do plano: "Base.2" (a mesma ilustração pela 2ª vez) é desenhada pela Base */
+export const desenho = (id: string) => id.split('.')[0];
 
 const cn = loadFont('normal', {weights: ['400', '700'], subsets: ['latin']});
 export const FONTE = cn.fontFamily;

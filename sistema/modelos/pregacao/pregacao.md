@@ -9,7 +9,11 @@ parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 q
 
 **A referência mostra o jeito do modelo, não um roteiro para copiar (G30).** O modelo é inspiração: o porquê e o como
 de cada tela. Não se copia a sequência nem os tempos do aprovado. Cada momento descrito aqui é repertório, com o seu
-porquê, e só entra onde a fala nova tiver o mesmo porquê.
+porquê, e só entra onde a fala nova tiver o mesmo porquê. A skill `.claude/skills/pregacao/SKILL.md` diz a
+personalidade e como achar, na fala nova, a tese, a frase protagonista e a palavra de peso. Os textos do aprovado ("Esse
+vídeo está sendo 100% editado pelo Claude.", "você está vendo apenas um desses modelos.", “edição”) são exemplos
+daquela fala; o vídeo novo nasce sem eles (`scripts/plano_novo.tsx`). O modelo não tem tela livre: tudo na tela é a
+própria fala em tipografia.
 
 Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
 
@@ -212,28 +216,38 @@ false, fundo: 'real'}`. O render sai **sem som**; a voz entra no `mixar.sh`.
 
 Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do vídeo".
 
+0. **Leia a skill** `.claude/skills/pregacao/SKILL.md` (a personalidade, as peças e a invenção da ênfase).
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py pregacao <gravacao.mp4> <AAAA-MM-DD-tema>`.
    Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`), mede o rosto (`src/rosto.json`) e adapta
-   a gravação ao modelo. O molde para ao carregar e diz qual lista do plano refazer.
+   a gravação ao modelo. **O plano nasce vazio:** o bloco O PLANO de `src/Corte.tsx` vem do `scripts/plano_novo.tsx`
+   do molde (a pessoa num plano 1,0, todos os trechos e momentos `null`, legenda automática abaixo do queixo, com a
+   lista comentada das peças), nunca com o plano do aprovado. O molde para ao carregar e diz qual lista do plano refazer.
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
 2. **Escreva o `plano.md`** na pasta do vídeo, frase a frase sobre `src/palavras.json`: a frase mais forte (abertura), a
    fala protagonista dos trechos mais ligados ao tema (tela creme, com o porquê; G17, G28), a virada e o comando do fecho. A
    maior parte fica na legenda.
-3. **Monte O PLANO** em `src/Corte.tsx` (na pasta do vídeo), nesta ordem:
+3. **Monte O PLANO** no bloco marcado de `src/Corte.tsx` (na pasta do vídeo; entre a linha O PLANO e a linha fim do
+   plano), nesta ordem:
    - `T`: cada trecho numa palavra, `w('palavra', n)` (início da n-ésima vez que ela é dita), `c()` = 2 quadros antes.
-     Trechos, nesta ordem no tempo: `bloco1` (abertura em frase-bloco, obrigatório), `base1` (legenda, obrigatório),
-     `base2`, `base3`, `destaque` (tela creme), `previas`, `base3b`, `bloco2` (a virada), `base4`, `cta` (Comenta),
-     `fecho` (dissolve para o preto). Trecho que a fala não tem: `null`. Reponha cada trecho no lugar certo da fala nova
-     só onde a fala nova tem o mesmo porquê (G30); trecho sem esse porquê fica `null` e vira legenda.
-   - `ENQ`: o zoom de cada trecho, 1,0 por padrão; até 1,18 só onde a fala tem motivo (G6).
+     Trechos, nesta ordem no tempo: `bloco1` (sempre 0), `base1` (a 1ª legenda depois da abertura; `null` sem
+     abertura), `base2`, `base3`, `destaque` (tela creme), `previas`, `base3b`, `bloco2` (a virada), `base4`, `cta`
+     (Comenta), `fecho` (dissolve para o preto). Trecho que a fala não tem: `null`. Cada trecho entra só onde a fala
+     nova tem o porquê dele (G30); trecho sem esse porquê fica `null` e vira legenda.
+   - `ZOOM`: o zoom de cada trecho (`{base2: 1.1}`), 1,0 por padrão; até 1,18 só onde a fala tem motivo (G6).
    - `LETREIRO`: `null` (o padrão). Só a pedido: `{palavra, texto}`, a palavra-tema dita que vira o letreiro, com o
      `fecho` pelo menos 1,5 s depois dela.
-   - `LEG_Y_PLANO`: troque `1060` por `null` e a legenda vai sozinha para logo abaixo do queixo medido.
-   - `PEDACOS`: as páginas da legenda, `[índice da 1ª palavra, 'texto / 2ª linha', até?]`, com o texto da fala. O 4º campo
-     (`'vitrine'`) é só do vídeo aprovado: não use.
-   - `BLOCOS`: os textos de cada frase-bloco, da tela creme e do Comenta (`{txt, tam, serif?, vermelho?, quebra?,
-     pincel?}`); o `top` da frase-bloco é `topoBloco(zoom do trecho)`.
-   - `FOLGA`: quanto o vídeo segue depois da última palavra (padrão 0,73 s).
+   - `LEG_Y_PLANO`: `null` (o vídeo novo nasce assim) põe a legenda logo abaixo do queixo medido; um número fixa o topo
+     (o aprovado fixou 1060).
+   - `PEDACOS`: as páginas da legenda, `[índice da 1ª palavra, 'texto / 2ª linha', até?, , corpo?]`, com o texto da
+     fala. O 4º campo (`'vitrine'`) é só do vídeo aprovado: não use.
+   - `ABERTURA`, `DESTAQUE`, `VIRADA`, `COMANDO`: os textos da frase-bloco do gancho, da tela creme, da frase-bloco da
+     virada e do Comenta (`[{txt, tam, serif?, vermelho?, quebra?, pincel?}]`), ou `null`. O `top` sai sozinho do zoom
+     do trecho.
+   - `FOLGA` (fora do bloco): quanto o vídeo segue depois da última palavra (padrão 0,73 s).
+   **O teste do clone:** no plano de cenas (`cenas.json` → `tools/decupar.py oficina/<v> --plano`, ou o `plano.md`), a
+   linha de cada cena com ênfase diz o nome dela como está no plano (`ABERTURA`, `DESTAQUE`, `VIRADA`, `COMANDO`) e a
+   palavra dita entre aspas que pediu ela. Depois `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até sair `SEM
+   CLONE`, e a folha de quadros ao lado da `referencia/folha.jpg`: mesmo modelo, outro vídeo.
 4. **Recorte a pessoa** (só se o dono pediu letreiro, `fundo: 'desfoque'` ou `fundo: 'recorte'`), na pasta do vídeo e pela trava porque é pesado:
    `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py`. Grava `public/pessoa.webm`.
 5. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo; ele pega a trava sozinho, **não** rode dentro do
@@ -254,7 +268,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e `2`), a janela em
 `T.previas` e o render com `--props='{"previas":true,"nomesPrevias":["modeloA","modeloB"]}'`.
 
-## 10. O plano do vídeo aprovado (para comparar)
+## 10. O plano do vídeo aprovado (exemplo para comparar; ele fica no molde, o vídeo novo nasce sem ele)
 
 Feito antes das regras de 2026-11-05 (o letreiro MODELOS atrás da pessoa recortada, a frase-bloco da virada no meio da
 frase, troca de zoom a cada corte, golpes e whoosh). Serve para ver a tipografia e o porquê de cada momento, não como

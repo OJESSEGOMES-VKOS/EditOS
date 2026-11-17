@@ -12,6 +12,10 @@
 // 7. legenda com destaque (título), dono 2026-11-07: texto normal ('base') no MESMO tamanho da legenda padrão (LEG_TAM)
 //    e entrada palavra por palavra (cada palavra aparece no quadro em que é dita, nunca antes de 0,1 s da voz nem
 //    mais de 0,1 s depois).
+// 8. a base (autoridade.md §1): o vídeo com a legenda é a maior parte (>= 50% do tempo), nunca duas telas seguidas
+//    (tela, painel, celular, lista ou prévias) sem o vídeo entre elas; a tela cheia dura de 1 a 2,5 s (avisa).
+// As telas novas (src/telas/) entram como as telas da casa: o texto dito delas (textos no plano) conta na cobertura, na
+// repetição e na zona (a caixa de texto do modo, src/ui.tsx). O herói que não existe para ao carregar.
 // As telas cheias e os títulos (palavra a palavra com a voz, aprovados) entram na cobertura, na repetição e na zona;
 // a régua de tempo vale para a legenda (como na memória legenda-conta-historia).
 // Sai com código 1 se algo falhar ou se o plano não bater com a fala (aí diz a lista e a linha). Apaga o temporário sempre.
@@ -25,7 +29,7 @@ const tmp = path.resolve('.tmp-cobertura.mjs');
 let M;
 try {
 	await build({
-		stdin: {contents: "export {textos, PALAVRAS, ZONA, LEG_Y, LEG_Y2, LEG_TAM, DURACAO, PEDACOS, TITULOS, TELAS, larguraLeg} from './src/Reel.tsx';", resolveDir: process.cwd(), loader: 'ts'},
+		stdin: {contents: "export {textos, PALAVRAS, ZONA, LEG_Y, LEG_Y2, LEG_TAM, DURACAO, PEDACOS, TITULOS, TELAS, TRECHOS, larguraLeg} from './src/Reel.tsx';", resolveDir: process.cwd(), loader: 'ts'},
 		bundle: true, platform: 'node', format: 'esm', outfile: tmp, logLevel: 'error', jsx: 'automatic', loader: {'.json': 'json'},
 		external: ['remotion', 'react', 'react/jsx-runtime'],
 		plugins: [{name: 'stub', setup(b) {
@@ -38,7 +42,7 @@ try {
 	// o plano não bate com a fala: o Reel.tsx para ao carregar com a mensagem do que refazer; aqui ganha a linha da lista
 	let msg = String(e?.message ?? e).split('\n')[0];
 	const lista = /Na lista (\w+)/.exec(msg)?.[1];
-	const n = lista ? fs.readFileSync('src/Reel.tsx', 'utf8').split('\n').findIndex((l) => new RegExp(`^(export )?const ${lista}\\b`).test(l)) : -1;
+	const n = lista ? fs.readFileSync('src/Reel.tsx', 'utf8').split('\n').findIndex((l) => new RegExp(`^(export )?(const |let )?${lista}\\b`).test(l)) : -1;
 	if (n >= 0) msg = msg.replace(`Na lista ${lista}`, `Na lista ${lista} (src/Reel.tsx, linha ${n + 1})`);
 	fs.rmSync(tmp, {force: true}); // o exit não passa pelo finally
 	console.error(msg);
@@ -46,7 +50,7 @@ try {
 } finally {
 	fs.rmSync(tmp, {force: true});
 }
-const {textos, PALAVRAS: PS, ZONA, LEG_Y, LEG_Y2, LEG_TAM, DURACAO, PEDACOS, TITULOS, TELAS, larguraLeg} = M;
+const {textos, PALAVRAS: PS, ZONA, LEG_Y, LEG_Y2, LEG_TAM, DURACAO, PEDACOS, TITULOS, TELAS, TRECHOS, larguraLeg} = M;
 const FPS = 30, MIN_PEDACO = 1.5, MIN_PALAVRA = 0.4, MAX_LINHAS = 4;
 const previas = process.argv.includes('--previas');
 const N = Math.round(DURACAO * FPS);
@@ -139,7 +143,16 @@ const longos = [
 	...TELAS.filter((s) => s.linhas.length > MAX_LINHAS).map((s) => `tela da palavra ${s.primeira}`),
 ];
 
+// 8. a base: o vídeo é a maior parte; nunca duas telas seguidas
+const TR = TRECHOS(previas);
+const noVideo = TR.filter((x) => x.modo === 'video').reduce((s, x) => s + x.fim - x.a, 0) / DURACAO;
+const seguidas = TR.flatMap((x, k) => (k && x.modo !== 'video' && TR[k - 1].modo !== 'video' && x.a < x.fim ? [`${TR[k - 1].modo} (${TR[k - 1].a.toFixed(2)} s) e ${x.modo} (${x.a.toFixed(2)} s)`] : []));
+const telaLonga = TR.filter((x) => x.modo === 'tela' && (x.fim - x.a > 2.5 + 1e-6 || x.fim - x.a < 1 - 1e-6)).map((x) => `tela cheia de ${x.a.toFixed(2)} s dura ${(x.fim - x.a).toFixed(2)} s`);
+
 console.log(`modo: ${previas ? 'com' : 'sem'} prévias`);
+console.log(`o vídeo com a legenda: ${Math.round(noVideo * 100)}% do tempo (a base, >= 50%); ${seguidas.length} telas seguidas sem o vídeo entre elas`); seguidas.forEach((c) => console.log('  ' + c));
+if (noVideo < 0.5) console.log('  -> telas demais: cada tela só onde a fala tem o porquê dela (autoridade.md §1); o resto fica no vídeo com a legenda');
+telaLonga.forEach((c) => console.log(`  aviso: ${c} (uma ideia por tela, de 1 a 2,5 s)`));
 console.log(`${PS.length} palavras, ${buracos.length} com buraco`); buracos.forEach((b) => console.log('  ' + b));
 if (buracos.length) console.log("  -> ponha essas palavras numa página de PEDACOS, ou num título/tela que esteja na tela enquanto são ditas ('#n' só pula o que outra peça mostra)");
 console.log(`${curtos.length} pedaços/palavras curtos (mín. ${MIN_PEDACO} s por pedaço, ${MIN_PALAVRA} s por palavra)`); curtos.forEach((c) => console.log('  ' + c));
@@ -155,4 +168,4 @@ ex.forEach((e) => console.log(`  ${e.de.toFixed(2)}-${e.ate.toFixed(2)} ${e.tipo
 console.log(`${tamTit.length} títulos com texto normal fora do tamanho da legenda (${LEG_TAM} px)`); tamTit.forEach((c) => console.log('  ' + c));
 console.log(`${entrada.length} palavras de título fora do tempo da voz (entrada palavra por palavra)`); entrada.forEach((c) => console.log('  ' + c));
 const ruimPos = posicoes.length > 2 || posicoes.some((y) => y !== LEG_Y && y !== LEG_Y2);
-process.exit(buracos.length || curtos.length || repetidas.length || ruimPos || fora.length || longos.length || tamTit.length || entrada.length ? 1 : 0);
+process.exit(noVideo < 0.5 || seguidas.length || buracos.length || curtos.length || repetidas.length || ruimPos || fora.length || longos.length || tamTit.length || entrada.length ? 1 : 0);

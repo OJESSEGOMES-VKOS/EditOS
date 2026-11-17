@@ -9,10 +9,12 @@ const {fontFamily: ANTON} = loadAnton('normal', {weights: ['400'], subsets: ['la
 const {fontFamily: INTER} = loadInter('normal', {weights: ['700'], subsets: ['latin', 'latin-ext']});
 
 export type Cena27Props = {
-  rotulo: string; // "POSTANDO TODO DIA"
-  palavra: string; // "DIA"
-  mes: string; // "ABRIL"
-  dias: number; // dias do mês / do desafio (ex.: 30)
+  rotulo: string; // a linha pequena acima do contador (o que a pessoa faz todo dia, como foi dito)
+  palavra: string; // a palavra vermelha ao lado do número (ex.: o nome da unidade dita)
+  mes: string; // o nome do mês do calendário
+  dias: number; // quantos quadrinhos o calendário tem
+  ate?: number; // dia em que o contador pousa (padrão: dias); os quadrinhos depois dele ficam vazios
+  fimQuadro?: number; // quadro em que o contador pousa (padrão 79); todo o ritmo escala junto
   inicioSemana: number; // 0 = domingo; coluna do dia 1
   iniciaisSemana?: string[];
   vermelho?: string;
@@ -25,24 +27,27 @@ const H = 1350;
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 export const Cena27: React.FC<Cena27Props> = ({
-  rotulo, palavra, mes, dias, inicioSemana, iniciaisSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], vermelho = '#E5383B',
+  rotulo, palavra, mes, dias, ate: ateP, fimQuadro = 79, inicioSemana, iniciaisSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], vermelho = '#E5383B',
   width = W, height = H,
 }) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const s = Math.min(width / W, height / H);
 
-  // curva devagar-rápido-devagar: 4 batidas, corrida, 3 batidas
-  const batIni = [6, 12, 18, 24];
-  const rapIni = 27;
-  const rapFim = 60;
-  const meio = dias - 1 - 4 - 3; // dias percorridos na corrida (do 5 ao dias-3)
-  const batFim = [66, 72, 79];
+  // curva devagar-rápido-devagar: 4 batidas, corrida, 3 batidas (contagem curta, até 8: só batidas)
+  const ate = Math.min(ateP ?? dias, dias);
+  const e = fimQuadro / 79;
+  const curta = ate <= 8;
+  const batIni = curta ? Array.from({length: ate - 1}, (_, i) => Math.round(6 * e + (i * (fimQuadro - 6 * e)) / Math.max(1, ate - 2))) : [6, 12, 18, 24].map((t) => t * e);
+  const rapIni = 27 * e;
+  const rapFim = 60 * e;
+  const meio = curta ? 0 : ate - 1 - 4 - 3; // dias percorridos na corrida (do 5 ao ate-3)
+  const batFim = curta ? [] : [66, 72, 79].map((t) => t * e);
   const cfg = {damping: 11, stiffness: 220, mass: 0.6};
   const valor = (f: number) => {
     let v = 1;
     for (const t of batIni) v += spring({frame: f - t, fps, config: cfg});
-    v += meio * interpolate(f, [rapIni, rapFim], [0, 1], {...clamp, easing: Easing.inOut(Easing.cubic)});
+    if (meio > 0) v += meio * interpolate(f, [rapIni, rapFim], [0, 1], {...clamp, easing: Easing.inOut(Easing.cubic)});
     for (const t of batFim) v += spring({frame: f - t, fps, config: cfg});
     return v;
   };
@@ -54,7 +59,11 @@ export const Cena27: React.FC<Cena27Props> = ({
   const chegada: number[] = [];
   for (let d = 1; d <= dias; d++) {
     let f = 0;
-    while (f < 150 && valor(f) < d - 0.4) f++;
+    if (d > ate) {
+      chegada[d] = Infinity;
+      continue;
+    }
+    while (f < fimQuadro + 60 && valor(f) < d - 0.4) f++;
     chegada[d] = f;
   }
 
@@ -77,7 +86,7 @@ export const Cena27: React.FC<Cena27Props> = ({
     );
   };
 
-  const final = chegada[dias];
+  const final = chegada[ate];
   const soco = frame >= final ? interpolate(frame - final, [0, 4, 12], [1, 1.035, 1], {...clamp, easing: Easing.out(Easing.quad)}) : 1;
   const circulo = interpolate(frame, [final + 3, final + 18], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 
@@ -121,8 +130,8 @@ export const Cena27: React.FC<Cena27Props> = ({
                 const d = i - inicioSemana + 1;
                 if (d < 1 || d > dias) return <div key={i} />;
                 const t0 = chegada[d];
-                const dur = d <= 5 || d > dias - 3 ? 8 : 4;
-                const k = interpolate(frame, [t0, t0 + dur], [0, 1], {...clamp, easing: Easing.out(Easing.quad)});
+                const dur = d <= 5 || d > ate - 3 ? 8 : 4;
+                const k = t0 === Infinity ? 0 : interpolate(frame, [t0, t0 + dur], [0, 1], {...clamp, easing: Easing.out(Easing.quad)});
                 return (
                   <div key={i} style={{position: 'relative', height: cel, borderRadius: 14, background: k > 0 ? `rgba(229,56,59,${0.06 + 0.12 * k})` : '#EFEFED'}}>
                     <div style={{position: 'absolute', left: 10, top: 6, fontFamily: INTER, fontWeight: 700, fontSize: 21, color: '#74746F'}}>{d}</div>
@@ -131,7 +140,7 @@ export const Cena27: React.FC<Cena27Props> = ({
                         <path d={`M ${24 + (d % 3)} ${58 + (d % 2) * 3} Q 36 66 ${43 + (d % 4)} 80 Q 58 52 ${82 - (d % 3) * 2} ${30 + (d % 5)}`} stroke={vermelho} strokeWidth={9 + (d % 3)} fill="none" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - k} />
                       </svg>
                     )}
-                    {d === dias && circulo > 0 && (
+                    {d === ate && circulo > 0 && (
                       <svg width={cel + 40} height={cel + 40} viewBox="0 0 140 140" style={{position: 'absolute', left: -20, top: -20, overflow: 'visible'}}>
                         <path d="M 78 14 C 120 16, 134 60, 120 98 C 104 132, 40 134, 18 100 C 0 70, 12 26, 56 15 C 70 12, 86 14, 96 20" stroke={vermelho} strokeWidth={6} fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - circulo} />
                       </svg>

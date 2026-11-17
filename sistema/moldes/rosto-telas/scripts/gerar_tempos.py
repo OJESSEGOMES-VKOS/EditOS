@@ -5,6 +5,9 @@ A gravação é um take só (sem decupagem): os "blocos" são os cortes de enqua
 2 quadros antes da palavra que abre a frase.
 Este arquivo É o plano: num vídeo novo, refaça o bloco "O PLANO" abaixo para a fala nova. Tela que o vídeo não usa
 (editor, modelos, celular, previas, outros, prompt, fecho, silencio) vira None e some do vídeo e do som.
+Num vídeo novo o bloco já nasce vazio (scripts/plano_novo.py, posto pelo tools/novo-video.py): rosto puro e legenda.
+Tela que a fala pede e a casa não tem é uma tela livre: livres=[dict(comp=..., modo='dividido'|'cheia', de=..., sai=...)],
+desenhada em src/telas/ (o registro é src/telas/index.ts).
 Se uma palavra do plano não existe na fala, o script para e diz a linha. Se public/quadro.jpg (a miniatura dos formatos)
 não existe, ele é tirado de public/fala.mp4.
 uso (de dentro do molde): ../../.venv/Scripts/python.exe scripts/gerar_tempos.py
@@ -110,6 +113,32 @@ T = dict(
 )
 # ================================================================ fim do plano
 
+# as telas livres (src/telas/ da pasta do vídeo): a tela que a fala nova pede e o aprovado não tem
+T.setdefault('livres', [])
+_reg = (AQUI / 'src' / 'telas' / 'index.ts')
+_registradas = set(re.findall(r'\b([A-Z]\w*)\b', re.sub(r'/\*.*?\*/|//[^\n]*', '', _reg.read_text(encoding='utf-8'), flags=re.S))) if _reg.exists() else set()
+for k, L in enumerate(T['livres']):
+    onde = f'livres[{k}] ({L.get("comp", "?")})'
+    for c in ('comp', 'modo', 'de', 'sai'):
+        if c not in L:
+            sys.exit(f'scripts/gerar_tempos.py: {onde} sem "{c}" (comp, modo, de e sai são obrigatórios).')
+    if L['modo'] not in ('dividido', 'cheia'):
+        sys.exit(f'scripts/gerar_tempos.py: {onde}: modo "{L["modo"]}" não existe (dividido ou cheia).')
+    if not L['de'] < L['sai']:
+        sys.exit(f'scripts/gerar_tempos.py: {onde}: o "de" ({L["de"]}) tem de vir antes do "sai" ({L["sai"]}).')
+    if L['comp'] not in _registradas:
+        sys.exit(f'scripts/gerar_tempos.py: {onde}: a tela "{L["comp"]}" não está registrada em src/telas/index.ts.')
+    if L['modo'] == 'cheia':
+        tit = L.get('titulo')
+        if not tit:
+            sys.exit(f'scripts/gerar_tempos.py: {onde}: tela cheia pede titulo=dict(i0=iw(...), grupos=[...]) (o título no topo é o texto dito).')
+        if tit['i0'] + sum(tit['grupos']) > len(W):
+            sys.exit(f'scripts/gerar_tempos.py: o título de {onde} passa do fim da fala ({len(W)} palavras); ajuste os grupos.')
+    else:
+        L.pop('titulo', None)
+        L.pop('rosto', None)
+    L['em'] = {n: round(float(v), 3) for n, v in (L.get('em') or {}).items()}
+
 for nome, tit in T['titulos'].items():
     if isinstance(tit, dict) and tit['i0'] + sum(tit['grupos']) > len(W):
         sys.exit(f'scripts/gerar_tempos.py: os títulos de "{nome}" passam do fim da fala ({len(W)} palavras); ajuste os grupos.')
@@ -125,4 +154,6 @@ print('blocos', BLOCOS)
 for k, v in T.items():
     if isinstance(v, dict):
         print(k, v)
+for L in T['livres']:
+    print('livre', L)
 print('próximo: ../../.venv/Scripts/python.exe scripts/rosto.py (o enquadramento segue os blocos novos)')

@@ -39,7 +39,8 @@ Uma pessoa falando, em rosto cheio, e telas claras que entram para **representar
 - **Rosto cheio no plano A**, fixo dentro do trecho. O plano B (15% mais perto) só com motivo na fala (G6).
 - **Legenda sem tarja**, branca, com a palavra que está sendo dita em menta (0 s, 21 s).
 - **Tela dividida** com painel marfim em cima e a legenda numa pílula verde-escura na divisa (5 s a 9 s, 24 s a 26 s).
-- **Telas que encenam a fala**, só onde a fala tem o porquê de cada uma (seção 4); o resto é o rosto cheio: o editor
+- **Telas que encenam a fala**, só onde a fala tem o porquê de cada uma (seção 4), quase sempre telas livres nascidas
+  da fala nova; o resto é o rosto cheio. As do aprovado, como exemplo: o editor
   "Claude Code" com o próprio vídeo na prévia (2 s a 4 s), o chip do Claude (10 s), o celular com o Reel (11 s a 14 s), a
   caixa do Claude digitando a frase dita (24 s a 26 s).
 - **Fecho no jeito minimalista do Instagram:** o campo de comentário com a palavra, a foto e o @ reais (27 s a 29 s).
@@ -97,12 +98,23 @@ No aprovado, em conta redonda: cerca de 2/3 do tempo com tela marfim e 1/3 só n
   dividido, o editor ou o celular fica parado sem corte. Cada trecho dura de 2 a 5 s; o editor e o celular contam como
   um trecho cada.
 
-## 4. As telas (a assinatura)
+## 4. As telas: a gramática é a assinatura, as telas do aprovado são exemplos
 
-Cada tela abaixo diz por que foi usada no aprovado. Usar só quando a fala nova tiver o mesmo porquê (G30, G19); a
-mesma informação nunca aparece duas vezes (G26) e cada tela sai junto com o trecho (G23, G27).
+**A assinatura do modelo é a gramática, não a lista de telas:** rosto cheio como base; painel marfim que entra já
+preenchido e sai no corte; dois modos de tela (dividido, com a legenda na pílula, e cheia, com o título que é o texto
+dito e o rosto numa moldura); um objeto de papel por tela que faz o que a frase diz, preso à palavra; o vocabulário de
+movimento da casa (mola, ✓ menta, barra verde, marca-texto, risco, anéis). A skill `.claude/skills/rosto-telas/SKILL.md`
+escreve essa personalidade regra a regra.
 
-| Tela | Usada no aprovado porque | Usar quando a fala nova |
+**Tela que a fala pede e o aprovado não tem é uma tela livre** (o normal num tema novo): desenhada com o kit de
+`src/ui.tsx` (`Palco`, `Entra`, `Cartao`, `Frase`, `MarcaTexto`, `Chip`, `ItemCheck`, `Barra`, `Numero`, `Risco`,
+`Icone`, `Ondas`, `Bolinha`) em `src/telas/<Nome>.tsx` da pasta do vídeo, registrada em `src/telas/index.ts` e ligada no
+plano por `livres` (seção 9). Ela nunca mora no molde.
+
+As telas abaixo são **exemplos do aprovado**, cada uma com o porquê dela. Uma delas só volta quando a fala nova tiver o
+mesmo porquê (G30, G19); a mesma informação nunca aparece duas vezes (G26) e cada tela sai junto com o trecho (G23, G27).
+
+| Tela (exemplo) | Usada no aprovado porque | Usar quando a fala nova |
 |---|---|---|
 | Editor "Claude Code" | a fala dizia que o vídeo estava sendo editado pelo Claude (2 s) | fala do próprio ato de editar ou do Claude editando |
 | Cartões dos modelos (dividido) | a fala citava os vários modelos que ele criou (5 s) | cita uma lista de coisas que a pessoa criou ou tem |
@@ -232,9 +244,12 @@ arroba: '', foto: ''}`.
 
 Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do vídeo".
 
+0. **Leia a skill** `.claude/skills/rosto-telas/SKILL.md` (a personalidade, as peças e a invenção).
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py rosto-telas <gravacao.mp4> <AAAA-MM-DD-tema>`.
-   Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`) e adapta a gravação ao modelo. Ao
-   carregar, o molde para de propósito e diz que `src/tempos.json` é de outra fala.
+   Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`) e adapta a gravação ao modelo. **O
+   plano nasce vazio:** o bloco O PLANO do `scripts/gerar_tempos.py` vem do `scripts/plano_novo.py` do molde (rosto puro,
+   toda tela `None`, com a lista comentada das peças), nunca com as telas do aprovado. Ao carregar, o molde para de
+   propósito e diz que `src/tempos.json` é de outra fala.
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
 2. **Escreva o `plano.md`** na pasta do vídeo, frase a frase sobre `src/palavras.json`, abrindo com a decupagem limpa
    (cortes nas pausas, G5) e o plano de cenas: onde cortar e qual plano (A por padrão; B só com motivo, G6; dividido,
@@ -253,6 +268,16 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    - `modelos`: obrigatórios `de`, `modelos`, `criei`, `melhorei`, `sai` e `nomes`. Opcionais: `entradas` (um tempo por
      cartão; sem ele os cartões entram espaçados por igual até `modelos`), `editar` (os cartões saem; sem ele ficam até o
      painel sair), `formatos` (3 tempos) e `claude` (sem eles não há formatos nem chip).
+   - **as telas livres** (a tela que a fala pede e a casa não tem): `livres=[dict(comp='Nome', modo='dividido' ou
+     'cheia', de=corte('...'), sai=corte('...'), em=dict(chave=w('palavra')), textos=dict(...), dados=dict(...))]`.
+     No `dividido` o painel ocupa até y 880 e a legenda vai para a pílula; na `cheia` é obrigatório
+     `titulo=dict(i0=iw('1ª palavra'), grupos=[...])` (o título é o texto dito, a legenda some) e `rosto=dict(x, y, w)`
+     põe o rosto numa moldura 9:16 (sem ele o rosto some; o aprovado nunca tirou o rosto, então use a moldura). O desenho
+     vai em `src/telas/<Nome>.tsx`, tudo dentro do `<Palco modo={L.modo}>`, e entra no registro `src/telas/index.ts`.
+     Texto na tela só o dito (G19), nunca o mesmo que a pílula mostra na hora (G26: o `cobertura.mjs` cobra).
+   - **Fala rápida e tela cheia:** cada página de título precisa de 1,5 s e de até 2 linhas; antes de escolher a frase
+     da tela cheia, conte as páginas. Frase rápida demais para título fica no dividido (a pílula cabe até ~54 letras).
+   - `fecho` sem DM: `mandar=None, dm=None` quando a fala não promete mandar na DM.
    O rosto cheio é a maior parte (seção 2). Tela que a fala não pede vira `None`.
 4. **Gere o plano:** `../../.venv/Scripts/python.exe scripts/gerar_tempos.py` (na pasta do vídeo). Grava
    `src/tempos.json`; se uma palavra do plano não existe na fala, ele para e diz a linha.
@@ -263,6 +288,10 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    quadro e com e sem prévias, toda palavra escrita enquanto é dita, página de 1,5 s, palavra de 0,4 s (0,25 s a última
    de uma página de 1,5 s), nada em dois lugares, até 2 linhas, as 2 posições da legenda e a zona segura, e diz o que
    mexer. Página curta que ele aponta quase sempre é plano, não legenda: veja "Fala rápida" abaixo.
+7b. **O teste do clone:** no plano de cenas (`cenas.json` → `tools/decupar.py oficina/<v> --plano`), a linha de cada
+   cena com tela diz o nome dela como está no plano (`Ouvidos`, `fecho`, `outros`...) e a palavra dita entre aspas que
+   pediu ela. Depois `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até sair `SEM CLONE` (texto do aprovado que a
+   fala não diz, plano parecido com o do aprovado, tela sem dono na fala).
 8. **Som (só com ordem de efeitos ou música, G6):** `../../.venv/Scripts/python.exe audio/compor.py` (na pasta do
    vídeo). Ele lê o `tempos.json` e segue o plano sozinho. Sai `public/trilha.wav`. `--cama` liga a música. Sem ordem,
    pule este passo.
@@ -274,7 +303,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 11. **Mixe:** `sh scripts/mixar.sh out/so-voz.mp4 out/final.mp4` (na pasta do vídeo; só a voz). Com ordem de efeitos,
     ponha `public/trilha.wav` como 3º argumento. Sai em -14 LUFS.
 12. **Confira a identidade:** `.venv/Scripts/python.exe tools/parece.py oficina/<v>/out/final.mp4 rosto-telas` e a
-    folha lado a lado. Ela confere a cara de cada tela (cor, fonte, enquadramento, posição da legenda), não a ordem nem
+    folha lado a lado com `referencia/folha.jpg`: mesmo modelo, sim; mesmo vídeo, não. Ela confere a cara de cada tela (cor, fonte, enquadramento, posição da legenda), não a ordem nem
     a quantidade de telas do aprovado. Brilho, contraste e cortes por minuto são aviso (seção 2).
 
 **Fala rápida (3 palavras por segundo ou mais):** as telas cabem do mesmo jeito; o que muda é o tamanho de cada pedaço.

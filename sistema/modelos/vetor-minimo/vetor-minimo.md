@@ -110,6 +110,14 @@ comando na fala, não há apagão nem moral: segure o resultado na tela com a ú
 - **Vetor com sombreado suave de volume** (degradês do SVG), nunca traço chapado nem imagem raster no personagem.
 - **Objetos repetidos são idênticos.** Pessoa real nunca; o personagem é palito sem rosto, manequim sem rosto ou só as
   mãos.
+- **O objeto que ele segura é a frase, e a tela 9:16 é só o exemplo do aprovado.** Ela existe lá porque a fala era sobre
+  modelos de edição de vídeo: cada boneco era um modelo e a varredura editava a tela dele. Num vídeo novo a tela só
+  volta quando a fala nova é sobre vídeos ou telas editadas; o normal é o objeto que a ideia de cada personagem nomeia
+  (o fone para "ouvidos", a caixa para "biblioteca", o haltere para "treino"), desenhado em `src/telas/<Nome>.tsx` da
+  pasta do vídeo com o kit de `src/kit.tsx` (`COR`, `coresDe`, `Varredura`, `PALCO`: centrado em 0,0, até 140 x 190) e
+  registrado em `src/telas/index.ts`. A regra do objeto novo é a da tela: cru em cinza antes da ação, aceso em giz com o
+  halo de borda depois dela, verde na virada (ou na ação do "você"), apagado no "apenas um". A skill
+  `.claude/skills/vetor-minimo/SKILL.md` ensina a inventar.
 
 **Paleta (a identidade do modelo):**
 
@@ -183,30 +191,40 @@ Prévia só de vídeo seu, nunca de terceiro.
 
 Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do vídeo" (`oficina/<AAAA-MM-DD-tema>/`).
 
+0. **Leia a skill** `.claude/skills/vetor-minimo/SKILL.md` (a personalidade, as peças e a invenção do objeto novo).
 1. **A narração vira vídeo** (o `novo-video.py` pede um vídeo): se você tem só o áudio,
    `ffmpeg -f lavfi -i color=c=black:s=1080x1920:r=30 -i narracao.wav -shortest -c:v libx264 -pix_fmt yuv420p -c:a aac narracao.mp4`.
    Se a gravação tem rosto, use-a direto: só a voz entra.
 2. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py vetor-minimo <narracao.mp4> <AAAA-MM-DD-tema>`.
-   Isso copia o molde, grava `public/voz.wav` e transcreve a fala em `src/palavras.json`.
-   Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
+   Isso copia o molde, grava `public/voz.wav` e transcreve a fala em `src/palavras.json`. **O plano nasce vazio** (o
+   `scripts/plano_novo.py` entra no lugar do bloco O PLANO de `scripts/plano.py`): o preto e a voz, e o `checar.mjs`
+   reprova até a história ser montada pela fala.
+   Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui, todos num `--trocar` só:
+   `--trocar Cloud=Claude Earthshot=earshot`.
 3. **Escolha a metáfora:** ache a frase-tese e a frase de virada, escolha a forma (A, B ou C) e escreva o `plano.md`
-   na pasta do vídeo, frase a frase. Na forma C, um personagem por ideia da fala.
-4. **Monte O PLANO em `src/plano.json`** (na pasta do vídeo). O molde para de propósito enquanto o plano não bater com a
-   fala nova e diz a palavra que difere. Um tempo é `segundos`, `[índice, "palavra"]` ou `[índice, "palavra", ±segundos]`.
-   - `"fala"`: o texto da fala nova. `"cauda"`: segundos depois da última palavra (0,7 no aprovado). Aumente a cauda
+   na pasta do vídeo, frase a frase. Na forma C, um personagem por ideia da fala, e para cada um **o objeto que a ideia
+   dele nomeia**, com a palavra dita entre aspas que pediu o objeto e o porquê (o `tools/clone.py` cobra essa linha).
+4. **Monte O PLANO em `scripts/plano.py`** (na pasta do vídeo), só entre as linhas `O PLANO` e `fim do plano`, e rode
+   `../../.venv/Scripts/python.exe scripts/plano.py`: ele escreve `src/plano.json` (o que o vídeo, o checador e o som
+   leem; nunca edite o json à mão). Um tempo é `segundos` ou `p('palavra', n, ±segundos)` (a n-ésima vez que a palavra é
+   dita; palavra que a fala não tem para o script com a mensagem).
+   - `fala=FALA` (vem da transcrição). `cauda`: segundos depois da última palavra (0,7 no aprovado). Aumente a cauda
      quando a última frase não fecha o tempo de leitura (1 s + 3 palavras/s).
-   - `"apenasUm"`, `"previas"` (`ergue`, `sobe`, `desce`), `"virada"` (60 a 76% da duração) e `"apagao"`. `null` desliga.
-   - `"chegadas"`: cada uma com `x0`, `x1`, `t0`, `d` (duração do freio), `edita` (instante da varredura) e,
-     se for o caso, `previa` (0 esquerda, 1 direita), `destaque` ou `voce`. `voce`: fica crua até `edita` e acende
-     verde nela, sem esperar a virada (é "você" na fala). `destaque`: o personagem que acende branco no `apenasUm`.
-   - Sem "só um" ou "um desses" na fala, `"apenasUm": null`.
-   - `"frases"`: `txt` (entre aspas tipográficas, caixa alta, até 7 palavras), `de`, `dig` (tempo de digitar) e `ate`.
-   - `"moral"`: as 2 linhas, cada uma com `txt`, `de` e `dig`.
-   - Forma A ou B, ou objeto diferente da tela segurada: desenhe a cena nova em `src/Reel.tsx` com as mesmas peças
-     (palco, reflexo, halo, digitação, freio).
+   - `apenasUm`, `previas` (`ergue`, `sobe`, `desce`), `virada` (60 a 76% da duração) e `apagao`. `None` desliga.
+   - `chegadas`: `chegada(comp, x0, x1, t0, d, acao)`: `comp` é o objeto que ele segura (`'Tela'` é o do aprovado; o
+     objeto novo é o nome de `src/telas/<Nome>.tsx`), `d` a duração do freio, `acao` o instante da varredura e, se for o
+     caso, `previa=0|1`, `destaque=True` ou `voce=True`. `voce`: fica cru até a `acao` e acende verde nela, sem esperar
+     a virada (é "você" na fala). `destaque`: o personagem que acende branco no `apenasUm`.
+   - Sem "só um" ou "um desses" na fala, `apenasUm=None`.
+   - `frases`: `frase(txt, de, dig, ate)`, txt entre aspas tipográficas, caixa alta, até 7 palavras ditas.
+   - `moral`: as 2 linhas, cada uma `moral(txt, de, dig)`.
+   - O objeto novo: `src/telas/<Nome>.tsx` com o kit de `src/kit.tsx`, registrado em `src/telas/index.ts` (seção 4).
+     Forma A ou B: desenhe a cena nova em `src/Reel.tsx` com as mesmas peças (palco, reflexo, halo, digitação, freio).
 5. **Confira as regras:** `node scripts/checar.mjs` (na pasta do vídeo) até terminar em `sem problemas`. Ele confere o
    plano contra a fala, o tempo de leitura, uma frase por vez com 0,4 s de vão, a entrada na palavra, as aspas, até 7
-   palavras numa linha, a zona segura, travessão, nome do modelo, a virada entre 60 e 76% e a moral de 3 s.
+   palavras numa linha, a zona segura, travessão, nome do modelo, a virada entre 60 e 76% e a moral de 3 s; reprova o
+   plano vazio, e o vídeo para ao carregar se uma chegada segura um objeto que não está registrado.
+   **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (da raiz) até `SEM CLONE`.
 6. **Som:** `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo). Grava `public/trilha.wav` e
    `public/efeitos.wav` a partir do plano (ganhos opcionais: `scripts/som.py -6 -8`, trilha e efeitos em dB).
 7. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 5 10 15 22 28` (na pasta do

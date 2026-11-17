@@ -1,8 +1,8 @@
 import React from 'react';
-import {AbsoluteFill, Easing, Img, OffthreadVideo, Sequence, getStaticFiles, interpolate, spring, staticFile, useCurrentFrame} from 'remotion';
-import {loadFont as loadPoppins} from '@remotion/google-fonts/Poppins';
-import {loadFont as loadSerif} from '@remotion/google-fonts/DMSerifDisplay';
-import {loadFont as loadScript} from '@remotion/google-fonts/GreatVibes';
+import {AbsoluteFill, Img, OffthreadVideo, Sequence, getStaticFiles, staticFile, useCurrentFrame} from 'remotion';
+import {C, E, FPS, SANS, SCRIPT, SERIF, entra, mola, suave, tw} from './tema';
+import {Heroi, ModoTela, Pilula, ZONA_TEXTO} from './ui';
+import {TELAS_NOVAS} from './telas';
 import P from './palavras_voz.json'; // scripts/palavras.py: src/palavras.json com o começo ancorado no ataque da voz
 import W from './palavras.json'; // a transcrição de tools/novo-video.py (só para conferir que palavras_voz.json é desta fala)
 import ROSTO_T from './rosto.json'; // entrada padrão: [[t,cx,cy,h]] a cada 0,25 s, em fração do quadro
@@ -17,31 +17,9 @@ import ROSTO_T from './rosto.json'; // entrada padrão: [[t,cx,cy,h]] a cada 0,2
  * ênfase e botão de ação que acende na palavra.
  * Muda o que é da fala nova e do cenário: a cor de destaque sai da parede bege (caramelo), e nada do cliente.
  */
-export const FPS = 30;
+export {FPS};
 export const DURACAO = P.duracao;
-const pop = loadPoppins('normal', {weights: ['500', '600', '800'], subsets: ['latin']});
-const serif = loadSerif('normal', {weights: ['400'], subsets: ['latin']});
-const script = loadScript('normal', {weights: ['400'], subsets: ['latin']});
-const SANS = pop.fontFamily;
-const SERIF = serif.fontFamily;
-const SCRIPT = script.fontFamily;
-
-/* mundo de cor (MODELO §7): uma cor de destaque tirada do cenário. Aqui a parede bege/taupe da gravação vira um
-   caramelo; os papéis são os mesmos do verde-água do dentista (escuro, escuro2, destaque, destaque2, clara, creme, tinta) */
-const C = {
-	escuro: '#16110D',
-	escuro2: '#3B2D22',
-	cor: '#8F5F33',
-	cor2: '#B27C48',
-	fundoCor: '#6A4422',
-	clara: '#EBCB9F',
-	creme: '#F4EFE6',
-	tinta: '#1F160F',
-};
-const E = {out: Easing.bezier(0.22, 1, 0.36, 1), io: Easing.bezier(0.45, 0, 0.55, 1)};
-const tw = (t: number, a: number, b: number, v0: number, v1: number, e = E.out) =>
-	interpolate(t, [a, b], [v0, v1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: e});
-const mola = (t: number, de: number, d = 18) => (t < de ? 0 : spring({frame: (t - de) * FPS, fps: FPS, config: {damping: d, stiffness: 120, mass: 0.8}}));
+/* as fontes, a cor de destaque do cenário (C) e o movimento moram em src/tema.ts; o kit das telas novas em src/ui.tsx */
 
 type Pal = {texto: string; de: number; ate: number};
 const PS: Pal[] = P.palavras;
@@ -68,11 +46,95 @@ const confere = (lista: string, i0: number, txt: string) =>
 	});
 const c = (t: number) => t - 0.06; // corte 2 quadros antes da palavra
 
-/* ================================================================ O PLANO (preso à fala; num vídeo novo, refazer T,
- * trechos, CAM, MARCAS, LISTA, CURTA_JUNTO, ROSTO_MEDIDO, ENTRADAS, PEDACOS, TELAS, CTA, FLASH e TITULOS). Os números são índices de palavras de
- * src/palavras_voz.json (0 = a 1ª). Lista vazia ou null desliga a parte. */
-type Modo = 'video' | 'tela' | 'celular' | 'previas' | 'lista';
-export const T = {
+/* ---------------------------------------------------------------- o que o plano usa (a casa; não muda por vídeo) */
+/* os modos de cada trecho: video (a gravação com a legenda, a maior parte), tela (tela cheia), painel (dividida com uma
+   tela nova em cima), celular, lista, previas (dividida com as peças da casa) */
+const M = {video: 'video', tela: 'tela', painel: 'painel', celular: 'celular', lista: 'lista', previas: 'previas'} as const;
+type Modo = (typeof M)[keyof typeof M];
+/* as vozes de uma linha de título: normal (Poppins 600, o tamanho da legenda), ancora (Poppins 800), serifa (DM Serif)
+   e cursiva (Great Vibes); uma alternativa por título */
+const normal = (tam: number, txt: string): [Voz, number, string] => ['base', tam, txt];
+const ancora = (tam: number, txt: string): [Voz, number, string] => ['ancora', tam, txt];
+const serifa = (tam: number, txt: string): [Voz, number, string] => ['serif', tam, txt];
+const cursiva = (tam: number, txt: string): [Voz, number, string] => ['script', tam, txt];
+/* a fonte de uma linha da tela cheia */
+const F = {ancora: 'ancora', serif: 'serif', script: 'script'} as const;
+const DAVEZ = 'davez' as const;
+void cursiva;
+/* zona segura das redes em 9:16 (todo texto): x 60–940, y 250–1500, centro horizontal em x 500 */
+export const ZONA = {esq: 60, dir: 940, topo: 250, base: 1500};
+const ZW = ZONA.dir - ZONA.esq;
+/* legenda (dono, 2026-11-07, G12): UM tamanho no vídeo inteiro, nunca encolhe nem cresce para caber; frase longa quebra em
+   blocos. A largura vem das larguras reais da Poppins 600 (em, medidas no arquivo da fonte; acento = a letra base), para o
+   plano e o checador saberem se a linha cabe sem encolher */
+const LARG_POP: Record<string, number> = {};
+Object.entries({24: ' ', 25: ',', 26: '.:', 28: 'Iijl', 32: ';', 34: 'f', 35: '!', 36: '"1', 39: 't', 40: 'r', 46: 'L', 48: 'z', 53: 'EF', 54: '?sx', 55: '7', 57: '2J', 58: '-TZk', 60: '3cvy', 61: 'PS', 62: 'e', 63: '9', 64: '568BRYo', 65: '0', 66: '4Khnu', 68: 'abdgpq', 69: 'X', 70: 'U', 71: 'V', 72: 'ADH', 74: 'N', 77: 'CG', 78: 'O', 79: 'Q', 83: '%', 84: 'w', 90: 'M', 102: 'W', 105: 'm'}).forEach(([w, cs]) => [...cs].forEach((ch) => (LARG_POP[ch] = Number(w) / 100)));
+/** largura de uma linha da legenda em px (+0,005 em por letra do letterSpacing; a caixa *x* da dividida soma 32 px) */
+export const larguraLeg = (l: string, tam: number) => [...l.replace(/\*/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')].reduce((s, ch) => s + (LARG_POP[ch] ?? 0.68) + 0.005, 0) * tam + (l.split('*').length - 1) * 16;
+const LEG_TAM = 72;
+/** as páginas da legenda feitas sozinhas, das palavras i0 a i1 - 1 (o começo vazio usa a fala toda): cada página fecha
+ * no ponto, na vírgula que já deu 1,5 s ou com 4 palavras e 1,5 s, e cabe em 2 linhas de 72 px. Ponto de partida: depois
+ * ajuste à mão pelo sentido (G11, G14), como no aprovado */
+const paginasAuto = (i0 = 0, i1 = PS.length): string[] => {
+	const linhas = (ws: number[]) => {
+		const tx = ws.map((i) => PS[i].texto);
+		if (larguraLeg(tx.join(' '), LEG_TAM) <= ZW && tx.length <= 3) return tx.join(' ');
+		let melhor: [number, string] | null = null;
+		for (let k = 1; k < tx.length; k++) {
+			const w = Math.max(larguraLeg(tx.slice(0, k).join(' '), LEG_TAM), larguraLeg(tx.slice(k).join(' '), LEG_TAM));
+			if (w <= ZW && (!melhor || w < melhor[0])) melhor = [w, `${tx.slice(0, k).join(' ')} / ${tx.slice(k).join(' ')}`];
+		}
+		return melhor ? melhor[1] : null;
+	};
+	const out: string[] = [];
+	let cur: number[] = [];
+	const fecha = (ate = cur.length) => {
+		if (ate) out.push(linhas(cur.slice(0, ate)) ?? cur.slice(0, ate).map((i) => PS[i].texto).join(' '));
+		cur = cur.slice(ate);
+	};
+	// só se fecha a página depois de uma palavra "solta": a próxima começa depois do fim desta e 0,34 s depois do começo
+	// (a página seguinte entra 2 quadros antes da voz, mas nunca antes de esta palavra ficar 0,4 s: assim ela não apaga o
+	// fim desta nem atrasa a outra)
+	const solta = (i: number) => i + 1 >= i1 || (PS[i + 1].de - PS[i].de >= 0.34 && PS[i + 1].de >= PS[i].ate - 0.01);
+	for (let i = i0; i < i1; i++) {
+		if (cur.length && linhas([...cur, i]) === null) {
+			// não cabe mais em 2 linhas: volta até a última palavra solta da página (sem nenhuma, fecha aqui mesmo)
+			let j = cur.length;
+			while (j > 0 && !solta(cur[j - 1])) j--;
+			fecha(j || cur.length);
+		}
+		cur.push(i);
+		const txt = PS[i].texto;
+		const dur = PS[i].ate - PS[cur[0]].de;
+		if (solta(i) && (/[.?!…]["”»)]*$/.test(txt) || (/[,;:]$/.test(txt) && dur >= 1.5) || (cur.length >= 4 && dur >= 1.5))) fecha();
+	}
+	fecha();
+	return out;
+};
+
+/* as peças da casa que o plano liga (cada uma só onde a fala tem o porquê dela; autoridade.md §4). Desligadas aqui; o
+   plano liga com uma linha `PECA = ...;` (tools/clone.py lê essas linhas) */
+type LT = {txt: string; tam: number; fonte?: 'script' | 'serif' | 'ancora'; acento?: boolean};
+type Fundo = 'E' | 'L';
+/** textos ditos de uma tela nova: nome -> [índice da 1ª palavra, 'as palavras ditas'] (o molde confere com a fala) */
+type Ditos = Record<string, [number, string]>;
+type Tela = {de: number; fundo: Fundo; topo: number; linhas: LT[]; primeira: number; heroi: string; em?: Record<string, number>; textos?: Ditos; dados?: Record<string, unknown>};
+type PainelNovo = {de: number; heroi: string; em?: Record<string, number>; textos?: Ditos; dados?: Record<string, unknown>};
+type Tit = {de: number; ate: number; primeira: number; linhas: Linha[]; marca?: number};
+type ListaDef = {titulo: string; itens: string[]; vistos: number[]; acende: number | typeof DAVEZ};
+let TITULOS = [] as Tit[];
+let TELAS = [] as Tela[];
+let PAINEIS = [] as PainelNovo[];
+let LISTA = null as ListaDef | null;
+let CELULAR = null as {marcas: [number, number]} | null;
+let CTA = null as {i: number; comando: string; palavra: string; de: number} | null;
+let FLASH = null as number | null;
+
+// ================================================================ O PLANO (preso à fala; num vídeo novo, nasce vazio do
+// scripts/plano_novo.tsx e cada peça entra porque a fala nova pediu, com a linha "por quê" no plano.md). Os números são
+// índices de palavras de src/palavras_voz.json (0 = a 1ª); `de(i)` = o início da palavra i, `c(x)` = 2 quadros antes.
+// Este é o plano do vídeo aprovado: repertório, não roteiro (autoridade.md §10).
+const T = {
 	ele: de(7) + 0.43, // "Ele foi criado justamente para" (a legenda entra quando "Claude." já ficou 0,43 s)
 	telas: c(de(13)), // "te mostrar a diferença entre vários modelos" (tela 1)
 	tela2: c(de(20)), // "que eu criei e melhorei"
@@ -85,64 +147,45 @@ export const T = {
 	aprender: c(de(74)), // "e aprender a como usar isso nos seus vídeos," (tela 4)
 	comenta: c(de(83)), // "comenta edição aqui embaixo que eu vou te mandar na sua DM agora." (fecho)
 };
-/* as palavras que fazem cada peça agir (índices); cada peça lê as suas na ordem */
-const MARCAS = {
+// as palavras que fazem cada herói da casa agir (índices); cada herói lê as suas na ordem
+const MARCAS: Record<string, number[]> = {
 	cartoes: [18], // "vários": os outros dois cartões saem de trás
 	barras: [22, 24], // "criei" nascem as barras, "melhorei" a última sobe
 	linhaTempo: [30], // "vídeo": a lâmina corta (antiga G43, abolida: a tela entra no fim de cena forte, depois do "editar")
 	player: [78, 82], // "usar": o vídeo toca; "vídeos": ganha a legenda
-	celular: [39, 46], // "Instagram": a interface acende; "desses": os outros celulares saem de trás
 };
-Object.entries(MARCAS).forEach(([k, is]) => is.forEach((i) => de(i, `MARCAS.${k}`)));
-/* painel de lista (modo 'lista'): título do cabeçalho, itens e as palavras dos vistos; null desliga.
-   vistos: uma palavra por item (cada visto na sua palavra, o item da vez acende) ou só [primeira, última] (os vistos
-   espaçados por igual entre as duas). acende: 'davez' (o item da vez) ou o índice da palavra em que o último acende */
-const LISTA = {
+// painel de lista (modo lista): título do cabeçalho, itens e as palavras dos vistos. vistos: uma palavra por item (cada
+// visto na sua palavra, o item da vez acende com acende: DAVEZ) ou só [primeira, última] (espaçados por igual)
+LISTA = {
 	titulo: 'Modelos de edição',
 	itens: ['interface-encenada', 'rosto-telas', 'trailer', 'pregacao', 'pagina-de-livro', 'minidocumentario', 'youtube-didatico', 'autoridade'],
 	vistos: [68, 71], // "outros" até "edição"
-	acende: 72 as number | 'davez', // "como": este modelo acende
-} as {titulo: string; itens: string[]; vistos: number[]; acende: number | 'davez'} | null;
-if (LISTA) {
-	LISTA.vistos.forEach((i) => de(i, 'LISTA.vistos'));
-	if (typeof LISTA.acende === 'number') de(LISTA.acende, 'LISTA.acende');
-	if (LISTA.vistos.length !== LISTA.itens.length && LISTA.vistos.length !== 2)
-		throw errPlano('LISTA', `${LISTA.vistos.length} vistos para ${LISTA.itens.length} itens (ponha um por item, ou só a primeira e a última palavra)`);
-}
-/* telas cheias: a palavra que vem depois de uma de até 2 letras entra junto com ela (o "e" não fica sozinho na ponta
-   da linha esperando a próxima palavra). Vídeo novo: true. false = como no vídeo aprovado */
-const CURTA_JUNTO = false;
-/* páginas da legenda com entrada própria (índice da 1ª palavra -> tempo); as outras entram com a voz */
-const ENTRADAS: Record<number, number> = {8: T.ele};
-/* fecho: o campo de comentário recebe Comenta “PALAVRA” (i = índice de "comenta"; a palavra é a seguinte; de = o corte
-   do fecho); null desliga. Fora do plano, o fecho só lê o CTA (nunca T) */
-const CTA = {i: 83, comando: 'Comenta', palavra: '“EDIÇÃO”', de: T.comenta} as {i: number; comando: string; palavra: string; de: number} | null;
-if (CTA) confere('CTA', CTA.i, `${CTA.comando} ${CTA.palavra}`);
-/* flash na ênfase (tempo do corte); null desliga. Sem public/flash.mp4, o molde desenha um flash branco no lugar */
-const FLASH = T.mas as number | null;
-/* antiga G43, abolida (dono, 2026-11-05): a maior parte do vídeo é o vídeo normal; tela cheia ou dividida só no fim de cena forte, nunca
- * uma por frase. O aprovado tinha 3 telas cheias seguidas na mesma frase (13 a 33), o celular (34 a 47), o painel de
- * lista (68 a 73) e a tela 4 (74 a 82). Aqui fica a tela do fim da 1ª frase longa ("...usando o Claude."). */
-const trechos = (previas: boolean): [number, Modo][] => [
-	[0, 'video'],
-	[T.telas, 'video'],
-	[T.tela3, 'tela'],
-	[T.celular, 'video'],
-	// com prévias, a dividida das prévias já abre em "Eu posso até colocar" (sozinho no vídeo o pedaço ficava < 1,5 s)
-	...(previas ? ([[T.eu, 'previas']] as [number, Modo][]) : ([[T.eu, 'video']] as [number, Modo][])),
-	[T.mas, 'video'],
-	[T.comenta, 'video'],
-];
-const trecho = (t: number, previas: boolean) => {
-	const TR = trechos(previas);
-	let i = 0;
-	TR.forEach(([a], k) => {
-		if (t >= a) i = k;
-	});
-	return {a: TR[i][0], fim: TR[i + 1] ? TR[i + 1][0] : DURACAO, modo: TR[i][1]};
+	acende: 72, // "como": este modelo acende
 };
-
-/* câmera: deriva bem lenta (<1%/s); "true" = corte. Ênfases: "Mas se você quiser" (aproxima) e o fecho (abre o quadro) */
+// o celular de Reels (modo celular): "Instagram" acende a interface; "desses" traz os outros celulares de trás
+CELULAR = {marcas: [39, 46]};
+// telas cheias: a palavra que vem depois de uma de até 2 letras entra junto com ela. Vídeo novo: true
+const CURTA_JUNTO = false;
+// páginas da legenda com entrada própria (índice da 1ª palavra -> tempo); as outras entram com a voz
+const ENTRADAS: Record<number, number> = {8: T.ele};
+// fecho: Comenta “PALAVRA” (i = índice de "comenta"; a palavra é a seguinte; de = o corte do fecho)
+CTA = {i: 83, comando: 'Comenta', palavra: '“EDIÇÃO”', de: T.comenta};
+// flash na ênfase (o tempo do corte), na virada da fala
+FLASH = T.mas;
+// os trechos: [começo, modo]. O vídeo é a maior parte; tela, painel, celular e lista só onde a fala tem o porquê, nunca
+// dois seguidos. O aprovado tinha 3 telas cheias seguidas, o celular, o painel de lista e a tela 4 (autoridade.md §10);
+// aqui fica a tela do fim da 1ª frase longa ("...usando o Claude.")
+const trechos = (previas: boolean): [number, Modo][] => [
+	[0, M.video],
+	[T.telas, M.video],
+	[T.tela3, M.tela],
+	[T.celular, M.video],
+	// com prévias, a dividida das prévias já abre em "Eu posso até colocar" (sozinho no vídeo o pedaço ficava < 1,5 s)
+	[T.eu, previas ? M.previas : M.video],
+	[T.mas, M.video],
+	[T.comenta, M.video],
+];
+// câmera: deriva bem lenta (<1%/s); "true" = corte (ignorado: só aproximação lenta, dono 2026-11-05)
 const CAM: [number, number, boolean?][] = [
 	[0, 1.0],
 	[T.telas, 1.035],
@@ -153,42 +196,10 @@ const CAM: [number, number, boolean?][] = [
 	[T.comenta, 1.0, true], // abre o quadro no fecho
 	[DURACAO, 1.03],
 ];
-/* decisão do dono (2026-11-05): o zoom do autoridade é só aproximação lenta e contínua, nunca corte seco de zoom;
-   os pontos marcados "true" (corte) são ignorados e a câmera passa por eles deslizando */
-const CAM_LENTO = CAM.filter(([, , corte]) => !corte);
-const zoomEm = (t: number) => {
-	let i = 0;
-	CAM_LENTO.forEach(([a], k) => {
-		if (t >= a) i = k;
-	});
-	const [a, z0] = CAM_LENTO[i];
-	const prox = CAM_LENTO[i + 1];
-	if (!prox || prox[0] <= a) return z0;
-	return tw(t, a, prox[0], z0, prox[1], E.io);
-};
-
-/* o ponto entre os olhos, origem do zoom e da metade de baixo da dividida. Na vitrine, medido à mão (src/rosto.json +
-   quadro de 5 s); num vídeo novo, null = a mediana de src/rosto.json (olhos ~0,09 da altura do rosto acima do centro) */
+// o ponto entre os olhos: na vitrine, medido à mão; num vídeo novo, null (a mediana de src/rosto.json)
 const ROSTO_MEDIDO = {x: 590, y: 620} as {x: number; y: number} | null;
-const med = (v: number[]) => [...v].sort((a, b) => a - b)[v.length >> 1];
-const RT = ROSTO_T as number[][];
-const ROSTO = ROSTO_MEDIDO ?? (RT.length ? {x: Math.round(med(RT.map((r) => r[1])) * 1080), y: Math.round((med(RT.map((r) => r[2])) - 0.09 * med(RT.map((r) => r[3]))) * 1920)} : {x: 540, y: 620});
-/* tratamento leve da gravação: opção desligada (G6, dono: a cor é a da gravação); liga com a prop tratamento */
-const COR_TRAT = 'contrast(1.06) saturate(0.94) brightness(0.98)';
-let COR = 'none';
-const Fala: React.FC<{zoom: number}> = ({zoom}) => (
-	<AbsoluteFill style={{transform: `scale(${zoom})`, transformOrigin: `${ROSTO.x}px ${ROSTO.y}px`, filter: COR}}>
-		<OffthreadVideo muted src={staticFile('fala.mp4')} style={{width: 1080, height: 1920}} />
-	</AbsoluteFill>
-);
-
-const suave = (t: number, d: number, dur = 0.4): React.CSSProperties => {
-	const e = tw(t, d - 0.06, d - 0.06 + dur, 0, 1);
-	return {opacity: e, filter: `blur(${(1 - e) * 4}px)`, transform: `translateY(${(1 - e) * 10}px)`};
-};
-
-/* ---------------------------------------------------------------- legenda limpa (bemclean); '#n' pula n palavras */
-/* 2026-10-12: cada pedaço >= 1,5 s, até 2 linhas (' / '), cada trecho da fala uma vez só */
+// a legenda: as páginas com a fala escrita ('/' quebra a linha, *x* destaca na dividida, '#n' pula n palavras já mostradas
+// por uma tela, um título ou o fecho; paginasAuto(i0, i1) faz as páginas das palavras i0 a i1 - 1 sozinho)
 const PEDACOS = [
 	'#8',
 	'Ele foi criado / justamente para',
@@ -203,6 +214,79 @@ const PEDACOS = [
 	'#2', // fecho: Comenta "EDIÇÃO" fixo
 	'aqui embaixo que eu vou / te mandar na sua DM agora.',
 ];
+// telas cheias: a tipografia da fala a partir de `primeira` e o herói (da casa: Cartoes, Barras, LinhaTempo, Player; ou
+// uma tela nova de src/telas/). O aprovado também tinha "te mostrar / a diferença entre vários / modelos" (Cartoes, E),
+// "que eu / criei / e melhorei" (Barras, L) e "e aprender a como / usar isso / nos seus vídeos," (Player, L)
+TELAS = [{de: T.tela3, fundo: 'E', topo: 530, primeira: 28, linhas: [{txt: 'tipo de vídeo', tam: 124}, {txt: 'usando o Claude.', tam: 100, fonte: F.serif, acento: true}], heroi: 'LinhaTempo'}];
+// títulos sobre o vídeo (o gancho e a frase de extremo destaque). G6: o 2º título do aprovado, das prévias, saiu
+TITULOS = [{de: 0, ate: T.ele, primeira: 0, linhas: [[normal(72, 'Esse vídeo está')], [normal(72, 'sendo'), ancora(116, '100%')], [normal(72, 'editado pelo'), serifa(72, 'Claude.')]]}];
+// ================================================================ fim do plano
+void paginasAuto;
+void DAVEZ;
+
+/* ---------------------------------------------------------------- o plano confere com a fala ao carregar */
+Object.entries(MARCAS).forEach(([k, is]) => is.forEach((i) => de(i, `MARCAS.${k}`)));
+if (LISTA) {
+	LISTA.vistos.forEach((i) => de(i, 'LISTA.vistos'));
+	if (typeof LISTA.acende === 'number') de(LISTA.acende, 'LISTA.acende');
+	if (LISTA.vistos.length !== LISTA.itens.length && LISTA.vistos.length !== 2)
+		throw errPlano('LISTA', `${LISTA.vistos.length} vistos para ${LISTA.itens.length} itens (ponha um por item, ou só a primeira e a última palavra)`);
+}
+if (CELULAR) CELULAR.marcas.forEach((i) => de(i, 'CELULAR.marcas'));
+if (CTA) confere('CTA', CTA.i, `${CTA.comando} ${CTA.palavra}`);
+const MODOS_USADOS = new Set([...trechos(false), ...trechos(true)].map(([, m]) => m));
+if (MODOS_USADOS.has(M.tela) && !TELAS.length) throw errPlano('TELAS', 'um trecho é M.tela e TELAS está vazio');
+if (MODOS_USADOS.has(M.painel) && !PAINEIS.length) throw errPlano('PAINEIS', 'um trecho é M.painel e PAINEIS está vazio');
+if (MODOS_USADOS.has(M.lista) && !LISTA) throw errPlano('LISTA', 'um trecho é M.lista e LISTA não foi ligada');
+if (MODOS_USADOS.has(M.celular) && !CELULAR) throw errPlano('CELULAR', 'um trecho é M.celular e CELULAR não foi ligado');
+const confereDitos = (lista: string, d?: Ditos) => Object.values(d ?? {}).forEach(([i, txt]) => confere(lista, i, txt));
+TELAS.forEach((s) => {
+	confere('TELAS', s.primeira, s.linhas.map((l) => l.txt).join(' '));
+	confereDitos('TELAS', s.textos);
+	Object.values(s.em ?? {}).forEach((x) => { if (!(x >= 0 && x <= DURACAO)) throw errPlano('TELAS', `em: ${x} fora do vídeo`); });
+});
+PAINEIS.forEach((s) => {
+	confereDitos('PAINEIS', s.textos);
+	Object.values(s.em ?? {}).forEach((x) => { if (!(x >= 0 && x <= DURACAO)) throw errPlano('PAINEIS', `em: ${x} fora do vídeo`); });
+});
+const trecho = (t: number, previas: boolean) => {
+	const TR = trechos(previas);
+	let i = 0;
+	TR.forEach(([a], k) => {
+		if (t >= a) i = k;
+	});
+	return {a: TR[i][0], fim: TR[i + 1] ? TR[i + 1][0] : DURACAO, modo: TR[i][1]};
+};
+
+/* decisão do dono (2026-11-05): o zoom do autoridade é só aproximação lenta e contínua, nunca corte seco de zoom;
+   os pontos marcados "true" (corte) são ignorados e a câmera passa por eles deslizando */
+const CAM_LENTO = CAM.filter(([, , corte]) => !corte);
+const zoomEm = (t: number) => {
+	let i = 0;
+	CAM_LENTO.forEach(([a], k) => {
+		if (t >= a) i = k;
+	});
+	const [a, z0] = CAM_LENTO[i];
+	const prox = CAM_LENTO[i + 1];
+	if (!prox || prox[0] <= a) return z0;
+	return tw(t, a, prox[0], z0, prox[1], E.io);
+};
+
+/* o ponto entre os olhos, origem do zoom e da metade de baixo da dividida (ROSTO_MEDIDO do plano, ou a mediana de
+   src/rosto.json: olhos ~0,09 da altura do rosto acima do centro) */
+const med = (v: number[]) => [...v].sort((a, b) => a - b)[v.length >> 1];
+const RT = ROSTO_T as number[][];
+const ROSTO = ROSTO_MEDIDO ?? (RT.length ? {x: Math.round(med(RT.map((r) => r[1])) * 1080), y: Math.round((med(RT.map((r) => r[2])) - 0.09 * med(RT.map((r) => r[3]))) * 1920)} : {x: 540, y: 620});
+/* tratamento leve da gravação: opção desligada (G6, dono: a cor é a da gravação); liga com a prop tratamento */
+const COR_TRAT = 'contrast(1.06) saturate(0.94) brightness(0.98)';
+let COR = 'none';
+const Fala: React.FC<{zoom: number}> = ({zoom}) => (
+	<AbsoluteFill style={{transform: `scale(${zoom})`, transformOrigin: `${ROSTO.x}px ${ROSTO.y}px`, filter: COR}}>
+		<OffthreadVideo muted src={staticFile('fala.mp4')} style={{width: 1080, height: 1920}} />
+	</AbsoluteFill>
+);
+
+
 type Pagina = {txt: string; i0: number; n: number; de: number; ate: number};
 const PAGINAS: Pagina[] = (() => {
 	const out: (Pagina | null)[] = [];
@@ -229,23 +313,12 @@ const PAGINAS: Pagina[] = (() => {
 		return [{...g, ate: CTA && g.de < CTA.de ? Math.min(fim, CTA.de) : fim}];
 	});
 })();
-/* zona segura das redes em 9:16 (todo texto): x 60–940, y 250–1500, centro horizontal em x 500 */
-export const ZONA = {esq: 60, dir: 940, topo: 250, base: 1500};
-const ZW = ZONA.dir - ZONA.esq;
 /* largura estimada (em por caractere, com folga) para encolher só a linha que passaria da zona */
 const FATOR = {base: 0.6, ancora: 0.6, serif: 0.5, script: 0.42} as const;
 const telaTam = (l: {txt: string; tam: number; fonte?: 'script' | 'serif' | 'ancora'}) => Math.min(l.tam, (l.tam * (ZW / 1.04)) /  larguraTxt(l.txt, l.fonte ?? 'base', l.tam));
 export const larguraTxt = (txt: string, voz: keyof typeof FATOR, tam: number) => txt.replace(/\*/g, '').length * FATOR[voz] * tam;
-/* legenda (dono, 2026-11-07, G12): UM tamanho no vídeo inteiro, nunca encolhe nem cresce para caber; frase longa quebra em
-   blocos. A largura vem das larguras reais da Poppins 600 (em, medidas no arquivo da fonte; acento = a letra base), para o
-   plano e o checador saberem se a linha cabe sem encolher */
-const LARG_POP: Record<string, number> = {};
-Object.entries({24: ' ', 25: ',', 26: '.:', 28: 'Iijl', 32: ';', 34: 'f', 35: '!', 36: '"1', 39: 't', 40: 'r', 46: 'L', 48: 'z', 53: 'EF', 54: '?sx', 55: '7', 57: '2J', 58: '-TZk', 60: '3cvy', 61: 'PS', 62: 'e', 63: '9', 64: '568BRYo', 65: '0', 66: '4Khnu', 68: 'abdgpq', 69: 'X', 70: 'U', 71: 'V', 72: 'ADH', 74: 'N', 77: 'CG', 78: 'O', 79: 'Q', 83: '%', 84: 'w', 90: 'M', 102: 'W', 105: 'm'}).forEach(([w, cs]) => [...cs].forEach((ch) => (LARG_POP[ch] = Number(w) / 100)));
-/** largura de uma linha da legenda em px (+0,005 em por letra do letterSpacing; a caixa *x* da dividida soma 32 px) */
-export const larguraLeg = (l: string, tam: number) => [...l.replace(/\*/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')].reduce((s, ch) => s + (LARG_POP[ch] ?? 0.68) + 0.005, 0) * tam + (l.split('*').length - 1) * 16;
 /* legenda em 2 posições só: LEG_Y no peito (gravação) e LEG_Y2, pé em 1500 (tela dividida e fecho) */
 export const LEG_Y = 1150;
-const LEG_TAM = 72;
 const LEG_TAM2 = 56;
 const LEG_LH = 1.25;
 export const LEG_Y2 = Math.floor(ZONA.base - 2 * LEG_TAM2 * LEG_LH - 6);
@@ -327,10 +400,6 @@ const Titulo: React.FC<{t: number; de: number; ate: number; primeira: number; li
 const Sombra: React.FC = () => <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0) 44%, rgba(0,0,0,0.2) 56%, rgba(0,0,0,0.2) 74%, rgba(0,0,0,0) 88%)'}} />;
 
 /* ================================================================ TELA CHEIA (texto-e-objeto) */
-type Fundo = 'E' | 'L';
-type LT = {txt: string; tam: number; fonte?: 'script' | 'serif' | 'ancora'; acento?: boolean};
-type Heroi = React.FC<{t: number; de: number; fim: number; fg: string; ac: string}>;
-type Tela = {de: number; fundo: Fundo; topo: number; linhas: LT[]; primeira: number; heroi: Heroi};
 const Ptela: React.FC<{t: number; de: number; children: React.ReactNode; first: boolean}> = ({t, de: d, children, first}) => {
 	const k = tw(t, d - 0.04, d + 0.16, 0, 1);
 	return <span style={{display: 'inline-block', marginLeft: first ? 0 : '0.24em', opacity: k, filter: `blur(${(1 - k) * 16}px)`, transform: `translateX(${(1 - k) * 34}px)`}}>{children}</span>;
@@ -366,8 +435,6 @@ const BlocoTela: React.FC<{t: number; s: Tela; fg: string; sub: string; ac: stri
 	);
 };
 
-/* heróis: um objeto por tela, que faz o que a frase diz */
-const entra = (k: number): React.CSSProperties => ({opacity: Math.min(1, k * 2), transform: `scale(${0.8 + 0.2 * k})`});
 
 /* "a diferença entre vários modelos": o mesmo quadro dele em três cartões 9:16, cada um com uma edição diferente */
 const Cartoes: Heroi = ({t, de: d, fg, ac}) => {
@@ -511,12 +578,14 @@ const Player: Heroi = ({t, de: d, fim, fg, ac}) => {
 	);
 };
 
-/* antiga G43, abolida: só a tela do fim de cena forte. O aprovado também tinha, em tela cheia: "te mostrar / a diferença entre vários /
- * modelos" (Cartoes, fundo E), "que eu / criei / e melhorei" (Barras, fundo L) e "e aprender a como / usar isso / nos seus
- * vídeos," (Player, fundo L): os heróis continuam aqui como repertório. */
-const TELAS: Tela[] = [
-	{de: T.tela3, fundo: 'E', topo: 530, primeira: 28, linhas: [{txt: 'tipo de vídeo', tam: 124}, {txt: 'usando o Claude.', tam: 100, fonte: 'serif', acento: true}], heroi: LinhaTempo},
-];
+/* os heróis: os da casa (exemplos do aprovado, cada um com o porquê em autoridade.md §4) e as telas novas do vídeo
+   (src/telas/, registradas em src/telas/index.ts). O plano chama pelo nome: heroi: 'LinhaTempo' */
+const HEROIS: Record<string, Heroi> = {Cartoes, Barras, LinhaTempo, Player, ...(TELAS_NOVAS as Record<string, Heroi>)};
+[...TELAS, ...PAINEIS].forEach((s) => {
+	if (!HEROIS[s.heroi]) throw errPlano(TELAS.includes(s as Tela) ? 'TELAS' : 'PAINEIS', `o herói "${s.heroi}" não existe: escreva src/telas/${s.heroi}.tsx e registre em src/telas/index.ts (os da casa: Cartoes, Barras, LinhaTempo, Player)`);
+});
+const ditos = (d?: Ditos) => Object.fromEntries(Object.entries(d ?? {}).map(([k, [, txt]]) => [k, txt]));
+
 const TelaCheia: React.FC<{t: number; fim: number}> = ({t, fim}) => {
 	const i = TELAS.filter((s) => t >= s.de).length - 1;
 	const s = TELAS[Math.max(0, i)];
@@ -526,12 +595,12 @@ const TelaCheia: React.FC<{t: number; fim: number}> = ({t, fim}) => {
 	const ac = escuro ? C.clara : C.tinta;
 	const z = 1 + Math.max(0, t - s.de) * 0.012;
 	const fundo = escuro ? `radial-gradient(ellipse 90% 60% at 50% 38%, ${C.escuro2} 0%, ${C.escuro} 72%)` : `radial-gradient(ellipse 90% 70% at 50% 32%, ${C.cor2} 0%, ${C.cor} 62%, ${C.fundoCor} 100%)`;
-	const H = s.heroi;
+	const H = HEROIS[s.heroi];
 	return (
 		<AbsoluteFill style={{background: fundo, overflow: 'hidden'}}>
 			<AbsoluteFill style={{backgroundImage: `radial-gradient(${escuro ? 'rgba(235,203,159,0.07)' : 'rgba(255,255,255,0.08)'} 2px, transparent 2px)`, backgroundSize: '44px 44px'}} />
 			<AbsoluteFill style={{transform: `scale(${z})`, transformOrigin: '540px 960px'}}>
-				<H t={t} de={s.de} fim={fim} fg={fg} ac={escuro ? C.clara : C.creme} />
+				<H t={t} de={s.de} fim={fim} fg={fg} ac={escuro ? C.clara : C.creme} modo="cheia" em={s.em ?? {}} textos={ditos(s.textos)} dados={s.dados ?? {}} />
 				<BlocoTela t={t} s={s} fg={fg} sub={sub} ac={ac} />
 			</AbsoluteFill>
 		</AbsoluteFill>
@@ -576,20 +645,14 @@ const FundoPainel: React.FC<{t: number; a: number; children: React.ReactNode; or
 	);
 };
 
-/* o rótulo em pílula branca do modelo (MODELO §6) */
-const Pilula: React.FC<{txt: string; tam?: number; style?: React.CSSProperties}> = ({txt, tam = 34, style}) => (
-	<div style={{display: 'inline-flex', alignItems: 'center', gap: tam * 0.45, padding: `${tam * 0.4}px ${tam * 0.8}px`, borderRadius: 999, background: 'rgba(255,255,255,0.95)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)', whiteSpace: 'nowrap', ...style}}>
-		<span style={{width: tam * 0.42, height: tam * 0.42, borderRadius: tam, background: C.cor, flexShrink: 0}} />
-		<span style={{fontFamily: SANS, fontWeight: 800, fontSize: tam, letterSpacing: '0.02em', color: '#1d1d1d', lineHeight: 1.1}}>{txt}</span>
-	</div>
-);
 
 /* "se você estiver no Instagram agora, você está vendo apenas um desses modelos": o vídeo dele num celular (interface
    genérica, sem logotipo); o nome deste modelo entra na pílula em "apenas"; os outros celulares saem de trás em "desses" */
 const Celular: React.FC<{t: number; a: number; arroba: string}> = ({t, a, arroba}) => {
 	const k = mola(t, a + 0.05);
-	const ui = tw(t, de(MARCAS.celular[0]) - 0.06, de(MARCAS.celular[0]) + 0.3, 0, 1); // "Instagram"
-	const outros = mola(t, de(MARCAS.celular[1]) - 0.04, 18); // "desses"
+	const [inst, desses] = CELULAR ? CELULAR.marcas.map((i) => de(i)) : [a, a];
+	const ui = tw(t, inst - 0.06, inst + 0.3, 0, 1); // "Instagram"
+	const outros = mola(t, desses - 0.04, 18); // "desses"
 	const W = 380;
 	const H = 790;
 	const top = 70;
@@ -716,11 +779,23 @@ const Lista: React.FC<{t: number; a: number; lista: NonNullable<typeof LISTA>}> 
 	);
 };
 
+/* a dividida com uma tela nova em cima (PAINEIS): o fundo do painel da casa, o herói da fala nova no <Palco> */
+const painelEm = (t: number) => PAINEIS.filter((p) => t >= p.de - 0.001).pop() ?? PAINEIS[0];
+const PainelNovoTela: React.FC<{t: number; a: number; fim: number}> = ({t, a, fim}) => {
+	const s = painelEm(t);
+	const H = HEROIS[s.heroi];
+	return (
+		<FundoPainel t={t} a={a}>
+			<H t={t} de={a} fim={fim} fg={C.creme} ac={C.clara} modo="dividida" em={s.em ?? {}} textos={ditos(s.textos)} dados={s.dados ?? {}} />
+		</FundoPainel>
+	);
+};
+
 /* ---------------------------------------------------------------- fecho: o campo de comentário que recebe EDIÇÃO */
 /* fecho entre o queixo (~1000 na gravação aberta) e a legenda na 2ª posição: Comenta 64 + 22 + campo 170 */
 export const FECHO = {top: 1040, altura: 64 + 22 + 170, larg: 750};
 const Comenta: React.FC<{t: number; cta: NonNullable<typeof CTA>}> = ({t, cta}) => {
-	const b = de(cta.i + 1); // a palavra a comentar
+	const b = de(cta.i + cta.comando.split(' ').length); // a palavra a comentar (o comando dito pode ter mais de uma palavra)
 	const k = mola(t, cta.de + 0.04, 20);
 	const acende = tw(t, b - 0.05, b + 0.25, 0, 1);
 	const toque = tw(t, b - 0.05, b + 0.55, 0, 1);
@@ -752,16 +827,6 @@ const FlashDesenhado: React.FC = () => {
 const TOP = 1110;
 /* todo título fica no MESMO lugar, topo em TOP, com 2 ou 3 linhas (dono, 2026-11-07, G13: mesmo tipo de destaque =
    mesma posição; antes o de 3 linhas subia 110 px) */
-type Tit = {de: number; ate: number; primeira: number; linhas: Linha[]; marca?: number};
-const TITULOS: Tit[] = [
-	{de: 0, ate: T.ele, primeira: 0, linhas: [[['base', 72, 'Esse vídeo está']], [['base', 72, 'sendo'], ['ancora', 116, '100%']], [['base', 72, 'editado pelo'], ['serif', 72, 'Claude.']]]},
-	/* G6: o aprovado tinha um 2º título ("duas prévias rápidas / aqui em cima, aceleradas / em três vezes.", de T.previas a
-	 * T.mas); sem as prévias na tela ele não tem motivo, e a frase fica na legenda */
-];
-
-TELAS.forEach((s) => confere('TELAS', s.primeira, s.linhas.map((l) => l.txt).join(' ')));
-TITULOS.forEach((q) => confere('TITULOS', q.primeira, q.linhas.map((l) => l.map((x) => x[2]).join(' ')).join(' ')));
-
 /* mídia que não vem com a gravação: se faltar, para com o comando que a faz (e não com um erro de rede) */
 const tem = (arq: string) => {
 	const lista = getStaticFiles();
@@ -777,7 +842,7 @@ export const Reel: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''],
 	const zoom = zoomEm(t);
 	const tit = modo === 'video' ? TITULOS.find((q) => t >= q.de - 0.1 && t < q.ate) : undefined;
 	const cta = CTA !== null && t >= CTA.de;
-	const dividida = modo === 'celular' || modo === 'previas' || modo === 'lista';
+	const dividida = modo === 'celular' || modo === 'previas' || modo === 'lista' || modo === 'painel';
 	if ((modo === 'tela' || modo === 'celular') && !tem('quadro.jpg')) throw new Error(`Falta ${QUADRO}`);
 	if (modo === 'previas' && !(tem('previa1.mp4') && tem('previa2.mp4')))
 		throw new Error('Falta public/previa1.mp4 ou previa2.mp4: faça com tools/previa.py (modelos/autoridade/autoridade.md, seção 9) ou renderize com "previas": false.');
@@ -799,6 +864,11 @@ export const Reel: React.FC<Props> = ({previas = false, nomesPrevias = ['', ''],
 			{modo === 'lista' && LISTA && (
 				<Dividida t={t} a={a} fim={fim}>
 					<Lista t={t} a={a} lista={LISTA} />
+				</Dividida>
+			)}
+			{modo === 'painel' && (
+				<Dividida t={t} a={a} fim={fim}>
+					<PainelNovoTela t={t} a={a} fim={fim} />
 				</Dividida>
 			)}
 
@@ -836,7 +906,7 @@ export const textos = (t: number, previas: boolean, arroba = ''): Caixa[] => {
 	const out: Caixa[] = [];
 	const tit = modo === 'video' ? TITULOS.find((q) => t >= q.de - 0.1 && t < q.ate) : undefined;
 	const cta = CTA !== null && t >= CTA.de;
-	const dividida = modo === 'celular' || modo === 'previas' || modo === 'lista';
+	const dividida = modo === 'celular' || modo === 'previas' || modo === 'lista' || modo === 'painel';
 	if (modo === 'video')
 		TITULOS.forEach((q) => {
 			if (t < q.de - 0.1 || t >= q.ate) return;
@@ -857,7 +927,15 @@ export const textos = (t: number, previas: boolean, arroba = ''): Caixa[] => {
 		const c = centro(500, larg);
 		out.push({nome: 'tela ' + s.primeira, tipo: 'tela', palavras: Array.from({length: n}, (_, k) => s.primeira + k).filter((i) => nasceu(t, i)), x0: 540 + (c.x0 - 540) * z, x1: 540 + (c.x1 - 540) * z, y0: esc(s.topo), y1: esc(s.topo + alt)});
 	}
-	if (cta && CTA) out.push({nome: `fecho ${CTA.comando} ${CTA.palavra}`, tipo: 'fecho', palavras: [CTA.i, CTA.i + 1].filter((i) => nasceu(t, i)), ...centro(500, FECHO.larg), y0: FECHO.top, y1: FECHO.top + FECHO.altura});
+	// o texto dito de uma tela nova: conta na cobertura e na repetição, na caixa de texto do modo (src/ui.tsx, ZONA_TEXTO)
+	const novos = (d: Ditos | undefined, m: ModoTela) =>
+		Object.entries(d ?? {}).forEach(([k, [i, txt]]) => {
+			const z = ZONA_TEXTO[m];
+			out.push({nome: `tela nova ${k}`, tipo: 'tela', palavras: Array.from({length: txt.split(' ').length}, (_, j) => i + j).filter((x) => nasceu(t, x)), x0: z.x0, x1: z.x1, y0: z.y0, y1: z.y1});
+		});
+	if (modo === 'tela') novos(TELAS[TELAS.filter((x) => t >= x.de).length - 1].textos, 'cheia');
+	if (modo === 'painel') novos(painelEm(t).textos, 'dividida');
+	if (cta && CTA) out.push({nome: `fecho ${CTA.comando} ${CTA.palavra}`, tipo: 'fecho', palavras: Array.from({length: CTA.comando.split(' ').length + 1}, (_, k) => CTA!.i + k).filter((i) => nasceu(t, i)), ...centro(500, FECHO.larg), y0: FECHO.top, y1: FECHO.top + FECHO.altura});
 	const pg = PAGINAS.find((g) => t >= g.de && t < g.ate);
 	const legY = modo === 'video' && !tit && !cta ? LEG_Y : dividida || cta ? LEG_Y2 : null;
 	if (pg && legY !== null) {
@@ -877,4 +955,6 @@ export const textos = (t: number, previas: boolean, arroba = ''): Caixa[] => {
 	if (modo === 'previas') out.push({nome: 'nomes das prévias', tipo: 'rotulo', palavras: [], x0: 100, x1: 980 - 100, y0: 760, y1: 830});
 	return out;
 };
-export {PS as PALAVRAS, LEG_TAM, LEG_TAM2, PEDACOS, TITULOS, TELAS};
+/** os trechos do plano, para o checador (o tempo de cada modo e telas seguidas) */
+export const TRECHOS = (previas: boolean) => trechos(previas).map(([a, modo], k, TR) => ({a, fim: TR[k + 1] ? TR[k + 1][0] : DURACAO, modo}));
+export {PS as PALAVRAS, LEG_TAM, LEG_TAM2, PEDACOS, TITULOS, TELAS, PAINEIS};

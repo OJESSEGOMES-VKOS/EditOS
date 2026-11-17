@@ -7,7 +7,8 @@ const {fontFamily: FIGTREE} = loadFont('normal', {weights: ['500', '600', '700']
 
 export type Mensagem = {texto: string; minha: boolean; chave?: boolean};
 export type Cena34Props = {
-  mensagens?: Mensagem[]; // até 5, uma pode ser a "chave"
+  mensagens: Mensagem[]; // 1 a 5, as que a fala conta; uma pode ser a "chave" (o golpe da história)
+  tempos?: number[]; // quadro em que cada balão salta (na fala); padrão: um a cada ~15 quadros, a chave 30 depois
   corMinha?: string;
   lida?: string;
   width?: number;
@@ -16,13 +17,8 @@ export type Cena34Props = {
 };
 
 export const Cena34: React.FC<Cena34Props> = ({
-  mensagens = [
-    {texto: 'viu os números??', minha: false},
-    {texto: 'não, o que houve', minha: true},
-    {texto: 'bateu 1 milhão', minha: false, chave: true},
-    {texto: 'da noite pro dia', minha: false},
-    {texto: 'não acredito', minha: true},
-  ],
+  mensagens,
+  tempos: temposDados,
   corMinha = '#2B5FF7',
   lida = 'Lida',
   width = 1080,
@@ -42,7 +38,7 @@ export const Cena34: React.FC<Cena34Props> = ({
     if (i === 0) t = 0;
     else if (m.chave) t += 30;
     else t += msgs[i - 1].chave ? 16 : 15;
-    tempos.push(t * s);
+    tempos.push(temposDados?.[i] ?? t * s);
   });
 
   const ease = Easing.bezier(0.45, 0, 0.15, 1);

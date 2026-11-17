@@ -1,0 +1,92 @@
+// Arquivo gerado por ferramentas (não edite à mão): a lista dos estilos de src/estilos/.
+import * as e_bordado from './estilos/bordado';
+import * as e_caderno from './estilos/caderno';
+import * as e_colagem from './estilos/colagem';
+import * as e_cosmico from './estilos/cosmico';
+import * as e_degrade from './estilos/degrade';
+import * as e_desenho_plano from './estilos/desenho-plano';
+import * as e_fluidos from './estilos/fluidos';
+import * as e_giz from './estilos/giz';
+import * as e_gravura from './estilos/gravura';
+import * as e_isometrico from './estilos/isometrico';
+import * as e_linha_do_tempo from './estilos/linha-do-tempo';
+import * as e_lume from './estilos/lume';
+import * as e_madeira_3d from './estilos/madeira-3d';
+import * as e_mapa from './estilos/mapa';
+import * as e_maquete_3d from './estilos/maquete-3d';
+import * as e_maquina from './estilos/maquina';
+import * as e_massinha_3d from './estilos/massinha-3d';
+import * as e_mesa_de_jogo from './estilos/mesa-de-jogo';
+import * as e_mosaico from './estilos/mosaico';
+import * as e_musica from './estilos/musica';
+import * as e_nanquim from './estilos/nanquim';
+import * as e_neon from './estilos/neon';
+import * as e_oficina_antiga from './estilos/oficina-antiga';
+import * as e_oleo from './estilos/oleo';
+import * as e_origami from './estilos/origami';
+import * as e_papel_e_sombras from './estilos/papel-e-sombras';
+import * as e_papel_recortado from './estilos/papel-recortado';
+import * as e_pixel from './estilos/pixel';
+import * as e_pixel_reativo from './estilos/pixel-reativo';
+import * as e_planta_tecnica from './estilos/planta-tecnica';
+import * as e_pontos from './estilos/pontos';
+import * as e_pop_up from './estilos/pop-up';
+import * as e_rabisco from './estilos/rabisco';
+import * as e_silhueta from './estilos/silhueta';
+import * as e_so_texto from './estilos/so-texto';
+import * as e_teatro from './estilos/teatro';
+import * as e_teatro_de_sombras from './estilos/teatro-de-sombras';
+import * as e_terminal from './estilos/terminal';
+import * as e_tipografia from './estilos/tipografia';
+import * as e_traco from './estilos/traco';
+import * as e_traco_dourado from './estilos/traco-dourado';
+import * as e_vidro_3d from './estilos/vidro-3d';
+import * as e_vitral from './estilos/vitral';
+import * as e_vitral_cosmico from './estilos/vitral-cosmico';
+
+export const ESTILOS = [
+  {id: 'bordado', tema: e_bordado.tema, Exemplo: e_bordado.Exemplo},
+  {id: 'caderno', tema: e_caderno.tema, Exemplo: e_caderno.Exemplo},
+  {id: 'colagem', tema: e_colagem.tema, Exemplo: e_colagem.Exemplo},
+  {id: 'cosmico', tema: e_cosmico.tema, Exemplo: e_cosmico.Exemplo},
+  {id: 'degrade', tema: e_degrade.tema, Exemplo: e_degrade.Exemplo},
+  {id: 'desenho-plano', tema: e_desenho_plano.tema, Exemplo: e_desenho_plano.Exemplo},
+  {id: 'fluidos', tema: e_fluidos.tema, Exemplo: e_fluidos.Exemplo},
+  {id: 'giz', tema: e_giz.tema, Exemplo: e_giz.Exemplo},
+  {id: 'gravura', tema: e_gravura.tema, Exemplo: e_gravura.Exemplo},
+  {id: 'isometrico', tema: e_isometrico.tema, Exemplo: e_isometrico.Exemplo},
+  {id: 'linha-do-tempo', tema: e_linha_do_tempo.tema, Exemplo: e_linha_do_tempo.Exemplo},
+  {id: 'lume', tema: e_lume.tema, Exemplo: e_lume.Exemplo},
+  {id: 'madeira-3d', tema: e_madeira_3d.tema, Exemplo: e_madeira_3d.Exemplo},
+  {id: 'mapa', tema: e_mapa.tema, Exemplo: e_mapa.Exemplo},
+  {id: 'maquete-3d', tema: e_maquete_3d.tema, Exemplo: e_maquete_3d.Exemplo},
+  {id: 'maquina', tema: e_maquina.tema, Exemplo: e_maquina.Exemplo},
+  {id: 'massinha-3d', tema: e_massinha_3d.tema, Exemplo: e_massinha_3d.Exemplo},
+  {id: 'mesa-de-jogo', tema: e_mesa_de_jogo.tema, Exemplo: e_mesa_de_jogo.Exemplo},
+  {id: 'mosaico', tema: e_mosaico.tema, Exemplo: e_mosaico.Exemplo},
+  {id: 'musica', tema: e_musica.tema, Exemplo: e_musica.Exemplo},
+  {id: 'nanquim', tema: e_nanquim.tema, Exemplo: e_nanquim.Exemplo},
+  {id: 'neon', tema: e_neon.tema, Exemplo: e_neon.Exemplo},
+  {id: 'oficina-antiga', tema: e_oficina_antiga.tema, Exemplo: e_oficina_antiga.Exemplo},
+  {id: 'oleo', tema: e_oleo.tema, Exemplo: e_oleo.Exemplo},
+  {id: 'origami', tema: e_origami.tema, Exemplo: e_origami.Exemplo},
+  {id: 'papel-e-sombras', tema: e_papel_e_sombras.tema, Exemplo: e_papel_e_sombras.Exemplo},
+  {id: 'papel-recortado', tema: e_papel_recortado.tema, Exemplo: e_papel_recortado.Exemplo},
+  {id: 'pixel', tema: e_pixel.tema, Exemplo: e_pixel.Exemplo},
+  {id: 'pixel-reativo', tema: e_pixel_reativo.tema, Exemplo: e_pixel_reativo.Exemplo},
+  {id: 'planta-tecnica', tema: e_planta_tecnica.tema, Exemplo: e_planta_tecnica.Exemplo},
+  {id: 'pontos', tema: e_pontos.tema, Exemplo: e_pontos.Exemplo},
+  {id: 'pop-up', tema: e_pop_up.tema, Exemplo: e_pop_up.Exemplo},
+  {id: 'rabisco', tema: e_rabisco.tema, Exemplo: e_rabisco.Exemplo},
+  {id: 'silhueta', tema: e_silhueta.tema, Exemplo: e_silhueta.Exemplo},
+  {id: 'so-texto', tema: e_so_texto.tema, Exemplo: e_so_texto.Exemplo},
+  {id: 'teatro', tema: e_teatro.tema, Exemplo: e_teatro.Exemplo},
+  {id: 'teatro-de-sombras', tema: e_teatro_de_sombras.tema, Exemplo: e_teatro_de_sombras.Exemplo},
+  {id: 'terminal', tema: e_terminal.tema, Exemplo: e_terminal.Exemplo},
+  {id: 'tipografia', tema: e_tipografia.tema, Exemplo: e_tipografia.Exemplo},
+  {id: 'traco', tema: e_traco.tema, Exemplo: e_traco.Exemplo},
+  {id: 'traco-dourado', tema: e_traco_dourado.tema, Exemplo: e_traco_dourado.Exemplo},
+  {id: 'vidro-3d', tema: e_vidro_3d.tema, Exemplo: e_vidro_3d.Exemplo},
+  {id: 'vitral', tema: e_vitral.tema, Exemplo: e_vitral.Exemplo},
+  {id: 'vitral-cosmico', tema: e_vitral_cosmico.tema, Exemplo: e_vitral_cosmico.Exemplo},
+];

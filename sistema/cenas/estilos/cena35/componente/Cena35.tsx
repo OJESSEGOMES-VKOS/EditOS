@@ -7,23 +7,31 @@ import {loadFont} from '@remotion/google-fonts/InstrumentSans';
 
 const {fontFamily: INSTR} = loadFont('normal', {weights: ['500', '600'], subsets: ['latin']});
 
-export type Tipo = 'pessoa' | 'onibus' | 'casa' | 'predio' | 'torre';
-export type Objeto = {tipo: Tipo; nome: string; altura: string; metros: number};
+export type Tipo = 'pessoa' | 'onibus' | 'casa' | 'predio' | 'torre' | 'bloco';
+// tipo: a forma de argila mais perto do objeto dito; 'bloco' é o genérico (caixa com faixas). largura em metros troca a do tipo.
+export type Objeto = {tipo: Tipo; nome: string; altura: string; metros: number; largura?: number};
 export type Cena35Props = {
-  objetos?: Objeto[]; // do menor ao maior, até 5
+  objetos: Objeto[]; // os que a fala compara, do menor ao maior, 2 a 5
   width?: number;
   height?: number;
   duracao?: number;
 };
 
-const PPM = 9; // px por metro no quadro final
+let PPM = 9; // px por metro no quadro final (recalculado pela maior altura: a maior ocupa ~1080 px)
 const G = 1150; // linha do chão (fixa)
 const FRENTE = '#F1F2F4';
 const LADO = '#D6DBE1';
 const JANELA = '#C9CFD7';
 
 // largura de frente e de lado (em metros) por tipo
-const DIM: Record<Tipo, [number, number]> = {pessoa: [0.55, 0], onibus: [11, 2.2], casa: [9, 3.2], predio: [14, 4.6], torre: [10, 3.4]};
+const DIM0: Record<Tipo, [number, number]> = {pessoa: [0.55, 0], onibus: [11, 2.2], casa: [9, 3.2], predio: [14, 4.6], torre: [10, 3.4], bloco: [8, 2.6]};
+// as larguras dos tipos acompanham a escala da demo (1 m = 9 px quando o maior tem 120 m); fora dela, escalam junto
+const dim = (o: Objeto): [number, number] => {
+  const [wf, ws] = DIM0[o.tipo];
+  const f = 9 / PPM;
+  if (o.largura) return [o.largura, (o.largura * ws) / (wf || 1)];
+  return o.tipo === 'pessoa' ? [wf * (o.metros / 1.8), 0] : [wf * f, ws * f];
+};
 
 const Caixa: React.FC<{x: number; w: number; d: number; h: number; base?: number; frente?: string; lado?: string}> = ({x, w, d, h, base = 0, frente, lado}) => (
   <>
@@ -34,7 +42,7 @@ const Caixa: React.FC<{x: number; w: number; d: number; h: number; base?: number
 
 const Desenho: React.FC<{o: Objeto}> = ({o}) => {
   const h = o.metros * PPM;
-  const [wf, ws] = DIM[o.tipo];
+  const [wf, ws] = dim(o);
   const w = wf * PPM;
   const d = ws * PPM;
   if (o.tipo === 'pessoa') {
@@ -76,6 +84,10 @@ const Desenho: React.FC<{o: Objeto}> = ({o}) => {
       </>
     );
   }
+  if (o.tipo === 'bloco') {
+    const faixas = `repeating-linear-gradient(to bottom, ${FRENTE} 0 ${h / 8}px, ${JANELA} ${h / 8}px ${h / 6}px)`;
+    return <Caixa x={0} w={w} d={d} h={h} frente={faixas} />;
+  }
   // torre esbelta com recuos e agulha
   const aletas = `repeating-linear-gradient(to right, ${FRENTE} 0 ${PPM * 1.2}px, #dfe3e8 ${PPM * 1.2}px ${PPM * 1.5}px)`;
   const ladoA = `repeating-linear-gradient(to right, ${LADO} 0 ${PPM * 1.2}px, #c9cfd7 ${PPM * 1.2}px ${PPM * 1.5}px)`;
@@ -91,13 +103,7 @@ const Desenho: React.FC<{o: Objeto}> = ({o}) => {
 };
 
 export const Cena35: React.FC<Cena35Props> = ({
-  objetos = [
-    {tipo: 'pessoa', nome: 'Pessoa', altura: '1,8 m', metros: 1.8},
-    {tipo: 'onibus', nome: 'Ônibus', altura: '4 m', metros: 4.2},
-    {tipo: 'casa', nome: 'Casa', altura: '10 m', metros: 10},
-    {tipo: 'predio', nome: 'Prédio', altura: '60 m', metros: 60},
-    {tipo: 'torre', nome: 'Torre', altura: '120 m', metros: 120},
-  ],
+  objetos,
   width = 1080,
   height = 1350,
   duracao = 150,
@@ -107,9 +113,10 @@ export const Cena35: React.FC<Cena35Props> = ({
   const s = duracao / 150;
   const k = Math.min(width / 1080, height / 1350);
   const obs = objetos.slice(0, 5);
+  PPM = 1080 / Math.max(...obs.map((o) => o.metros));
 
   // posições finais com o mesmo vão entre cada par
-  const larg = obs.map((o) => (DIM[o.tipo][0] + DIM[o.tipo][1]) * PPM);
+  const larg = obs.map((o) => (dim(o)[0] + dim(o)[1]) * PPM);
   const ESQ = 70;
   const DIR = 1012;
   const vao = (DIR - ESQ - larg.reduce((a, b) => a + b, 0)) / Math.max(1, obs.length - 1);
@@ -119,7 +126,7 @@ export const Cena35: React.FC<Cena35Props> = ({
     xs.push(acc);
     acc += l + vao;
   });
-  const centro = (i: number) => xs[i] + (DIM[obs[i].tipo][0] * PPM) / 2;
+  const centro = (i: number) => xs[i] + (dim(obs[i])[0] * PPM) / 2;
 
   // câmera: recuo em escala logarítmica, ancorado num ponto da linha do chão
   const S0 = 20;

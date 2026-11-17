@@ -6,6 +6,7 @@ import {Rosto} from './Rosto';
 import {Legenda} from './Legenda';
 import {EditorFrente, EditorFundo} from './Editor';
 import {CelularFrente, CelularFundo, Fecho, Modelos, Outros, PreviasCena, Prompt} from './Cenas';
+import {LivresFrente, LivresFundo} from './Livres';
 
 /** arroba: o @ sem o "@" no Reel do celular e no fecho (vazio esconde); foto: arquivo em public/ do avatar (vazio esconde) */
 export type Props = {voz: boolean; previas: boolean; nomesPrevias: [string, string]; arroba?: string; foto?: string};
@@ -16,6 +17,7 @@ export const Vitrine: React.FC<Props> = ({voz = true, previas = false, nomesPrev
 		<AbsoluteFill style={{...fundoClaro, overflow: 'hidden'}}>
 			<EditorFundo />
 			<CelularFundo />
+			<LivresFundo />
 			<Rosto />
 			<EditorFrente />
 			<CelularFrente />
@@ -24,6 +26,7 @@ export const Vitrine: React.FC<Props> = ({voz = true, previas = false, nomesPrev
 			<PreviasCena />
 			<Prompt />
 			<Fecho />
+			<LivresFrente />
 			<Legenda />
 			{voz ? <Audio src={staticFile('voz.wav')} /> : null}
 		</AbsoluteFill>

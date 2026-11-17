@@ -66,9 +66,11 @@ Para cada cena, nesta ordem:
   | 1.2 | 5,3–6,7 s | e o GPT-Astra. | rosto, punch-in (casa) | o nome fecha a frase no rosto |
   ```
   Depois do plano de cenas vem o plano frase a frase que o `<modelo>.md` já pede, agora seguindo as cenas.
-- **Componente:** a primeira vez que um estilo é usado, o assistente constrói o componente Remotion dele, confere contra a ficha e a demo e guarda em `estilos/<id>/componente/` (o `.tsx` com as props: textos, tempos,
-  cores, formato, e um `LEIA.md` de uma tela com as props e o que foi conferido). Nos vídeos seguintes, copia o
-  componente para o `src/` do vídeo e só troca as props. Correção do dono num estilo vai para a ficha do estilo
+- **Cada estilo é uma skill** (`.claude/skills/cenaNN/`, na raiz do EditOS, pelo método de `JEITO.md`). A cena se compõe
+  pela ficha do estilo (A personalidade e Como variar) a partir da frase dita: o número de batidas, as palavras e os
+  objetos vêm da fala. O componente (`estilos/<id>/componente/`) é a peça: copie para o `src/` do vídeo e recomponha;
+  a demo é um exemplo e nunca se repete batida por batida. Palavra da demo (`componente/textos-demo.json`) não entra
+  num vídeo cuja fala não a diz (`tools/clone.py` confere). Correção do dono num estilo vai para a ficha do estilo
   (seção "Correções do dono", com data) e para o componente.
 - **Prova:** o checador do molde continua valendo para o vídeo todo; a cena com estilo passa pelas mesmas regras de
   legenda, leitura e zona segura. Antes de entregar, olhe os quadros de cada cena com estilo.

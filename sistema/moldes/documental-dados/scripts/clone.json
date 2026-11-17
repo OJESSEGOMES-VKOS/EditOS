@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: as peças do plano (src/plano.ts) que só entram com um porquê na fala, e o texto que cada uma escreve fixo no código (nenhuma escreve: todo texto vem do plano). As telas, os números e o dado são do vídeo; o dado do exemplo (src/dados.json com outra fala) o scripts/checar.mjs reprova.",
+ "telas": ["camera", "marcas", "reguas", "divisao", "pilha", "apagao", "documento"],
+ "fixos": {}
+}

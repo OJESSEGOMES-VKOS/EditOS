@@ -9,10 +9,11 @@ const {fontFamily: INTER} = loadFont('normal', {weights: ['500', '600', '700', '
 export type Cena11Props = {
   width?: number;
   height?: number;
-  destino?: string;
-  lugares?: {nome: string; x: number; y: number}[];
+  destino: string; // o lugar dito (inventado ou do dono; nunca marca nem mapa real)
+  lugares?: {nome: string; x: number; y: number}[]; // 0 a 3 lugares ditos, em terreno aberto (chão 2400x2400)
+  rota?: [number, number][]; // pontos nos eixos das ruas (múltiplos de 190); o 1º é o ponto azul, o último o alfinete
   minutosInicio?: number;
-  minutos?: number;
+  minutos?: number; // sem minutos (undefined), o cartão da viagem não entra
   distancia?: string;
   rotaTexto?: string;
   botao?: string;
@@ -23,7 +24,7 @@ const PASSO = 190, RUA = 40;
 const rnd = (s: number) => {const x = Math.sin(s * 91.7 + 13.3) * 43758.5453; return x - Math.floor(x);};
 // rio: curva suave atravessando o chão
 const rioY = (x: number) => 1230 - x * 0.08 + Math.sin(x / 420) * 70;
-const ROTA: [number, number][] = [[760, 2090], [760, 1520], [1140, 1520], [1140, 950], [1520, 950], [1520, 760], [1710, 760]]; // eixos das ruas (múltiplos de PASSO)
+export const ROTA_EXEMPLO: [number, number][] = [[760, 2090], [760, 1520], [1140, 1520], [1140, 950], [1520, 950], [1520, 760], [1710, 760]]; // eixos das ruas (múltiplos de PASSO)
 const PARQUES = new Set(['2-9', '8-3', '10-7', '4-4']);
 const RUA_AMARELA = 8; // índice da rua horizontal principal
 
@@ -40,16 +41,13 @@ const Predio: React.FC<{x: number; y: number; w: number; h: number; d: number}> 
 export const Cena11: React.FC<Cena11Props> = ({
   width = 1080,
   height = 1350,
-  destino = 'O Estúdio',
-  lugares = [
-    {nome: 'Cidade Velha', x: 950, y: 690},
-    {nome: 'Estação Central', x: 1430, y: 1330},
-    {nome: 'Parque da Ribeira', x: 1330, y: 1700},
-  ],
-  minutosInicio = 14,
-  minutos = 12,
-  distancia = '4,2 km',
-  rotaTexto = 'Rota mais rápida',
+  destino,
+  lugares = [],
+  rota = ROTA_EXEMPLO,
+  minutos,
+  minutosInicio = (minutos ?? 0) + 2,
+  distancia = '',
+  rotaTexto = '',
   botao = 'Ir',
 }) => {
   const frame = useCurrentFrame();
@@ -99,19 +97,19 @@ export const Cena11: React.FC<Cena11Props> = ({
 
   // rota: desenha pelas ruas, cantos arredondados, freia na chegada
   const rotaP = interpolate(frame, [4, 80], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.3, 0.2, 0.35, 1)});
-  const rotaD = 'M' + ROTA.map((p) => p.join(',')).join(' L');
+  const rotaD = 'M' + rota.map((p) => p.join(',')).join(' L');
   const qPino = 80;
   const pino = interpolate(frame, [qPino, qPino + 7], [-220, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.quad)});
   const amassa = frame >= qPino + 7 ? 1 - 0.18 * Math.exp(-(frame - qPino - 7) / 2.5) * Math.cos((frame - qPino - 7) / 1.4) : 1;
   const rot = spring({frame: frame - qPino - 6, fps, config: {damping: 9, stiffness: 260, mass: 0.5}});
   const qCard = 96;
   const card = spring({frame: frame - qCard, fps, config: {damping: 11, stiffness: 150, mass: 0.7}});
-  const odo = interpolate(frame, [qCard + 4, qCard + 26], [0, minutosInicio - minutos], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+  const odo = interpolate(frame, [qCard + 4, qCard + 26], [0, minutosInicio - (minutos ?? 0)], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
   const pulso = (frame % 30) / 30;
 
   const billboard = (sc = 1): React.CSSProperties => ({transform: `rotateZ(${-yaw}deg) rotateX(${-pitch}deg) scale(${sc / s})`, transformOrigin: '50% 100%', transformStyle: 'preserve-3d'});
-  const [px, py] = ROTA[ROTA.length - 1];
-  const [dx, dy] = ROTA[0];
+  const [px, py] = rota[rota.length - 1];
+  const [dx, dy] = rota[0];
 
   return (
     <AbsoluteFill style={{overflow: 'hidden', background: 'linear-gradient(#f1f4f7, #E4E9EE 40%)'}}>
@@ -166,7 +164,7 @@ export const Cena11: React.FC<Cena11Props> = ({
       </div>
       {/* cartão da viagem */}
       <div style={{position: 'absolute', left: (width - 1080 * k) / 2, top: (height - 1350 * k) / 2, width: 1080, height: 1350, transform: `scale(${k})`, transformOrigin: '0 0', pointerEvents: 'none'}}>
-        {frame >= qCard && (
+        {frame >= qCard && minutos !== undefined && (
           <div style={{position: 'absolute', left: 40, right: 40, top: 1120, height: 160, background: '#fff', borderRadius: 30, boxShadow: '0 12px 40px rgba(30,40,60,0.18)', transform: `translateY(${(1 - card) * 360}px)`, display: 'flex', alignItems: 'center', padding: '0 40px', fontFamily: INTER}}>
             <div style={{flex: 1}}>
               <div style={{display: 'flex', alignItems: 'baseline', gap: 10, color: '#121417'}}>
@@ -177,7 +175,7 @@ export const Cena11: React.FC<Cena11Props> = ({
                 </div>
                 <span style={{fontWeight: 800, fontSize: 56, letterSpacing: -2}}>min</span>
               </div>
-              <div style={{fontWeight: 500, fontSize: 24, color: '#6B737C', marginTop: 6}}>{distancia} · <span style={{color: '#1F9D55', fontWeight: 600}}>{rotaTexto}</span></div>
+              <div style={{fontWeight: 500, fontSize: 24, color: '#6B737C', marginTop: 6}}>{distancia}{distancia && rotaTexto ? ' · ' : ''}<span style={{color: '#1F9D55', fontWeight: 600}}>{rotaTexto}</span></div>
             </div>
             <div style={{width: 130, height: 76, borderRadius: 18, background: '#1A73E8', color: '#fff', fontWeight: 700, fontSize: 30, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{botao}</div>
           </div>

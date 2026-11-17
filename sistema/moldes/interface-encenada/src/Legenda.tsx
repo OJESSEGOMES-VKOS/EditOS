@@ -1,5 +1,5 @@
 import React from 'react';
-import {C, DIVISA, MONO, P, SANS, SERIF, cenaEm, iw, montaCenas, tw, useCenas, useT} from './tema';
+import {C, CAIXAS_ALTAS, CHAVES, DIVISA, EQUILIBRIO, MONO, P, SANS, SELECOES, SERIF, cenaEm, montaCenas, tw, useCenas, useT} from './tema';
 import type {Modo} from './tema';
 
 /**
@@ -9,14 +9,13 @@ import type {Modo} from './tema';
  */
 type Pal = {texto: string; de: number; ate: number; i: number};
 type Pedaco = {pal: Pal[]; de: number; ate: number; cheio?: boolean};
-/* ---------------------------------------------------------------- o plano da legenda (refazer num vídeo novo)
- * iw('palavra', n) é a n-ésima vez que a palavra é dita (confere contra a fala ao carregar). */
-/** palavras-chave: 100%, Claude, diferença, Claude, prévias, três, edição (a do pedido), DM */
-const CHAVE = new Set([iw('100%'), iw('claude'), iw('diferença'), iw('claude', 2), iw('prévias'), iw('três'), iw('edição', 2), iw('dm')]);
-/** a palavra que a pessoa vai comentar sai em caixa alta */
-const CAIXA_ALTA = new Set([iw('edição', 2)]);
-/** a chave que ganha a caixa de seleção com alças (ref3) */
-const SELECAO = new Set([iw('edição', 2)]);
+/* ---------------------------------------------------------------- o plano da legenda
+ * CHAVE (palavras-chave), CAIXA_ALTA (a palavra do pedido) e SELECAO (a que ganha alças) moram no bloco "O PLANO" de
+ * src/tema.ts, junto com as cenas. */
+const CHAVE = CHAVES;
+const CAIXA_ALTA = CAIXAS_ALTAS;
+const SELECAO = SELECOES;
+const EQUILIBRA = EQUILIBRIO;
 /** tempo mínimo de cada pedaço na tela (s). 0 = pedaços de 1 a 3 palavras como na vitrine (MODELO §3); com 1.5 os pedaços
  * se juntam até durar 1,5 s e cada palavra ficar 0,4 s (REGRAS §3), que é o que o conferidor cobra */
 export const MIN_PEDACO = 1.5; // G12 e REGRAS §3: o padrão do molde é o tempo de ler (0 refaz a vitrine aprovada)
@@ -37,7 +36,7 @@ const pedacos = (): Pedaco[] => {
 			at = [];
 		}
 	});
-	const gs = MIN_PEDACO ? juntar(out, cena) : out;
+	const gs = MIN_PEDACO ? (EQUILIBRA ? equilibrar(cena) : juntar(out, cena)) : out;
 	return gs.map((g, i) => {
 		const prox = gs[i + 1];
 		const c = CORTES[cena(g.de)];
@@ -59,6 +58,53 @@ const juntar = (gs: Pedaco[], cena: (t: number) => number): Pedaco[] => {
 			if (quer) at.cheio = true;
 			out.push(g);
 		}
+	}
+	return out;
+};
+/** com EQUILIBRA (o padrão do vídeo novo; a vitrine aprovada saiu sem): em vez de juntar grupos de 3 palavras na gula, cada
+ * cena é cortada em pedaços pela melhor partição (programação dinâmica): nenhum pedaço curto (1,5 s; 1 s o cheio de 2
+ * linhas), nenhuma palavra que some antes de 0,4 s, até 2 linhas, e o corte de preferência numa pontuação ou pausa. Fala
+ * rápida deixava o último pedaço da cena sozinho ("seu vídeo." em 0,5 s) e não havia corte de cena que resolvesse. */
+const equilibrar = (cena: (t: number) => number): Pedaco[] => {
+	const W = P.palavras.map((q, i) => ({...q, i}));
+	const out: Pedaco[] = [];
+	let s = 0;
+	while (s < W.length) {
+		const k = cena(W[s].de);
+		let e = s;
+		while (e + 1 < W.length && cena(W[e + 1].de) === k) e++;
+		const c = CORTES[k];
+		const modo = c?.modo ?? 'palco';
+		const fimCena = c ? c.ate : Infinity;
+		// custo[j]: a melhor partição das palavras s..j-1; de[j]: onde começa o último pedaço dela
+		const custo: number[] = Array(e + 2).fill(Infinity), de: number[] = Array(e + 2).fill(-1), cheios: boolean[] = Array(e + 2).fill(false);
+		custo[s] = 0;
+		for (let a = s; a <= e; a++) {
+			if (custo[a] === Infinity) continue;
+			for (let b = a + 1; b <= e + 1 && b - a <= 14; b++) {
+				const pal = W.slice(a, b);
+				if (linhasDe(pal, modo) > MAX_LINHAS) break;
+				const ult = pal[pal.length - 1];
+				const cheio = linhasDe(pal, modo) === MAX_LINHAS && (b > e || linhasDe(W.slice(a, b + 1), modo) > MAX_LINHAS);
+				const ate = Math.min(Math.max(ult.ate + 0.45, pal[0].de + MIN_PEDACO, ult.de + 0.4), b <= e ? W[b].de : Infinity, fimCena);
+				let v = ate - pal[0].de < (cheio ? 1 : MIN_PEDACO) - 1e-6 ? 1 : 0;
+				if (!cheio) v += pal.filter((p) => ate - p.de < 0.4 - 1e-6).length;
+				const pausa = b > e || /[.,!?]$/.test(ult.texto) || W[b].de - ult.ate > 0.3;
+				const c2 = custo[a] + v * 1000 + (pausa ? 0 : 2) + 0.3 * Math.max(0, ate - pal[0].de - 3) + 0.5;
+				if (c2 < custo[b]) {
+					custo[b] = c2;
+					de[b] = a;
+					cheios[b] = cheio;
+				}
+			}
+		}
+		const partes: Pedaco[] = [];
+		for (let b = e + 1; b > s; b = de[b]) {
+			const pal = W.slice(de[b], b);
+			partes.unshift({pal, de: pal[0].de, ate: pal[pal.length - 1].ate, cheio: cheios[b]});
+		}
+		out.push(...partes);
+		s = e + 1;
 	}
 	return out;
 };

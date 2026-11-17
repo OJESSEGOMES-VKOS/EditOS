@@ -12,9 +12,9 @@ export type Parte = {nome: string; spec: string};
 export type Cena12Props = {
   width?: number;
   height?: number;
-  partes?: Parte[]; // de cima para baixo: teclas, chaves, placa, placa de circuito, colunas, caixa
-  titulo?: string;
-  specTitulo?: string;
+  partes: Parte[]; // rótulos de cima para baixo, um por camada (até 6 nas camadas de exemplo); só partes ditas
+  titulo: string; // curto, frase comum, palavras ditas
+  specTitulo?: string; // linha mono em caixa alta (vazia: nada)
   laranja?: string;
 };
 
@@ -36,16 +36,9 @@ const Caixa: React.FC<BoxP> = ({x, y, w, h, d, z = 0, topo, lado, frente, topoEx
 export const Cena12: React.FC<Cena12Props> = ({
   width = 1080,
   height = 1350,
-  partes = [
-    {nome: 'Teclas', spec: 'PBT · 1u × 21'},
-    {nome: 'Chaves', spec: 'lineares · encaixe'},
-    {nome: 'Placa', spec: 'alumínio de 1,5 mm'},
-    {nome: 'Placa de circuito', spec: 'um chip, 21 teclas'},
-    {nome: 'Colunas', spec: 'latão · M2 × 4'},
-    {nome: 'Caixa', spec: 'bandeja com junta'},
-  ],
-  titulo = '21 teclas, aberto',
-  specTitulo = 'VISTA EXPLODIDA · 6 CAMADAS · PASSO DE 19,05 MM',
+  partes,
+  titulo,
+  specTitulo = '',
   laranja = '#FF5A2A',
 }) => {
   const frame = useCurrentFrame();
@@ -146,7 +139,7 @@ export const Cena12: React.FC<Cena12Props> = ({
         </div>
         {/* linhas-guia e rótulos */}
         <svg width={1080} height={1350} style={{position: 'absolute', inset: 0}}>
-          {partes.map((p, i) => {
+          {partes.slice(0, 6).map((p, i) => {
             const q = qCamada(i) + 6;
             const d = proj(BW / 2 + 8, BH / 2 - 30, zDe(i) + (i === 4 ? 60 : 12));
             const ly = 205 + i * 102 + (i >= 3 ? 10 : 0);
@@ -161,7 +154,7 @@ export const Cena12: React.FC<Cena12Props> = ({
             );
           })}
         </svg>
-        {partes.map((p, i) => {
+        {partes.slice(0, 6).map((p, i) => {
           const q = qCamada(i) + 9;
           const ly = 205 + i * 102 + (i >= 3 ? 10 : 0);
           const s = spring({frame: frame - q, fps, config: {damping: 11, stiffness: 220, mass: 0.5}});

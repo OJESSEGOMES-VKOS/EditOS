@@ -9,6 +9,8 @@ import {loadFont} from '@remotion/google-fonts/JetBrainsMono';
 const {fontFamily} = loadFont('normal', {weights: ['400', '600'], subsets: ['latin', 'latin-ext']});
 
 export type Rotulo40 = {nome: string; hora: string};
+// Rótulos: só os que a fala nomeia (0 a 3); sem rótulo, ele não aparece. A maquete (BOXES, ROUTE) é o lugar da demo:
+// num lugar novo, redesenhe BOXES/SITE/ROUTE/GATE/DOCK na pasta do vídeo (ver ../cena40.md, Como variar).
 export type Cena40Props = {
   rotuloPortao?: Rotulo40;
   rotuloVeiculo?: Rotulo40;
@@ -44,9 +46,9 @@ const DOCK: V3 = [36, 3, 54];
 const ROUTE: V3[] = [[43, 0.2, 104], [43, 0.2, 94], [36, 0.2, 92], [36, 0.2, 56]];
 
 export const Cena40: React.FC<Cena40Props> = ({
-  rotuloPortao = {nome: 'PORTÃO', hora: '02:14'},
-  rotuloVeiculo = {nome: 'CAMINHÃO 3', hora: ''},
-  rotuloDestino = {nome: 'DOCA 2', hora: '02:16'},
+  rotuloPortao,
+  rotuloVeiculo,
+  rotuloDestino,
   corGelo = '#85C9FB',
   corDestaque = '#CF3538',
   width = W,
@@ -298,9 +300,9 @@ export const Cena40: React.FC<Cena40Props> = ({
           </g>
 
           {/* rótulos no preto */}
-          {labelAt(GATE, 1215, L1, rotuloPortao, 'l')}
-          {labelAt([36, 12, 70], 1215, L2, rotuloVeiculo, 'r')}
-          {labelAt(DOCK, 180, L3, rotuloDestino, 'l')}
+          {rotuloPortao && labelAt(GATE, 1215, L1, rotuloPortao, 'l')}
+          {rotuloVeiculo && labelAt([36, 12, 70], 1215, L2, rotuloVeiculo, 'r')}
+          {rotuloDestino && labelAt(DOCK, 180, L3, rotuloDestino, 'l')}
 
           {/* vinheta */}
           <rect width={W} height={H} fill="url(#h40haze)" opacity="0" />

@@ -7,7 +7,7 @@ import {loadFont} from '@remotion/google-fonts/Outfit';
 const {fontFamily} = loadFont('normal', {weights: ['500'], subsets: ['latin', 'latin-ext']});
 
 export type GlowOrbProps = {
-  frase?: string;
+  frase: string; // a frase dita (uma linha; a letra encolhe sozinha até 56 px)
   largura?: number;
   altura?: number;
   cores?: {fundo: string; halo: string; haloFim: string; orbe: string; orbeLuz: string; linha: string};
@@ -24,7 +24,7 @@ const CIRCULOS = [
 ] as const;
 
 export const GlowOrb: React.FC<GlowOrbProps> = ({
-  frase = 'Esteja presente.',
+  frase,
   largura,
   altura,
   cores = CORES,
@@ -56,6 +56,8 @@ export const GlowOrb: React.FC<GlowOrbProps> = ({
   const raioAnel = R * (1 + 1.0 * anel);
 
   const letras = Array.from(frase);
+  // uma linha só: Outfit 500 tem ~0,52 em por letra; cabe em ~960 px, nunca abaixo de 56
+  const tamanho = Math.max(56, Math.min(100, 960 / (letras.length * 0.52)));
   const fimTexto = inicioTexto + letras.length * 2.5 + 10;
   const aperto = interpolate(f, [inicioTexto, fimTexto], [0.06, -0.03], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
 
@@ -100,7 +102,7 @@ export const GlowOrb: React.FC<GlowOrbProps> = ({
         />
         {/* a frase: letra a letra saindo de uma máscara */}
         <div style={{position: 'absolute', left: 0, right: 0, top: 920, display: 'flex', justifyContent: 'center', overflow: 'hidden', paddingTop: 20, paddingBottom: 30}}>
-          <div style={{fontFamily, fontWeight: 500, fontSize: 100, color: cores.linha, letterSpacing: `${aperto}em`, whiteSpace: 'pre', lineHeight: 1}}>
+          <div style={{fontFamily, fontWeight: 500, fontSize: tamanho, color: cores.linha, letterSpacing: `${aperto}em`, whiteSpace: 'pre', lineHeight: 1}}>
             {letras.map((c, i) => {
               const sp = spring({frame: f - inicioTexto - i * 2.5, fps, config: {damping: 10, stiffness: 140}});
               return (

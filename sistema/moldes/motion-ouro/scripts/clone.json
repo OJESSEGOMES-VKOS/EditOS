@@ -1,0 +1,7 @@
+{
+ "_leia": "Para tools/clone.py: as telas da casa que o plano liga (o nome da linha no bloco O PLANO de scripts/plano.py, ex.: C3 = cena('C3', ...)) e o texto que cada uma escreve fixo no código, quando ela é usada.",
+ "telas": ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"],
+ "fixos": {
+  "C7": ["1x", "2x", "3x"]
+ }
+}

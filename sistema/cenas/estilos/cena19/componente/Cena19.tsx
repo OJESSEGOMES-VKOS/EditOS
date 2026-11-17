@@ -13,23 +13,25 @@ export type Marco = {ano: number; titulo: string; linha: string; icone?: 'lumina
 export type Cena19Props = {
   width?: number;
   height?: number;
-  kicker?: string;
-  titulo?: string;
-  tituloAzul?: string;
-  anoInicial?: number;
-  anoFinal?: number; // último ano desenhado no chão
-  pontos?: Marco[];
+  // textos e marcos vêm da fala (sem padrão: os da demo ficam no demo.tsx)
+  kicker: string;
+  titulo: string;
+  tituloAzul?: string; // o fecho do título em azul
+  anoInicial: number;
+  anoFinal?: number; // último ano desenhado no chão (padrão: o ano do último marco + 1)
+  pontos: Marco[]; // 2 a 5 marcos (o último é o HOJE); o chão se ajusta a qualquer intervalo de anos
   seloAgora?: string;
   azul?: string;
 };
 
 const INK = '#0E1116', GRIS = '#6A717C', CLARO = '#B7BEC8';
 
-const Icone: React.FC<{tipo?: Marco['icone']; cor: string}> = ({tipo = 'luminaria', cor}) => (
+const Icone: React.FC<{tipo?: Marco['icone']; cor: string; letra: string}> = ({tipo, cor, letra}) => (
   <svg viewBox="0 0 40 40" width="100%" height="100%">
     {tipo === 'luminaria' && <g fill="none" stroke={cor} strokeWidth={2.2} strokeLinecap="round"><path d="M10 34h16M18 34V22l8-9" /><path d="M23 9l8 4-4 6z" fill={cor} /></g>}
     {tipo === 'caixa' && <g fill="none" stroke={cor} strokeWidth={2.2} strokeLinejoin="round"><path d="M8 14l12-6 12 6v13l-12 6-12-6z" /><path d="M8 14l12 6 12-6M20 20v13" /></g>}
     {tipo === 'arco' && <g fill="none" stroke={cor} strokeWidth={2.4} strokeLinecap="round"><path d="M12 34V16a8 8 0 0 1 16 0" /><path d="M24 18h8l-2 5h-4z" fill={cor} /><path d="M8 34h10" /></g>}
+    {!tipo && <text x="20" y="28" textAnchor="middle" fontSize="22" fontWeight={800} fill={cor} fontFamily={SG}>{letra}</text>}
     {tipo === 'mesa' && <g fill={cor}><rect x="6" y="12" width="5" height="18" rx="1" /><rect x="13" y="12" width="5" height="18" rx="1" /><rect x="20" y="12" width="5" height="18" rx="1" /><rect x="27" y="12" width="5" height="18" rx="1" /><rect x="5" y="30" width="28" height="3" /></g>}
   </svg>
 );
@@ -39,17 +41,12 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const Cena19: React.FC<Cena19Props> = ({
   width = 1080,
   height = 1350,
-  kicker = 'ATELIÊ NORTE · 2016 ATÉ HOJE',
-  titulo = 'De uma garagem a ',
-  tituloAzul = '31 países',
-  anoInicial = 2016,
-  anoFinal = 2025,
-  pontos = [
-    {ano: 2016, titulo: 'Uma luminária na garagem', linha: 'Protótipo feito com sobras de carvalho.', icone: 'luminaria'},
-    {ano: 2018, titulo: 'Primeiros 500 pedidos', linha: 'Pré-venda esgotada em nove dias.', icone: 'caixa'},
-    {ano: 2021, titulo: 'A luminária Arco vai ao mundo', linha: 'Agora com envio para 31 países.', icone: 'arco'},
-    {ano: 2024, titulo: 'Abre o estúdio novo', linha: '48 pessoas, uma mesa longa.', icone: 'mesa'},
-  ],
+  kicker,
+  titulo,
+  tituloAzul = '',
+  anoInicial,
+  anoFinal: anoFinalProp,
+  pontos,
   seloAgora = 'HOJE',
   azul = '#2442F5',
 }) => {
@@ -57,13 +54,19 @@ export const Cena19: React.FC<Cena19Props> = ({
   const {fps} = useVideoConfig();
   const k = Math.min(width / 1080, height / 1350);
   const W = 1080, H = 1350;
-  const D = 110; // unidades de mundo por ano
-  const Z = (ano: number) => (ano - anoInicial) * D;
   const anoAgora = pontos[pontos.length - 1].ano;
+  const anoFinal = anoFinalProp ?? anoAgora + 1;
+  // o caminho até o hoje tem sempre o mesmo comprimento no mundo (880, como a demo de 8 anos): muda só o espaço por ano
+  const vao = Math.max(1, anoAgora - anoInicial);
+  const D = 880 / vao; // unidades de mundo por ano
+  const Z = (ano: number) => (ano - anoInicial) * D;
+  const passoAnos = Math.ceil(60 / D); // anos sem marco: só um a cada tantos, para não amontoar
+  const fr = (v: number) => anoInicial + (v * vao) / 8;
+  const chavesAgulha = [fr(0.15), fr(1.05), fr(2.5), fr(4.3), fr(6.1), anoAgora - (0.35 * vao) / 8, anoAgora];
 
   // agulha (playhead): já anda no quadro 0, acelera no meio, freia no "hoje"
   const fimAgulha = 90;
-  const ph = interpolate(frame, [0, 15, 30, 45, 60, 75, fimAgulha], [anoInicial + 0.15, anoInicial + 1.05, anoInicial + 2.5, anoInicial + 4.3, anoInicial + 6.1, anoAgora - 0.35, anoAgora], {extrapolateRight: 'clamp'});
+  const ph = interpolate(frame, [0, 15, 30, 45, 60, 75, fimAgulha], chavesAgulha, {extrapolateRight: 'clamp'});
 
   // câmera: começa baixa e perto do começo, sobe, recua e endireita; pousa ~1 s depois da agulha
   const c = interpolate(frame, [0, 120], [0, 1], {extrapolateRight: 'clamp', easing: Easing.bezier(0.45, 0, 0.2, 1)});
@@ -122,8 +125,8 @@ export const Cena19: React.FC<Cena19Props> = ({
     return d;
   };
   const anos = [] as number[];
-  for (let a = anoInicial; a <= anoFinal; a++) anos.push(a);
   const chave = new Set(pontos.map((m) => m.ano));
+  for (let a = anoInicial; a <= anoFinal; a++) if (chave.has(a) || (a - anoInicial) % passoAnos === 0) anos.push(a);
 
   // grade do chão
   const linhasGrade: React.ReactNode[] = [];
@@ -140,7 +143,7 @@ export const Cena19: React.FC<Cena19Props> = ({
   const passou = (ano: number) => frame >= 0 && ph >= ano - 0.02;
   const quadroDoAno = (ano: number) => {
     for (let q = 0; q <= fimAgulha; q++) {
-      const v = interpolate(q, [0, 15, 30, 45, 60, 75, fimAgulha], [anoInicial + 0.15, anoInicial + 1.05, anoInicial + 2.5, anoInicial + 4.3, anoInicial + 6.1, anoAgora - 0.35, anoAgora]);
+      const v = interpolate(q, [0, 15, 30, 45, 60, 75, fimAgulha], chavesAgulha);
       if (v >= ano - 0.02) return q;
     }
     return fimAgulha;
@@ -200,8 +203,7 @@ export const Cena19: React.FC<Cena19Props> = ({
           const agora = i === pontos.length - 1;
           const q0 = quadroDoAno(m.ano) + (agora ? 4 : 0);
           const base = P(0, 0, Z(m.ano));
-          const hastesFinal = [90, 48, 45, 126];
-          const hastePx = (i === 0 ? lerp(200, 90, c) : hastesFinal[Math.min(i, 3)]) * (agora ? 1 : 1);
+          const hastePx = agora ? 126 : i === 0 ? lerp(200, 90, c) : [48, 45][(i - 1) % 2];
           const topo = {x: base.x, y: base.y - hastePx};
           const pt = spring({frame: frame - q0, fps, config: {damping: 14, stiffness: 260, mass: 0.5}});
           const haste = interpolate(frame - q0, [2, 8], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
@@ -219,7 +221,7 @@ export const Cena19: React.FC<Cena19Props> = ({
                 <div style={{position: 'absolute', left: topo.x - 22 + (agora ? -24 : 0), top: topo.y, transform: `scale(${esc})`, transformOrigin: '0 0', perspective: 800}}>
                   <div style={{position: 'absolute', left: 0, bottom: 0, width: 470, transform: `rotateX(${(1 - abre) * 88}deg)`, transformOrigin: 'bottom left', display: 'flex', gap: 18, padding: '18px 22px', borderRadius: 10, background: agora ? azul : '#fff', boxShadow: '0 2px 4px rgba(14,17,22,0.08), 0 14px 30px rgba(14,17,22,0.12)', color: agora ? '#fff' : INK}}>
                     <div style={{width: 92, height: 92, flexShrink: 0, borderRadius: 6, background: agora ? 'rgba(255,255,255,0.16)' : '#EEF0F3', padding: 12, boxSizing: 'border-box'}}>
-                      <Icone tipo={m.icone} cor={agora ? '#fff' : '#3A3F47'} />
+                      <Icone tipo={m.icone} cor={agora ? '#fff' : '#3A3F47'} letra={Array.from(m.titulo)[0] ?? ''} />
                     </div>
                     <div style={{minWidth: 0}}>
                       <div style={{fontFamily: MONO, fontWeight: 600, fontSize: 20, letterSpacing: 1, color: agora ? '#C9D0FF' : azul}}>{m.ano}</div>

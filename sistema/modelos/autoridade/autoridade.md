@@ -13,6 +13,10 @@ porquê, e só entra onde a fala nova tiver o mesmo porquê.
 
 Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
 
+**A skill do modelo é a entrada:** `.claude/skills/autoridade/SKILL.md` (a personalidade, as peças e como inventar a tela
+que a fala nova pede; método comum em `sistema/JEITO.md`). O vídeo novo nasce com o plano vazio (a pessoa com a legenda)
+e cada peça entra porque a fala nova pediu.
+
 ---
 
 ## 0. Do seu jeito (o aluno preenche, se quiser)
@@ -47,8 +51,12 @@ o porquê delas** (G19, G28, G30). O aprovado ilustrava quase toda frase: não �
   cima (o Instagram no celular, as prévias, a lista de modelos; 11 s a 19 s, 22 s a 23 s); usar quando a fala nova
   citar uma lista, um app ou um material para mostrar, ou a pedido.
 - **Uma cor de destaque tirada do cenário** da gravação (no vídeo aprovado, caramelo `#8F5F33`, da parede bege).
-- **Fecho:** o comando fixo, Comenta “EDIÇÃO”, num botão que acende (27 s a 29 s).
+- **Fecho, quando a fala pede comentário:** o comando dito e a palavra entre aspas num botão que acende (no aprovado, Comenta “EDIÇÃO”, 27 s a 29 s).
 - **Nada de efeito no fundo, nada de tratamento de cor na gravação, nada de preto e branco** (G6).
+- **As telas do aprovado são exemplos, com o porquê** (seção 10). O que é do modelo: a pessoa com a legenda como base,
+  a câmera calma, a tipografia, os dois fundos, o herói que faz o que a frase diz, a dividida com o vídeo embaixo, a cor
+  do cenário. O que é só daquele vídeo: os cartões, as barras, a linha do tempo, o celular, a lista de modelos, os
+  textos e a ordem. Num tema novo, o normal é uma tela nova (seção 9, "Tela nova").
 
 ## 2. Os números do modelo (o `parece.py` confere)
 
@@ -226,12 +234,12 @@ escreva o nome do modelo na tela (a fala "um desses modelos" fica só na legenda
 | Fundo e cor (G6) | **o vídeo normal**, prop `tratamento: false` | `tratamento: true` (o leve do aprovado), com ordem. Desfoque de fundo só com ordem |
 | Telas cheias, dividida, títulos | onde a fala tem o porquê (seção 1), mais o título do gancho e o fecho | Mais, só a pedido do dono |
 | Whoosh do flash | **desligado** (G6) | Com ordem: `FLASH` em `scripts/som.py` (veja o passo 7 da seção 9) |
-| Flash na ênfase | só na virada da fala | `FLASH = null` em `src/Reel.tsx` quando não há virada |
-| Fecho com o botão Comenta | **ligado** | `CTA = null` em `src/Reel.tsx` |
+| Flash na ênfase | só na virada da fala | a linha `FLASH = ...;` no plano; sem virada, sem a linha |
+| Fecho com o botão Comenta | só quando a fala pede comentário | a linha `CTA = ...;` no plano; sem pedido, sem a linha |
 | Música (cama em ré maior) | desligada (G6) | Com ordem: `sh scripts/mixar.sh out/so-video.mp4 public/trilha.wav out/final.mp4` |
 | @ no celular | vazio (a linha do perfil some) | Prop `arroba: "@seu.arroba"`, só o real de quem fala |
 | Prévias | desligadas | Prop `previas: true` e `nomesPrevias: ["modeloA","modeloB"]` |
-| Cor de destaque | a do cenário | Os tons de `C` no topo de `src/Reel.tsx` (destaque, escuro, claro), tirados da gravação |
+| Cor de destaque | a do cenário | Os tons de `C` em `src/tema.ts` (destaque, escuro, claro), tirados da gravação |
 
 Os padrões vêm do `src/Root.tsx`: `{previas: false, nomesPrevias: ['interface-encenada', 'rosto-telas'], arroba: '',
 tratamento: false}`.
@@ -265,31 +273,39 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 4. **Escreva o `plano.md`** na pasta do vídeo, frase a frase: onde cai a ênfase, o trecho ligado ao tema que vira tela cheia
    ou dividida (G28), com o porquê de cada uma (G30; a maior parte é o vídeo com a legenda), o título do gancho, a cor de
    destaque do cenário.
-5. **Monte O PLANO** no topo de `src/Reel.tsx` (na pasta do vídeo). O molde para ao carregar e diz qual lista não bate:
-   - `T`: os cortes, `c(de(i))` = 2 quadros antes da palavra i. As chaves são livres (troque as do aprovado pelas
-     suas, sem guardar chave que sobrou): só o plano lê `T`;
-   - `trechos`: o modo de cada trecho (`video`, `tela`, `celular`, `previas`, `lista`); `video` na maior parte, os outros
-     só onde a fala tem o porquê deles (seção 1);
-   - `CAM`: a deriva e os cortes de ênfase (`true` = corte), no máximo 3, no tamanho de rosto da seção 3;
-   - `MARCAS`: as palavras que fazem cada herói agir, uma lista por herói (as do aprovado são dos heróis dele);
-   - `LISTA`: o painel de lista, `{titulo, itens, vistos, acende}`, ou `null`. `titulo` e `itens` vêm da fala nova;
-     `vistos` tem uma palavra por item (cada visto na sua palavra) e `acende: 'davez'` acende o item da vez. O formato
-     do aprovado, `vistos: [primeira, última]` com `acende` = índice da palavra, espaça os vistos por igual e acende só o
-     último;
-   - `CURTA_JUNTO = true` (seção 4);
-   - `ENTRADAS`: páginas de legenda com entrada própria (`{}` se nenhuma);
-   - `CTA` (`{i: índice de "comenta", comando, palavra, de: o corte do fecho}`, ou `null`) e `FLASH` (o tempo do
-     flash, ou `null`). Sem chamada para ação na fala, não há fecho nem o 3º corte de enquadramento: `CTA = null` e pronto: o resto do molde não procura `T.comenta`;
+5. **Monte o bloco do plano** de `src/Reel.tsx` (na pasta do vídeo), entre a linha `O PLANO` e a linha `fim do plano`.
+   O vídeo novo **nasce com o começo vazio** (`scripts/plano_novo.tsx`, que o `novo-video.py` põe no lugar do plano do
+   aprovado): a pessoa com a deriva e a legenda de páginas automáticas (`paginasAuto()`), nenhuma tela. Dali você só
+   acrescenta. O molde para ao carregar e diz qual lista não bate:
+   - `T`: os cortes, `c(de(i))` = 2 quadros antes da palavra i, com o nome que quiser (só o plano lê `T`);
+   - `trechos`: `[começo, modo]`, com `M.video` (a base, a maior parte), `M.tela`, `M.painel`, `M.celular`, `M.lista`,
+     `M.previas`; os outros modos só onde a fala tem o porquê deles (seção 1), nunca dois seguidos;
+   - `CAM`: a deriva e as ênfases (`true` = ponto ignorado), no máximo 3, no tamanho de rosto da seção 3;
+   - `MARCAS`: as palavras que fazem um herói da casa agir (`cartoes`, `barras`, `linhaTempo`, `player`);
+   - `CURTA_JUNTO = true` (seção 4); `ENTRADAS`: páginas com entrada própria (`{}` se nenhuma);
    - `ROSTO_MEDIDO = null` (obrigatório, seção 3);
-   - `PEDACOS`: as páginas da legenda, com a fala escrita (`/` quebra a linha, `*x*` destaca na dividida, `'#n'` pula n
-     palavras já mostradas por uma tela, título ou o fecho);
-   - `TELAS` e `TITULOS`: o texto da fala a partir de `primeira`. Lista vazia desliga;
-   - `C`: a cor de destaque tirada do cenário.
-   Os heróis do molde (`Cartoes`, `Barras`, `LinhaTempo`, `Player`, `Celular`) desenham as frases do aprovado. Herói
-   que não ilustra a sua frase sai do plano, e você escreve um novo (veja "Como escrever um herói", abaixo).
+   - `PEDACOS`: as páginas da legenda. O começo vazio usa `paginasAuto()`; troque por páginas escritas à mão pelo
+     sentido (`/` quebra a linha, `*x*` destaca na dividida, `'#n'` pula n palavras já mostradas por uma tela, um
+     título ou o fecho). Dá para misturar: `['#13', ...paginasAuto(13, 40), 'página à mão', ...]`.
+   - **As peças da casa**, cada uma uma linha `PECA = ...;` só quando a fala tem o porquê dela (o `tools/clone.py` lê
+     essas linhas; peça desligada = a linha não existe): `TITULOS` (o gancho e a frase de extremo destaque; linhas com
+     `normal(72, ...)`, `ancora(116, ...)`, `serifa(72, ...)` ou `cursiva(72, ...)`), `TELAS` (tela cheia: a tipografia
+     a partir de `primeira` e `heroi: 'Nome'`), `PAINEIS` (dividida com uma tela nova em cima), `LISTA` (`{titulo,
+     itens, vistos, acende: DAVEZ}`, tudo da fala nova), `CELULAR` (`{marcas: [Instagram, a palavra que traz os
+     outros]}`), `CTA` (`{i: índice de "comenta", comando, palavra, de: o corte do fecho}`) e `FLASH` (o tempo da
+     virada). Sem chamada para ação na fala, sem `CTA`.
+   - `C` (a cor de destaque tirada do cenário) mora em `src/tema.ts`.
+   Os heróis da casa (`Cartoes`, `Barras`, `LinhaTempo`, `Player`) e o `CELULAR` desenham frases do aprovado: só voltam
+   com o mesmo porquê. O normal num tema novo é uma **tela nova** (abaixo).
 6. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo; `--previas` se for usar prévias) até zerar.
-   Ele confere, quadro a quadro, toda palavra escrita enquanto é dita, página de 1,5 s e palavra de 0,4 s, nada repetido,
-   legenda em no máximo 2 posições, zona segura e linhas, e diz o que mexer.
+   Ele confere, quadro a quadro, toda palavra escrita enquanto é dita, página de 1,5 s e palavra de 0,4 s, nada repetido
+   (o texto dito das telas novas entra na conta), legenda em no máximo 2 posições, zona segura e linhas, **a base** (o
+   vídeo com a legenda em 50% do tempo ou mais, nunca duas telas seguidas; avisa tela cheia fora de 1 a 2,5 s) e diz o que
+   mexer.
+   **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (da raiz do estúdio) até `SEM CLONE`, com
+   o `plano.md` dizendo, para cada peça ligada e cada tela nova, a palavra dita entre aspas que pediu ela; depois
+   `tools/decupar.py oficina/<v> --conferir`, os quadros e a folha lado a lado com `referencia/folha.jpg` (mesmo modelo
+   sim, mesmo vídeo não; `JEITO.md` §5).
 7. **Som (só com ordem de efeito ou música, G6; sem ordem, pule):** o whoosh cai no mesmo tempo do `FLASH` do `src/Reel.tsx`. Em `FLASH` de `scripts/som.py`, um inteiro é o
    índice da palavra (corte 2 quadros antes dela, como `c(de(i))`) e um número com casa decimal são os segundos. Se o
    corte da ênfase não é `c(de(i))` (por exemplo `de(20) + 0.42`), passe os segundos:
@@ -305,17 +321,23 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
     Reprovou, corrija o que ele aponta. Passou, olhe a folha lado a lado que ele grava: compare tipografia,
     enquadramento e acabamento, não a sequência de telas (G30).
 
-**Como escrever um herói** (o objeto da tela cheia que faz o que a frase diz):
-- O formato é `Heroi`: um componente que recebe `{t, de, fim, fg, ac}` (o tempo atual, o começo e o fim da tela, a cor
-  da frente e a de acento, já certas para o fundo escuro ou de cor). Ele desenha em coordenadas do quadro 1080x1920,
-  abaixo do texto da tela (de y 1000 a 1600) e dentro de x 100 a 980.
-- As palavras que fazem o herói agir ficam em `MARCAS`, numa lista com o nome dele: `meuHeroi: [i1, i2]`. O molde
-  confere que cada índice existe. Dentro do herói, `const [a, b] = MARCAS.meuHeroi.map((i) => de(i))`.
-- Movimento: `mola(t, quando)` dá uma mola de 0 a 1 que começa em `quando` (comece 0,04 s antes da palavra);
-  `tw(t, a, b, v0, v1)` é a transição suave; `entra(k)` é a entrada padrão (aparece e cresce de 80% a 100%).
+**Tela nova** (o herói que a fala pede e a casa não tem; o normal num tema novo):
+- Mora em `src/telas/<Nome>.tsx` **da pasta do vídeo** (nunca no molde), registrada em `src/telas/index.ts`
+  (`export const TELAS_NOVAS = {Nome};`). O formato é `Heroi` (`src/ui.tsx`): recebe `{t, de, fim, fg, ac, modo, em,
+  textos, dados}` (o tempo atual, o começo e o fim da tela, a cor da frente e a de acento já certas para o fundo, o
+  modo `cheia` ou `dividida`, e do plano os instantes, os textos ditos e o resto).
+- Desenha dentro do `<Palco modo={modo}>`, com o kit de `src/ui.tsx` (`Em`, `Entra`, `Cartao`, `Painel`, `Texto`,
+  `Pilula`, `Visto`, `Barra`, `Numero`, `Traco`, `Onda`) e as cores e o movimento de `src/tema.ts` (`C`, `mola`, `tw`,
+  `entra`, `suave`). Na cheia, o palco é o espaço do herói (x 100 a 980, y 1000 a 1600, sem texto); na dividida, o
+  painel de cima (texto só de y 250 a 900 e até x 940).
+- Os instantes vêm do plano: `em: {chave: de(i)}`; o texto, só o dito: `textos: {chave: [i, 'palavras ditas']}` (o molde
+  confere com a fala; o checador conta esse texto na cobertura e na repetição: a legenda pula o que a tela já mostra).
 - Uma ação por palavra marcada, nunca mais que 3 por herói. Use o quadro dele (`public/quadro.jpg`) quando a frase fala
   dele ou do vídeo.
-- Ligue na tela: `{de: T.minhaTela, fundo: 'E', topo: 500, primeira: i, linhas: [...], heroi: MeuHeroi}` em `TELAS`.
+- Ligue: na cheia, `TELAS = [{de: T.minhaTela, fundo: 'E', topo: 530, primeira: i, linhas: [...], heroi: 'Nome', em:
+  {...}}];` e o trecho `[T.minhaTela, M.tela]`; na dividida, `PAINEIS = [{de: T.meuPainel, heroi: 'Nome', em: {...}}];`
+  e o trecho `[T.meuPainel, M.painel]`.
+- Os heróis da casa leem `MARCAS` (`const [a, b] = MARCAS.player.map((i) => de(i))`); a tela nova lê `em`.
 
 Exemplo, o `Player` do molde ("aprender a como usar isso nos seus vídeos": o vídeo toca em "usar" e ganha a legenda em
 "vídeos"), com `MARCAS.player = [78, 82]`:
@@ -344,7 +366,13 @@ com `--previas` e o render com `--props='{"previas":true,"nomesPrevias":["modelo
 **Série de um mesmo cliente:** o vídeo novo parte do código do vídeo que o cliente aprovou. Variação nova só acrescenta;
 a base segue a aprovada (G35).
 
-## 10. O plano do vídeo aprovado (para comparar)
+## 10. O plano do vídeo aprovado (exemplos com o porquê, não roteiro)
+
+Cada tela abaixo existiu porque a fala do aprovado tinha o porquê dela: os cartões porque a fala dizia "a diferença
+entre vários modelos" (vários vídeos lado a lado), as barras porque dizia "criei e melhorei" (algo que cresce), a
+lâmina porque dizia "editar", o celular porque dizia "se você estiver no Instagram agora", a lista porque dizia
+"outros modelos de edição", o player porque dizia "usar isso nos seus vídeos", o fecho porque dizia "comenta edição".
+Num vídeo novo, uma delas só volta se a fala nova disser a mesma coisa; o resto é tela nova ou a pessoa com a legenda.
 
 Feito antes das regras de 2026-11-05: três telas cheias seguidas na mesma frase, o celular, o painel e a tela 4, quase
 uma tela por frase, whoosh e o tratamento leve na gravação. Serve para ver a tipografia e o porquê de cada tela, não

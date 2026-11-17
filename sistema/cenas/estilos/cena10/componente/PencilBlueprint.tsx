@@ -8,8 +8,9 @@ import {loadFont} from '@remotion/google-fonts/BarlowSemiCondensed';
 const {fontFamily} = loadFont('normal', {weights: ['500', '600'], subsets: ['latin', 'latin-ext']});
 
 export type PencilBlueprintProps = {
-  rotulo?: [string, string];
-  cotas?: {altura: number; base: number; angulo: number}; // números do desenho (ilustração, não medida real)
+  rotulo: string[]; // 1 ou 2 linhas em caixa alta, palavras ditas (3 a 5 no total)
+  cotas?: {altura: number; base: number; angulo: number}; // só números ditos; sem cotas, o sistema de cotas não entra
+  tracos?: Traco[]; // o objeto da fala, traço a traço (padrão: a luminária de exemplo; as cotas estão medidas nela)
   inicioInundacao?: number;
   largura?: number;
   altura?: number;
@@ -31,7 +32,7 @@ const rimPt = (k: number): P => {
 };
 
 // traço de lápis: levemente curvado, tremido, pontas que passam do ponto; "amp" 0 = reto
-const linha = (p: P, q: P, sd: string, amp: number, sobra: number): string => {
+export const linha = (p: P, q: P, sd: string, amp: number, sobra: number): string => {
   const dx = q[0] - p[0];
   const dy = q[1] - p[1];
   const L = Math.hypot(dx, dy) || 1;
@@ -51,7 +52,7 @@ const linha = (p: P, q: P, sd: string, amp: number, sobra: number): string => {
   }
   return 'M' + pts.join(' L');
 };
-const elipse = (cx: number, cy: number, rx: number, ry: number, rot: number, sd: string, amp: number): string => {
+export const elipse = (cx: number, cy: number, rx: number, ry: number, rot: number, sd: string, amp: number): string => {
   const a = (rot * Math.PI) / 180;
   const pts: string[] = [];
   const n = 40;
@@ -65,9 +66,10 @@ const elipse = (cx: number, cy: number, rx: number, ry: number, rot: number, sd:
   return 'M' + pts.join(' L');
 };
 
-type Traco = {d: (amp: number) => string; t0: number; t1: number; leve?: boolean; centro?: boolean; dobra?: boolean};
+// leve: construção; centro: vira traço-ponto; guia: o círculo que vira o arco de ângulo; dobra: traço dobrado
+export type Traco = {d: (amp: number) => string; t0: number; t1: number; leve?: boolean; centro?: boolean; guia?: boolean; dobra?: boolean};
 
-const TRACOS: Traco[] = [
+export const LUMINARIA: Traco[] = [
   {d: (a) => linha([110, 1192], [970, 1192], 'ch', a, 10), t0: -6, t1: 8, dobra: true},
   {d: (a) => linha([405, 330], [405, 1215], 'ei', a, 0), t0: -4, t1: 6, leve: true, centro: true},
   {d: (a) => linha(A, B, 'b1', a, 14), t0: 4, t1: 13, dobra: true},
@@ -81,7 +83,7 @@ const TRACOS: Traco[] = [
   {d: (a) => elipse(A[0], A[1], 16, 16, 0, 'ja', a), t0: 14, t1: 18},
   {d: (a) => elipse(B[0], B[1], 16, 16, 0, 'jb', a), t0: 16, t1: 20},
   {d: (a) => elipse(B[0], B[1], 36, 34, 10, 'jb2', a * 2), t0: 18, t1: 22, leve: true},
-  {d: (a) => elipse(B[0], B[1], 78, 78, 0, 'gc', a), t0: 19, t1: 24, leve: true, centro: true},
+  {d: (a) => elipse(B[0], B[1], 78, 78, 0, 'gc', a), t0: 19, t1: 24, leve: true, centro: true, guia: true},
   {d: (a) => linha(B, C, 'u1', a, 14), t0: 22, t1: 30, dobra: true},
   {d: (a) => linha([B[0] - 12, B[1] - 14], [C[0] + 4, C[1] - 16], 'u2', a, 10), t0: 24, t1: 31, dobra: true},
   {d: (a) => elipse(C[0], C[1], 16, 16, 0, 'jc', a), t0: 30, t1: 33},
@@ -93,8 +95,9 @@ const TRACOS: Traco[] = [
 ];
 
 export const PencilBlueprint: React.FC<PencilBlueprintProps> = ({
-  rotulo = ['DO RABISCO', 'AO SISTEMA'],
-  cotas = {altura: 480, base: 320, angulo: 100},
+  rotulo,
+  cotas,
+  tracos = LUMINARIA,
   inicioInundacao = 51,
   largura,
   altura,
@@ -156,7 +159,7 @@ export const PencilBlueprint: React.FC<PencilBlueprintProps> = ({
           <rect x={-600} y={-600} width={2280} height={2550} fill="url(#gp10)" />
           {/* rascunho a grafite */}
           <g fill="none" stroke={cores.grafite} strokeLinecap="round" strokeLinejoin="round" filter="url(#dente10)">
-            {TRACOS.map((t, i) => {
+            {tracos.map((t, i) => {
               const p = prog(t);
               if (p <= 0) return null;
               return (
@@ -175,10 +178,10 @@ export const PencilBlueprint: React.FC<PencilBlueprintProps> = ({
               <rect x={-600} y={-600} width={2280} height={2550} fill="url(#gb10)" />
               <path d={borda} fill="none" stroke={cores.mare} strokeWidth={26} opacity={0.9} />
               <g fill="none" stroke={cores.branco} strokeLinecap="round" strokeLinejoin="round">
-                {TRACOS.map((t, i) => {
+                {tracos.map((t, i) => {
                   if (t.leve && !t.centro) return <path key={i} d={t.d(reto * 0.6)} strokeWidth={1.4} opacity={0.75} />;
                   if (t.centro) {
-                    if (i === 13) return f < 72 ? <path key={i} d={t.d(0)} strokeWidth={1.4} opacity={interpolate(f, [62, 72], [0.7, 0], cl)} strokeDasharray="22 7 4 7" /> : null;
+                    if (t.guia) return f < 72 ? <path key={i} d={t.d(0)} strokeWidth={1.4} opacity={interpolate(f, [62, 72], [0.7, 0], cl)} strokeDasharray="22 7 4 7" /> : null;
                     return <path key={i} d={t.d(0)} strokeWidth={1.6} strokeDasharray="26 8 5 8" opacity={0.85} />;
                   }
                   return <path key={i} d={t.d(reto)} strokeWidth={2.4} />;
@@ -187,7 +190,7 @@ export const PencilBlueprint: React.FC<PencilBlueprintProps> = ({
             </g>
           )}
           {/* sistema de cotas */}
-          {f >= 66 && (
+          {f >= 66 && cotas && (
             <g stroke={cores.branco} fill="none" strokeWidth={1.6}>
               {/* marcas de centro */}
               {[A, B, C].map(([x, y], i) => {
@@ -214,7 +217,7 @@ export const PencilBlueprint: React.FC<PencilBlueprintProps> = ({
           )}
         </svg>
         {/* números que contam até o lugar */}
-        {f >= 80 && (
+        {f >= 80 && cotas && (
           <div style={{fontFamily, fontWeight: 500, fontSize: 44, color: cores.branco, fontVariantNumeric: 'tabular-nums'}}>
             <div style={{position: 'absolute', left: xV - 92, top: midV - 26, transform: `scale(${sp(80, 10, 200)})`}}>{conta(cotas.altura, 80)}</div>
             <div style={{position: 'absolute', left: midH - 40, top: yH + 6, transform: `scale(${sp(83, 10, 200)})`}}>{conta(cotas.base, 83)}</div>
@@ -223,7 +226,7 @@ export const PencilBlueprint: React.FC<PencilBlueprintProps> = ({
         )}
         {/* rótulo: a régua desenha primeiro, o texto sobe */}
         <div style={{position: 'absolute', left: 126, top: 247, width: 526 * regra, height: 2, background: cores.branco, opacity: 0.85}} />
-        {rotulo.map((l, i) => (
+        {rotulo.slice(0, 2).map((l, i) => (
           <div key={i} style={{position: 'absolute', left: 126, top: 76 + i * 84, height: 86, overflow: 'hidden'}}>
             <div style={{fontFamily, fontWeight: 600, fontSize: 84, letterSpacing: '0.07em', lineHeight: 1, color: cores.branco, transform: `translateY(${(1 - rot(i)) * 105}%)`}}>{l}</div>
           </div>

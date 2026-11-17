@@ -12,9 +12,13 @@ const Demo: React.FC = () => (
       selo: 'Pão quentinho!',
       menu: ['Início', 'Cardápio', 'Quem somos', 'Contato'],
       texto: 'Somos uma pequena padaria de família no coração do bairro. Toda manhã fazemos pães, bolos e doces fresquinhos, do jeito que fazemos desde 1987.',
+      links: ['Clique aqui', 'para ver o nosso', 'cardápio', '.'],
       horario: 'Horário: seg. a sáb. 7h às 18h',
       semana: ['Esta semana:', 'Rosca de canela (seg.)', 'Pão de centeio (qua.)'],
       caixa: 'Encomende pelo telefone!',
+      caixaSub: 'de seg. a sáb.',
+      contadorRotulo: 'Você é o visitante número',
+      livro: 'Assine nosso livro de visitas!',
       contador: '004127',
       rodape: 'Padaria Roseira. Todos os direitos reservados. Atualizado em 2009.',
     }}

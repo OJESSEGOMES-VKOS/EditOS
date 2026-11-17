@@ -1,3 +1,3 @@
 # cena24 Before and after slider: componente
 
-**Props:** `manchete [2]`, `endereco` (inventado), `antes {...}` (site antigo), `depois {...}` (site novo, com `produtos[]`), `rotuloAntes`, `rotuloDepois`, `tomate`, `width`, `height`. Num vídeo de verdade, o antes e depois real do cliente.
+**Props:** `manchete[]` (1 ou 2 linhas), `endereco`, `antesImagem` e `depoisImagem` (o caminho de verdade: as duas versões reais, por `staticFile()`; com elas as páginas desenhadas não entram), `antes {...}` e `depois {...}` (as páginas desenhadas da demo, opcionais; os textos de link (`links`: link, texto, link, fim), caixa, contador e livro de visitas também vêm daqui), `janela` (false: moldura simples para foto), `parada` (onde o divisor assenta, 0 a 1, padrão 0,5), `rotuloAntes`, `rotuloDepois`, `tomate`, `width`, `height`. Os textos da demo estão em `textos-demo.json`: nenhum deles vai para um vídeo novo. Como compor uma cena nova: `../cena24.md` (A personalidade, Como variar).

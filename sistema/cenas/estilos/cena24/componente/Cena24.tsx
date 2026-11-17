@@ -1,7 +1,7 @@
 // cena24 — Before and after slider (Antes e depois, cortina). Duas páginas inteiras em texto e formas,
 // uma em cima da outra numa janela de navegador genérica; o divisor varre da direita para a esquerda e volta ao meio.
 import React from 'react';
-import {AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Easing, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
 import {loadFont as loadInterTight} from '@remotion/google-fonts/InterTight';
 import {loadFont as loadManrope} from '@remotion/google-fonts/Manrope';
 
@@ -10,10 +10,16 @@ const {fontFamily: MAN} = loadManrope('normal', {weights: ['500', '600', '700', 
 
 export type Produto = {nome: string; detalhe: string; preco: string};
 export type Cena24Props = {
-  manchete: [string, string]; // cada linha termina com o ponto em tomate
+  manchete: string[]; // 1 ou 2 linhas; cada linha termina com o ponto em tomate
   endereco: string; // ex.: padariaroseira.com.br (inventado)
-  antes: {saudacao: string; nome: string; selo: string; menu: string[]; texto: string; horario: string; semana: string[]; caixa: string; contador: string; rodape: string};
-  depois: {faixa: string; marca: string; menu: string[]; titulo: [string, string, string]; sub: string; botao: string; selo: string; produtos: Produto[]};
+  // o caminho de verdade: as duas versões reais (print, foto), via staticFile() ou URL. Com elas, as páginas desenhadas não entram.
+  antesImagem?: string;
+  depoisImagem?: string;
+  // a página desenhada (a demo): só quando não há imagem
+  antes?: {saudacao: string; nome: string; selo: string; menu: string[]; texto: string; links?: [string, string, string, string?]; horario: string; semana: string[]; caixa: string; caixaSub?: string; contadorRotulo?: string; contador: string; livro?: string; rodape: string};
+  depois?: {faixa: string; marca: string; menu: string[]; titulo: [string, string, string]; sub: string; botao: string; selo: string; produtos: Produto[]};
+  janela?: boolean; // false: moldura simples arredondada (foto de reforma, rosto, produto) em vez do navegador
+  parada?: number; // onde o divisor assenta no fim (0 a 1; padrão 0,5)
   rotuloAntes?: string;
   rotuloDepois?: string;
   tomate?: string;
@@ -61,7 +67,7 @@ const SiteAntigo: React.FC<{d: Cena24Props['antes']}> = ({d}) => (
         ))}
       </div>
       <div style={{position: 'absolute', left: 16, top: 270, width: 400, fontSize: 21, lineHeight: 1.25, textAlign: 'justify'}}>
-        {d.texto} <span style={{color: '#0000EE', textDecoration: 'underline'}}>Clique aqui</span> para ver o nosso <span style={{color: '#0000EE', textDecoration: 'underline'}}>cardápio</span>.
+        {d.texto}{d.links ? <> <span style={{color: '#0000EE', textDecoration: 'underline'}}>{d.links[0]}</span> {d.links[1]} <span style={{color: '#0000EE', textDecoration: 'underline'}}>{d.links[2]}</span>{d.links[3] ?? ''}</> : null}
         <div style={{fontWeight: 700, fontSize: 25, marginTop: 22}}>{d.horario}</div>
         <div style={{fontWeight: 700, fontSize: 21, marginTop: 18}}>{d.semana[0]}</div>
         {d.semana.slice(1).map((x) => (
@@ -70,16 +76,16 @@ const SiteAntigo: React.FC<{d: Cena24Props['antes']}> = ({d}) => (
       </div>
       <div style={{position: 'absolute', left: 470, top: 280, width: 330, border: '2px solid #B22', background: '#FFF6F0', padding: 14, textAlign: 'center'}}>
         <div style={{fontWeight: 700, fontSize: 28}}>{d.caixa}</div>
-        <div style={{fontStyle: 'italic', fontSize: 18, marginTop: 6}}>de seg. a sáb.</div>
+        {d.caixaSub ? <div style={{fontStyle: 'italic', fontSize: 18, marginTop: 6}}>{d.caixaSub}</div> : null}
       </div>
       <div style={{position: 'absolute', left: 470, top: 420, width: 330, textAlign: 'center', fontSize: 19}}>
-        Você é o visitante número
+        {d.contadorRotulo}
         <div style={{display: 'flex', justifyContent: 'center', gap: 3, marginTop: 6}}>
           {d.contador.split('').map((c, i) => (
             <span key={i} style={{background: '#111', color: '#7CFF6B', fontFamily: 'Courier New, monospace', fontSize: 22, padding: '0 5px'}}>{c}</span>
           ))}
         </div>
-        <div style={{color: '#0000EE', textDecoration: 'underline', marginTop: 14}}>Assine nosso livro de visitas!</div>
+        {d.livro ? <div style={{color: '#0000EE', textDecoration: 'underline', marginTop: 14}}>{d.livro}</div> : null}
       </div>
       <div style={{position: 'absolute', left: 0, right: 0, bottom: 20, textAlign: 'center', fontSize: 15, color: '#444'}}>{d.rodape}</div>
     </div>
@@ -128,17 +134,18 @@ const SiteNovo: React.FC<{d: Cena24Props['depois']; tomate: string; frame: numbe
 );
 
 export const Cena24: React.FC<Cena24Props> = (props) => {
-  const {manchete, endereco, antes, depois, rotuloAntes = 'ANTES', rotuloDepois = 'DEPOIS', tomate = '#E4572E', width = W, height = H} = props;
+  const {manchete, endereco, antes, depois, antesImagem, depoisImagem, janela = true, parada = 0.5, rotuloAntes = 'ANTES', rotuloDepois = 'DEPOIS', tomate = '#E4572E', width = W, height = H} = props;
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const s = Math.min(width / W, height / H);
+  const ph = janela ? PH : JH;
 
   // posição do divisor (fração da largura da página)
   const pos = (f: number) => {
     const ida = interpolate(f, [0, 30], [0.93, 0.055], {...clamp, easing: Easing.bezier(0.55, 0, 0.35, 1)});
     const assenta = interpolate(f, [30, 38], [0, 0.03], {...clamp, easing: Easing.out(Easing.quad)});
     const volta = spring({frame: f - 41, fps, config: {damping: 11, stiffness: 70, mass: 1}});
-    return ida + assenta + (0.5 - 0.085) * volta;
+    return ida + assenta + (parada - 0.085) * volta;
   };
   const p = pos(frame);
   const vel = Math.abs(pos(frame + 0.5) - pos(frame - 0.5)) * JW; // px por quadro
@@ -159,29 +166,32 @@ export const Cena24: React.FC<Cena24Props> = (props) => {
       <div style={{position: 'absolute', left: (width - W * s) / 2, top: (height - H * s) / 2, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0'}}>
         <div style={{position: 'absolute', inset: 0, transform: `scale(${zoom})`, transformOrigin: '50% 55%'}}>
           <div style={{position: 'absolute', top: 44, width: W, textAlign: 'center', fontFamily: IT, fontWeight: 700, fontSize: 88, lineHeight: 0.98, letterSpacing: -3.2, color: '#121418'}}>
-            {ponto(manchete[0])}
-            <br />
-            {ponto(manchete[1])}
+            {manchete.map((l, i) => (
+              <React.Fragment key={i}>
+                {i > 0 ? <br /> : null}
+                {ponto(l)}
+              </React.Fragment>
+            ))}
           </div>
           {/* janela */}
           <div style={{position: 'absolute', left: (W - JW) / 2, top: 268, width: JW, height: JH, borderRadius: 18, overflow: 'hidden', background: '#fff', boxShadow: '0 2px 4px rgba(20,30,50,0.06), 0 12px 28px rgba(20,30,50,0.10), 0 40px 80px rgba(20,30,50,0.14)'}}>
-            <div style={{height: 56, background: '#F1F2F4', display: 'flex', alignItems: 'center', padding: '0 20px', gap: 9, borderBottom: '1px solid #E2E4E8'}}>
+            {janela ? <div style={{height: 56, background: '#F1F2F4', display: 'flex', alignItems: 'center', padding: '0 20px', gap: 9, borderBottom: '1px solid #E2E4E8'}}>
               {[0, 1, 2].map((i) => <span key={i} style={{width: 13, height: 13, borderRadius: 7, background: '#C9CCD2'}} />)}
               <span style={{marginLeft: 18, color: '#A0A4AB', fontSize: 22}}>‹ ›</span>
               <div style={{margin: '0 auto', background: '#fff', borderRadius: 999, padding: '6px 70px', fontFamily: MAN, fontSize: 18, color: '#555', fontWeight: 500}}>{endereco}</div>
               <span style={{color: '#A0A4AB', fontSize: 22}}>···</span>
-            </div>
-            <div style={{position: 'relative', width: JW, height: PH}}>
-              <SiteAntigo d={antes} />
+            </div> : null}
+            <div style={{position: 'relative', width: JW, height: ph}}>
+              {antesImagem ? <Img src={antesImagem} style={{position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover'}} /> : antes ? <SiteAntigo d={antes} /> : null}
               <div style={{position: 'absolute', inset: 0, clipPath: `inset(0 0 0 ${x}px)`}}>
-                <SiteNovo d={depois} tomate={tomate} frame={frame} fps={fps} />
+                {depoisImagem ? <Img src={depoisImagem} style={{position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover'}} /> : depois ? <SiteNovo d={depois} tomate={tomate} frame={frame} fps={fps} /> : null}
               </div>
               {/* rótulos */}
               <div style={{position: 'absolute', left: 18, top: 16, background: '#1A1A1A', color: '#fff', fontFamily: MAN, fontWeight: 800, fontSize: 17, letterSpacing: 2.5, padding: '7px 16px', borderRadius: 999}}>{rotuloAntes}</div>
               <div style={{position: 'absolute', right: 18, top: 16, background: '#fff', color: '#1A1A1A', fontFamily: MAN, fontWeight: 800, fontSize: 17, letterSpacing: 2.5, padding: '7px 16px', borderRadius: 999, boxShadow: '0 1px 4px rgba(0,0,0,0.15)'}}>{rotuloDepois}</div>
               {/* divisor + alça */}
-              <div style={{position: 'absolute', left: x - 3, top: 0, width: 6, height: PH, background: '#fff', boxShadow: '0 0 10px rgba(0,0,0,0.18)', filter: `blur(${borrao * 0.4}px)`}} />
-              <div style={{position: 'absolute', left: x - 32, top: PH / 2 - 32, width: 64, height: 64, borderRadius: 32, background: '#fff', boxShadow: '0 4px 14px rgba(0,0,0,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transform: `scaleX(${squash}) scaleY(${2 - squash})`, filter: `blur(${borrao * 0.5}px)`}}>
+              <div style={{position: 'absolute', left: x - 3, top: 0, width: 6, height: ph, background: '#fff', boxShadow: '0 0 10px rgba(0,0,0,0.18)', filter: `blur(${borrao * 0.4}px)`}} />
+              <div style={{position: 'absolute', left: x - 32, top: ph / 2 - 32, width: 64, height: 64, borderRadius: 32, background: '#fff', boxShadow: '0 4px 14px rgba(0,0,0,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transform: `scaleX(${squash}) scaleY(${2 - squash})`, filter: `blur(${borrao * 0.5}px)`}}>
                 <svg width={34} height={20} viewBox="0 0 34 20"><path d="M10 3 L3 10 L10 17 M24 3 L31 10 L24 17" stroke="#1A1A1A" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </div>
             </div>

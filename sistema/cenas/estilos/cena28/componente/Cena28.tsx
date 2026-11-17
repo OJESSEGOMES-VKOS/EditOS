@@ -13,8 +13,9 @@ export type Cena28Props = {
   nomeA: string;
   nomeB: string;
   subtitulo: string;
-  linhas: Linha[]; // até 4; a última é o desfecho
-  formato?: (v: number) => string;
+  linhas: Linha[]; // 1 a 4; a última é o desfecho
+  inicios?: number[]; // quadro em que cada linha começa (padrão: 8 + i * 13); ponha na palavra que cita a linha
+  formato?: (v: number) => string; // padrão: número com milhar (ex.: R$ vem daqui, como foi dito)
   azul?: string;
   laranja?: string;
   width?: number;
@@ -24,7 +25,7 @@ export type Cena28Props = {
 const W = 1080;
 const H = 1350;
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
-const fmtPadrao = (v: number) => `R$ ${Math.round(v).toLocaleString('pt-BR')}`;
+const fmtPadrao = (v: number) => Math.round(v).toLocaleString('pt-BR');
 
 const Check: React.FC<{cor: string; tam: number; k: number; giro?: number}> = ({cor, tam, k, giro = 0}) => (
   <div style={{width: tam, height: tam, borderRadius: tam * 0.24, background: cor, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${k}) rotate(${giro}deg)`, flexShrink: 0}}>
@@ -33,7 +34,7 @@ const Check: React.FC<{cor: string; tam: number; k: number; giro?: number}> = ({
 );
 
 export const Cena28: React.FC<Cena28Props> = ({
-  nomeA, nomeB, subtitulo, linhas, formato = fmtPadrao, azul = '#3D7BFF', laranja = '#FF7A30', width = W, height = H,
+  nomeA, nomeB, subtitulo, linhas, inicios, formato = fmtPadrao, azul = '#3D7BFF', laranja = '#FF7A30', width = W, height = H,
 }) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
@@ -78,7 +79,7 @@ export const Cena28: React.FC<Cena28Props> = ({
 
         {linhas.map((l, i) => {
           const final = i === n - 1;
-          const t0 = 8 + i * 13;
+          const t0 = inicios?.[i] ?? 8 + i * 13;
           const dur = final ? 26 : 14;
           const y = TOP + i * PASSO + (final ? 30 : 0);
           const rot = interpolate(frame, [t0, t0 + 6], [1, 0], {...clamp, easing: Easing.out(Easing.cubic)});
@@ -101,6 +102,8 @@ export const Cena28: React.FC<Cena28Props> = ({
           const placa = spring({frame: frame - fim - 2, fps, config: {damping: 10, stiffness: 170}});
           const brilho = final ? interpolate(frame, [fim - 2, fim + 14], [-0.3, 1.3], clamp) : -1;
           const flash = final ? interpolate(frame, [fim, fim + 4, fim + 20], [0, 1, 0], clamp) : 0;
+          const corV = l.vence === 'a' ? azul : laranja;
+          const rgbV = l.vence === 'a' ? '61,123,255' : '255,122,48';
           if (frame < t0) {
             return (
               <div key={i} style={{position: 'absolute', left: CX - MEIA, top: y + 118, width: MEIA * 2, height: espB, borderRadius: 4, background: 'rgba(255,255,255,0.05)'}} />
@@ -109,10 +112,10 @@ export const Cena28: React.FC<Cena28Props> = ({
           return (
             <React.Fragment key={i}>
               {final && flash > 0 && (
-                <div style={{position: 'absolute', left: l.vence === 'b' ? CX : 0, top: 0, width: CX, height: H, background: `radial-gradient(ellipse 80% 40% at ${l.vence === 'b' ? '70%' : '30%'} 80%, rgba(255,122,48,${0.18 * flash}) 0%, rgba(0,0,0,0) 70%)`}} />
+                <div style={{position: 'absolute', left: l.vence === 'b' ? CX : 0, top: 0, width: CX, height: H, background: `radial-gradient(ellipse 80% 40% at ${l.vence === 'b' ? '70%' : '30%'} 80%, rgba(${rgbV},${0.18 * flash}) 0%, rgba(0,0,0,0) 70%)`}} />
               )}
               {final && (
-                <div style={{position: 'absolute', left: 104, top: y - 34, width: W - 208, height: 220, borderRadius: 14, border: `2px solid ${laranja}`, background: 'rgba(255,122,48,0.06)', transform: `scale(${0.92 + 0.08 * placa})`, opacity: placa > 0.02 ? 1 : 0}} />
+                <div style={{position: 'absolute', left: 104, top: y - 34, width: W - 208, height: 220, borderRadius: 14, border: `2px solid ${corV}`, background: `rgba(${rgbV},0.06)`, transform: `scale(${0.92 + 0.08 * placa})`, opacity: placa > 0.02 ? 1 : 0}} />
               )}
               <div style={{position: 'absolute', top: y - 12, width: W, height: 40, overflow: 'hidden', textAlign: 'center'}}>
                 <div style={{fontFamily: BARLOW, fontWeight: 600, fontSize: 25, letterSpacing: 4, color: '#8F96A5', transform: `translateY(${rot * 40}px)`}}>{l.rotulo}</div>

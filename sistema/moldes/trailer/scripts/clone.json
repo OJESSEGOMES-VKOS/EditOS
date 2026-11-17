@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: as peças da casa que o plano liga (nome da constante no bloco O PLANO de src/Reel.tsx) e o texto que cada uma escreve fixo no código. No trailer nenhuma peça escreve texto fixo: todo texto na tela é a fala (destaques, legenda, abertura e fecho saem das palavras ditas).",
+ "telas": ["ABERTURA", "BLOCOS", "FECHO_DEF", "PREVIAS", "RESPIROS"],
+ "fixos": {}
+}

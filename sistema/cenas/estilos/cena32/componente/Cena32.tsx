@@ -8,10 +8,13 @@ const {fontFamily: PLEX} = loadFont('normal', {weights: ['500', '600', '700'], s
 
 export type Item = {nome: string; valor: string};
 export type Cena32Props = {
-  loja?: string;
-  data?: string;
-  itens?: Item[]; // 4 (no máximo 5)
-  total?: string;
+  loja: string; // o nome que a fala dá (quem cobrou, o projeto); nunca uma loja real que não foi dita
+  data?: string; // linha pequena cinza; vazia = sem data
+  itens: Item[]; // 1 a 5, os que a fala cita, na ordem dita
+  total: string;
+  rotuloTotal?: string;
+  tempos?: number[]; // quadro em que cada item sai da fenda (na palavra dita); padrão: um a cada 10 quadros a partir do 30
+  tempoTotal?: number; // quadro em que o total sai
   width?: number;
   height?: number;
   duracao?: number;
@@ -46,15 +49,13 @@ const Papel: React.FC<{L: number; conteudo: React.ReactNode; flex: number}> = ({
 };
 
 export const Cena32: React.FC<Cena32Props> = ({
-  loja = 'ESTÚDIO ALVO',
-  data = '03 NOV 2026   14:22',
-  itens = [
-    {nome: 'Câmera', valor: 'R$ 2.400'},
-    {nome: 'Lente', valor: 'R$ 1.200'},
-    {nome: 'Luzes', valor: 'R$ 680'},
-    {nome: 'Microfone', valor: 'R$ 250'},
-  ],
-  total = 'R$ 4.530',
+  loja,
+  data = '',
+  itens,
+  total,
+  rotuloTotal = 'TOTAL',
+  tempos,
+  tempoTotal,
   width = 1080,
   height = 1350,
   duracao = 150,
@@ -63,7 +64,7 @@ export const Cena32: React.FC<Cena32Props> = ({
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse 80% 60% at 50% 45%, #11192B 0%, #0b1120 50%, #06090F 100%)', overflow: 'hidden'}}>
       <div style={{position: 'absolute', left: '50%', top: '50%', width: 1080, height: 1350, marginLeft: -540, marginTop: -675, transform: `scale(${k})`}}>
-        <Cena loja={loja} data={data} itens={itens} total={total} duracao={duracao} />
+        <Cena loja={loja} data={data} itens={itens} total={total} rotuloTotal={rotuloTotal} tempos={tempos} tempoTotal={tempoTotal} duracao={duracao} />
       </div>
       <svg width="100%" height="100%" style={{position: 'absolute', inset: 0, opacity: 0.06, mixBlendMode: 'overlay'}}>
         <filter id="g32"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" /><feColorMatrix type="saturate" values="0" /></filter>
@@ -73,7 +74,7 @@ export const Cena32: React.FC<Cena32Props> = ({
   );
 };
 
-const Cena: React.FC<Required<Omit<Cena32Props, 'width' | 'height'>>> = ({loja, data, itens, total, duracao}) => {
+const Cena: React.FC<Required<Omit<Cena32Props, 'width' | 'height' | 'tempos' | 'tempoTotal'>> & {tempos?: number[]; tempoTotal?: number}> = ({loja, data, itens, total, rotuloTotal, tempos, tempoTotal, duracao}) => {
   const frame = useCurrentFrame();
   const s = duracao / 150;
   const its = itens.slice(0, 5);
@@ -85,8 +86,8 @@ const Cena: React.FC<Required<Omit<Cena32Props, 'width' | 'height'>>> = ({loja, 
   const FIM = yBarra + 96;
   // avanço do papel: cabeçalho já impresso, uma linha por passo, total numa corrida mais longa, código de barras por último
   const passos: [number, number, number][] = [];
-  its.forEach((_, i) => passos.push([(30 + i * 10) * s, 4, LINHA]));
-  const tTotal = (30 + its.length * 10 + 2) * s;
+  its.forEach((_, i) => passos.push([tempos?.[i] ?? (30 + i * 10) * s, 4, LINHA]));
+  const tTotal = tempoTotal ?? (tempos?.length ? tempos[tempos.length - 1] + 12 * s : (30 + its.length * 10 + 2) * s);
   passos.push([tTotal, 9, yBarra - (yItem0 + its.length * LINHA) + 2]);
   passos.push([tTotal + 16 * s, 6, FIM - yBarra - 2]);
   let L = yItem0 + 2;
@@ -117,7 +118,7 @@ const Cena: React.FC<Required<Omit<Cena32Props, 'width' | 'height'>>> = ({loja, 
       {lin(yDupla, <div style={{borderTop: '2px solid #1C1F25', borderBottom: '2px solid #1C1F25', height: 5}} />)}
       {lin(yTotal, (
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline'}}>
-          <span style={{fontWeight: 700, fontSize: 20, letterSpacing: 2}}>TOTAL</span>
+          <span style={{fontWeight: 700, fontSize: 20, letterSpacing: 2}}>{rotuloTotal}</span>
           <span style={{fontWeight: 700, fontSize: 56, letterSpacing: -1}}>{total}</span>
         </div>
       ))}

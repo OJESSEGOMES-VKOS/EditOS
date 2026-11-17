@@ -1,4 +1,4 @@
-// Checador do imagem-por-palavra: carrega src/modelo.ts (com src/plano.json, src/imagens.json, a fala e o rosto) e confere
+// Checador do imagem-por-palavra: carrega src/modelo.ts (com src/plano.ts, src/imagens.json, a fala e o rosto) e confere
 // as regras da casa e as do modelo (modelos/imagem-por-palavra/imagem-por-palavra.md). Sai com código 1 quando reprova.
 // Também grava src/presentes.json (as imagens que existem: o render usa o efeito tipográfico no lugar das que faltam)
 // e src/eventos.json (cada evento visual com o seu tempo: o scripts/som.py toca um efeito em cada).
@@ -56,6 +56,13 @@ const LIM = {
 const erros = [], avisos = [];
 const t2 = (x) => x.toFixed(2);
 ERROS_PLANO.forEach((e) => erros.push(e));
+// o vídeo novo nasce sem as imagens do aprovado (sistema/JEITO.md): imagem da lista presa a uma palavra que esta fala não
+// tem na mesma posição é de outro vídeo, e não entra nem esquecida
+const limpa = (s) => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9%]/g, '');
+for (const [id, im] of Object.entries(IM)) {
+	const [i, w] = im.palavra ?? [];
+	if (!PS[i] || limpa(PS[i].texto) !== limpa(w)) erros.push(`src/imagens.json: "${id}" ilustra [${i}, "${w}"], que não é desta fala (é imagem de outro vídeo, do aprovado?): esvazie a lista ({}) e apague public/img/ antes de montar a sua (imagem-por-palavra.md §9)`);
+}
 if (TEM_ROSTO && !TEM_MAOS) avisos.push('sem src/maos.json medido: rode scripts/maos.py (o texto do peito não pode ficar sobre as mãos)');
 
 // 1. a faixa de imagem: emendada, começa no 0, cada plano numa palavra
@@ -152,7 +159,10 @@ BLOCOS.forEach((b) => {
 	for (const i of b.ids) {
 		const naGigante = b.pico && i >= b.pico.de && i <= b.pico.ate; // a gigante entra inteira na 1ª palavra dela
 		const fica = (b.fixo ? DURACAO : b.t1) - Math.max(naGigante ? entra(b.pico.de) : entra(i), b.t0);
-		if (fica < LIM.palavra - 1e-6) erros.push(`${nome}: "${PS[i].texto}" fica ${t2(fica)} s (mínimo 0,4 s)`);
+		// a última de um bloco que já ficou 1,5 s não é palavra solta: fica o tempo da fala dela (G9), com piso de 0,25 s
+		// (a mesma conta do rosto-telas e do corte-palestra; fala rápida termina o trecho colada no seguinte)
+		const min = i === b.ids[b.ids.length - 1] && dur >= LIM.bloco - 1e-6 ? 0.25 : LIM.palavra;
+		if (fica < min - 1e-6) erros.push(`${nome}: "${PS[i].texto}" fica ${t2(fica)} s (mínimo ${min === LIM.palavra ? '0,4' : '0,25'} s)`);
 		if (entra(i) < b.t0 - 1e-6) erros.push(`${nome}: "${PS[i].texto}" entra antes do bloco`);
 	}
 	if (b.estilo === 'heroi') return;

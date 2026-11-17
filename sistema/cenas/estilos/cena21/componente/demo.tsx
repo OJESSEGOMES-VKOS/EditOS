@@ -11,6 +11,8 @@ const Demo: React.FC = () => (
     titulo={['Sua semana,', 'planejada em minutos.']}
     subtitulo="Arraste as tarefas para a semana. O Semanário faz o resto."
     botao="Começar grátis"
+    entrar="Entrar"
+    quadro={{titulo: 'Esta semana', detalhe: '12 tarefas', abas: ['Dia', 'Semana', 'Mês'], colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']}}
     width={1080}
     height={1350}
   />

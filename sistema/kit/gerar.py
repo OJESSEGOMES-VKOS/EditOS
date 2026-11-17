@@ -19,12 +19,16 @@ FORMATOS = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21
 
 
 def chave():
-    k = os.environ.get('KIE_API_KEY', '').strip()
+    # KIE_API_KEY_TEMP (chave temporária), quando preenchida, vale no lugar da KIE_API_KEY, que fica guardada.
     env = AQUI / '.env'
-    if not k and env.exists():
-        for linha in env.read_text(encoding='utf-8').splitlines():
-            if linha.strip().startswith('KIE_API_KEY='):
-                k = linha.split('=', 1)[1].strip().strip('"\'')
+    linhas = env.read_text(encoding='utf-8').splitlines() if env.exists() else []
+    def ler(nome):
+        v = os.environ.get(nome, '').strip()
+        for linha in linhas:
+            if not v and linha.strip().startswith(nome + '='):
+                v = linha.split('=', 1)[1].strip().strip('"\'')
+        return v
+    k = ler('KIE_API_KEY_TEMP') or ler('KIE_API_KEY')
     if not k:
         sys.exit('Falta a chave da kie.ai: cole em kit/.env (KIE_API_KEY=...).')
     return k

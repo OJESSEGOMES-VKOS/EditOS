@@ -2,6 +2,7 @@
 // do modelo (modelos/rosto-telas/rosto-telas.md, seções 5 e 8). Sai com código 1 quando reprova e diz o que mexer (arquivo:linha).
 // uso (de dentro da pasta do vídeo ou do molde): node scripts/cobertura.mjs
 // Antes, o molde confere que src/tempos.json e src/rosto_med.json são desta fala (rode gerar_tempos.py e rosto.py).
+// Telas livres (livres no plano): o título da tela cheia entra na conta como o do editor; no dividido, o painel não repete a pílula (G26); toda tela livre desenha dentro do <Palco>.
 // Confere, quadro a quadro, sem e com prévias: toda palavra dita escrita na tela enquanto é dita; página >= 1,5 s; palavra
 // >= 0,4 s depois de aparecer (a última de uma página que já ficou 1,5 s: >= 0,25 s, não é palavra solta); nenhuma palavra em dois lugares; até 2 linhas; as 2 posições da legenda; zona segura.
 import {build} from 'esbuild';
@@ -23,7 +24,7 @@ let R;
 try {
 	await build({
 		stdin: {
-			contents: "export {PAGINAS, legendaEm, MIN_PAGINA} from './src/Legenda.tsx'; export {PAGINAS as PAG_ED, vida, paginaEm} from './src/Editor.tsx'; export {PAG_CEL, vidaCel} from './src/Cenas.tsx'; export {P, T, FPS} from './src/tema.ts';",
+			contents: "export {PAGINAS, legendaEm, MIN_PAGINA} from './src/Legenda.tsx'; export {PAGINAS as PAG_ED, vida, paginaEm} from './src/Editor.tsx'; export {PAG_CEL, vidaCel} from './src/Cenas.tsx'; export {P, T, FPS, LIVRES, vidaLivre} from './src/tema.ts'; export {PAG_LIVRES} from './src/Livres.tsx';",
 			resolveDir: MOLDE, loader: 'ts',
 		},
 		bundle: true, platform: 'node', format: 'esm', outfile: tmp, logLevel: 'silent', jsx: 'automatic', loader: {'.json': 'json'}, absWorkingDir: MOLDE,
@@ -40,14 +41,14 @@ try {
 	fs.rmSync(tmp, {force: true});
 }
 if (!R) process.exit(1);
-const {PAGINAS, legendaEm, MIN_PAGINA, PAG_ED, vida, paginaEm, PAG_CEL, vidaCel, P, T, FPS} = R;
+const {PAGINAS, legendaEm, MIN_PAGINA, PAG_ED, vida, paginaEm, PAG_CEL, vidaCel, P, T, FPS, LIVRES, vidaLivre, PAG_LIVRES} = R;
 const PB = P.palavras;
 const ids = (pal) => pal.map((p) => PB.indexOf(p));
 const L_MIN = linha('src/tema.ts', 'export const MIN_PAGINA');
 const L_TIT = linha('scripts/gerar_tempos.py', 'titulos=dict(');
 const ZONA = {esq: 60, dir: 940, topo: 250, base: 1500};
-const LARG = {rosto: [110, 940, 68], pilula: [120, 930, 56], titulo: [80, 940, 74]}; // caixa x e fonte de cada lugar (src/Legenda.tsx; src/Editor.tsx Titulo, vídeo novo: right 140)
-const larguraTxt = (txt, fonte) => txt.length * fonte * 0.56; // Geist 800, estimada pelas letras
+const LARG = {rosto: [110, 940, 68], pilula: [146, 904, 56], titulo: [80, 940, 74]}; // pílula: a caixa de 120-930 menos o respiro de 26 px de cada lado // caixa x e fonte de cada lugar (src/Legenda.tsx; src/Editor.tsx Titulo, vídeo novo: right 140)
+const larguraTxt = (txt, fonte) => txt.length * fonte * 0.5; // Geist 800 apertada: medida no render ~0,47 em por letra (2026-11-17), conta 0,5
 let reprova = false;
 
 for (const previas of T.previas ? [false, true] : [false]) {
@@ -66,13 +67,28 @@ for (const previas of T.previas ? [false, true] : [false]) {
 		};
 		const lg = legendaEm(t, previas);
 		if (lg) marca(`leg${lg.i}`, PAGINAS[lg.i].pal.map((p) => p.texto).join(' '), PAGINAS[lg.i].pal, lg.pilula ? 'pilula' : 'rosto', true);
-		for (const [pre, pags, v] of [['ed', PAG_ED, vida(t)], ['cel', PAG_CEL, vidaCel(t)]]) {
+		const livres = PAG_LIVRES.map((x, k) => [`liv${k}`, x.pags, x.pags.length ? vidaLivre(t, x.L) : 0]);
+		for (const [pre, pags, v] of [['ed', PAG_ED, vida(t)], ['cel', PAG_CEL, vidaCel(t)], ...livres]) {
 			if (v <= 0) continue;
 			const i = paginaEm(t, pags);
 			if (i >= 0) marca(`${pre}${i}`, pags[i].pal.map((p) => p.texto).join(' '), pags[i].pal, 'titulo', false);
 		}
 	}
-	const buracos = [], curtos = [], dobras = [], linhas = [], fora = [];
+	const buracos = [], curtos = [], dobras = [], linhas = [], fora = [], livres = [];
+	// telas livres divididas: o texto escrito no painel nunca é o mesmo que a pílula mostra na mesma hora (G26)
+	const limpa = (x) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9%]+/g, ' ').trim();
+	LIVRES.forEach((L, k) => {
+		if (L.modo !== 'dividido') return;
+		const ditos = new Set();
+		for (let f = Math.ceil(L.de * FPS); f <= Math.floor(L.sai * FPS); f++) {
+			const lg = legendaEm(f / FPS, previas);
+			if (lg && lg.pilula) PAGINAS[lg.i].pal.forEach((p) => ditos.add(limpa(p.texto)));
+		}
+		for (const [nome, txt] of Object.entries(L.textos ?? {})) {
+			const ws = limpa(String(txt)).split(' ').filter((w) => w.length > 2);
+			if (ws.length && ws.every((w) => ditos.has(w))) livres.push(`livres[${k}] (${L.comp}) escreve "${txt}" (textos.${nome}) e a pílula mostra as mesmas palavras na mesma hora (G26): deixe a pílula contar e o painel mostrar o objeto`);
+		}
+	});
 	PB.forEach((p, i) => {
 		let f0 = Math.ceil((p.de + 0.1) * FPS), f1 = Math.floor((p.ate - 0.07) * FPS);
 		if (f1 < f0) f0 = f1 = Math.round(((p.de + p.ate) / 2) * FPS);
@@ -116,7 +132,15 @@ for (const previas of T.previas ? [false, true] : [false]) {
 	console.log(`${linhas.length} páginas com mais de 2 linhas`); linhas.forEach((x) => console.log('  ' + x));
 	console.log(`posições da legenda: ${[...lugares].join(', ')} (rosto: abaixo do queixo; pilula: na divisa, y 914)`);
 	console.log(`${fora.length} textos fora da zona segura (x ${ZONA.esq}-${ZONA.dir}; os lugares em y já ficam entre ${ZONA.topo} e ${ZONA.base})`); fora.forEach((x) => console.log('  ' + x));
-	if (buracos.length || curtos.length || dobras.length || linhas.length || fora.length || lugares.size > 2) reprova = true;
+	console.log(`${livres.length} telas livres repetindo a pílula`); livres.forEach((x) => console.log('  ' + x));
+	if (buracos.length || curtos.length || dobras.length || linhas.length || fora.length || livres.length || lugares.size > 2) reprova = true;
+}
+// toda tela livre desenha dentro do <Palco> (a zona segura do modo, src/ui.tsx) e tem o arquivo com o nome dela
+const TELAS = path.join(MOLDE, 'src', 'telas');
+for (const L of LIVRES) {
+	const arq = path.join(TELAS, `${L.comp}.tsx`);
+	if (!fs.existsSync(arq)) { console.log(`\ntela livre ${L.comp}: não achei src/telas/${L.comp}.tsx (um arquivo por tela, com o nome do comp)`); reprova = true; continue; }
+	if (!fs.readFileSync(arq, 'utf8').includes('<Palco')) { console.log(`\ntela livre ${L.comp}: desenhe dentro do <Palco modo={L.modo}> (a zona segura, src/ui.tsx)`); reprova = true; }
 }
 console.log(reprova ? '\nREPROVADO: corrija o que está acima e rode de novo.' : '\nAPROVADO: 0 em todas as regras.');
 process.exit(reprova ? 1 : 0);

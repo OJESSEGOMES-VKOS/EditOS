@@ -1,6 +1,7 @@
 import React from 'react';
 import {Freeze, Img, OffthreadVideo, staticFile} from 'remotion';
-import {C, DESFOQUE_LEVE, E, G, P, Props, R, SANS, SERIF, SOMBRA, TITULO, mola, rostoX, tw, useT} from './tema';
+import {C, CONTADORES, DESFOQUE_LEVE, E, G, P, Props, R, SANS, SERIF, SOMBRA, TITULO, cenaAnterior, mola, rostoX, tw, useT} from './tema';
+import type {Cena} from './tema';
 
 /** o vídeo pode acabar antes da fala: daí em diante segura o penúltimo quadro de public/fala.mp4 */
 const ULTIMO = R.quadros - 2;
@@ -104,7 +105,7 @@ export const Card: React.FC<{caixa: {x: number; y: number; w: number; h: number}
 };
 
 export type Vista = {at: number; x: number; y: number; w: number}; // a janela do print (px do print) que enche o card a partir de at
-export type Grifo = {at: number; x: number; y: number; w: number; h: number}; // marca-texto (px do print), nasce em at
+export type Grifo = {at: number; x: number; y: number; w: number; h: number; cor?: 'azul' | 'vermelho'}; // marca-texto (px do print), nasce em at; vermelho só no defeito (problema → solução)
 /** prova real: o print inteiro dentro do card, com câmera que só viaja entre vistas (sobe/aproxima devagar, 0,6 s) e o grifo
  * que se desenha da esquerda pra direita em 0,35 s no instante da palavra (E7) */
 export const Prova: React.FC<{src: string; larg: number; caixaW: number; vistas: Vista[]; grifos?: Grifo[]}> = ({src, larg, caixaW, vistas, grifos = []}) => {
@@ -123,7 +124,7 @@ export const Prova: React.FC<{src: string; larg: number; caixaW: number; vistas:
 			<Img src={staticFile(src)} style={{width: larg, display: 'block'}} />
 			{grifos.map((g, i) => {
 				const k = tw(t, g.at, g.at + 0.35, 0, 1);
-				return k > 0 ? <div key={i} style={{position: 'absolute', left: g.x, top: g.y, width: g.w * k, height: g.h, background: C.grifo, borderRadius: 6, mixBlendMode: 'multiply'}} /> : null;
+				return k > 0 ? <div key={i} style={{position: 'absolute', left: g.x, top: g.y, width: g.w * k, height: g.h, background: g.cor === 'vermelho' ? C.grifoRuim : C.grifo, borderRadius: 6, mixBlendMode: 'multiply'}} /> : null;
 			})}
 		</div>
 	);
@@ -218,5 +219,49 @@ export const Capitulo: React.FC<{de: number; rotulo: string; numero: string; chi
 				</Card>
 			)}
 		</div>
+	);
+};
+
+/* ---------------------------------------------------------------- o kit das telas (as da casa e as livres de src/telas/) */
+/** a imagem que enche o fundo da vitrine (o próprio print, que o FundoVitrine borra e escurece) */
+export const ImgFundo: React.FC<{src: string}> = ({src}) => <Img src={staticFile(src)} style={{width: '100%', height: '100%', objectFit: 'cover'}} />;
+/** a VITRINE, o palco de toda tela de prova: sem rosto, o card grande (G.cardVitrine, x 80 a 960, y 250 a 1140: a zona
+ * segura da tela, acima da legenda de y 1180) sobre o próprio conteúdo desfocado e escuro. Vindo de outra vitrine, o card
+ * desliza da direita com borrão; senão sobe com mola. Tudo da tela mora dentro dela: o print (<Prova>) e o contador. */
+export const Vitrine: React.FC<{c: Cena; fundo: React.ReactNode; children: React.ReactNode}> = ({c, fundo, children}) => {
+	const ant = cenaAnterior(c);
+	return (
+		<>
+			<FundoVitrine>{fundo}</FundoVitrine>
+			<Card caixa={G.cardVitrine} de={c.de} deLado={ant?.modo === 'vitrine'}>
+				{children}
+			</Card>
+		</>
+	);
+};
+/** a largura útil do print dentro do card da vitrine (para o caixaW da <Prova>) */
+export const LARG_VITRINE = G.cardVitrine.w - 8;
+/** os contadores da cena (contadores() no plano de src/tema.ts: o número sobe até o número DITO, G10) */
+export const ContadorDa: React.FC<{c: Cena}> = ({c}) => (
+	<>
+		{CONTADORES.filter((k) => k.cena === c.id).map((k, i) => (
+			<Contador key={i} de={k.de} ate={k.ate} valor={k.valor} sufixo={k.sufixo} y={k.y} />
+		))}
+	</>
+);
+
+/** o PALCO claro (opção, só com fundo: 'recorte', G6): o título-promessa só na cena dele (PV5), o card da prova (mais alto quando não há título) e o cartão de câmera
+ * embaixo com a cabeça saindo da moldura (PV8). A legenda vem por cima, em Reel.tsx. */
+const cardDo = (c: Cena) => (c.id === TITULO?.cena ? G.cardPalcoTitulo : G.cardPalco);
+export const Palco: React.FC<{c: Cena; children: React.ReactNode}> = ({c, children}) => {
+	const primeiro = c.de === 0;
+	return (
+		<>
+			{c.id === TITULO?.cena && <Titulo />}
+			<Card caixa={cardDo(c)} de={primeiro ? 0.25 : c.de}>
+				{children}
+			</Card>
+			<RostoPalco />
+		</>
 	);
 };

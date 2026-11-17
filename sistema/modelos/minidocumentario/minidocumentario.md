@@ -10,6 +10,9 @@ parênteses, como (6 s), apontam para ele. Do lado dele ficam a `folha.jpg` (1 q
 **A referência mostra o jeito do modelo, não um roteiro para copiar (G30).** O modelo é inspiração: o porquê e o como
 de cada tela. Não se copia a sequência nem os tempos do aprovado. Cada tela descrita aqui é repertório, com o seu porquê,
 e só entra no vídeo novo onde a fala nova tiver o mesmo porquê. As telas, os textos e os cortes nascem da fala nova.
+A skill `.claude/skills/minidocumentario/SKILL.md` diz a personalidade e como escolher o nível de cada palavra da fala
+nova. O vídeo novo nasce sem o plano do aprovado (`scripts/plano_novo.tsx`: a gravação íntegra num plano, sem texto).
+O modelo não tem tela livre: a imagem é sempre material filmado (M1); o que se inventa é a legenda nos três níveis.
 
 Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
 
@@ -267,12 +270,15 @@ estúdio, terço com o nome e o @ reais de quem fala e prévias ligadas. Nada di
 Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do vídeo" (`oficina/<v>/`). Um processo pesado
 por vez.
 
+0. **Leia a skill** `.claude/skills/minidocumentario/SKILL.md` (a personalidade, as peças e a invenção da ênfase).
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py minidocumentario <gravacao.mp4> <AAAA-MM-DD-tema>`.
    Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`), mede o rosto (`src/rosto.json`) e
-   adapta a gravação ao modelo. Confira de ouvido o trecho rápido e corrija nomes e números.
+   adapta a gravação ao modelo. Confira de ouvido o trecho rápido e corrija nomes e números. **O plano nasce vazio:** o
+   bloco O PLANO de `src/Reel.tsx` vem do `scripts/plano_novo.tsx` do molde (um plano `rosto` íntegro do começo ao fim,
+   `blocos` vazio, sem vazamento nem terço, com a lista comentada das peças), nunca com o plano do aprovado.
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
-2. **Reescreva o `plano.md`** na pasta do vídeo, uma linha por frase: tempo, fala, mundo, texto na tela, palavra-chave,
-   gatilho (seção 7) e de onde vem a imagem. O que veio nele é o plano do aprovado, de outra fala.
+2. **Escreva o `plano.md`** na pasta do vídeo (o do aprovado fica no molde), uma linha por frase: tempo, fala, mundo, texto na tela, palavra-chave,
+   gatilho (seção 7) e de onde vem a imagem.
 3. **Fundo (só se o dono pediu; o padrão é o fundo real e este passo não existe):** na pasta do vídeo,
    `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/grade.py --desfoque` grava
    `public/fala_desfoque.mp4` (desfoque leve, para `fundo: 'desfoque'`); sem `--desfoque` grava
@@ -286,7 +292,8 @@ por vez.
    `src/cards.json`. Rode sempre antes de usar o papel ou os celulares: o `src/cards.json` que vem do molde é o do
    aprovado e aponta para quadros que não existem no vídeo novo.
 5. **Ângulos e B-roll:** conte quantas câmeras o material tem (seção 1.1). Uma só: um plano `rosto` do começo ao fim. Mais de uma: um plano por ângulo, com o porquê. B-roll só material real do criador (G7); nada gerado.
-6. **Monte O PLANO** em `src/Reel.tsx` (na pasta do vídeo). O molde para ao carregar até o plano bater com a fala nova e
+6. **Monte O PLANO** no bloco marcado de `src/Reel.tsx` (na pasta do vídeo; entre a linha O PLANO e a linha fim do
+   plano). O molde para ao carregar até o plano bater com a fala nova e
    diz a lista e a linha. Os ids são índices de `src/palavras.json` (0 = a 1ª).
    - `PLANOS`: os planos emendados de 0 a `DURACAO`, cada corte no início da 1ª palavra do plano, com `mundo`, `q`
      (`s` zoom, `ox`/`oy` onde cai o rosto) nos de rosto, `img` nos de arquivo e `papel` nos de papel (`colagem` com
@@ -299,6 +306,11 @@ por vez.
 7. **Confira as regras:** `node scripts/sincronia.mjs` (na pasta do vídeo) até sair 0 erros. Ele confere sincronia,
    cortes, texto que atravessa corte, palavra coberta uma vez, até 4 linhas, posições, zona segura, tempo de leitura e
    texto no rosto, e avisa mídia que falta.
+   **O teste do clone:** no plano de cenas (`cenas.json` → `tools/decupar.py oficina/<v> --plano`, ou o `plano.md`),
+   a linha de cada cena com ênfase diz a peça (gigante, intermediário, `VAZAMENTOS`) e a palavra dita entre aspas que
+   pediu ela. Depois `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até sair `SEM CLONE`, e a folha de quadros ao
+   lado da `referencia/folha.jpg`: mesmo modelo, outro vídeo. Os mundos, temas e alinhamentos vão sem aspas no plano
+   (`mundo: rosto`, `tema: escuro`, `al: kwL`); entre aspas, só o que é dito.
 8. **Som (só com ordem de efeito ou música, G6):** rode (ele lê `FOLGA` e `VAZAMENTOS` do `src/Reel.tsx`)
    `../../.venv/Scripts/python.exe scripts/trilha.py` (na pasta do vídeo). Sai `public/efeitos.wav` e
    `public/trilha.wav`. Sem ordem, pule e mixe só a voz.

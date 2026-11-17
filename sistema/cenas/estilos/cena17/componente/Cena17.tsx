@@ -10,20 +10,28 @@ export type Linha = {nome: string; sub: string; valor: string; positivo?: boolea
 export type Cena17Props = {
   width?: number;
   height?: number;
+  // tudo vem da fala e do app real (G25); sem padrão: os textos da demo ficam no demo.tsx
+  tela?: React.ReactNode; // a tela recriada fiel do app do dono; se vier, substitui a tela de exemplo inteira
+  hora?: string; // barra de status
   saudacao?: string;
   nome?: string;
+  moeda?: string; // "R$"
+  abas?: string[]; // seletor de período (vazio: some)
+  tituloLista?: string;
+  verTudo?: string;
   rotuloSaldo?: string;
   saldoInicial?: number;
   saldoFinal?: number;
   delta?: string;
   deltaLinha?: string;
   linhas?: Linha[];
-  notifTitulo?: string;
+  notifTitulo?: string; // vazio: sem cartão de notificação
+  notifHora?: string;
   notifTexto?: string[];
   statRotulo?: string;
-  statValor?: string;
+  statValor?: string; // vazio: sem cartão de número
   statDelta?: string;
-  metaTitulo?: string;
+  metaTitulo?: string; // vazio: sem cartão de meta
   metaTexto?: string;
   metaPct?: number;
   acento?: string;
@@ -39,26 +47,29 @@ const fmt = (v: number) => {
 export const Cena17: React.FC<Cena17Props> = ({
   width = 1080,
   height = 1350,
-  saudacao = 'Bom dia',
-  nome = 'Marina Alves',
-  rotuloSaldo = 'Saldo total',
-  saldoInicial = 19679.14,
-  saldoFinal = 24860.42,
-  delta = '+ 6,2%',
-  deltaLinha = '+R$ 1.240 em 30 dias',
-  linhas = [
-    {nome: 'Estúdio Norte', sub: 'Salário · Hoje', valor: '+R$ 4.200,00', positivo: true},
-    {nome: 'Mercado Verde', sub: 'Mercado · Ontem', valor: '−R$ 86,40'},
-    {nome: 'Aluguel', sub: 'Moradia · 27 out', valor: '−R$ 1.850,00'},
-  ],
-  notifTitulo = 'Pagamento recebido',
-  notifTexto = ['R$ 4.200 chegaram do Estúdio Norte.', 'R$ 420 foram para a reserva.'],
-  statRotulo = 'Guardado no mês',
-  statValor = 'R$ 1.240',
-  statDelta = '+18% vs set',
-  metaTitulo = 'Viagem a Lisboa',
-  metaTexto = 'R$ 4.100 de R$ 5.000',
-  metaPct = 82,
+  tela,
+  hora = '',
+  saudacao = '',
+  nome = '',
+  moeda = 'R$',
+  abas = [],
+  tituloLista = '',
+  verTudo = '',
+  rotuloSaldo = '',
+  saldoInicial = 0,
+  saldoFinal = 0,
+  delta = '',
+  deltaLinha = '',
+  linhas = [],
+  notifTitulo = '',
+  notifHora = 'agora',
+  notifTexto = [],
+  statRotulo = '',
+  statValor = '',
+  statDelta = '',
+  metaTitulo = '',
+  metaTexto = '',
+  metaPct = 0,
   acento = '#0e9f6e',
   acentoClaro = '#e3f6ee',
 }) => {
@@ -97,8 +108,10 @@ export const Cena17: React.FC<Cena17Props> = ({
   const caminho = [...vis, ponta].map((p, i) => `${i ? 'L' : 'M'}${p[0]},${p[1]}`).join(' ');
 
   // cartões: um de cada vez, ~meio segundo entre eles
-  const qN = 52, qS = 68, qM = 84;
-  const cN = sp(qN), cS = sp(qS), cM = sp(qM);
+  const presentes = [notifTitulo !== '', statValor !== '', metaTitulo !== ''];
+  const ordem = (i: number) => presentes.slice(0, i).filter(Boolean).length;
+  const qN = 52 + 16 * ordem(0), qS = 52 + 16 * ordem(1), qM = 52 + 16 * ordem(2);
+  const cN = presentes[0] ? sp(qN) : 0, cS = presentes[1] ? sp(qS) : 0, cM = presentes[2] ? sp(qM) : 0;
   const anelM = interpolate(frame, [qM, qM + 26], [0, metaPct / 100], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
   const barras = [0.45, 0.55, 0.4, 0.62, 0.5, 1];
 
@@ -122,8 +135,11 @@ export const Cena17: React.FC<Cena17Props> = ({
               <div key={i} style={{position: 'absolute', inset: 0, borderRadius: 64, background: i === 0 ? '#8d939b' : '#3a3e45', transform: `translateZ(${-2 - i * 2.4}px)`}} />
             ))}
             <div style={{position: 'absolute', inset: 0, borderRadius: 64, background: `linear-gradient(100deg, #1b1d21 ${brilho * 100 - 8}%, #c9ced6 ${brilho * 100}%, #1b1d21 ${brilho * 100 + 8}%)`, padding: 14, boxSizing: 'border-box'}}>
+              {tela ? (
+              <div style={{position: 'relative', width: '100%', height: '100%', borderRadius: 52, overflow: 'hidden', background: '#fff'}}>{tela}</div>
+              ) : (
               <div style={{position: 'relative', width: '100%', height: '100%', borderRadius: 52, overflow: 'hidden', background: '#fff', padding: '22px 26px', boxSizing: 'border-box'}}>
-                <div style={{display: 'flex', justifyContent: 'space-between', fontSize: 15, fontWeight: 700}}><span>8:30</span><span style={{letterSpacing: 2}}>▪▪▪</span></div>
+                <div style={{display: 'flex', justifyContent: 'space-between', fontSize: 15, fontWeight: 700}}><span>{hora}</span><span style={{letterSpacing: 2}}>▪▪▪</span></div>
                 <div style={{position: 'absolute', left: '50%', top: 16, width: 104, height: 30, marginLeft: -52, borderRadius: 16, background: '#0b0c0e'}} />
                 <div style={{display: 'flex', alignItems: 'center', gap: 10, marginTop: 26}}>
                   <div style={{width: 38, height: 38, borderRadius: 19, background: 'linear-gradient(135deg,#9aa6b4,#4a5462)'}} />
@@ -131,7 +147,7 @@ export const Cena17: React.FC<Cena17Props> = ({
                   <div style={{width: 32, height: 32, borderRadius: 16, border: '1.5px solid #e3e6ea'}} />
                 </div>
                 <div style={{fontSize: 13, color: GR, fontWeight: 500, marginTop: 22}}>{rotuloSaldo}</div>
-                <div style={{fontSize: 44, fontWeight: 800, letterSpacing: -1.5, fontVariantNumeric: 'tabular-nums', lineHeight: 1.1}}>R$ {saldo.i}<span style={{fontSize: 24, color: '#a7adb5'}}>,{saldo.d}</span></div>
+                <div style={{fontSize: 44, fontWeight: 800, letterSpacing: -1.5, fontVariantNumeric: 'tabular-nums', lineHeight: 1.1}}>{moeda} {saldo.i}<span style={{fontSize: 24, color: '#a7adb5'}}>,{saldo.d}</span></div>
                 <div style={{display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, height: 24}}>
                   <span style={{background: acentoClaro, color: acento, fontWeight: 700, fontSize: 12, padding: '3px 8px', borderRadius: 10, transform: `scale(${chip})`}}>{delta}</span>
                   <span style={{fontSize: 12, color: GR, fontWeight: 500, opacity: chip > 0.5 ? 1 : 0}}>{deltaLinha}</span>
@@ -141,13 +157,13 @@ export const Cena17: React.FC<Cena17Props> = ({
                   <path d={`${caminho} L${ponta[0]},125 L0,125 Z`} fill="url(#as17f)" />
                   <path d={caminho} stroke={acento} strokeWidth={3} fill="none" strokeLinejoin="round" />
                   <circle cx={ponta[0]} cy={ponta[1]} r={5} fill="#fff" stroke={acento} strokeWidth={2.5} />
-                  {graf >= 1 && <g transform={`translate(${ponta[0] - 78},${ponta[1] - 36}) scale(${chip})`}><rect width={74} height={22} rx={6} fill={INK} /><text x={37} y={15} fill="#fff" fontSize={11} fontWeight={700} textAnchor="middle" fontFamily={PJ}>R$ 24.860</text></g>}
+                  {graf >= 1 && <g transform={`translate(${ponta[0] - 78},${ponta[1] - 36}) scale(${chip})`}><rect width={74} height={22} rx={6} fill={INK} /><text x={37} y={15} fill="#fff" fontSize={11} fontWeight={700} textAnchor="middle" fontFamily={PJ}>{moeda} {fmt(saldoFinal).i}</text></g>}
                 </svg>
-                <div style={{position: 'relative', display: 'flex', justifyContent: 'space-between', background: '#f2f4f6', borderRadius: 12, padding: 4, marginTop: 8, fontSize: 12, fontWeight: 600, color: GR}}>
-                  <div style={{position: 'absolute', top: 4, bottom: 4, width: '20%', left: `calc(${aba * 20}% + 4px)`, background: '#fff', borderRadius: 9, boxShadow: '0 1px 3px rgba(0,0,0,0.1)'}} />
-                  {['1S', '1M', '3M', '1A', 'Tudo'].map((t) => <span key={t} style={{position: 'relative', flex: 1, textAlign: 'center', padding: '6px 0'}}>{t}</span>)}
-                </div>
-                <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 18, fontSize: 15, fontWeight: 700}}><span>Atividade recente</span><span style={{color: acento, fontSize: 12}}>Ver tudo</span></div>
+                {abas.length > 0 && <div style={{position: 'relative', display: 'flex', justifyContent: 'space-between', background: '#f2f4f6', borderRadius: 12, padding: 4, marginTop: 8, fontSize: 12, fontWeight: 600, color: GR}}>
+                  <div style={{position: 'absolute', top: 4, bottom: 4, width: `${100 / abas.length}%`, left: `calc(${(aba * 100) / abas.length}% + 4px)`, background: '#fff', borderRadius: 9, boxShadow: '0 1px 3px rgba(0,0,0,0.1)'}} />
+                  {abas.map((t) => <span key={t} style={{position: 'relative', flex: 1, textAlign: 'center', padding: '6px 0'}}>{t}</span>)}
+                </div>}
+                <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 18, fontSize: 15, fontWeight: 700}}><span>{tituloLista}</span><span style={{color: acento, fontSize: 12}}>{verTudo}</span></div>
                 {linhas.map((l, i) => {
                   const r = sp(30 + i * 6, {damping: 14, stiffness: 200, mass: 0.6});
                   return (
@@ -165,6 +181,7 @@ export const Cena17: React.FC<Cena17Props> = ({
                 </div>
                 <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(115deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.18) 48%, rgba(255,255,255,0) 56%)'}} />
               </div>
+              )}
             </div>
           </div>
         </div>
@@ -177,7 +194,7 @@ export const Cena17: React.FC<Cena17Props> = ({
               <div style={{position: 'absolute', left: 22, top: 22, width: 456, display: 'flex', gap: 16}}>
                 <div style={{width: 50, height: 50, borderRadius: 13, background: acento, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 22}}>↗</div>
                 <div style={{flex: 1}}>
-                  <div style={{display: 'flex', justifyContent: 'space-between', fontSize: 19, fontWeight: 700}}><span>{notifTitulo}</span><span style={{fontSize: 13, color: GR, fontWeight: 500}}>agora</span></div>
+                  <div style={{display: 'flex', justifyContent: 'space-between', fontSize: 19, fontWeight: 700}}><span>{notifTitulo}</span><span style={{fontSize: 13, color: GR, fontWeight: 500}}>{notifHora}</span></div>
                   {notifTexto.map((t) => <div key={t} style={{fontSize: 15, color: '#3c434d', fontWeight: 500, marginTop: 3}}>{t}</div>)}
                 </div>
               </div>

@@ -1,0 +1,16 @@
+{
+ "_leia": "Para tools/clone.py: as peças da casa que o plano liga (as linhas 'peça = valor' do bloco O PLANO de src/plano.ts; '= None' é desligada) e o texto que cada uma escreve fixo no código. Aqui nenhuma escreve texto fixo: todo texto na tela é a fala. A faixa de imagem (planos) não entra na lista porque a pessoa já é um plano; cada imagem tem dono pela 'palavra' dela em src/imagens.json, que o checador confere.",
+ "telas": [
+  "picos",
+  "heroi",
+  "tarja",
+  "ponte",
+  "flash",
+  "negativo"
+ ],
+ "fixos": {},
+ "nao_copiar": [
+  "public/img",
+  "material"
+ ]
+}

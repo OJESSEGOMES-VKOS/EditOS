@@ -15,6 +15,9 @@ imagem-por-palavra`, tirar o `--sem-adaptar` da §9 e trocar este parágrafo pel
 
 Regras gerais: `REGRAS.md` §0 (G1–G35, reescritas pelo dono em 2026-11-05) mandam acima deste arquivo.
 
+**A entrada é a skill** `.claude/skills/imagem-por-palavra/SKILL.md` (o jeito, não o clone, `sistema/JEITO.md`): o vídeo
+novo nasce com o plano vazio e cada imagem, gigante ou cartão entra porque a fala nova pediu.
+
 **O modelo é inspiração, não molde (G30).** Ensina a forma (a imagem que entra na palavra, a legenda que fica enquanto a
 imagem passa, o pico que explode) e o porquê de cada recurso. Num vídeo novo, cada recurso só entra onde a fala nova tem
 o mesmo porquê; a ordem e os tempos das referências e da vitrine nunca se copiam. Padrão sem pedido: a pessoa na gravação
@@ -47,7 +50,7 @@ tabela "O que este modelo sobrescreve", no fim da §6, cada item com o motivo.
 - Não quero:
 
 **Para o assistente:** leia esta seção antes de tudo. A paleta e qualquer cor solta escrita aqui valem sem pedir licença
-(`"paleta"` e `"cores"` no `src/plano.json`). O resto da cara (fonte, posições, tamanhos, ritmo) só muda avisando antes.
+(`paleta` e `cores` no bloco O PLANO de `src/plano.ts`). O resto da cara (fonte, posições, tamanhos, ritmo) só muda avisando antes.
 Quando o dono corrigir algo e valer para os próximos vídeos, anote aqui nas palavras dele e no `CORRECOES.md`.
 
 ---
@@ -171,11 +174,11 @@ Medidos nas duas referências (as de 16:9 e 4:3 traduzidas para 1080x1920) e fix
 
 ## 3. Cenas e ritmo
 
-**Os planos da faixa de imagem** (`"planos"` no `src/plano.json`, cada um começa numa palavra: `"de": [índice, "palavra"]`):
+**Os planos da faixa de imagem** (`planos` no bloco O PLANO de `src/plano.ts`, cada um começa numa palavra: `de: w('palavra')` ou `de: [índice, 'palavra']`):
 
 | Tipo | Como é | Quando a fala pede |
 |---|---|---|
-| `img` | imagem em tela cheia, sempre andando (`mov`: empurra 1,00→1,08, recua, gira ±1,6°, desliza ±26 px), vinheta e faixa escura embaixo para a legenda | toda palavra concreta (objeto, lugar, ação, gente sem rosto) |
+| `img` | imagem em tela cheia, sempre andando (`mov`: empurra 1,00→1,08, recua, gira ±1,6°, desliza ±26 px), vinheta e faixa escura embaixo para a legenda. Print, logo ou documento (`"caber": true` na lista) entra inteiro, num quadro acima da legenda, sem cortar | toda palavra concreta (objeto, lugar, ação, gente sem rosto) |
 | `rajada` | várias imagens em sequência, `passo` 0,17–0,25 s | lista, "qualquer tipo de", enumeração, "tudo isso" |
 | `estilos` | a mesma imagem trocando de estilo a cada 0,17 s (natural, duotone, P&B, negativo, arquivo) | verbo de movimento, velocidade, "de novo", "aceleradas" (E10) |
 | `mosaico` | ladrilhos 2 colunas entrando um a um (`passo` ≥ 0,17 s); `escuro` (0–1) escurece por cima | "vários", "muitos", quantidade; recapitulação; o fundo do fecho (`passo` 0,5, `escuro` 0,62) |
@@ -362,24 +365,41 @@ Os comandos rodam da raiz do estúdio (`sistema/`), menos onde está escrito "na
 1. **Roteiro escrito para ser ilustrado** (R9; vale a skill `orquestrador-conteudo`): gancho de contradição resolvido na
    2ª frase, a frase-promessa (vai virar o herói), viradas marcadas ("mas", "só que"), números ditos em comparação, fecho
    com "você". Em cada frase, marque as palavras que viram imagem.
-2. **Crie o vídeo:** `QUEM=<nome> sh tools/com-trava.sh .venv/Scripts/python.exe tools/novo-video.py imagem-por-palavra <gravacao.mp4> <AAAA-MM-DD-tema> --trocar Cloud=Claude --sem-adaptar`.
-   O `--sem-adaptar` é obrigatório enquanto o modelo não tem `assinatura.json`. **Apague `public/img/`** que veio do molde
-   (são as imagens da vitrine; o `material.py` lista as órfãs). Sem `ffmpeg` completo no PATH o `preparar.py` cai no filtro
+2. **Crie o vídeo:** `QUEM=<nome> sh tools/com-trava.sh .venv/Scripts/python.exe tools/novo-video.py imagem-por-palavra <gravacao.mp4> <AAAA-MM-DD-tema> --trocar Cloud=Claude --sem-adaptar`
+   (vários nomes errados: `--trocar A=B C=D`, num `--trocar` só).
+   O `--sem-adaptar` é obrigatório enquanto o modelo não tem `assinatura.json`. **O começo vazio:** o bloco O PLANO de
+   `src/plano.ts` nasce do `scripts/plano_novo.ts` (a pessoa aberta e a legenda curta da casa, `quebrasPadrao()`; nenhuma
+   imagem, gigante, herói nem cartão da vitrine). Na pasta do vídeo, **esvazie `src/imagens.json` (`{}`) e apague
+   `public/img/` e `material/`** que vieram do molde (são da vitrine; o checador recusa imagem presa a palavra de outra
+   fala). Sem `ffmpeg` completo no PATH o `preparar.py` cai no filtro
    de voz (ver pendências); a gravação comum já tem a base pronta em `teste-comum/base/`.
 3. **Meça as mãos** (na pasta do vídeo): `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/maos.py`.
 4. **Liste a fala** (na pasta do vídeo): `node scripts/conferir.mjs --palavras` (marca os fins de trecho).
-5. **A lista palavra → imagem** em `src/imagens.json`, depois
+5. **A lista palavra → imagem** em `src/imagens.json` (cada imagem com a `palavra` dita que ela ilustra; print, logo ou
+   documento com `"caber": true`; no modo só materiais, só arquivos da pessoa, `"fonte": "usuario"`), depois
    `../../kit/.venv/Scripts/python.exe scripts/material.py --lista` e, aprovada a lista,
    `QUEM=<nome> sh ../../tools/com-trava.sh ../../kit/.venv/Scripts/python.exe scripts/material.py` (gera só o que falta;
    `--folha` monta `material/folha.jpg` para olhar). Escreva o `roteiro.md` na pasta do vídeo (vai junto na entrega).
-6. **O plano** em `src/plano.json`: `"planos"` (a faixa de imagem, §3), `"quebras"` (onde um trecho longo vira outro
-   bloco), `"picos"` (§4; só onde o termo importa, G17), `"heroi"` (no máximo um), `"tarja"`, `"ponte"`, `"flash"`, `"texto"` (grafia na tela:
-   `{"84": "“EDIÇÃO”"}`), `"paleta"`, `"cores"`.
+6. **O plano** no bloco O PLANO de `src/plano.ts` (entre as linhas `O PLANO` e `fim do plano`; o resto do arquivo não
+   muda): `planos` (a faixa de imagem, §3), `quebras` (onde um trecho longo vira outro bloco; `quebrasPadrao()` divide
+   sozinho), `picos` (§4; só onde o termo importa, G17), `heroi` (no máximo um), `tarja`, `ponte`, `flash`, `texto`
+   (grafia na tela: `{84: '“EDIÇÃO”'}`), `paleta`, `cores`, `queixo` (quando o detector pega o queixo baixo demais e a
+   legenda cai nas mãos). Peça desligada é `= None`. Prenda à fala com `w('palavra', n)` (a n-ésima vez que ela é dita).
+   Dentro do bloco, texto entre aspas é só o que é dito; tipos e opções são as constantes (`PESSOA`, `IMG`, `FECHADO`,
+   `GIGANTE`, `NOITE`...), para o `tools/clone.py` ler o texto da tela sem engano. Antes de pôr uma gigante, conte: as
+   pequenas do bloco somam no máximo 2 linhas (1 depois), e o termo precisa de 55% da largura no tamanho do vídeo (a
+   gigante mais longa decide o tamanho). Escreva o porquê de cada peça no `cenas.json` (passo 7b).
 7. **Confira** (na pasta do vídeo): `node scripts/conferir.mjs` até `APROVADO`. Confere: plano bate com a fala; piso de
    0,17 s e rajadas ≤ 3 s; **a pessoa em pelo menos 50% do vídeo (G6); trocas/s e janelas de 5 s medidas dentro das
    ondas de imagem**; cartão ≤ 4 s seguidos; enquadres diferentes entre planos da pessoa; negativo fora da pessoa; cada palavra uma vez; bloco ≤ 2 linhas, ≥ 1,5 s (1,2 com aviso), palavra ≥ 0,4 s,
    sem passar da pontuação; pico no lugar e no tamanho; zona segura; texto fora do rosto e das mãos; 2 posições de
-   legenda; travessão e nome do modelo. Grava `src/presentes.json` e `src/eventos.json`.
+   legenda; travessão e nome do modelo; imagem da lista presa a palavra de outra fala. Grava `src/presentes.json` e
+   `src/eventos.json`. A última palavra de um bloco que já ficou 1,5 s pede 0,25 s (G9: fica o tempo da fala dela); as
+   outras, 0,4 s.
+   **7b. O teste do clone** (de `sistema/`): as respostas e os porquês no `cenas.json` (a peça pelo nome, `picos`,
+   `heroi`..., e a palavra dita entre aspas), `.venv/Scripts/python.exe tools/decupar.py oficina/<v> --plano`, depois
+   `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até `SEM CLONE` e `tools/decupar.py oficina/<v> --conferir`
+   até `APROVADO`.
 8. **Olhe quadros** (na pasta do vídeo): `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 0 1.5 ...`
    (um pacote só; saem em `conferencia/`). Olhe o quadro 0, um logo depois de cada pico, o herói, a tarja e o fecho.
 9. **Renderize** (na pasta do vídeo):
@@ -396,7 +416,22 @@ Os comandos rodam da raiz do estúdio (`sistema/`), menos onde está escrito "na
 tem palavras concretas nos trechos ligados ao tema, a onda fica abaixo de 1,8 trocas/s: o checador avisa. Volte ao
 passo 1 e reescreva as frases para ter o que ilustrar; número sem fonte não vira pico.
 
-## 10. A vitrine (repertório, não roteiro)
+## 10. Os exemplos do jeito (repertório com o porquê, nunca roteiro)
+
+Os vídeos abaixo são **aplicações** da cara do modelo a uma fala. Nada deles entra num vídeo novo sozinho: nem as
+imagens, nem os textos, nem a ordem. Um recurso só volta quando a fala nova tem o mesmo porquê (`sistema/JEITO.md`).
+A entrada do modelo é a skill `.claude/skills/imagem-por-palavra/SKILL.md`.
+
+- **A prova da skill (2026-11-17, só materiais):** `oficina/2026-11-17-teste-skill-imagem-por-palavra/`, a fala do
+  earshot com o material que a pasta daquele vídeo tinha (logo, orelha, prints do repositório, a leitura do earshot,
+  quadros da gravação). Pessoa 82%, quatro ondas curtas, trava em "extrema", "sonoros", "própria" e "ÁUDIO"; checador
+  `APROVADO`, `tools/clone.py` `SEM CLONE`; folha em `conferencia/lado-a-lado.jpg`.
+- **A v3 (2026-11-07, sem imagem):** `oficina/2026-11-07-rc-imagem-por-palavra-v3/`, só a camada (a): pessoa 91%,
+  reenquadre e trava; o cartão preto só no fim, onde o rosto encosta na câmera.
+- **A vitrine (2026-11-03, com 20 fotos geradas a pedido):** o resto desta seção. Ela é anterior às regras I-LEGENDA
+  v3 (cartão raro com `porque`, gigante sem pontuação, uma altura): o plano dela, guardado no bloco O PLANO de
+  `moldes/imagem-por-palavra/src/plano.ts`, não passa mais no checador de hoje. Serve para ver os recursos de imagem
+  (mosaico, rajada, estilos, herói, ponte), não como plano a seguir.
 
 A vitrine mostra onde cada recurso entrou e por quê. Num vídeo novo, o recurso só entra onde a fala nova tiver o mesmo
 porquê; nunca se copia a ordem nem os tempos (G30). Porquês desta vitrine: pico **diferença** porque é o termo da
@@ -404,7 +439,7 @@ promessa; mosaico em "vários" porque a fala diz quantidade; rajada em "qualquer
 "apenas um desses modelos" porque é a frase-promessa; estilos em "aceleradas" porque é verbo de velocidade; mosaico
 escurecido com o comando fixo porque a fala pede comentário.
 
-**O molde, desde a correção de 2026-11-05, vem com o plano corrigido** (`src/plano.json`, mesmas imagens): pessoa de 0 a 4,1 s
+**O molde, desde a correção de 2026-11-05, vem com o plano corrigido** (o bloco O PLANO de `src/plano.ts`, mesmas imagens): pessoa de 0 a 4,1 s
 (gancho na legenda, sem o pico "100%", que caía no meio da frase); onda 1 de 4,1 a 9,5 s, a parte forte da frase longa
 ("te mostrar a diferença entre vários modelos que eu criei e melhorei para editar qualquer tipo de vídeo": "mostrar",
 cartão creme com o pico **diferença**, mosaico em "vários", "criei", "melhorei", "editar", a rajada com a claquete); pessoa

@@ -16,7 +16,7 @@ faz:
 Cada versão final sai sozinha em <perfil>/conteudo/<tema>-DD-MM-AA/vN.mp4 (tools/entregar.py, chamado pelo final do molde).
 Depois: refazer o plano sobre a fala nova seguindo modelos/<modelo>/<modelo>.md (o arquivo único do modelo), rodar o checador e renderizar.
 """
-import argparse, json, shutil, subprocess, sys
+import argparse, json, re, shutil, subprocess, sys
 sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8')  # acentos no terminal do Windows
 from pathlib import Path
 
@@ -30,14 +30,15 @@ if (AQUI / '.cache' / 'ffmpeg' / 'ffmpeg.exe').exists() or (AQUI / '.cache' / 'f
 _comp = RAIZ / 'node_modules' / '@remotion' / 'compositor-win32-x64-msvc'
 if _comp.is_dir():
     os.environ['PATH'] = os.environ['PATH'].replace(os.pathsep, os.pathsep + str(_comp) + os.pathsep, 1)
-MIDIA_ORIGEM = {'fala.mp4', 'voz.wav', 'previa1.mp4', 'previa2.mp4', 'fala_grade.mp4', 'fala_desfoque.mp4'}
+MIDIA_ORIGEM = {'fala.mp4', 'voz.wav', 'previa1.mp4', 'previa2.mp4', 'fala_grade.mp4', 'fala_desfoque.mp4',
+                'trilha.wav', 'efeitos.wav'}  # som do aprovado: no vídeo novo nasce do plano novo, e só com ordem (G6)
 
 ap = argparse.ArgumentParser()
 ap.add_argument('modelo')
 ap.add_argument('gravacao')
 ap.add_argument('nome')
 ap.add_argument('--idioma', default='pt')
-ap.add_argument('--trocar', nargs='*', default=[])
+ap.add_argument('--trocar', nargs='*', action='extend', default=[])  # pode repetir: --trocar A=B --trocar C=D
 ap.add_argument('--sem-voz', action='store_true')
 ap.add_argument('--tratar-voz', action='store_true', help='opção (G6, só com ordem explícita): limpa a voz no preparar.py; no mixar, TRATAR_VOZ=1')
 ap.add_argument('--sem-adaptar', action='store_true')
@@ -56,8 +57,20 @@ if destino.exists():
     sys.exit(f'{destino} já existe')
 
 
+try:  # mídia do aprovado que o molde não pode passar pro vídeo novo (voz antiga, prints e foto de quem gravou): clone.json
+    NAO_COPIAR = {(molde / x).resolve() for x in json.loads((molde / 'scripts' / 'clone.json').read_text(encoding='utf-8')).get('nao_copiar', [])}
+except (OSError, ValueError):
+    NAO_COPIAR = set()
+
+
 def ignorar(pasta, nomes):
     p = Path(pasta)
+    if any((p / n).resolve() in NAO_COPIAR for n in nomes):
+        return [n for n in nomes if (p / n).resolve() in NAO_COPIAR] + ignorar_base(p, nomes)
+    return ignorar_base(p, nomes)
+
+
+def ignorar_base(p, nomes):
     fora = {'node_modules', 'out', 'conferencia', '.tmp', 'trabalho', 'entrada', 'entrega.json'}
     # da raiz do molde não vêm o plano, as props e o manual do vídeo aprovado (o plano do vídeo novo nasce do zero, e as
     # props da vitrine trazem o nome e o @ de quem gravou o aprovado)
@@ -69,6 +82,39 @@ def ignorar(pasta, nomes):
 
 print('1/4 copiando o molde', a.modelo)
 shutil.copytree(molde, destino, ignore=ignorar)
+# de qual molde o vídeo nasceu (tools/clone.py compara o vídeo com o aprovado desse molde)
+(destino / 'molde.json').write_text(json.dumps({'molde': a.modelo}, ensure_ascii=False) + '\n', encoding='utf-8')
+
+
+def plano_vazio(pasta: Path) -> str | None:
+    """O começo vazio (sistema/JEITO.md): o vídeo novo nasce sem o plano do aprovado. Se o molde tem scripts/plano_novo.*,
+    o texto dele entra no lugar do bloco entre a linha "O PLANO" e a linha "fim do plano" do script do plano (o arquivo
+    de scripts/ ou src/ que tem os dois marcadores, com a mesma extensão). Devolve o arquivo trocado, ou None."""
+    novos = sorted((pasta / 'scripts').glob('plano_novo.*'))
+    if not novos:
+        return None
+    novo = novos[0]
+    for alvo in sorted([*(pasta / 'scripts').glob(f'*{novo.suffix}'), *(pasta / 'src').glob(f'*{novo.suffix}')]):
+        if alvo == novo:
+            continue
+        bruto = alvo.read_bytes().decode('utf-8')
+        nl = '\r\n' if '\r\n' in bruto else '\n'
+        linhas = [l.rstrip('\r') for l in bruto.split('\n')]  # arquivo com fim de linha misturado também serve
+        ini = next((i for i, l in enumerate(linhas) if re.match(r'\s*(#|//|/\*|\*)[\s=\-*]*O PLANO', l)), None)  # só a linha-marcador
+        fim = next((i for i, l in enumerate(linhas) if ini is not None and i > ini and 'fim do plano' in l.lower()), None)
+        if ini is None or fim is None:
+            continue
+        miolo = novo.read_bytes().decode('utf-8').replace('\r\n', '\n').rstrip('\n').split('\n')
+        linhas[ini + 1:fim] = miolo
+        alvo.write_bytes(nl.join(linhas).encode('utf-8'))
+        return str(alvo.relative_to(pasta))
+    print(f'aviso: o molde tem {novo.name}, mas nenhum script com as linhas "O PLANO" e "fim do plano"; o plano do aprovado ficou')
+    return None
+
+
+trocado = plano_vazio(destino)
+if trocado:
+    print(f'   começo vazio: o bloco "O PLANO" de {trocado} nasceu sem as telas do aprovado (scripts/plano_novo)')
 
 # o vídeo pertence ao perfil em uso quando nasce; a entrega (tools/entregar.py) segue nele mesmo se o perfil mudar
 sys.path.insert(0, str(AQUI))

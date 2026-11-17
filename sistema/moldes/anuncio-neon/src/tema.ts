@@ -38,7 +38,7 @@ const limpa = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCa
 		const j = k >= 0 ? k : Math.min(plano.length, fala.length);
 		pare(
 			`O plano não bate com a fala. src/tempos.json foi feito para outra fala: na palavra ${j + 1} o plano tem "${plano[j] ?? '(fim)'}" e src/palavras.json tem "${fala[j] ?? '(fim)'}". ` +
-				'Refaça "cenas", "blocos", "marcas", "texto", "acordes" e "duracao_q" em src/tempos.json e as telas em src/cenas.tsx sobre a fala nova (modelos/anuncio-neon/anuncio-neon.md §9), e cole o texto da fala nova no campo "fala" (linha 2).',
+				'Refaça o plano sobre a fala nova no bloco "O PLANO" de scripts/plano.py (que grava src/tempos.json), com as telas novas em src/telas/ (modelos/anuncio-neon/anuncio-neon.md §9), e rode ../../.venv/Scripts/python.exe scripts/plano.py.',
 		);
 	}
 	const n = P.length;

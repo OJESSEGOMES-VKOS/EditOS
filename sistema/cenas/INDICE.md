@@ -1,6 +1,9 @@
 # Índice dos estilos de cena (Animation Styles)
 
-Os 46 estilos de cena do EditOS. Cada um mora em `estilos/<id>/` com a ficha (`<id>.md`) e a demo (`demo.mp4`). Como
+Os 46 estilos de cena do EditOS. Cada um mora em `estilos/<id>/` com a ficha (`<id>.md`) e a demo (`demo.mp4`). Cada um é também uma
+skill (`.claude/skills/<id>/SKILL.md`, na raiz do EditOS): a ficha traz a personalidade, como variar e o que nunca
+fazer, e o componente traz as palavras da demo em `componente/textos-demo.json`, que nunca vão para um vídeo cuja fala
+não as diz. `cena03`, `cena12` e `cena22` se recompõem a cada vídeo (o componente é só a referência). Como
 escolher e aplicar: `METODO.md`. Número é estável: estilo novo entra com o próximo número livre, nunca renumera.
 
 **2D** = edição em tela plana. **3D edição** = profundidade feita no próprio Remotion (perspectiva, CSS 3D, three.js),

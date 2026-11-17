@@ -1,0 +1,43 @@
+{
+ "_leia": "Para tools/clone.py: as telas da casa (src/Canvas.tsx CASA, ligadas no plano por <Tela comp=\"Nome\" />) e o texto que cada uma escreve fixo no código. O plano mora no bloco O PLANO de src/Canvas.tsx. nao_copiar: mídia do vídeo aprovado que o tools/novo-video.py não leva pro vídeo novo.",
+ "telas": [
+  "Hora2347",
+  "Data15",
+  "Relogio",
+  "Campo",
+  "SinalPago",
+  "PainelImg",
+  "Doze",
+  "Botao",
+  "Marca"
+ ],
+ "fixos": {
+  "Hora2347": [
+   "23:47"
+  ],
+  "Data15": [
+   "QUA",
+   "15",
+   "14:30 · Corte"
+  ],
+  "Campo": [
+   "agendar · Studio Aurora"
+  ],
+  "SinalPago": [
+   "Sinal pago",
+   "R$ 20,00"
+  ],
+  "Botao": [
+   "Teste grátis"
+  ],
+  "Marca": [
+   "marcaı"
+  ]
+ },
+ "nao_copiar": [
+  "public/som.m4a",
+  "public/painel.png",
+  "public/reserva.png",
+  "public/confirmado.png"
+ ]
+}

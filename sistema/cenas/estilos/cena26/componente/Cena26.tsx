@@ -9,16 +9,17 @@ const {fontFamily: INTER} = loadFont('normal', {weights: ['400', '500', '600', '
 
 export type Resposta = {iniciais: string; nome: string; arroba: string; texto: string; curtidas: number; cor: string};
 export type Cena26Props = {
-  contexto: [string, string]; // "Postado na terça." + "Apagado na quinta." (a segunda em negrito)
+  contexto: string[]; // 1 ou 2 partes; a última em negrito (ex.: quando foi postado + o que aconteceu)
   iniciais: string;
   nome: string;
   arroba: string;
   cargo: string;
   textoAntes: string; // parte do post antes da frase-chave
   fraseChave: string; // sublinhada
+  textoDepois?: string; // parte do post depois da frase-chave
   hora: string;
   numeros: {respostas: number; reposts: number; curtidas: number; views: number};
-  respostas: [Resposta, Resposta];
+  respostas: Resposta[]; // 0 a 3, cada uma sobe 16 quadros depois da anterior
   vermelho?: string;
   width?: number;
   height?: number;
@@ -60,7 +61,7 @@ const Avatar: React.FC<{ini: string; tam: number; cor: string}> = ({ini, tam, co
 );
 
 export const Cena26: React.FC<Cena26Props> = ({
-  contexto, iniciais, nome, arroba, cargo, textoAntes, fraseChave, hora, numeros, respostas, vermelho = '#F4385E',
+  contexto, iniciais, nome, arroba, cargo, textoAntes, fraseChave, textoDepois, hora, numeros, respostas, vermelho = '#F4385E',
   width = W, height = H,
 }) => {
   const frame = useCurrentFrame();
@@ -84,14 +85,14 @@ export const Cena26: React.FC<Cena26Props> = ({
   const vermelhoOn = frame >= tCor;
 
   // respostas sobem de baixo, a segunda empurra a pilha
-  const r1 = spring({frame: frame - 30, fps, config: {damping: 12, stiffness: 130}});
-  const r2 = spring({frame: frame - 46, fps, config: {damping: 12, stiffness: 130}});
+  const f0s = respostas.map((_, i) => 30 + i * 16);
+  const ks = f0s.map((f0) => spring({frame: frame - f0, fps, config: {damping: 12, stiffness: 130}}));
   const vel = (f0: number) => {
     const a = spring({frame: frame - f0, fps, config: {damping: 12, stiffness: 130}});
     const b = spring({frame: frame - f0 - 1, fps, config: {damping: 12, stiffness: 130}});
     return Math.abs(a - b);
   };
-  const empurra = -28 * r1 - 34 * r2;
+  const empurra = ks.reduce((acc, k, i) => acc - (i === 0 ? 28 : 34) * k, 0);
   const recuo = 1.03 - 0.03 * interpolate(frame, [0, 115], [0, 1], {...clamp, easing: Easing.inOut(Easing.sin)});
 
   // marcador
@@ -125,11 +126,12 @@ export const Cena26: React.FC<Cena26Props> = ({
       <div style={{position: 'absolute', left: (width - W * s) / 2, top: (height - H * s) / 2, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0'}}>
         <div style={{position: 'absolute', inset: 0, transform: `scale(${recuo})`, transformOrigin: '50% 45%'}}>
           <div style={{position: 'absolute', top: 54, width: W, textAlign: 'center', fontSize: 34, color: '#6B7684', fontWeight: 500}}>
-            {contexto[0]} <span style={{fontWeight: 700, color: '#3A434F'}}>{contexto[1]}</span>
+            {contexto.slice(0, -1).join(' ')}{contexto.length > 1 ? ' ' : ''}<span style={{fontWeight: 700, color: '#3A434F'}}>{contexto[contexto.length - 1]}</span>
           </div>
           <div style={{position: 'absolute', inset: 0, transform: `translateY(${empurra}px)`}}>
-            <Quote r={respostas[0]} k={r1} v={vel(30)} y={TOP + 478} x={-16} f0={30} />
-            <Quote r={respostas[1]} k={r2} v={vel(46)} y={TOP + 660} x={22} f0={46} />
+            {respostas.map((r, i) => (
+              <Quote key={i} r={r} k={ks[i]} v={vel(f0s[i])} y={TOP + 478 + i * 182} x={i % 2 ? 22 : -16} f0={f0s[i]} />
+            ))}
             <div style={{position: 'absolute', left: 80, top: TOP, width: 920, perspective: 1600, zIndex: 0}}>
               <div style={{background: '#fff', borderRadius: 26, padding: '34px 40px 30px', boxShadow: '0 0 0 1.5px #E3E7EC, 0 18px 40px rgba(15,20,25,0.12), 0 3px 8px rgba(15,20,25,0.06)', transform: `rotateX(${rotX}deg) rotateZ(${rotZ}deg) scale(${esc})`, transformOrigin: '50% 30%'}}>
                 <div style={{display: 'flex', alignItems: 'center'}}>
@@ -147,6 +149,7 @@ export const Cena26: React.FC<Cena26Props> = ({
                       <path d="M1 12 C 20 9, 45 13, 70 10 S 92 11, 98 8 L 99 14 C 80 16, 55 13, 30 16 S 8 15, 1 17 Z" fill={vermelho} style={{clipPath: `inset(0 ${(1 - kMarc) * 100}% 0 0)`}} />
                     </svg>
                   </span>
+                  {textoDepois ? <> {textoDepois}</> : null}
                 </div>
                 <div style={{fontSize: 26, color: '#6B7684', marginTop: 20}}>{hora}</div>
                 <div style={{height: 1.5, background: '#E3E7EC', margin: '22px 0 20px'}} />

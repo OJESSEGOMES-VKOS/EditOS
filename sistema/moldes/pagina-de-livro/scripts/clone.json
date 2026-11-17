@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: as peças da casa que o plano liga (nome da constante no bloco O PLANO de src/Reel.tsx) e o texto que cada uma escreve fixo no código. No pagina-de-livro nenhuma peça escreve texto fixo: blocos (palavra gigante), legenda e comando saem das palavras ditas, todos dentro de PECAS; fora dela só o chicote da chamada.",
+ "telas": ["CHICOTE"],
+ "fixos": {}
+}

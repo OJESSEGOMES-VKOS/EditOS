@@ -1,7 +1,8 @@
 // Conferidor do texto-e-objeto: confere o plano (CENAS de src/Cenas.tsx) contra a fala e o texto de cada tela contra as
 // regras de ofício (modelos/texto-e-objeto/texto-e-objeto.md). Sai com código 1 quando reprova e diz o que mexer (arquivo:linha).
 // uso (de dentro da pasta do vídeo ou do molde): node scripts/cobertura.mjs
-// Confere: 1) toda palavra do plano (w('palavra', n) em src/) existe na fala e as linhas de cada tela seguem a fala;
+// Confere: 0) o plano não está vazio e cada herói do plano existe (da casa ou tela livre registrada em src/telas/index.ts);
+// 1) toda palavra do plano (w('palavra', n) e naTela(c, 'palavra') nos heróis usados e nas telas livres) existe na fala e as linhas de cada tela seguem a fala;
 // 2) tela >= 1,5 s; 3) palavra >= 0,4 s na tela depois de nascer; 4) até 4 linhas por tela; 5) o bloco de texto dentro da
 // zona segura (x 60-940, y 250-1500), já com a aproximação da câmera no fim da tela. O texto dos heróis não é medido.
 import {build} from 'esbuild';
@@ -46,7 +47,11 @@ const alcancaveis = (mapa, raizes) => {
 // 1. as palavras do plano existem na fala (lista todas de uma vez, com a linha); só conta o herói que alguma tela de CENAS usa
 const faltam = [];
 const mapa = declaracoes(CENAS_SRC);
-const vivas = alcancaveis(mapa, ['CENAS', 'Tela', 'cenaEm']);
+// os heróis que o plano usa (heroi: <Heroi comp="Nome" />): só eles contam; o registro CASA não puxa os outros
+const usados = [...(mapa.get('CENAS')?.linhas.join('\n') ?? '').matchAll(/comp="(\w+)"/g)].map((m) => m[1]);
+mapa.delete('CASA');
+mapa.delete('Heroi');
+const vivas = alcancaveis(mapa, ['CENAS', 'Tela', 'cenaEm', ...usados]);
 const conta = (i) => [...mapa].some(([n, d]) => vivas.has(n) && i >= d.de && i < d.de + d.linhas.length);
 CENAS_SRC.forEach((l, i) => {
 	if (!conta(i)) return;
@@ -55,6 +60,20 @@ CENAS_SRC.forEach((l, i) => {
 		if (tem < n) faltam.push(`src/Cenas.tsx:${i + 1}: ${m[0]} pede a ${n}ª vez que se diz "${m[1]}", e a fala ${tem ? `só tem ${tem}` : 'não tem nenhuma'}`);
 	}
 });
+// as telas livres (src/telas/<Nome>.tsx) que o plano usa: as mesmas contas, e registradas em src/telas/index.ts
+const TELAS_DIR = path.join(SRC, 'telas');
+const registro = fs.existsSync(path.join(TELAS_DIR, 'index.ts')) ? fs.readFileSync(path.join(TELAS_DIR, 'index.ts'), 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '') : '';
+for (const nome of usados) {
+	const arq = path.join(TELAS_DIR, `${nome}.tsx`);
+	if (!fs.existsSync(arq)) continue; // herói da casa
+	if (!new RegExp(`\\b${nome}\\b`).test(registro)) faltam.push(`src/telas/${nome}.tsx existe, mas não está registrada em src/telas/index.ts`);
+	fs.readFileSync(arq, 'utf8').split('\n').forEach((l, i) => {
+		for (const m of l.matchAll(/\b(?:w\('([^'$]+)'(?:,\s*(\d+))?\)|naTela\(\w+,\s*'([^'$]+)'(?:,\s*(\d+))?\))/g)) {
+			const palavra = m[1] ?? m[3], n = Number(m[2] ?? m[4] ?? 1), tem = PB.filter((p) => limpa(p.text) === limpa(palavra)).length;
+			if (tem < n) faltam.push(`src/telas/${nome}.tsx:${i + 1}: ${m[0]} pede a ${n}ª vez que se diz "${palavra}", e a fala ${tem ? `só tem ${tem}` : 'não tem nenhuma'}`);
+		}
+	});
+}
 console.log(`${faltam.length} palavras dos heróis que a fala não tem`);
 faltam.forEach((x) => console.log('  ' + x));
 
@@ -87,6 +106,10 @@ if (!R || faltam.length) {
 	process.exit(1);
 }
 const {CENAS, QUADROS, FPS} = R;
+if (!CENAS.some((c) => c.linhas.length || c.heroi)) {
+	console.log('REPROVADO: PLANO VAZIO. O vídeo nasceu sem as telas do aprovado: monte CENAS em src/Cenas.tsx pela fala nova (.claude/skills/texto-e-objeto/SKILL.md e texto-e-objeto.md §9).');
+	process.exit(1);
+}
 const FIM = QUADROS / FPS;
 const ZONA = {esq: 60, dir: 940, topo: 250, base: 1500};
 const fator = (l) => (l.fonte === 'script' ? 0.42 : l.fonte === 'serif' ? 0.42 : l.tam >= 120 ? 0.5 : 0.52); // largura média da letra (em)

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Freeze, OffthreadVideo, staticFile} from 'remotion';
-import {C, E, R, SANS, SERIF, SOMBRA, mola, rostoX, tw, useT} from './tema';
+import {C, DIVISA, E, MONO, R, SANS, SERIF, SOMBRA, mola, rostoX, tw, useT} from './tema';
 
 /** o vídeo pode acabar antes da fala: daí em diante segura o penúltimo quadro de public/fala.mp4 (na vitrine, 906 quadros:
  * segura o 904). A contagem vem de src/rosto_med.json, que scripts/rosto.py mede do vídeo. */
@@ -134,3 +134,148 @@ export const RostoPalco: React.FC = () => (
 		<FalaEm s={0.82} cx={431} oy={250} />
 	</div>
 );
+
+/* ================================================================ o kit da tela livre (src/telas/ da pasta do vídeo)
+ * As peças da casa para a interface que a fala nova pede e o aprovado não tem. Toda tela livre desenha dentro do <Palco>,
+ * e cada movimento está preso a uma palavra dita (os instantes chegam do plano em `em`). A língua é a do modelo: creme com
+ * grade, papel #FBF8F2 ou escuro #161616, terracota #D97757 de acento, Geist / Instrument Serif itálica / Geist Mono,
+ * entrada com mola ou deslizando em ~8 quadros, troca no lugar com chicote (Troca). Nada de ícone genérico nem selo. */
+
+/** dividido (M3): em cima o visual (até a DIVISA, y 858), embaixo o rosto no tamanho do aprovado */
+const LARGURA_APROVADO = 398.6;
+export const Dividido: React.FC<{children: React.ReactNode}> = ({children}) => (
+	<>
+		<div style={{position: 'absolute', left: 0, top: 0, width: 1080, height: DIVISA, overflow: 'hidden'}}>{children}</div>
+		<div style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920, clipPath: `inset(${DIVISA}px 0 0 0)`}}>
+			<FalaEm s={LARGURA_APROVADO / R.largura} cx={540} oy={1170} />
+		</div>
+	</>
+);
+
+/** a zona segura de cada modo, onde a tela livre desenha (px no quadro 1080x1920, ou no card do palco):
+ * palco = o card inteiro (966x705); dividido = a metade de cima (x 60-1020, y 60-800); motion = x 60-1020, y 150-1270
+ * (com a legenda no topo, y 420-1500) */
+export const ZONA_LIVRE = {
+	palco: {x: 0, y: 0, w: 966, h: 705},
+	dividido: {x: 60, y: 60, w: 960, h: 740},
+	motion: {x: 60, y: 150, w: 960, h: 1120},
+	motionTopo: {x: 60, y: 420, w: 960, h: 1080},
+};
+export const Palco: React.FC<{modo: 'palco' | 'dividido' | 'motion'; topo?: boolean; children: React.ReactNode}> = ({modo, topo, children}) => {
+	const z = modo === 'motion' && topo ? ZONA_LIVRE.motionTopo : ZONA_LIVRE[modo];
+	return <div style={{position: 'absolute', left: z.x, top: z.y, width: z.w, height: z.h}}>{children}</div>;
+};
+
+/** pasta e arquivo (ícones desenhados) */
+export const Pasta: React.FC<{cor?: string; cheia?: number}> = ({cor = C.destaque, cheia = 1}) => (
+	<svg width={36} height={30} viewBox="0 0 36 30" style={{flex: 'none'}}>
+		<path d="M2 5 Q2 2 5 2 L13 2 L16 6 L31 6 Q34 6 34 9 L34 25 Q34 28 31 28 L5 28 Q2 28 2 25 Z" fill={cor} fillOpacity={0.18 + 0.72 * cheia} stroke={cor} strokeWidth={2.5} />
+	</svg>
+);
+export const Arq: React.FC<{cor?: string}> = ({cor = '#9C958A'}) => (
+	<svg width={36} height={30} viewBox="0 0 36 30" style={{flex: 'none'}}>
+		<path d="M9 2 L22 2 L29 9 L29 28 L9 28 Z" fill="none" stroke={cor} strokeWidth={2.5} strokeLinejoin="round" />
+		<path d="M22 2 L22 9 L29 9" fill="none" stroke={cor} strokeWidth={2.5} strokeLinejoin="round" />
+	</svg>
+);
+
+/** entra com mola no instante `em` (sobe 60 px; salta: o pop de escala 0,6 para 1) */
+export const Entra: React.FC<{em: number; x: number; y: number; w?: number; h?: number; salta?: boolean; children: React.ReactNode}> = ({em, x, y, w, h, salta, children}) => {
+	const {t} = useT();
+	if (t < em - 0.02) return null;
+	const k = mola(t, em - 0.02, {damping: 18});
+	const st: React.CSSProperties = salta ? pop(t, em - 0.02) : {opacity: Math.min(1, k * 1.5), transform: `translateY(${(1 - k) * 60}px)`};
+	return <div style={{position: 'absolute', left: x, top: y, width: w, height: h, ...st}}>{children}</div>;
+};
+
+/** janela de app (papel ou escura), barra com os três pontos e o nome em mono; o conteúdo vai embaixo da barra */
+export const Janela: React.FC<{w: number; h: number; titulo?: string; escuro?: boolean; children?: React.ReactNode}> = ({w, h, titulo, escuro, children}) => (
+	<div style={{position: 'relative', width: w, height: h, borderRadius: 26, background: escuro ? C.escuro : C.branco, boxShadow: SOMBRA, border: escuro ? '1px solid #2E2C2A' : '1px solid #E6E1D8', overflow: 'hidden'}}>
+		<div style={{height: 70, borderBottom: escuro ? '1px solid #2E2C2A' : '1px solid #EEE9E1', display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 28}}>
+			{['#FF5F57', '#FEBC2E', '#28C840'].map((k) => (
+				<div key={k} style={{width: 18, height: 18, borderRadius: 9, background: k}} />
+			))}
+			{titulo ? <div style={{flex: 1, textAlign: 'center', marginRight: 120, fontFamily: MONO, fontSize: 22, color: C.suave}}>{titulo}</div> : null}
+		</div>
+		<div style={{position: 'absolute', left: 0, top: 70, width: w, height: h - 70}}>{children}</div>
+	</div>
+);
+
+/** uma linha de lista em mono que desliza da esquerda no instante `em` (pasta, arquivo, item); `marca` acende a seleção */
+export const Linha: React.FC<{em: number; y: number; x?: number; icone?: 'pasta' | 'arq' | null; marca?: number; children: React.ReactNode}> = ({em, y, x = 36, icone = null, marca, children}) => {
+	const {t} = useT();
+	if (t < em - 0.02) return null;
+	const k = tw(t, em - 0.02, em + 0.2, 0, 1);
+	const sel = marca !== undefined && t >= marca;
+	return (
+		<div style={{position: 'absolute', left: x, top: y, display: 'flex', alignItems: 'center', gap: 18, padding: '12px 18px', borderRadius: 12, fontFamily: MONO, fontWeight: 500, fontSize: 32, color: sel ? C.branco : C.tinta, background: sel ? C.selecao : 'transparent', opacity: k, transform: `translateX(${(1 - k) * -50}px)`}}>
+			{icone === 'pasta' ? <Pasta cor={sel ? C.branco : C.destaque} /> : icone === 'arq' ? <Arq /> : null}
+			{children}
+		</div>
+	);
+};
+
+/** o ✓ verde que estala no instante `em` */
+export const Check: React.FC<{em: number; size?: number}> = ({em, size = 40}) => {
+	const {t} = useT();
+	if (t < em) return null;
+	return <div style={{width: size, height: size, borderRadius: size / 2, background: C.verde, color: C.branco, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: SANS, fontWeight: 800, fontSize: size * 0.6, ...pop(t, em)}}>✓</div>;
+};
+
+/** texto que se digita letra a letra de `de` a `ate`, com o cursor piscando (campo de prompt, busca, comentário) */
+export const Digita: React.FC<{texto: string; de: number; ate: number; mono?: boolean; size?: number; cor?: string}> = ({texto, de, ate, mono, size = 46, cor = C.tinta}) => {
+	const {t} = useT();
+	const n = Math.round(tw(t, de, ate, 0, texto.length, (x) => x));
+	const pisca = t < ate + 0.6 && (t < ate || Math.floor(t * 2.2) % 2 === 0);
+	return (
+		<span style={{fontFamily: mono ? MONO : SANS, fontWeight: 500, fontSize: size, color: cor, whiteSpace: 'nowrap'}}>
+			{texto.slice(0, n)}
+			{t >= de - 0.2 && pisca ? <span style={{display: 'inline-block', width: 4, height: size * 1.05, background: C.tinta, marginLeft: 6, verticalAlign: '-0.15em'}} /> : null}
+		</span>
+	);
+};
+
+/** o botão de enviar: terracota com a seta, vira verde com o ✓ no instante `envia` */
+export const Enviar: React.FC<{envia: number; size?: number}> = ({envia, size = 62}) => {
+	const {t} = useT();
+	const ok = t >= envia;
+	return (
+		<div style={{width: size, height: size, borderRadius: size / 2, background: ok ? C.verde : C.destaque, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${ok ? 0.9 + 0.1 * mola(t, envia) : 1})`}}>
+			{ok ? (
+				<span style={{color: C.branco, fontFamily: SANS, fontWeight: 800, fontSize: size * 0.5}}>✓</span>
+			) : (
+				<svg width={size * 0.48} height={size * 0.48} viewBox="0 0 24 24">
+					<path d="M12 19V5M5 12l7-7 7 7" stroke="#fff" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+				</svg>
+			)}
+		</div>
+	);
+};
+
+/** o contador: pílula escura, o número em Geist 800 terracota claro subindo até EXATAMENTE o número dito (G10) */
+export const Contador: React.FC<{em: number; valor: number; sufixo?: string; rotulo?: string; size?: number}> = ({em, valor, sufixo = '', rotulo, size = 120}) => {
+	const {t} = useT();
+	if (t < em) return null;
+	const n = Math.round(tw(t, em, em + 0.75, 0, valor));
+	return (
+		<div style={{display: 'inline-flex', alignItems: 'baseline', gap: 18, background: C.escuro, borderRadius: 30, padding: '18px 34px', ...pop(t, em)}}>
+			<span style={{fontFamily: SANS, fontWeight: 800, fontSize: size, letterSpacing: '-0.04em', color: C.destaqueClaro, lineHeight: 1}}>
+				{n}
+				{sufixo}
+			</span>
+			{rotulo ? <span style={{fontFamily: SANS, fontWeight: 700, fontSize: size * 0.32, color: C.branco}}>{rotulo}</span> : null}
+		</div>
+	);
+};
+
+/** o grifo: marca-texto terracota a 30% que se desenha da esquerda para a direita em 0,35 s, atrás do texto */
+export const Grifo: React.FC<{em: number; children: React.ReactNode}> = ({em, children}) => {
+	const {t} = useT();
+	const k = tw(t, em, em + 0.35, 0, 1);
+	return (
+		<span style={{position: 'relative', display: 'inline-block'}}>
+			<span style={{position: 'absolute', left: -6, right: -6, top: '18%', bottom: '8%', background: 'rgba(217,119,87,0.30)', borderRadius: 6, transformOrigin: '0 50%', transform: `scaleX(${k})`}} />
+			<span style={{position: 'relative'}}>{children}</span>
+		</span>
+	);
+};

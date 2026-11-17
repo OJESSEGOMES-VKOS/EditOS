@@ -90,24 +90,72 @@ export const w = (texto: string, n = 1) => P.palavras[iw(texto, n)].de;
 /** corte seco 2 quadros antes da palavra que abre a cena (ref1/ref2: troca de modo sem transição) */
 const corte = (t: number) => t - 0.06;
 export type Modo = 'motion' | 'palco' | 'dividido' | 'rosto';
-export type Cena = {id: string; modo: Modo; de: number; ate: number; legendaTopo?: boolean};
+/** a tela livre: a interface que a fala nova pede e o aprovado não tem. O desenho mora em src/telas/<comp>.tsx da pasta do
+ * vídeo (registrado em src/telas/index.ts). modo: 'palco' (card no meio, rosto no card de baixo, titulo de 1 linha = texto
+ * dito), 'dividido' (a interface em cima, o rosto embaixo, a etiqueta mono na divisa) ou 'motion' (um visual grande, sem
+ * câmera; topo: true sobe a legenda para y 250). em = instantes (w('palavra')), textos = texto dito, dados = o resto. */
+export type Livre = {comp: string; modo: 'palco' | 'dividido' | 'motion'; de: number; titulo?: string; escuro?: boolean; topo?: boolean; em?: Record<string, number>; textos?: Record<string, string>; dados?: Record<string, unknown>};
+export type Cena = {id: string; modo: Modo; de: number; ate: number; legendaTopo?: boolean; livre?: Livre};
+/** uma tela da casa ligada no plano: o início dela (corte(w('palavra que abre o trecho')) */
+type Casa = {de: number} | null;
+/** o fecho do Instagram: a folha de comentários, a palavra digitada e publicada; a DM só se a fala promete mandar */
+export type Fecho = {de: number; palavra: string; digita: number; publica: number; coracao?: number; dm?: {chega: number; ponto: number} | null; fixado?: string | null} | null;
+/* As variáveis do plano. Cada tela da casa é uma variável com o mesmo nome do id dela em CENA_COMP (src/Cenas.tsx); a que
+ * o plano não liga fica null e não aparece. O plano (o bloco abaixo) só atribui as que a fala pede. */
+let rosto: number[] = [0]; // o rosto cheio (o padrão, G6): os inícios de cada trecho de rosto
+let perto: number[] = []; // o punch-in da virada ("mas", "só que"): os inícios
+let gancho: Casa = null, criado: Casa = null, modelos: Casa = null, instagram: Casa = null, nome: Casa = null, outros: Casa = null, previas: Casa = null;
+let comenta: Fecho = null;
+let livres: Livre[] = [];
+let CHAVE: number[] = [], CAIXA_ALTA: number[] = [], SELECAO: number[] = [];
+let EQUILIBRA = true; // a legenda corta cada cena na melhor partição (src/Legenda.tsx, equilibrar); a vitrine aprovada saiu sem
 /* G6 (2026-11-05): a maior parte é o ROSTO CHEIO, a gravação crua com o fundo real; a tela de interface (palco, motion,
  * dividido) entra só onde a fala pede a coisa e fecha uma cena forte (a frase acaba no ponto). Nunca uma tela por frase. */
-const base = (previas: boolean): [string, Modo, number, boolean?][] => [
-	['abre', 'rosto', 0], // Esse vídeo está sendo 100% editado pelo Claude. Ele foi criado justamente para te mostrar a
-	['modelos', 'palco', corte(w('diferença'))], // diferença entre vários modelos que eu criei e melhorei / para editar qualquer tipo de vídeo usando o Claude.  (fecha a cena: a interface dos modelos)
-	['fala', 'rosto', corte(w('inclusive'))], // Inclusive, se você estiver no Instagram agora, você está vendo apenas um desses modelos.
-	['previas', previas ? 'dividido' : 'rosto', corte(w('eu', 2))], // Eu posso até colocar duas prévias rápidas aqui em cima, aceleradas em três vezes.
-	['mas', 'rosto', corte(w('mas'))], // Mas se você quiser realmente ver outros modelos de edição como esse e aprender a como usar isso nos seus vídeos,  (punch-in da virada, até o fecho)
-	['comenta', 'motion', corte(w('comenta')), true], // comenta edição aqui embaixo que eu vou te mandar na sua DM agora.  (o fecho: a interface do pedido)
-];
-/* O plano da vitrine aprovada (antes da G6), para refazê-la: ['gancho', 'motion', 0], ['criado', 'dividido', corte(w('ele'))],
- * ['modelos', 'palco', corte(w('diferença'))], ['instagram', 'motion', corte(w('inclusive'))], ['nome', 'palco', corte(w('você', 2))],
- * ['previas', previas ? 'dividido' : 'rosto', corte(w('eu', 2))], ['mas', 'rosto', corte(w('mas'))], ['outros', 'palco', corte(w('ver'))],
- * ['comenta', 'motion', corte(w('comenta')), true] (e som.py com TELAS de todas). */
-export const montaCenas = (previas: boolean): Cena[] => {
-	const b = base(previas);
-	return b.map(([id, modo, de, topo], i) => ({id, modo, de, ate: i + 1 < b.length ? b[i + 1][2] : DURACAO, legendaTopo: topo}));
+// ================================================================ O PLANO (refazer num vídeo novo: tools/novo-video.py põe aqui o scripts/plano_novo.ts)
+rosto = [0, corte(w('inclusive'))]; // "Esse vídeo está sendo 100% editado pelo Claude. Ele foi criado..." e "Inclusive, se você estiver no Instagram agora..."
+modelos = {de: corte(w('diferença'))}; // "diferença entre vários modelos que eu criei e melhorei para editar qualquer tipo de vídeo usando o Claude." (a interface dos modelos)
+previas = {de: corte(w('eu', 2))}; // "Eu posso até colocar duas prévias rápidas aqui em cima, aceleradas em três vezes." (com a prop previas)
+perto = [corte(w('mas'))]; // "Mas se você quiser realmente ver outros modelos..." (punch-in da virada, até o fecho)
+comenta = {de: corte(w('comenta')), palavra: 'EDIÇÃO', digita: w('edição', 2), publica: w('aqui', 2) + 0.06, coracao: w('embaixo') + 0.15, dm: {chega: w('que', 2), ponto: w('dm')}, fixado: 'Comenta EDIÇÃO que eu te mando na DM'};
+livres = [];
+CHAVE = [iw('100%'), iw('claude'), iw('diferença'), iw('claude', 2), iw('prévias'), iw('três'), iw('edição', 2), iw('dm')]; // palavras-chave em serifa itálica
+CAIXA_ALTA = [iw('edição', 2)]; // a palavra que a pessoa vai comentar
+SELECAO = [iw('edição', 2)]; // a que ganha a caixa de seleção com alças
+EQUILIBRA = false; // a vitrine aprovada saiu com a junção gulosa antiga (os 4 pedaços curtos da seção 10)
+// ================================================================ fim do plano
+/* O plano da vitrine aprovada (antes da G6), para refazê-la: gancho = {de: 0}, criado = {de: corte(w('ele'))},
+ * modelos = {de: corte(w('diferença'))}, instagram = {de: corte(w('inclusive'))}, nome = {de: corte(w('você', 2))},
+ * previas = {de: corte(w('eu', 2))}, perto = [corte(w('mas'))], outros = {de: corte(w('ver'))}, comenta como acima, rosto = []
+ * (e som.py com TELAS de todas). */
+export const FECHO = comenta;
+export const LIVRES = livres;
+export const EQUILIBRIO = EQUILIBRA;
+export const CHAVES = new Set(CHAVE), CAIXAS_ALTAS = new Set(CAIXA_ALTA), SELECOES = new Set(SELECAO);
+/** o modo de cada tela da casa (o id é o nome da variável do plano) */
+const CASA: [string, Casa, Modo][] = [['gancho', gancho, 'motion'], ['criado', criado, 'dividido'], ['modelos', modelos, 'palco'], ['instagram', instagram, 'motion'], ['nome', nome, 'palco'], ['outros', outros, 'palco']];
+const plano = (comPrevias: boolean): Omit<Cena, 'ate'>[] => {
+	const xs: Omit<Cena, 'ate'>[] = [
+		...rosto.map((de) => ({id: 'rosto', modo: 'rosto' as Modo, de})),
+		...perto.map((de) => ({id: 'perto', modo: 'rosto' as Modo, de})),
+		...CASA.flatMap(([id, c, modo]) => (c ? [{id, modo, de: c.de}] : [])),
+		...(previas ? [{id: 'previas', modo: (comPrevias ? 'dividido' : 'rosto') as Modo, de: previas.de}] : []),
+		...(comenta ? [{id: 'comenta', modo: 'motion' as Modo, de: comenta.de, legendaTopo: true}] : []),
+		...livres.map((L, k) => ({id: `livre${k}`, modo: L.modo as Modo, de: L.de, legendaTopo: L.topo, livre: L})),
+	].sort((a, b) => a.de - b.de);
+	const erro = (m: string) => {
+		throw new Error(`O plano (bloco "O PLANO" de src/tema.ts): ${m} (modelos/interface-encenada/interface-encenada.md, seção 9).`);
+	};
+	if (!xs.length || Math.abs(xs[0].de) > 1e-6) erro('a primeira cena começa em 0 (o gancho é o rosto cheio, G29): rosto = [0, ...]');
+	xs.forEach((c, i) => i && Math.abs(c.de - xs[i - 1].de) < 0.2 && erro(`duas cenas começam juntas (${xs[i - 1].id} e ${c.id} em ${c.de.toFixed(2)} s)`));
+	livres.forEach((L, k) => {
+		if (!L.comp || !['palco', 'dividido', 'motion'].includes(L.modo)) erro(`livres[${k}] precisa de comp e de modo 'palco', 'dividido' ou 'motion'`);
+		if (L.titulo && L.modo !== 'palco') erro(`livres[${k}] (${L.comp}): título só no palco`);
+	});
+	return xs;
+};
+export const montaCenas = (comPrevias: boolean): Cena[] => {
+	const b = plano(comPrevias);
+	return b.map((c, i) => ({...c, ate: i + 1 < b.length ? b[i + 1].de : DURACAO}));
 };
 
 /** as prévias ligadas ou não e o perfil (props da composição) chegam a todo lugar por contexto; arroba e foto vazios escondem o elemento */

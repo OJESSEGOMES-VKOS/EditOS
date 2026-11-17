@@ -254,22 +254,27 @@ Os comandos rodam da raiz do estúdio (`sistema/`), menos onde está escrito "na
    ou voltando ao gancho; ~2,7 palavras/s, com pausas. Profissão regulamentada: seção 7b antes de tudo.
 2. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py especialista <gravacao.mp4> <AAAA-MM-DD-tema>`
    (**antes da aprovação do modelo, com `--sem-adaptar`**: ainda não há `assinatura.json`; esta nota sai na aprovação).
-   Nome errado na transcrição: `--trocar Errado=Certo`.
+   Nome errado na transcrição: `--trocar Errado=Certo`. **O plano nasce vazio** (`scripts/plano_novo.tsx` entra no
+   lugar do bloco O PLANO de `src/Reel.tsx`): só a base, com a legenda automática (`PEDACOS = null`: uma página por
+   subtrecho, até 2 linhas) e o `Y_TEXTO` medido desta gravação. Nada da vitrine vem junto (`JEITO.md`; a skill
+   `.claude/skills/especialista/SKILL.md` diz como escolher). O modelo não tem tela livre: o único grafismo é a letra.
 3. **Meça a cena e as mãos** (na pasta do vídeo): `../../.venv/Scripts/python.exe scripts/cor_da_cena.py` (cole a linha
    `C` no plano) e `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/maos.py`.
 4. **Escreva o `plano.md`** trecho a trecho sobre `src/palavras.json` (G14, G28): a função de cada trecho (seção 1) e o
    modo que ela chama, ou base. O vídeo começa na gravação original com ênfase no gancho (G29).
-5. **Monte O PLANO** no topo de `src/Reel.tsx` (o molde para ao carregar e diz o que não bate com a fala):
-   - `C`: a cor da cena;
-   - `MODOS_DEF`: `{tipo: 'gigante', primeira, cima?, grupos, traco?}` (cima = o começo da mesma fala, 1 linha;
-     traco: true marca a última palavra) ou `{tipo: 'citacao', paginas: [[i, 'texto / 2ª linha'], ...]}` sem aspas,
-     na ordem da fala;
-   - `TRANSICOES`: `[índice, 'palavra']` da 1ª palavra do trecho novo onde entra a fusão (só depois de ponto);
-   - `REENQUADRES`: `[]` (só a pedido);
-   - `PEDACOS`: a legenda da base, `[1ª palavra, 'texto / 2ª linha']`, cobrindo toda palavra fora dos modos;
-   - `Y_TEXTO` e `Y_PAR` da gravação (entre o queixo e o que houver de claro na roupa).
+5. **Ligue no bloco O PLANO** de `src/Reel.tsx` só o que a fala pede (o molde para ao carregar e diz o que não bate
+   com a fala). Cada peça é uma linha de atribuição; sem a linha, ela fica desligada:
+   - `GIGANTES = [gigante(i, ['grupo', ...], {cima?, traco?}), ...];` (cima = o começo da mesma fala, 1 linha;
+     traco: true marca a última palavra, uma vez no vídeo);
+   - `CITACOES = [citacao([i, 'texto / 2ª linha'], ...)];` sem aspas, só com fala citada de verdade;
+   - `TRANSICOES = [[índice, 'palavra'], ...];` a 1ª palavra do trecho novo onde entra a fusão (só depois de ponto);
+   - `REENQUADRES` só a pedido; `PEDACOS = [[i, 'texto / 2ª linha'], ...];` só se a legenda automática quebrar mal;
+   - `Y_TEXTO = ...; Y_PAR = ...;` só olhando o quadro (o padrão já é o medido da gravação).
+   A cor `C` fica logo acima do bloco (é medida da cena, não plano). No `plano.md`, cada destaque leva a peça e a
+   palavra dita entre aspas (`tools/clone.py` cobra; `scripts/clone.json` diz as peças).
 6. **Confira:** `node scripts/checar.mjs` (na pasta do vídeo) até `APROVADO`; leia os avisos. Aviso do checador sobre
-   "poucos modos" ou "base longa" não manda criar modo: quem manda é a fala.
+   "poucos modos" ou "base longa" não manda criar modo: quem manda é a fala. Depois `tools/decupar.py <pasta>
+   --conferir` e `tools/clone.py oficina/<pasta>` até `SEM CLONE` (de dentro de `sistema/`).
 7. **Som:** só a voz (G6). `scripts/som.py` e `--cama` só com ordem explícita.
 8. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 5 10` (na pasta do vídeo).
 9. **Renderize** (na pasta do vídeo):
@@ -282,10 +287,15 @@ Os comandos rodam da raiz do estúdio (`sistema/`), menos onde está escrito "na
 **O terceiro vídeo (tema chato, fala longa, sem citação):** base com a legenda pequena; um gigante só onde a fala tem
 peso; a tese em gigante com linha de cima e traço, se houver tese; fecho em gigante, se houver aforismo. Sem fala citada, não há citação: não invente.
 
-## 10. O plano da vitrine (exemplo, não roteiro)
+## 10. O plano da vitrine (exemplos com o porquê, não roteiro)
 
 Gravação comum (`teste-comum/gravacao.mp4`, 30,4 s de fala, 3,2 palavras/s), sem adaptar. Feita antes das regras de
-2026-11-05: serve para ver os modos funcionando, não como sequência a repetir (G30).
+2026-11-05: serve para ver os modos funcionando, não como sequência a repetir (G30). É o bloco O PLANO do molde; um
+vídeo novo nunca começa dele (nasce do `scripts/plano_novo.tsx`). Cada destaque abaixo existe por um porquê daquela
+fala: o gigante do gancho porque "100% editado pelo Claude" é a afirmação de peso; o do fim porque é a ordem ("comenta
+edição"); o "ver outros modelos" da tabela (o convite) não está mais no bloco do molde. Num vídeo novo, a palavra em gigante é a que tem o
+mesmo porquê na fala nova, nunca a mesma palavra. Prova de uma fala diferente (2026-11-17, earshot):
+`oficina/2026-11-17-teste-skill-especialista/` (base ~85%, gigantes OUVIDOS com traço, ALGO NOVO e ÁUDIO).
 
 | Tempo | Fala | Modo | Na tela |
 |---|---|---|---|

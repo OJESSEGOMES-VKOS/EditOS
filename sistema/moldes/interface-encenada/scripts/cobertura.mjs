@@ -51,7 +51,14 @@ const alcancaveis = (mapa, raizes) => {
 // cenas que base() usa (src/tema.ts); cena fora de base() não é cobrada.
 const faltam = [];
 const tema = FONTES.find((x) => x.f === 'src/tema.ts').linhas.join('\n');
-const usadas = [...(tema.match(/const base = [\s\S]*?\n\];/)?.[0] ?? '').matchAll(/\['(\w+)',/g)].map((m) => m[1]);
+// as telas da casa que o plano liga: no bloco do plano de src/tema.ts, cada uma é uma linha `<id> = ...` (rosto e perto
+// são o rosto cheio e o punch-in; as livres moram em src/telas/, não em Cenas.tsx)
+const BLOCO = tema.match(/\n[^\n]*O PLANO[^\n]*\n([\s\S]*?)\n[^\n]*fim do plano/)?.[1] ?? '';
+if (!/O PLANO/.test(tema) || !/fim do plano/.test(tema)) {
+	console.log('REPROVADO: src/tema.ts perdeu as linhas "O PLANO" e "fim do plano" (o bloco do plano): devolva os marcadores.');
+	process.exit(1);
+}
+const usadas = [...BLOCO.matchAll(/^(\w+) = (?!null)/gm)].map((m) => m[1]);
 const cenasTxt = FONTES.find((x) => x.f === 'src/Cenas.tsx').linhas;
 const comp = Object.fromEntries([...cenasTxt.join('\n').matchAll(/^\t(\w+): (\w+),$/gm)].map((m) => [m[1], m[2]]));
 const mapa = declaracoes(cenasTxt);
@@ -59,7 +66,7 @@ const vivas = alcancaveis(mapa, usadas.map((id) => comp[id]).filter(Boolean));
 const conta = (f, i) => f !== 'src/Cenas.tsx' || [...mapa].some(([n, d]) => vivas.has(n) && i >= d.de && i < d.de + d.linhas.length);
 for (const {f, linhas} of FONTES)
 	linhas.forEach((l, i) => {
-		if (!conta(f, i)) return;
+		if (!conta(f, i) || /^\s*(\/\/|\*|\/\*)/.test(l)) return; // comentário não é plano
 		for (const m of l.matchAll(/\bi?w\('([^'$]+)'(?:,\s*(\d+))?\)/g)) {
 			const n = Number(m[2] ?? 1);
 			const tem = PB.filter((p) => limpa(p.text) === limpa(m[1])).length;
@@ -69,7 +76,7 @@ for (const {f, linhas} of FONTES)
 console.log(`${faltam.length} palavras do plano que a fala não tem`);
 faltam.forEach((x) => console.log('  ' + x));
 if (faltam.length) {
-	console.log('REPROVADO: o plano é de outra fala. Refaça base() em src/tema.ts, as cenas de src/Cenas.tsx e CHAVE em src/Legenda.tsx (LEIA.md, "Vídeo novo").');
+	console.log('REPROVADO: o plano é de outra fala. Refaça o bloco "O PLANO" de src/tema.ts para a fala nova (comece do scripts/plano_novo.ts; modelos/interface-encenada/interface-encenada.md, seção 9).');
 	process.exit(1);
 }
 
@@ -80,7 +87,7 @@ const tmp = path.join(TMP, `cobertura-${process.pid}.mjs`);
 let R;
 try {
 	await build({
-		stdin: {contents: "export * from './src/Legenda.tsx'; export {DURACAO, FPS, montaCenas} from './src/tema.ts';", resolveDir: MOLDE, loader: 'ts'},
+		stdin: {contents: "export * from './src/Legenda.tsx'; export {DURACAO, FPS, LIVRES, montaCenas} from './src/tema.ts';", resolveDir: MOLDE, loader: 'ts'},
 		bundle: true, platform: 'node', format: 'esm', outfile: tmp, logLevel: 'silent', jsx: 'automatic', loader: {'.json': 'json'}, absWorkingDir: MOLDE,
 		plugins: [{name: 'stub', setup(b) {
 			b.onResolve({filter: /^@remotion\/google-fonts/}, (a) => ({path: a.path, namespace: 'stub'}));
@@ -95,7 +102,7 @@ try {
 	fs.rmSync(tmp, {force: true});
 }
 if (!R) process.exit(1);
-const {exibicoes, MIN_PEDACO, LUGAR, DURACAO, FPS} = R;
+const {exibicoes, MIN_PEDACO, LUGAR, DURACAO, FPS, montaCenas} = R;
 const L_MIN = onde('export const MIN_PEDACO');
 const ZONA = {esq: 60, dir: 940, topo: 250, base: 1500};
 
@@ -129,7 +136,7 @@ for (const previas of [false, true]) {
 	const fora = ex.filter((e) => e.x0 < ZONA.esq || e.x1 > ZONA.dir || e.y0 < ZONA.topo || e.y1 > ZONA.base).map((e) => `"${e.texto}" (${e.modo}) em ${fmt(e.de)} s: x ${Math.round(e.x0)}-${Math.round(e.x1)}, y ${Math.round(e.y0)}-${Math.round(e.y1)}`);
 	console.log(`\n${modo}: ${ex.length} pedaços de legenda`);
 	console.log(`${buracos.length} palavras sem legenda`); buracos.forEach((x) => console.log('  ' + x));
-	console.log(`${curtos.length} curtos (mín. 1,5 s por pedaço e 0,4 s por palavra)${curtos.length ? `: com MIN_PEDACO = ${MIN_PEDACO} (${L_MIN}); ponha 1.5 para os pedaços se juntarem; se ainda sobrar, a cena acaba cedo demais (mude o corte em base(), src/tema.ts)` : ''}`);
+	console.log(`${curtos.length} curtos (mín. 1,5 s por pedaço e 0,4 s por palavra)${curtos.length ? `: com MIN_PEDACO = ${MIN_PEDACO} (${L_MIN}); ponha 1.5 para os pedaços se juntarem; se ainda sobrar, a cena acaba cedo demais (mude o corte no bloco "O PLANO" de src/tema.ts)` : ''}`);
 	curtos.slice(0, 12).forEach((x) => console.log('  ' + x)); if (curtos.length > 12) console.log(`  ... e mais ${curtos.length - 12}`);
 	console.log(`${repetidas.length} palavras exibidas mais de uma vez`); repetidas.forEach((x) => console.log('  ' + x));
 	console.log(`${linhas.length} pedaços com mais de 2 linhas${linhas.length ? ": diminua MIN_PEDACO" : ""}`); linhas.forEach((x) => console.log('  ' + x));
@@ -154,6 +161,46 @@ for (const {f, linhas} of FONTES)
 console.log(`\n${titulos.length} títulos fora da zona segura${titulos.length ? ' (o topo de 2 linhas é 205 em src/ui.tsx, Titulo; encurte o título ou use uma linha)' : ''}`);
 titulos.forEach((x) => console.log('  ' + x));
 if (titulos.length) reprova = true;
+// 8. as telas livres: registradas, título dito e de 1 linha, de 1,5 a 8 s, e o texto do card que a legenda não mostra na
+// mesma hora (G26)
+const ditas = new Set(PB.map((p) => limpa(p.text)));
+const palavrasDe = (s) => s.split(/\s+/).map(limpa).filter(Boolean);
+const regArq = path.join(SRC, 'telas', 'index.ts');
+const regTxt = fs.existsSync(regArq) ? fs.readFileSync(regArq, 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '') : '';
+const registradas = new Set((regTxt.match(/TELAS\s*(?::[^=]*)?=\s*\{([^}]*)\}/)?.[1] ?? '').split(',').map((x) => x.split(':')[0].trim()).filter(Boolean));
+const cenas0 = montaCenas(false);
+const ex0 = exibicoes(false);
+const livres = [];
+cenas0.filter((c) => c.livre).forEach((c) => {
+	const L = c.livre, nome = `livres (${L.comp}, ${fmt(c.de)}-${fmt(c.ate)} s)`;
+	if (!registradas.has(L.comp)) livres.push(`${nome}: a tela "${L.comp}" não está registrada em src/telas/index.ts`);
+	if (L.titulo) {
+		if (!palavrasDe(L.titulo).every((p) => ditas.has(p))) livres.push(`${nome}: o título "${L.titulo}" tem palavra que a fala não diz (G19)`);
+		if (L.titulo.length > 14) livres.push(`${nome}: o título "${L.titulo}" tem ${L.titulo.length} letras (1 linha de serifa 112 px cabe até 14, seção 3)`);
+	}
+	if (c.ate - c.de < 1.5) livres.push(`${nome}: a tela fica ${fmt(c.ate - c.de)} s (mín. 1,5 s)`);
+	if (c.ate - c.de > 8) livres.push(`${nome}: a tela fica ${fmt(c.ate - c.de)} s (tela longa: quebre num corte ou volte ao rosto, seção 3)`);
+	const naLegenda = new Set(ex0.filter((e) => e.de < c.ate && e.ate > c.de).flatMap((e) => e.texto.split(/\s+/).map(limpa)));
+	for (const [k, txt] of Object.entries(L.textos ?? {})) {
+		const ws = palavrasDe(String(txt));
+		if (!ws.every((p) => ditas.has(p))) livres.push(`${nome}: textos.${k} "${txt}" tem palavra que a fala não diz (G19)`);
+		else if (ws.length && ws.every((p) => naLegenda.has(p))) livres.push(`${nome}: textos.${k} "${txt}" e a legenda mostram as mesmas palavras na mesma hora (G26): deixe a legenda contar e a tela mostrar o objeto`);
+	}
+});
+console.log(`\n${livres.length} problemas nas telas livres`);
+livres.forEach((x) => console.log('  ' + x));
+if (livres.length) reprova = true;
+// 9. o rosto cheio é a maior parte (G6, G19; seção 3)
+const rostoT = cenas0.filter((c) => c.modo === 'rosto').reduce((s, c) => s + c.ate - c.de, 0);
+console.log(`rosto cheio em ${Math.round((rostoT / DURACAO) * 100)}% do vídeo (sem prévias; mín. 50%)`);
+if (rostoT / DURACAO < 0.5) {
+	console.log('  o rosto cheio tem de ser a maior parte: tire uma tela ou encurte (tela só no trecho que pede a interface, G28)');
+	reprova = true;
+}
+// para o tools/clone.py: as telas da casa ligadas (com o início) e as livres deste plano, em src/tempos.json
+const tempos = {_leia: 'Gerado por scripts/cobertura.mjs a partir do plano de src/tema.ts, para o tools/clone.py. Não editar à mão.', livres: cenas0.filter((c) => c.livre).map((c) => ({comp: c.livre.comp, de: c.de}))};
+for (const c of cenas0) if (!c.livre && c.id !== 'rosto' && c.id !== 'perto') tempos[c.id] = {de: c.de};
+fs.writeFileSync(path.join(SRC, 'tempos.json'), JSON.stringify(tempos, null, 1) + '\n');
 console.log(`\nduração ${fmt(DURACAO)} s`);
 console.log(reprova ? 'REPROVADO: corrija o que está acima e rode de novo.' : 'APROVADO: 0 em todas as regras.');
 process.exit(reprova ? 1 : 0);

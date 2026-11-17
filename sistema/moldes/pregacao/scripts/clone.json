@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: os momentos da casa que o plano liga (nome da constante no bloco O PLANO de src/Corte.tsx) e o texto que cada um escreve fixo no código. No pregacao nenhum momento escreve texto fixo: frase-bloco, tela creme, virada, Comenta e legenda saem das palavras ditas (as etiquetas das prévias vêm das props).",
+ "telas": ["ABERTURA", "DESTAQUE", "VIRADA", "COMANDO", "LETREIRO"],
+ "fixos": {}
+}

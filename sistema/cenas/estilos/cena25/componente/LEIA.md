@@ -1,3 +1,3 @@
 # cena25 Ranking bars: componente
 
-**Props:** `titulo [2]`, `subtitulo`, `categorias[6]`, `heroi`, `anos[]`, `valores[ano][categoria]`, `legendaInicial`, `palavraPassa`, `legendaLideranca`, `legendaFinal`, `chip1`, `passoQuadros` (20), `laranja`, `width`, `height`. Números da demo ilustrativos.
+**Props:** `titulo[]` (1 ou 2 linhas), `subtitulo`, `categorias[]` (3 a 8; o espaço se divide entre elas), `heroi`, `anos[]` (os passos: número ou texto, ex. meses), `valores[passo][categoria]`, `unidade` e `prefixo` (ex. `%`, `R$ `), `maximo` (valor que ocupa a barra cheia; padrão o maior), `grade[]` (padrão calculado), `legendaInicial`, `palavraPassa`, `legendaLideranca`, `legendaFinal`, `chip1` (sem ele, não salta chip), `passoQuadros` (20), `laranja`, `width`, `height`. Números da demo ilustrativos. Os textos da demo estão em `textos-demo.json`: nenhum deles vai para um vídeo novo. Como compor uma cena nova: `../cena25.md` (A personalidade, Como variar).

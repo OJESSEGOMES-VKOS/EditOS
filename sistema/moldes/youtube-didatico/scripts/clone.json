@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: as telas da casa que o plano liga (cada uma é uma linha `NOME = ...` no bloco O PLANO de src/plano.ts; parte desligada não aparece no bloco) e o texto que cada uma escreve fixo no código (nenhuma escreve: todo texto vem do plano). As telas livres o checar.mjs grava em src/tempos.json.",
+ "telas": ["FRASES", "TITULOS", "LISTA", "GRADES", "MONTAGEM", "REEL", "ESTE", "PREVIAS", "CTA", "ATRAS"],
+ "fixos": {}
+}

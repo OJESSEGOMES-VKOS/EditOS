@@ -15,6 +15,10 @@ gravação com o fundo real (prop `fundo: 'real'`); recorte, palavra atrás da p
 explícita (G6). A maior parte do vídeo é a pessoa falando (cheio ou punch-in). O vídeo abre na gravação original,
 dinâmico, com ênfase no gancho (G29).
 
+**A entrada do modelo é a skill `youtube-didatico`** (`.claude/skills/youtube-didatico/SKILL.md`, pelo método de
+`sistema/JEITO.md`): a personalidade, as peças e como inventar a tela que a fala nova pede. O vídeo novo nasce com o
+plano vazio e passa pelo teste do clone (`tools/clone.py`) antes do render.
+
 O modelo nasceu para o vídeo longo de YouTube em 16:9. O aprovado é a adaptação vertical, que está validada como está.
 As regras valem para os dois formatos; onde muda, está escrito.
 
@@ -286,7 +290,8 @@ quem edita.
 | Música | desligada | `scripts/trilha.py` com os sopros e toques e o 3º argumento `public/trilha.wav` no `mixar.sh` |
 | Prévias | desligadas (`previas: false`), sem nomes (`nomesPrevias: ["", ""]`) | `--props='{"previas":true,"nomesPrevias":["<nome real 1>","<nome real 2>"]}'` e a mídia das prévias |
 | @ na tela de reels | vazio (sem @ e sem foto) | `--props='{"arroba":"<arroba real de quem fala>"}'`; foto em `public/avatar.jpg` |
-| Frase, título, grade, montagem, reels, contorno, prévias, chamada | no plano do aprovado (num vídeo novo, só onde a fala tem o mesmo porquê, G30) | Cada lista em `src/plano.ts` desliga com `[]` ou `null` |
+| Frase, título, grade, montagem, reels, contorno, prévias, chamada | ligadas só no molde (o plano do aprovado); o vídeo novo nasce com todas desligadas (`scripts/plano_novo.ts`) | Cada parte liga com uma linha `NOME = ...` no bloco O PLANO de `src/plano.ts`, só onde a fala tem o porquê (G30) |
+| Telas livres (`LIVRES`) | nenhuma | `src/telas/<Nome>.tsx` + `src/telas/index.ts` + `LIVRES = [...]` no bloco (seção 11, passo 3) |
 | Palavra atrás (`ATRAS`) | no plano do aprovado, mas **só aparece com `fundo: 'recorte'`** | `ATRAS` em `src/plano.ts` + a prop |
 | Conta no gelo (`LISTA`) | desligada (`null`) no aprovado | `LISTA = {de, ate, itens}` (seção 5) |
 | Legenda corrida (9:16) | desligada no aprovado (Y7); desenhada na seção 5, recomendada no 9:16 (treinamento talking-head 2026-11-03) | Montar com o desenho da seção 5 (o componente ainda não está no molde) |
@@ -314,20 +319,30 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
 2. **Escreva o `plano.md`** na pasta do vídeo, uma linha por frase sobre a fala real: hora, função (seção 4), resposta
    da tela, quem fornece e o texto. Escolha a espinha. Liste o que pedir ao criador no `PEDIDO.md`.
-3. **Monte O PLANO** em `src/plano.ts` (na pasta do vídeo). Ele chega com o plano do aprovado. Enquanto for o plano
-   antigo, o vídeo para ao carregar e diz qual palavra não bate. Depois de refazer os tempos, ele também para se ainda
-   sobrar parte do aprovado com outra fala (o nome do modelo ou os nomes dos vídeos do criador do aprovado) e diz o que
-   mudar. Sem vídeos prontos do criador, desligue exatamente: `TITULOS = []` (ou um título com palavra dita),
-   `GRADE = []`, `GRADES = []`, `MONTAGEM = null`, `ESTE = null`, `PREVIAS = null`, e `REEL = null` e `CTA = null`
-   quando a fala não cita rede nem pede comentário. O que fica é `ATRAS`, `FRASES`, `LISTA` e as `chaves`.
-   - `T`: cada tempo é `w(índice, 'palavra')` (o início da palavra) ou `em(segundos, índice, 'palavra')`.
+3. **Monte O PLANO** em `src/plano.ts` (na pasta do vídeo), o bloco entre as linhas `O PLANO` e `fim do plano`. Ele
+   **nasce vazio** (o `novo-video.py` põe ali o `scripts/plano_novo.ts` do molde): só a pessoa, plano cheio, e a lista
+   comentada das peças com o porquê de cada uma. Toda parte nasce desligada em cima do bloco; o bloco só liga a que a
+   fala nova pede, cada uma numa linha `NOME = ...` (é assim que o `tools/clone.py` vê quais telas da casa o vídeo usa).
+   Se sobrar parte do aprovado com outra fala (o nome do modelo, os nomes dos vídeos do criador), o vídeo para ao
+   carregar e diz o que tirar. A grade, a montagem, as prévias e o contorno só existem com os vídeos prontos do criador.
+   - `T`: cada tempo é `w(índice, 'palavra')` (o início da palavra), `em(segundos, índice, 'palavra')` ou
+     `fim(índice, 'palavra')`.
    - `chaves`: a câmera, `[t, pose, transição, gira?]`, com `POSE.cheio`, `POSE.punch(zoom, fy)`, `POSE.cartao`,
      `POSE.reel`, `POSE.baixo()`; transição 0 é corte seco.
-   - As partes: `ATRAS`, `FRASES`, `TITULOS`, `GRADE` e `GRADES`, `MONTAGEM`, `REEL`, `ESTE`, `PREVIAS`, `LISTA`, `CTA`.
-     Cada uma desliga com `[]` ou `null`. `TITULOS` nunca leva o nome do modelo.
+   - As partes da casa: `ATRAS`, `FRASES`, `TITULOS`, `GRADE` e `GRADES`, `MONTAGEM`, `REEL`, `ESTE`, `PREVIAS`, `LISTA`,
+     `CTA`. `TITULOS` nunca leva o nome do modelo.
+   - **As telas livres** (`LIVRES`): a tela de gelo que a fala pede e a casa não tem (conceito, processo, comparação,
+     negação, número). O desenho mora em `src/telas/<Nome>.tsx` da pasta do vídeo, com o kit de `src/ui.tsx` (`Palco`,
+     `Entra`, `Cartao`, `Palavras`, `Rotulo`, `Ponto`, `Fio`, `Risco`, `Contorno`, `Tracejado`, `Numero`, `Icone`),
+     registrado em `src/telas/index.ts`; no bloco, `LIVRES = [{comp: 'Nome', de, ate, em: {...}, textos: {...}}]` e a
+     chave `[de, POSE.cartao, 0.38, true]`. Como inventar: a skill `youtube-didatico`.
 4. **Confira as regras:** `node scripts/checar.mjs` (na pasta do vídeo) até terminar em `sem problemas`. Ele confere
-   que o plano é desta fala, tempo de leitura com e sem prévias (a conta também), linhas, nada atravessando corte, o
-   rosto no cartão durante a conta e a duração.
+   que o plano é desta fala, tempo de leitura com e sem prévias (a conta e as telas livres também), linhas, nada
+   atravessando corte, o rosto no cartão durante a conta e as telas livres, uma tela de gelo por vez, texto de tela livre
+   que não repete a frase ou o título na mesma hora (G26), as telas somando até 1/3 do vídeo e a duração. Ele grava
+   `src/tempos.json` com as telas livres, para o passo seguinte.
+   **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (da raiz do estúdio) até `SEM CLONE`, com
+   o `plano.md` dizendo, para cada parte ligada e cada tela livre, o nome dela e a palavra dita entre aspas que pediu ela.
 5. **Mídia que o plano pedir** (na pasta do vídeo):
    - pessoa recortada, **só se o dono pediu** `fundo: 'recorte'` ou `'desfoque'` (G6):
      `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py`
@@ -350,10 +365,13 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e o mesmo com `2`).
 
-## 12. O plano do vídeo aprovado (repertório, não roteiro)
+## 12. As telas do aprovado: exemplos com o porquê (repertório, não roteiro)
 
-Cada linha mostra uma tela e o porquê dela no aprovado (a função da seção 4). Num vídeo novo, a tela só entra onde a
-fala nova tiver o mesmo porquê; nunca se copia a ordem nem os tempos (G30).
+O aprovado é **um exemplo** do jeito aplicado a uma fala (a do "100% editado pelo Claude", em que o criador mostra os
+próprios modelos). O molde guarda o plano dele no bloco O PLANO de `src/plano.ts`, mas o vídeo novo nasce sem ele
+(`scripts/plano_novo.ts`). Cada linha abaixo é uma tela e o porquê dela lá (a função da seção 4). Num vídeo novo, a
+tela só volta onde a fala nova tiver o mesmo porquê; nunca se copia a ordem, os tempos nem os textos (G30). O normal
+num tema novo é a tela livre (seção 11, passo 3), que o aprovado não tem.
 
 - Punch-in com rosto puro: usado na referência porque a frase é de peso ou troca de ideia; usar quando a fala nova tiver o mesmo porquê.
 - Frase grande na frente ("EDITADO PELO / CLAUDE"): usada porque é a frase de efeito do gancho; usar quando a fala nova tiver uma frase de efeito.

@@ -10,13 +10,13 @@ import {Aneis, Fundo, G, IconeVidro, Particulas, ab, brilho, hexA} from './ui';
  * S2, S6 e S9 (corte seco). Tudo desenhado em código: nenhuma marca, nenhuma tela de terceiro.
  */
 
-const pop = (t: number, de: number, cfg = {}) => {
+export const pop = (t: number, de: number, cfg = {}) => {
 	const k = mola(t, de, {damping: 13, stiffness: 190, ...cfg});
 	return {opacity: Math.min(1, k * 2), transform: `scale(${0.55 + 0.45 * k})`, filter: k < 0.6 ? `blur(${(0.6 - k) * 20}px)` : undefined} as React.CSSProperties;
 };
 
 /* ---------------------------------------------------------------- glifos novos (linha branca) */
-const GL = {
+export const GL = {
 	play: (s: number, cor = '#fff') => (
 		<svg width={s} height={s} viewBox="0 0 100 100">
 			<path d="M34 22 L80 50 L34 78 Z" fill={cor} stroke={cor} strokeWidth={8} strokeLinejoin="round" />
@@ -77,7 +77,7 @@ const GL = {
 
 /* ---------------------------------------------------------------- telinhas abstratas de "modelo de edição" */
 /** desenho genérico de um vídeo vertical editado (variante 0-3); nada de tela real, nada de terceiro */
-const Telinha: React.FC<{v: number; larg: number; alt: number; t: number; claro?: boolean}> = ({v, larg, alt, t, claro}) => {
+export const Telinha: React.FC<{v: number; larg: number; alt: number; t: number; claro?: boolean}> = ({v, larg, alt, t, claro}) => {
 	const fundo = claro ? `linear-gradient(170deg, ${C.telaClaroA}, ${C.telaClaroB})` : `linear-gradient(170deg, ${C.telaEscuraA}, ${C.telaEscuraB})`;
 	const tinta = claro ? hexA(C.tinta, 0.75) : 'rgba(255,255,255,0.85)';
 	const fraco = claro ? hexA(C.tinta, 0.18) : 'rgba(255,255,255,0.16)';
@@ -124,7 +124,7 @@ const Telinha: React.FC<{v: number; larg: number; alt: number; t: number; claro?
 };
 
 /** placa inclinada em perspectiva, com sombra e contorno brilhante (anuncio-neon.md §4) */
-const Placa: React.FC<{x: number; y: number; larg: number; alt: number; rx?: number; ry?: number; rz?: number; s?: number; acesa?: number; op?: number; blur?: number; claro?: boolean; children: React.ReactNode}> = ({x, y, larg, alt, rx = 0, ry = 0, rz = 0, s = 1, acesa = 0, op = 1, blur = 0, claro, children}) => (
+export const Placa: React.FC<{x: number; y: number; larg: number; alt: number; rx?: number; ry?: number; rz?: number; s?: number; acesa?: number; op?: number; blur?: number; claro?: boolean; children: React.ReactNode}> = ({x, y, larg, alt, rx = 0, ry = 0, rz = 0, s = 1, acesa = 0, op = 1, blur = 0, claro, children}) => (
 	<div style={ab(x - larg / 2, y - alt / 2, {width: larg, height: alt, transform: `perspective(1800px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s})`, opacity: op, filter: blur > 0.3 ? `blur(${blur}px)` : undefined})}>
 		<div style={{position: 'absolute', inset: 0, borderRadius: larg * 0.08, overflow: 'hidden', border: `${3 + 2 * acesa}px solid ${acesa > 0 ? hexA(C.v, 0.5 + 0.5 * Math.min(1, acesa)) : claro ? hexA(C.tinta, 0.12) : 'rgba(255,255,255,0.14)'}`, boxShadow: `${claro ? `0 30px 60px ${hexA(C.sombraPlaca, 0.18)}` : '0 40px 80px rgba(0,0,0,0.6)'}${acesa > 0 ? `, 0 0 ${70 * acesa}px ${hexA(C.v, Math.min(1, 0.7 * acesa))}` : ''}`}}>
 			{children}

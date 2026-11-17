@@ -66,9 +66,21 @@ if (!PS.length) throw new Error('src/palavras.json está vazio: este molde preci
 /** fim da última palavra + 0,73 s (na vitrine: 29,63 + 0,73 = 30,36 s, a duração da voz) */
 export const DURACAO = Math.round((PS[PS.length - 1].ate + 0.73) * 100) / 100;
 
+/** peça que se desliga: opcional<Tipo>(null) a tira do vídeo (o tipo continua o mesmo) */
+const opcional = <X,>(x: X | null): X | null => x;
+/** abertura: bloco de 3 vozes até o 1º corte; `contador` é o número dito, que conta de 0 até ele (null = sem número) */
+type AberturaDef = {ate: number; cima: [number, string]; contador: [number, string] | null; baixo: [number, string]};
+/** fecho: o comando fixo e a palavra a comentar entre aspas, do comando até o fim */
+type FechoDef = {comando: [number, string]; palavra: [number, string]};
+/** as vozes do destaque, pelo nome da letra (no plano: [[playfair, 118, 'palavras ditas']]): inter = Inter Tight 800
+ * apertada (palavras comuns), playfair = Playfair itálica fina (a palavra de emoção), anton = Anton branca em caixa alta,
+ * antonVermelha = Anton vermelha #E01E1E (a palavra-chave) */
+const inter: Voz = 'sans', playfair: Voz = 'serif', anton: Voz = 'cond', antonVermelha: Voz = 'condRed';
+
 /* ================================================================ O PLANO (refazer num vídeo novo; o resto do arquivo é o modelo)
  * Cada índice é a posição da palavra em src/palavras.json, com a palavra esperada ao lado. Peça opcional se desliga com
- * null ou lista vazia. Depois de mexer: node scripts/cobertura.mjs até zerar. */
+ * null ou lista vazia. Depois de mexer: node scripts/cobertura.mjs até zerar. Um vídeo novo nasce com este bloco vazio
+ * (scripts/plano_novo.tsx, aplicado pelo tools/novo-video.py); o que está aqui é o plano do vídeo aprovado (exemplo). */
 
 /* trechos: os cortes, 2 quadros antes da palavra */
 export const T = {
@@ -94,21 +106,17 @@ const CHICOTES: number[] = [T.aprender];
 const RESPIROS: [number, number][] = []; // antiga G43, abolida: só no fim de cena forte; o aprovado tinha [[T.outros, T.aprender]]
 /** VHS [de, ate], só com a prop `efeitos`: flash rosa no início, tom verde e linhas até o fim (Infinity = até o fim do vídeo) */
 const VHS: [number, number][] = [[T.se1, T.se1 + 1.6], [T.comenta, Infinity]];
-/** peça que se desliga: opcional<Tipo>(null) a tira do vídeo (o tipo continua o mesmo) */
-const opcional = <X,>(x: X | null): X | null => x;
 /** janela das prévias (s), só com a prop `previas`: do flash do "colocar" ao desfoque do "Mas"; opcional(null) = sem prévias */
 export const PREVIAS = opcional<{de: number; ate: number}>({de: T.colocar, ate: T.mas});
 
-/** abertura (opcional<AberturaDef>(null) desliga): bloco de 3 vozes até o 1º corte; `contador` é o número dito, que conta de 0 até ele (null = sem número) */
-type AberturaDef = {ate: number; cima: [number, string]; contador: [number, string] | null; baixo: [number, string]};
+/** abertura (opcional<AberturaDef>(null) desliga) */
 const ABERTURA = opcional<AberturaDef>({
 	ate: c(8, 'Ele'), // G12: a abertura sai quando a legenda entra (um bloco por vez)
 	cima: [0, 'Esse vídeo está sendo'],
 	contador: [4, '100%'],
 	baixo: [5, 'editado pelo Claude.'],
 });
-/** fecho (opcional<FechoDef>(null) desliga): o comando fixo e a palavra a comentar entre aspas, do comando até o fim */
-type FechoDef = {comando: [number, string]; palavra: [number, string]};
+/** fecho (opcional<FechoDef>(null) desliga) */
 const FECHO_DEF = opcional<FechoDef>({comando: [83, 'Comenta'], palavra: [84, 'edição']});
 
 /* câmera: chaves [tempo, zoom, corte seco?]; entre chaves o zoom anda devagar */
@@ -139,7 +147,7 @@ export const BLOCOS: BlocoDef[] = [
 	/* antiga G43, abolida (dono, 2026-11-05): destaque só no fim de cena forte (a frase fecha no ponto com a fala de impacto), nunca um por
 	 * frase; o bloco sai quando a legenda seguinte entra. O aprovado tinha mais três ("a diferença entre / vários MODELOS",
 	 * "qualquer tipo de / VÍDEO", "outros modelos / de EDIÇÃO / como esse"), no meio das frases. */
-	{de: T.um, ate: c(48, 'Eu'), camera: [T.se1, T.colocar], primeira: 41, linhas: [[['sans', 80, 'você está vendo apenas']], [['serif', 118, 'um desses modelos.']]]},
+	{de: T.um, ate: c(48, 'Eu'), camera: [T.se1, T.colocar], primeira: 41, linhas: [[[inter, 80, 'você está vendo apenas']], [[playfair, 118, 'um desses modelos.']]]},
 ];
 /** legenda: [índice da 1ª palavra, texto do pedaço] ('/' quebra a linha; até 2 linhas). Toda palavra fora dos destaques
  * entra uma vez só; a página fica até a próxima começar (a última até o fim). */

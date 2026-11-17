@@ -8,7 +8,9 @@ import {loadFont} from '@remotion/google-fonts/ShareTechMono';
 const {fontFamily: mono} = loadFont('normal', {weights: ['400'], subsets: ['latin']});
 
 export type OscilloscopeProps = {
-  palavra?: string; // maiúsculas; letras disponíveis abaixo (A-Z básicas)
+  palavra: string; // a palavra dita (A-Z, 0-9, ! e .; acento cai: "AÇÃO" vira "ACAO"); a altura encolhe para caber
+  inicioPalavra?: number; // quadro em que as letras sobem da reta (padrão 76); a curva inteira estica ou encolhe junto
+  leitura?: string; // uma linha pequena de leitura embaixo: 'tecnica' (a da demo), um texto dito, ou vazio (nada)
   largura?: number;
   altura?: number;
   cores?: {tela: string; face: string; grade: string; brilho: string; nucleo: string};
@@ -39,20 +41,41 @@ const LETRAS: Record<string, [number, string]> = {
   U: [0.58, 'M0 -1 L0 -.35 C0 .1 .58 .1 .58 -.35 L.58 -1'],
   V: [0.62, 'M0 -1 L.31 0 L.62 -1'],
   Y: [0.62, 'M0 -1 L.31 -.48 L.62 -1 M.31 -.48 L.31 0'],
+  J: [0.46, 'M.46 -1 L.46 -.3 C.46 .08 0 .08 0 -.2'],
+  K: [0.58, 'M0 0 L0 -1 M.56 -1 L0 -.42 M.18 -.6 L.58 0'],
+  Q: [0.7, 'M.33 0 C-.11 0 -.11 -1 .33 -1 C.77 -1 .77 0 .33 0 M.42 -.2 L.72 .06'],
+  W: [0.84, 'M0 -1 L.2 0 L.42 -.62 L.64 0 L.84 -1'],
+  X: [0.6, 'M0 -1 L.6 0 M.6 -1 L0 0'],
+  Z: [0.58, 'M0 -1 L.58 -1 L0 0 L.58 0'],
+  '0': [0.56, 'M.28 0 C-.09 0 -.09 -1 .28 -1 C.65 -1 .65 0 .28 0'],
+  '1': [0.3, 'M.08 -.8 L.3 -1 L.3 0'],
+  '2': [0.58, 'M.04 -.8 C.12 -1.04 .56 -1.04 .56 -.72 C.56 -.45 .1 -.3 0 0 L.58 0'],
+  '3': [0.58, 'M.04 -.86 C.14 -1.03 .54 -1.03 .54 -.76 C.54 -.52 .3 -.52 .22 -.52 C.58 -.52 .6 -.2 .5 -.1 C.36 .05 .08 .03 0 -.14'],
+  '4': [0.6, 'M.46 0 L.46 -1 L0 -.32 L.6 -.32'],
+  '5': [0.58, 'M.54 -1 L.08 -1 L.04 -.56 C.3 -.66 .58 -.56 .58 -.3 C.58 .04 .12 .05 0 -.12'],
+  '6': [0.56, 'M.5 -.94 C.2 -1.06 0 -.8 0 -.4 C0 .06 .56 .06 .56 -.3 C.56 -.62 .1 -.62 0 -.36'],
+  '7': [0.56, 'M0 -1 L.56 -1 L.2 0'],
+  '8': [0.56, 'M.28 -.52 C-.04 -.52 -.04 -1 .28 -1 C.6 -1 .6 -.52 .28 -.52 C-.08 -.52 -.08 0 .28 0 C.64 0 .64 -.52 .28 -.52'],
+  '9': [0.56, 'M.56 -.64 C.46 -.38 0 -.4 0 -.68 C0 -1.04 .56 -1.04 .56 -.62 C.56 -.2 .36 .02 .06 -.04'],
+  '!': [0, 'M0 -1 L0 -.3 M0 -.07 L0 0'],
+  '.': [0, 'M0 -.07 L0 0'],
   ' ': [0.2, ''],
 };
 
 const N = 520;
 
-export const Oscilloscope: React.FC<OscilloscopeProps> = ({palavra = 'SINTONIA', largura, altura, cores = CORES}) => {
+export const Oscilloscope: React.FC<OscilloscopeProps> = ({palavra, inicioPalavra = 76, leitura: leituraProp = '', largura, altura, cores = CORES}) => {
   const f = useCurrentFrame();
   const {fps, width, height} = useVideoConfig();
   const W = largura ?? width;
   const H = altura ?? height;
   const s = Math.min(W / 1080, H / 1350);
   const cy = 745;
+  const k = inicioPalavra / 76; // escala do tempo da curva (a demo é 1)
+  const ext = Math.max(0, (W / s - 1080) / 2); // em formato largo, o feixe e a grade vão até as bordas de verdade
 
-  const curva = (t: number): string => {
+  const curva = (tq: number): string => {
+    const t = tq / k;
     // pesos de forma
     const aLiss = interpolate(t, [14, 24], [0, 1], {...cl, easing: Easing.inOut(Easing.cubic)});
     const aSolta = interpolate(t, [48, 56], [0, 1], {...cl, easing: Easing.inOut(Easing.cubic)});
@@ -64,7 +87,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({palavra = 'SINTONIA',
     for (let i = 0; i <= N; i++) {
       const u = i / N;
       // seno rolando
-      const xs = -80 + u * 1240;
+      const xs = -80 - ext + u * (1240 + 2 * ext);
       const ys = cy - 180 * Math.sin(2 * Math.PI * (3.2 * u) - fase);
       // Lissajous 2:3
       const xl = 540 + 290 * Math.sin(2 * Math.PI * 2 * u + giro);
@@ -81,24 +104,26 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({palavra = 'SINTONIA',
   };
 
   // letras
-  const capH = 150;
+  const limpa = palavra.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+  const letras = Array.from(limpa).map((c) => LETRAS[c] ?? LETRAS[' ']);
+  const larg1 = letras.reduce((a, [w]) => a + w, 0) + 0.32 * (letras.length - 1); // largura com altura 1
+  const capH = Math.max(70, Math.min(150, 940 / Math.max(0.1, larg1))); // cabe em ~940 px; a demo fica em 150
   const gap = 0.32 * capH;
-  const letras = Array.from(palavra).map((c) => LETRAS[c] ?? LETRAS[' ']);
-  const total = letras.reduce((a, [w]) => a + w * capH, 0) + gap * (letras.length - 1);
+  const total = larg1 * capH;
   let xx = 540 - total / 2;
   const pos = letras.map(([w]) => {
     const p = xx;
     xx += w * capH + gap;
     return p;
   });
-  const tLetra = 76;
+  const tLetra = inicioPalavra;
   const escLetra = (i: number, t: number) => (t < tLetra + i * 3 ? 0 : spring({frame: t - tLetra - i * 3, fps, config: {damping: 9, stiffness: 150}}));
 
-  const mostraCurva = (t: number) => t < 74;
-  const camada = (t: number, alfa: number, k: string) => (
-    <g key={k} opacity={alfa}>
-      {mostraCurva(t) ? <path d={curva(t)} /> : <path d={`M-80 ${cy} L1160 ${cy}`} />}
-      {t >= 70 && letras.map(([, d], i) => (
+  const mostraCurva = (t: number) => t < 74 * k;
+  const camada = (t: number, alfa: number, chave: string) => (
+    <g key={chave} opacity={alfa}>
+      {mostraCurva(t) ? <path d={curva(t)} /> : <path d={`M${-80 - ext} ${cy} L${1160 + ext} ${cy}`} />}
+      {t >= 70 * k && letras.map(([, d], i) => (
         <path key={i} d={d} transform={`translate(${pos[i]} ${cy}) scale(${capH} ${capH * escLetra(i, t)})`} vectorEffect="non-scaling-stroke" />
       ))}
     </g>
@@ -106,11 +131,12 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({palavra = 'SINTONIA',
 
   // ponto do feixe
   const uFeixe = (f * 0.023) % 1;
-  const feixeVis = f < 50;
+  const feixeVis = f < 50 * k;
 
-  const dphi = Math.max(0, interpolate(f, [18, 70], [46.7, 0], cl));
-  const leitura = f < 16 ? 'Y-T   5 ms/div' : `X-Y   Δφ ${dphi.toFixed(1).replace('.', ',')}°`;
-  const trava = f > 96;
+  const dphi = Math.max(0, interpolate(f / k, [18, 70], [46.7, 0], cl));
+  const tecnica = leituraProp === 'tecnica';
+  const leitura = tecnica ? (f / k < 16 ? 'Y-T   5 ms/div' : `X-Y   Δφ ${dphi.toFixed(1).replace('.', ',')}°`) : leituraProp;
+  const trava = f > inicioPalavra + 20;
 
   return (
     <AbsoluteFill style={{backgroundColor: cores.tela, overflow: 'hidden'}}>
@@ -119,14 +145,14 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({palavra = 'SINTONIA',
         <svg width={1080} height={1350} style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
           <defs>
             <radialGradient id="mg05" cx="50%" cy="55%" r="60%"><stop offset="0.45" stopColor="#fff" /><stop offset="1" stopColor="#000" /></radialGradient>
-            <mask id="m05"><rect x={-500} y={-500} width={2080} height={2350} fill="url(#mg05)" /></mask>
+            <mask id="m05"><rect x={-500 - ext} y={-500} width={2080 + 2 * ext} height={2350} fill="url(#mg05)" /></mask>
             <filter id="halo05" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7" /></filter>
             <filter id="meio05" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6" /></filter>
           </defs>
           {/* graticule que some nas bordas */}
           <g mask="url(#m05)" stroke={cores.grade} strokeWidth={2} opacity={0.6}>
-            {Array.from({length: 15}, (_, i) => <line key={`v${i}`} x1={540 + (i - 7) * 112} y1={-100} x2={540 + (i - 7) * 112} y2={1450} />)}
-            {Array.from({length: 17}, (_, i) => <line key={`h${i}`} x1={-100} y1={cy + (i - 8) * 112} x2={1180} y2={cy + (i - 8) * 112} />)}
+            {Array.from({length: 15 + 2 * Math.ceil(ext / 112)}, (_, i) => { const x = 540 + (i - 7 - Math.ceil(ext / 112)) * 112; return <line key={`v${i}`} x1={x} y1={-100} x2={x} y2={1450} />; })}
+            {Array.from({length: 17}, (_, i) => <line key={`h${i}`} x1={-100 - ext} y1={cy + (i - 8) * 112} x2={1180 + ext} y2={cy + (i - 8) * 112} />)}
             {Array.from({length: 60}, (_, i) => <line key={`tx${i}`} x1={540 + (i - 30) * 22.4} y1={cy - 7} x2={540 + (i - 30) * 22.4} y2={cy + 7} stroke="#13331f" />)}
             {Array.from({length: 70}, (_, i) => <line key={`ty${i}`} x1={533} y1={cy + (i - 35) * 22.4} x2={547} y2={cy + (i - 35) * 22.4} stroke="#13331f" />)}
           </g>
@@ -145,7 +171,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({palavra = 'SINTONIA',
           })()}
         </svg>
         <div style={{position: 'absolute', left: 0, right: 0, top: 1180, textAlign: 'center', fontFamily: mono, fontSize: 22, letterSpacing: '0.12em', color: cores.brilho, opacity: 0.45, whiteSpace: 'pre'}}>
-          {leitura}   <span style={{opacity: trava ? 1 : 0.5, color: trava ? cores.nucleo : cores.brilho}}>TRAVA</span>
+          {leitura}{tecnica && <>   <span style={{opacity: trava ? 1 : 0.5, color: trava ? cores.nucleo : cores.brilho}}>TRAVA</span></>}
         </div>
       </div>
       <svg width={W} height={H} style={{position: 'absolute', inset: 0, opacity: 0.06, mixBlendMode: 'screen'}}>

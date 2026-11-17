@@ -4,7 +4,7 @@
  * A regra está em ../../modelos/imagem-por-palavra/imagem-por-palavra.md.
  *
  * Gramática: duas faixas independentes.
- *  1. A FAIXA DE IMAGEM (src/plano.json → "planos"): uma fila emendada de planos, cada um começando no início de uma
+ *  1. A FAIXA DE IMAGEM (src/plano.ts → planos): uma fila emendada de planos, cada um começando no início de uma
  *     palavra (corte no 1º quadro da palavra que ele ilustra). Plano é a pessoa (aberto/fechado/close da mesma tomada),
  *     uma imagem (src/imagens.json), a mesma imagem trocando de estilo, um mosaico, dois painéis, ou um cartão chapado.
  *     Ela troca a cada 1 a 3 palavras, em ondas (rajada de 0,17–0,25 s por no máximo 3 s, depois respiro).
@@ -19,7 +19,7 @@
 import PB from './palavras.json';
 import ROSTO from './rosto.json';
 import MAOS from './maos.json';
-import PLANO from './plano.json';
+import PLANO from './plano'; // o plano do vídeo: o bloco O PLANO de src/plano.ts
 import IMAGENS from './imagens.json';
 import LARG from './larguras.json';
 
@@ -93,7 +93,9 @@ type PlanoJson = {
 const PJ = PLANO as unknown as PlanoJson;
 export const PALETA_PLANO = PJ.paleta ?? '';
 export const CORES_PLANO = PJ.cores ?? {};
-export type Imagem = {palavra: Ref; arquivo: string; prompt?: string; fonte?: string};
+/** caber: a imagem que não é foto 9:16 (print, logo, documento da pessoa) entra inteira, num quadro acima da legenda,
+ * sem cortar (G7: no modo só materiais é o material mais comum); sem caber, a foto cobre a tela */
+export type Imagem = {palavra: Ref; arquivo: string; prompt?: string; fonte?: string; caber?: boolean};
 export const IMGS = IMAGENS as unknown as Record<string, Imagem>;
 
 /** confere que o índice aponta para a palavra certa: plano de outra fala não renderiza (o checador diz o que refazer) */

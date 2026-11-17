@@ -3,6 +3,6 @@ import {Composition, registerRoot} from 'remotion';
 import {Cena13} from './Cena13';
 
 const Root: React.FC = () => (
-  <Composition id="Demo" component={Cena13} width={1080} height={1350} fps={30} durationInFrames={150} defaultProps={{width: 1080, height: 1350}} />
+  <Composition id="Demo" component={Cena13} width={1080} height={1350} fps={30} durationInFrames={150} defaultProps={{width: 1080, height: 1350, titulo: ['O RIO', 'NÃO TEM NOME'], frase: 'Três dias rio abaixo.', capitulo: 'Dia 01 · Capítulo um'}} />
 );
 registerRoot(Root);

@@ -49,28 +49,51 @@ const palavrasDe = (txt: string) => txt.replace(/\s*\/\s*/g, ' ').split(' ').fil
 const trecho = (i0: number, texto: string, onde: string) => palavrasDe(texto).map((p, k) => pw(i0 + k, p, onde));
 const semPont = (s: string) => s.replace(/[.,;:!?…]+$/, '');
 
-/* ================================================================ O PLANO (refazer num vídeo novo; o resto do arquivo é o modelo)
+/* ---------------------------------------------------------------- as peças do plano (o bloco do plano, abaixo, só liga o que a fala pede)
  * Cada índice é a posição da palavra em src/palavras.json, com o texto esperado ao lado (o molde para se não bater).
  * '/' quebra a linha. Depois de mexer: node scripts/checar.mjs até sair APROVADO. */
-
-/** a cor tirada da cena e da roupa (scripts/cor_da_cena.py): letra creme, ouro da citação, traço */
-export const C = {letra: '#F2EDE9', ouro: '#E2A665', traco: '#C9473B'}; // medido na gravação comum (parede bege, 32°)
-
-/** gigante: grupos de 1 a 3 palavras, um por vez; cima: o começo da MESMA fala, 1 linha acima do gigante, na mesma tela;
- * traco: true põe o traço vermelho sob a última palavra (a palavra-alvo).
- * citacao: páginas [1ª palavra, 'texto / 2ª linha'], SEM aspas no plano (o molde abre e fecha aspas em cada página).
- * Exemplo de par (do especialista v2): {tipo: 'gigante', primeira: 0, cima: 'Escolhe sempre coisas que te', grupos: ['desafiem'], traco: true} */
 type Gig = {tipo: 'gigante'; primeira: number; cima?: string; grupos: string[]; traco?: boolean};
 type Cit = {tipo: 'citacao'; paginas: [number, string][]};
 type ModoDef = Gig | Cit;
-const MODOS_DEF: ModoDef[] = [
-	{tipo: 'gigante', primeira: 0, grupos: ['Esse vídeo', 'está sendo', '100%', 'editado', 'pelo Claude.'], traco: true}, // gancho (fala longa demais para 1 linha de cima)
-	{tipo: 'gigante', primeira: 83, grupos: ['comenta', 'edição']}, // o comando do fim
-];
+/** GIGANTE (peso, tese, fecho): grupos de 1 a 3 palavras, um por vez, a partir da palavra `primeira`; `cima`: o começo da
+ * MESMA fala, 1 linha acima do gigante, na mesma tela; `traco: true`: o traço vermelho sob a última palavra (a palavra-alvo).
+ * Exemplo de par (do especialista v2): gigante(0, ['desafiem'], {cima: 'Escolhe sempre coisas que te', traco: true}) */
+const gigante = (primeira: number, grupos: string[], o: {cima?: string; traco?: boolean} = {}): Gig => ({tipo: 'gigante', primeira, grupos, ...o});
+/** CITAÇÃO (só fala citada de verdade): páginas [1ª palavra, 'texto / 2ª linha'], SEM aspas (o molde abre e fecha aspas em cada página) */
+const citacao = (...paginas: [number, string][]): Cit => ({tipo: 'citacao', paginas});
+
+/** a cor tirada da cena e da roupa: letra, ouro da citação, traço. Mede-se POR GRAVAÇÃO (scripts/cor_da_cena.py sugere a
+ * linha); o padrão é o medido na gravação comum (parede bege, 32°) */
+export const C = {letra: '#F2EDE9', ouro: '#E2A665', traco: '#C9473B'};
+/** a posição do texto medida nesta gravação (especialista.md §5): logo abaixo do queixo (p98 + 156), de 941 a 1300 */
+const _ROS = ROSTO_T as number[][];
+const _queixo = _ROS.length ? [..._ROS.map(([, , cy, h]) => (cy + h / 2) * 1920)].sort((a, b) => a - b)[Math.min(_ROS.length - 1, Math.floor(0.98 * _ROS.length))] : 1031;
+const Y_MEDIDO = Math.round(Math.min(1300, Math.max(941, _queixo + 36 + 120)));
+
+// o que o plano liga (vazio = só a base: a gravação e a legenda pequena)
+let GIGANTES: Gig[] = [];
+let CITACOES: Cit[] = [];
 /** transições (fusão) ANTES destas palavras: só onde um trecho fecha e começa outra ideia (G23) */
-const TRANSICOES: [number, string][] = [[8, 'Ele'], [48, 'Eu'], [62, 'Mas']];
-const REENQUADRES: [number, string, number][] = [];
-const PEDACOS: [number, string][] = [
+let TRANSICOES: [number, string][] = [];
+/** troca de plano na base: só a pedido do dono (G6) */
+let REENQUADRES: [number, string, number][] = [];
+/** a legenda da base, [1ª palavra, 'texto / 2ª linha']; null = automática (paginasAuto: trecho na pontuação, uma página
+ * por subtrecho até a vírgula, até 2 linhas) */
+let PEDACOS: [number, string][] | null = null;
+/** centro da legenda, da citação e do gigante sozinho; topo do par linha de cima + gigante */
+export let Y_TEXTO = Y_MEDIDO;
+export let Y_PAR = Y_MEDIDO - 87;
+
+/* ================================================================ O PLANO (refazer num vídeo novo; o resto do arquivo é o modelo) */
+// Vídeo novo: este bloco nasce do scripts/plano_novo.tsx (tools/novo-video.py), só a base. Cada modo entra porque a fala
+// nova tem a função dele (especialista.md §1), com a linha por quê no plano.md. Abaixo, a vitrine da gravação comum.
+// o gancho em gigante (fala longa demais para 1 linha de cima) e o comando do fim em gigante
+GIGANTES = [
+	gigante(0, ['Esse vídeo', 'está sendo', '100%', 'editado', 'pelo Claude.'], {traco: true}),
+	gigante(83, ['comenta', 'edição']),
+];
+TRANSICOES = [[8, 'Ele'], [48, 'Eu'], [62, 'Mas']];
+PEDACOS = [
 	[8, 'Ele foi criado justamente / para te mostrar'],
 	[15, 'a diferença entre vários modelos / que eu criei e melhorei'],
 	[25, 'para editar qualquer tipo / de vídeo usando o Claude.'],
@@ -85,10 +108,11 @@ const PEDACOS: [number, string][] = [
 	[74, 'e aprender a como usar / isso nos seus vídeos,'],
 	[85, 'aqui embaixo que eu vou / te mandar na sua DM agora.'],
 ];
-/** medir por gravação, no quadro: entre o queixo e o que houver de claro na roupa */
-export const Y_TEXTO = 1187; // centro da legenda, da citação e do gigante sozinho
-export const Y_PAR = 1100; // topo do par linha de cima + gigante (sem par nesta vitrine)
+// medido no quadro da gravação comum: entre o queixo e o que houver de claro na roupa (sem par nesta vitrine)
+Y_TEXTO = 1187;
+Y_PAR = 1100;
 /* ================================================================ fim do plano */
+const MODOS_DEF: ModoDef[] = [...GIGANTES, ...CITACOES].sort((a, b) => (a.tipo === 'gigante' ? a.primeira : a.paginas[0][0]) - (b.tipo === 'gigante' ? b.primeira : b.paginas[0][0]));
 
 /* ---------------------------------------------------------------- tempos */
 export const SEGURA = 1.16;
@@ -194,11 +218,61 @@ const ALT_LINHA = LINHA * 1.18;
 const gigTopo = (m: Modo) => ((m.def as Gig).cima ? Y_PAR + ALT_LINHA + GAP_PAR : Y_TEXTO - GIG * 0.55);
 
 /* ---------------------------------------------------------------- páginas de legenda (base e citação) */
+/** a legenda automática da base (PEDACOS = null, o começo vazio): toda palavra fora dos modos, em trechos que acabam na
+ * pontuação final ou numa fusão (G11, G14), uma página por subtrecho (até a vírgula), até 2 linhas de LIN letras; o
+ * subtrecho longo parte na maior pausa perto do meio */
+const LIN = 32; // letras por linha: 58 px de Playfair na zona de 880 px
+const paginasAuto = (): [number, string][] => {
+	const nosModos = new Set(MODOS.flatMap((m) => Array.from({length: m.i1 - m.i0 + 1}, (_, q) => m.i0 + q)));
+	const fusao = new Set(TRANSICOES.map(([i]) => i));
+	const fora = PS.map((_, i) => i).filter((i) => !nosModos.has(i));
+	const trechos: number[][] = [];
+	fora.forEach((i, k) => {
+		const ant = fora[k - 1];
+		if (k === 0 || ant !== i - 1 || /[.!?…]$/.test(PS[ant].texto) || fusao.has(i)) trechos.push([i]);
+		else trechos[trechos.length - 1].push(i);
+	});
+	const txt = (ids: number[]) => ids.map((i) => PS[i].texto).join(' ');
+	const linhas = (ids: number[]): string[] => {
+		if (txt(ids).length <= LIN) return [txt(ids)];
+		let m = [Infinity, '', ''] as [number, string, string];
+		for (let c = 1; c < ids.length; c++) {
+			const a = txt(ids.slice(0, c)), b = txt(ids.slice(c));
+			if (Math.max(a.length, b.length) < m[0]) m = [Math.max(a.length, b.length), a, b];
+		}
+		return [m[1], m[2]];
+	};
+	const cabe = (ids: number[]) => linhas(ids).every((l) => l.length <= LIN);
+	// palavra de ligação não fecha página ("vídeo e" / "escolher")
+	const LIGA = new Set(['e', 'o', 'a', 'os', 'as', 'de', 'do', 'da', 'dos', 'das', 'que', 'se', 'um', 'uma', 'para', 'pra', 'com', 'no', 'na', 'em', 'ao', 'por', 'mas', 'ou']);
+	// subtrecho que não cabe em 2 linhas: parte na maior pausa da fala, perto do meio, nunca depois de palavra de ligação
+	const parte = (s: number[]): number[][] => {
+		if (cabe(s)) return [s];
+		let melhor = 1, nota = -Infinity;
+		for (let k = 1; k < s.length; k++) {
+			const pausa = PS[s[k]].de - PS[s[k - 1]].ate;
+			const meio = Math.abs(k / s.length - 0.5);
+			const n = pausa * 4 - meio - (LIGA.has(sem(PS[s[k - 1]].texto)) ? 1 : 0);
+			if (n > nota) [melhor, nota] = [k, n];
+		}
+		return [...parte(s.slice(0, melhor)), ...parte(s.slice(melhor))];
+	};
+	const out: number[][] = [];
+	for (const tr of trechos) {
+		// uma página nunca atravessa a vírgula (o subtrecho, G11/G14): cada subtrecho é uma página, ou mais se não cabe
+		const subs: number[][] = [];
+		tr.forEach((i, k) => (k === 0 || /[,;:]$/.test(PS[tr[k - 1]].texto) ? subs.push([i]) : subs[subs.length - 1].push(i)));
+		out.push(...subs.flatMap(parte));
+	}
+	return out.map((ids) => [ids[0], linhas(ids).join(' / ')]);
+};
+export const PEDACOS_USADOS: [number, string][] = PEDACOS ?? paginasAuto();
+
 export type Pagina = {linhas: string[]; i0: number; n: number; de: number; ate: number; ouro: boolean; y: number};
 const aspas = (linhas: string[]) => linhas.map((l, i) => `${i === 0 ? '“' : ''}${l}${i === linhas.length - 1 ? '”' : ''}`);
 export const PAGINAS: Pagina[] = (() => {
 	const todas: [number, string, boolean][] = [
-		...PEDACOS.map(([a, txt]) => [a, txt, false] as [number, string, boolean]),
+		...PEDACOS_USADOS.map(([a, txt]) => [a, txt, false] as [number, string, boolean]),
 		...MODOS.flatMap((m) => (m.def.tipo === 'citacao' ? m.def.paginas.map(([a, txt]) => [a, txt, true] as [number, string, boolean]) : [])),
 	].sort((x, y) => x[0] - y[0]);
 	const gigs = MODOS.filter((m) => m.def.tipo === 'gigante');
@@ -206,7 +280,7 @@ export const PAGINAS: Pagina[] = (() => {
 		const crua = txt.split(/\s*\/\s*/);
 		const linhas = ouro ? aspas(crua) : crua;
 		const n = trecho(i0, txt, `PEDACOS, o pedaço '${txt}'`).length;
-		const de = PS[i0].de - 0.06;
+		const de = i0 === 0 ? 0 : PS[i0].de - 0.06; // a 1ª fala escrita desde o quadro 0 (G29)
 		const prox = todas[j + 1];
 		const fim = Math.min(prox ? PS[prox[0]].de - 0.06 : DURACAO - PRETO, ...gigs.map((m) => m.de).filter((x) => x > de + 0.01));
 		const lh = ouro ? ALT_LINHA : LEG * LEG_LH;

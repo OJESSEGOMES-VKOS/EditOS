@@ -10,11 +10,14 @@ const {fontFamily: INTER} = loadInter('normal', {weights: ['600'], subsets: ['la
 
 export type Fatia = {nome: string; valor: number; cor?: string};
 export type Cena37Props = {
-  titulo?: string;
+  titulo: string;
   contexto?: string;
-  prefixo?: string;
+  prefixo?: string; // antes do número (ex.: R$)
+  sufixo?: string; // depois do número (ex.: %)
   rotuloCentro?: string;
-  fatias?: Fatia[]; // a última é a fatia herói
+  fatias: Fatia[]; // 2 a 7 fatias, quantas a fala citar
+  heroi?: number; // índice da fatia da história (padrão: a última)
+  passo?: number; // quadros entre uma fatia e a próxima (padrão 10)
   corHeroi?: string;
   width?: number;
   height?: number;
@@ -39,18 +42,14 @@ const setor = (a0: number, a1: number, ri: number, re: number, dx = 0, dy = 0) =
 };
 
 export const Cena37: React.FC<Cena37Props> = ({
-  titulo = 'Para onde vão R$ 100',
-  contexto = 'Exemplo: uma cafeteria de bairro',
-  prefixo = 'R$',
-  rotuloCentro = 'das vendas',
-  fatias = [
-    {nome: 'Café e comida', valor: 31},
-    {nome: 'Equipe', valor: 28},
-    {nome: 'Aluguel', valor: 14},
-    {nome: 'Taxas e outros', valor: 9},
-    {nome: 'Marketing', valor: 8},
-    {nome: 'Lucro', valor: 10},
-  ],
+  titulo,
+  contexto = '',
+  prefixo = '',
+  sufixo = '',
+  rotuloCentro = '',
+  fatias,
+  heroi: iHeroi,
+  passo = 10,
   corHeroi = '#12A150',
   width = 1080,
   height = 1350,
@@ -62,12 +61,13 @@ export const Cena37: React.FC<Cena37Props> = ({
   const k = Math.min(width / 1080, height / 1350);
   const total = fatias.reduce((a, f) => a + f.valor, 0);
   const n = fatias.length;
-  const cores = fatias.map((f, i) => f.cor ?? (i === n - 1 ? corHeroi : TONS[i % TONS.length]));
+  const h = iHeroi ?? n - 1;
+  const cores = fatias.map((f, i) => f.cor ?? (i === h ? corHeroi : TONS[(i > h ? i - 1 : i) % TONS.length]));
 
-  const inicio = (i: number) => (-4 + i * 10) * s;
+  const inicio = (i: number) => (-4 + i * passo) * s;
   const prog = fatias.map((_, i) => spring({frame: frame - inicio(i), fps, config: {damping: 13, stiffness: 120}, durationInFrames: 22 * s}));
   const pousou = (i: number) => frame >= inicio(i) + 12 * s;
-  const tHeroi = inicio(n - 1) + 20 * s;
+  const tHeroi = inicio(n - 1) + 20 * s; // a história sai depois que o anel fecha
   const sai = spring({frame: frame - tHeroi, fps, config: {damping: 11, stiffness: 180}});
   const escurece = interpolate(frame, [tHeroi, tHeroi + 8 * s], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
 
@@ -84,7 +84,7 @@ export const Cena37: React.FC<Cena37Props> = ({
     const a0 = ang + GAP / 2;
     ang += span;
     const a1 = a0 + Math.max(0, (span - GAP) * prog[i]);
-    const heroi = i === n - 1;
+    const heroi = i === h;
     const meio = ((a0 + (a0 + span - GAP)) / 2 - 90) * (Math.PI / 180);
     const dist = heroi ? 26 * sai : 0;
     const grosso = heroi ? 10 * sai : 0;
@@ -112,6 +112,7 @@ export const Cena37: React.FC<Cena37Props> = ({
           <div style={{fontFamily: SORA, fontWeight: 700, color: '#111418', fontVariantNumeric: 'tabular-nums', letterSpacing: -4, lineHeight: 1}}>
             <span style={{fontSize: 50, verticalAlign: 'top', position: 'relative', top: 18, marginRight: 6}}>{prefixo}</span>
             <span style={{fontSize: 128}}>{soma}</span>
+            {sufixo ? <span style={{fontSize: 64, marginLeft: 4}}>{sufixo}</span> : null}
           </div>
           <div style={{fontFamily: INTER, fontWeight: 600, fontSize: 28, color: '#7B8491', marginTop: 10}}>{rotuloCentro}</div>
         </div>
@@ -121,7 +122,7 @@ export const Cena37: React.FC<Cena37Props> = ({
             const t0 = inicio(i) + 12 * s;
             const pop = spring({frame: frame - t0, fps, config: {damping: 10, stiffness: 240}});
             const nome = spring({frame: frame - t0 - 3, fps, config: {damping: 18, stiffness: 200}});
-            const heroi = i === n - 1;
+            const heroi = i === h;
             const corQ = heroi ? cores[i] : interpolateColors(escurece, [0, 1], [cores[i], interpolateColors(0.38, [0, 1], [cores[i], '#FFFFFF'])]);
             const pill = heroi ? sai : 0;
             if (!pousou(i) && pop < 0.01) return <div key={i} />;
@@ -131,7 +132,7 @@ export const Cena37: React.FC<Cena37Props> = ({
                   background: `rgba(18,161,80,${0.12 * pill})`, transform: `scale(${1 + 0.06 * pill})`, transformOrigin: '0 50%'}}>
                   <div style={{width: 26, height: 26, borderRadius: 5, background: corQ, transform: `scale(${pop})`}} />
                   <div style={{fontFamily: SORA, fontWeight: 700, fontSize: 38, color: heroi && pill > 0.5 ? corHeroi : interpolateColors(escurece * (heroi ? 0 : 1), [0, 1], ['#111418', '#5c636d']), transform: `scale(${pop})`, transformOrigin: '0 50%', marginRight: 6, fontVariantNumeric: 'tabular-nums'}}>
-                    {prefixo} {f.valor}
+                    {prefixo ? `${prefixo} ` : ''}{f.valor}{sufixo}
                   </div>
                   <div style={{overflow: 'hidden', height: 40}}>
                     <div style={{fontFamily: INTER, fontWeight: 600, fontSize: 26, lineHeight: '40px', color: heroi && pill > 0.5 ? corHeroi : '#7B8491', transform: `translateY(${(1 - nome) * 40}px)`}}>{f.nome}</div>

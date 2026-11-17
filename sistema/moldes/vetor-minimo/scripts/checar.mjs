@@ -4,7 +4,8 @@
 // cada palavra, e >= 1,5 s no total), uma frase por vez com 0,4 s de vão, entrada no início de uma palavra (±2 quadros),
 // aspas tipográficas nas falas, no máximo 7 palavras (uma linha só), largura dentro de x 60-940 (estimada: 0,64 do corpo
 // por letra, medida nos quadros da vitrine), nome de modelo, travessão, a virada entre 60 e 76% da duração, a moral
-// segurando >= 3 s e a duração cobrindo a fala. Só confere as partes que o plano tem.
+// segurando >= 3 s e a duração cobrindo a fala. Só confere as partes que o plano tem. O plano vazio reprova, e o objeto
+// novo de cada chegada (comp) tem de estar registrado em src/telas/index.ts (o src/Reel.tsx para ao carregar se não estiver).
 // O temporário vai para ../../.tmp e é apagado mesmo se der erro.
 import {build} from 'esbuild';
 import fs from 'node:fs';
@@ -16,7 +17,7 @@ const publico = fs.existsSync('public') ? fs.readdirSync('public').map((name) =>
 let M;
 try {
 	await build({
-		stdin: {contents: "export {FRASES, MORAL, T, DURACAO, FPS} from './src/Reel.tsx'; export {default as PB} from './src/palavras.json';", resolveDir: process.cwd(), loader: 'ts'},
+		stdin: {contents: "export {FRASES, MORAL, T, DURACAO, FPS, CHEGADAS} from './src/Reel.tsx'; export {default as PB} from './src/palavras.json';", resolveDir: process.cwd(), loader: 'ts'},
 		bundle: true, platform: 'node', format: 'esm', outfile: tmp, logLevel: 'error', jsx: 'automatic', loader: {'.json': 'json'},
 		plugins: [{name: 'stub', setup(b) {
 			b.onResolve({filter: /^(@remotion\/google-fonts\/.*|remotion)$/}, (a) => ({path: a.path, namespace: 'stub'}));
@@ -31,6 +32,13 @@ try {
 }
 if (!M) process.exit(1);
 const {FRASES, MORAL, T, DURACAO, FPS, PB} = M;
+// o plano vazio (o começo de um vídeo novo) não passa: a história nasce da fala nova
+if (!CHEGADAS_OK()) process.exit(1);
+function CHEGADAS_OK() {
+	if (M.CHEGADAS.length || FRASES.length || MORAL.length) return true;
+	console.log('PLANO VAZIO: o vídeo nasceu sem a história do aprovado. Monte o bloco O PLANO de scripts/plano.py pela fala nova (.claude/skills/vetor-minimo/SKILL.md, vetor-minimo.md §9), rode o plano.py e confira de novo.');
+	return false;
+}
 
 const erros = [];
 const ok = [];

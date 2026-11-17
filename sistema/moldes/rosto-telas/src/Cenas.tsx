@@ -210,7 +210,7 @@ export const Outros: React.FC = () => {
 	if (p <= 0) return null;
 	return (
 		<Coluna top={330}>
-			<Etiqueta p={p} style={{fontFamily: MONO, fontSize: 34, transform: `translateX(${(1 - p) * -40}px) scale(${0.85 + 0.15 * p})`}}>
+			<Etiqueta p={p} style={{fontFamily: MONO, fontSize: NOVO ? 68 : 34, transform: `translateX(${(1 - p) * -40}px) scale(${0.85 + 0.15 * p})`}}>
 				<svg width={40} height={40} viewBox="0 0 24 24" fill="none" stroke={C.verde} strokeWidth={2} strokeLinejoin="round">
 					<rect x={7} y={3} width={13} height={15} rx={2} />
 					<path d="M4 7v12a2 2 0 0 0 2 2h10" />
@@ -264,8 +264,9 @@ export const Fecho: React.FC = () => {
 	const n = Math.floor(tw(t, S.edicao, S.edicao + 0.42, 0, PALAVRA.length + 0.999, E.lin));
 	const marca = tw(t, S.edicao + 0.45, S.edicao + 0.85, 0, 1, E.inOut);
 	const aperta = mola(t, S.embaixo, {damping: 10, stiffness: 300, mass: 0.6});
-	const dm = mola(t, S.mandar, {damping: 15, stiffness: 170});
-	const voa = tw(t, S.dm, S.dm + 0.5, 0, 1, E.out);
+	// a DM que chega em cima só existe quando a fala promete mandar na DM (mandar e dm no plano; sem eles, None)
+	const dm = S.mandar != null ? mola(t, S.mandar, {damping: 15, stiffness: 170}) : 0;
+	const voa = S.dm != null ? tw(t, S.dm, S.dm + 0.5, 0, 1, E.out) : 0;
 	const fonte = '-apple-system, "Segoe UI", ' + DISPLAY;
 	const avatar = (lado: number) => foto && (
 		<div style={{width: lado, height: lado, flex: 'none', borderRadius: lado / 2, padding: 4, background: 'linear-gradient(45deg,#F9CE34,#EE2A7B,#6228D7)'}}>

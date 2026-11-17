@@ -3,7 +3,9 @@
 Componente: `Cena13.tsx`. Demo: `demo.tsx` (Composition `Demo`, 1080x1350, 30 fps, 150 quadros). Render: `../demo.mp4`.
 
 ## Props
-`width`, `height`, titulo [col1, col2] (verticais), frase, capitulo, papel, tinta, vermelho. Todas têm padrão (o conteúdo da demo).
+`width`, `height`, titulo (obrigatório: 1 ou 2 colunas verticais), frase e capitulo (opcionais; vazios, não entram),
+barco e figura (padrão ligados; desligue quando a fala não pede), papel, tinta, vermelho. Os textos da demo moram só no
+`demo.tsx` e em `textos-demo.json`; nunca voltam num vídeo (teste do clone).
 
 ## O que a cena faz
 Pintura procedural em SVG: três cordilheiras com lavagem atrás de frente irregular e faixa molhada, penhasco de pincel seco de cima para baixo, pinheiro com agulhas, barco, rio de riscos, sol que floresce com passada, título vertical pincelado e selo carimbado a 112%.

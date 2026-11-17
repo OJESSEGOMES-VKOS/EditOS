@@ -1,29 +1,43 @@
 import React from 'react';
 import {AbsoluteFill, OffthreadVideo, Sequence, staticFile} from 'remotion';
 import {Boneco, Pose} from './Boneco';
-import {ALT_PE, EM_PE, SENTADO} from './Poses';
-import {C, E, FONTE, FPS, NEON_OURO, NEON_VERDE, T, cena, ini, lerp, marca, tw, txt} from './base';
-import {Cama, Facho, Janela, Luminaria, Mesa, Parede, Poeira, Svg} from './Cenarios';
+import {ALT_PE, SENTADO} from './Poses';
+import {C, E, FONTE, NEON_OURO, NEON_VERDE, T, cena, ini, lerp, marca, tw, txt} from './base';
+import {Cama, Janela, Luminaria, Mesa, Parede, Poeira, Svg} from './Cenarios';
 import {Avanco, Cadeira, Cartao, Icone} from './Objetos';
+import {CHAO, Fundo, Luz, P, emPe, sec} from './kit';
+import {TELAS} from './telas';
 
 /**
  * Família B: uma ilustração PARADA por frase (personagem.md §4: "câmera parada"; o movimento vem do corte).
  * Só respiração/piscada do personagem e a poeira na luz dão vida. Chão em y 1140; legenda abaixo (y 1185-1490).
+ *
+ * O que é da casa e o que é exemplo (sistema/JEITO.md):
+ * - Base: a cena neutra da casa (ele em pé sob o foco, olhando quem assiste). É o começo vazio do vídeo novo
+ *   (scripts/plano_novo.py): cada frase nasce nela e troca pela cena que a frase pede.
+ * - S1 a S11: as cenas do vídeo aprovado ("100% editado pelo Claude"). São EXEMPLOS do jeito, presas àquela fala; uma
+ *   delas só volta num vídeo novo quando a fala nova diz a mesma coisa que fez ela existir (personagem.md §4).
+ * - N2 a N4: exemplos de cena nova de um teste antigo.
+ * - TELAS: as cenas novas do vídeo (src/telas/ da pasta do vídeo, com o kit de src/kit.tsx). O normal num tema novo.
  */
-type P = {f: number};
-const CHAO = 1140;
-const sec = (f: number) => f / FPS;
-const emPe = (x: number, s: number, extra: Partial<Pose> = {}): Pose => ({...EM_PE, x, y: CHAO - ALT_PE * s, s, ...extra}) as Pose;
 
-const Fundo: React.FC<{id: string; topo?: string}> = ({id, topo = '#121318'}) => (
-	<>
-		<Parede chao={CHAO} id={id} topo={topo} base="#09090b" />
-		<rect x={0} y={CHAO + 2} width={1080} height={1920 - CHAO} fill="#060607" />
-	</>
-);
-const Luz: React.FC<{cx: number; w0?: number; w1?: number; base?: number; op?: number; id: string; cor?: string}> = ({cx, w0 = 90, w1 = 520, base = CHAO, op = 1, id, cor = C.ouroClaro}) => (
-	<Facho cx={cx} topo={-20} base={base} w0={w0} w1={w1} op={op} cor={cor} id={id} />
-);
+/** Base: a cena neutra da casa. Ele em pé sob o foco, olhando quem assiste; o foco muda de lado a cada cena para o
+ * corte aparecer. Só serve de começo: a cena que a frase pede entra no lugar dela. */
+export const Base: React.FC<P> = ({f}) => {
+	const t = sec(f);
+	const k = T.cenas.findIndex((c) => f >= c.de_q && f < c.ate_q);
+	const x = k % 2 ? 620 : 460;
+	return (
+		<AbsoluteFill style={{background: C.preto}}>
+			<Svg>
+				<Fundo id="base" />
+				<Luz cx={x} w0={70} w1={560} id="base" op={0.85} />
+				<Poeira t={t} x={x - 300} y={300} w={600} h={800} n={20} op={0.4} cor={C.ouroClaro} seed={k + 1} />
+				<Boneco p={emPe(x, 1.0, {abre: 0.85, olhos: 'aberto', boca: 'leve', olhar: [0, 0]})} t={t} id="base" />
+			</Svg>
+		</AbsoluteFill>
+	);
+};
 
 // S1 "Esse vídeo está sendo 100% editado pelo Claude." mesa de edição, a barra chega a 100%
 export const S1: React.FC<P> = ({f}) => {
@@ -396,7 +410,7 @@ export const N4: React.FC<P> = ({f}) => {
 	);
 };
 
-export const CENAS: Record<string, React.FC<P>> = {S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, N2, N3, N4};
+export const CENAS: Record<string, React.FC<P>> = {Base, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, N2, N3, N4, ...(TELAS as Record<string, React.FC<P>>)};
 
 // ---------------------------------------------------------------- texto
 /** G16 (REGRAS.md): texto limpo, sem contorno nem sombra colada; liga só com pedido explícito do dono */

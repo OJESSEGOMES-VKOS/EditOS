@@ -65,15 +65,18 @@ console.log(`${PB.length} palavras, ${buracos.length} com buraco`);
 buracos.forEach((b) => console.log('  ' + b));
 
 // 2. tempo de leitura (regras da casa): pedaço >= 1,5 s na tela e palavra >= 0,4 s depois de nascer; repetição; linhas
-const MIN_PEDACO = 1.5, MIN_PALAVRA = 0.4, MAX_LINHAS_LEG = 2, MAX_LINHAS = 4;
+const MIN_PEDACO = 1.5, MIN_PALAVRA = 0.4, MIN_ULTIMA = 0.25, MAX_LINHAS_LEG = 2, MAX_LINHAS = 4;
 const ex = exibicoes();
 const curtos = [], linhas = [];
 for (const e of ex) {
 	const dur = e.ate - e.de;
 	if (dur < MIN_PEDACO) curtos.push(`"${e.nome}" fica ${fmt(dur)} s (${linhaDe(e)}): junte com o vizinho ou estenda até ${MIN_PEDACO} s`);
-	for (const i of e.ids)
-		if (e.ate - PB[i].start < MIN_PALAVRA)
+	// a última de um pedaço que já ficou 1,5 s pode ter 0,25 s (não é palavra solta; a mesma régua do rosto-telas, fala rápida)
+	e.ids.forEach((i, k) => {
+		const min = k === e.ids.length - 1 && dur >= MIN_PEDACO ? MIN_ULTIMA : MIN_PALAVRA;
+		if (e.ate - PB[i].start < min)
 			curtos.push(`"${PB[i].text}" em "${e.nome}" fica só ${fmt(e.ate - PB[i].start)} s (${linhaDe(e)}): o pedaço some cedo depois dela; termine o pedaço antes dela (ela passa para o seguinte) ou junte os dois`);
+	});
 	if (e.tipo === 'legenda' && e.linhas > MAX_LINHAS_LEG) linhas.push(`"${e.nome}" tem ${e.linhas} linhas (${linhaDe(e)}): no máximo ${MAX_LINHAS_LEG} neste modelo; divida o pedaço`);
 }
 BLOCOS.forEach((b) => { if (b.linhas.length + (b.carimbo ? 1 : 0) > MAX_LINHAS) linhas.push(`bloco de primeira ${b.primeira} tem mais de ${MAX_LINHAS} linhas (${onde(`primeira: ${b.primeira},`)})`); });

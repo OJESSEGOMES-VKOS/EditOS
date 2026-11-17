@@ -10,11 +10,17 @@ const {fontFamily: INTER} = loadFont('normal', {weights: ['500', '600', '700', '
 export type Cena21Props = {
   produto: string; // nome que sobe embaixo
   linha: string; // linha pequena
-  marca: string; // nome no topo da página
-  menu: string[];
-  titulo: [string, string];
-  subtitulo: string;
-  botao: string;
+  // a tela: a página real do dono (G25), desenhada em 820x~520; se vier, substitui a página de exemplo abaixo
+  tela?: React.ReactNode;
+  alvo?: [number, number]; // onde o cursor clica, em px da tela (padrão: o botão da página de exemplo)
+  // página de exemplo (só sem `tela`); nenhum texto tem padrão
+  marca?: string; // nome no topo da página
+  menu?: string[];
+  entrar?: string; // link à direita do menu
+  titulo?: string[]; // 1 ou 2 linhas
+  subtitulo?: string;
+  botao?: string;
+  quadro?: {titulo: string; detalhe: string; abas: string[]; colunas: string[]}; // a "foto do produto" (vazio: sem quadro)
   azul?: string;
   width?: number;
   height?: number;
@@ -29,8 +35,16 @@ const LH = 560; // altura da tampa
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 const Pagina: React.FC<Cena21Props & {rolagem: number; clique: number; cursor: [number, number]; cursorVis: number}> = (p) => {
+  if (p.tela) {
+    return (
+      <div style={{position: 'absolute', inset: 0, background: '#FAFAFB', overflow: 'hidden', fontFamily: INTER, color: '#0F1115'}}>
+        <div style={{position: 'absolute', left: 0, top: -p.rolagem, width: '100%'}}>{p.tela}</div>
+        <Cursor {...p} />
+      </div>
+    );
+  }
   const azul = p.azul ?? '#2F6BFF';
-  const dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  const dias = p.quadro?.colunas ?? [];
   const cores = ['#DCEBFF', '#DDF5E6', '#FFE6D5', '#E9E3FF', '#FFF1C9', '#D9F2F2'];
   const tarefas = [[0, 0, 0], [0, 1, 1], [1, 0, 2], [2, 1, 3], [3, 0, 1], [3, 2, 4], [4, 1, 5], [5, 0, 0], [5, 2, 2], [6, 1, 3], [1, 2, 4], [2, 3, 0]];
   return (
@@ -40,12 +54,12 @@ const Pagina: React.FC<Cena21Props & {rolagem: number; clique: number; cursor: [
           <div style={{width: 16, height: 12, borderRadius: 4, background: azul, marginRight: 8}} />
           <div style={{fontWeight: 700, fontSize: 14}}>{p.marca}</div>
           <div style={{display: 'flex', gap: 22, marginLeft: 70, color: '#555A63', fontWeight: 500}}>
-            {p.menu.map((m) => <span key={m}>{m}</span>)}
+            {(p.menu ?? []).map((m) => <span key={m}>{m}</span>)}
           </div>
-          <div style={{marginLeft: 'auto', color: '#555A63', fontWeight: 500}}>Entrar</div>
+          <div style={{marginLeft: 'auto', color: '#555A63', fontWeight: 500}}>{p.entrar ?? ''}</div>
         </div>
         <div style={{textAlign: 'center', marginTop: 38, fontSize: 50, fontWeight: 800, letterSpacing: -2, lineHeight: 1.0}}>
-          {p.titulo[0]}<br />{p.titulo[1]}
+          {(p.titulo ?? []).map((l, i) => <React.Fragment key={i}>{i > 0 && <br />}{l}</React.Fragment>)}
         </div>
         <div style={{textAlign: 'center', marginTop: 14, fontSize: 15, color: '#6E6E73', fontWeight: 500}}>{p.subtitulo}</div>
         <div style={{display: 'flex', justifyContent: 'center', marginTop: 18}}>
@@ -53,12 +67,12 @@ const Pagina: React.FC<Cena21Props & {rolagem: number; clique: number; cursor: [
             {p.botao}
           </div>
         </div>
-        {/* a imagem do produto: uma semana em quadros */}
-        <div style={{margin: '34px 70px 0', background: '#fff', borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', padding: '14px 18px 20px'}}>
+        {/* a imagem do produto: uma semana em quadros (exemplo) */}
+        {p.quadro && <div style={{margin: '34px 70px 0', background: '#fff', borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', padding: '14px 18px 20px'}}>
           <div style={{display: 'flex', alignItems: 'center', fontSize: 13, fontWeight: 700}}>
-            Esta semana <span style={{color: '#9A9AA0', fontWeight: 500, marginLeft: 10}}>12 tarefas</span>
+            {p.quadro.titulo} <span style={{color: '#9A9AA0', fontWeight: 500, marginLeft: 10}}>{p.quadro.detalhe}</span>
             <span style={{marginLeft: 'auto', display: 'flex', gap: 6}}>
-              {['Dia', 'Semana', 'Mês'].map((t, i) => (
+              {p.quadro.abas.map((t, i) => (
                 <span key={t} style={{fontSize: 11, padding: '3px 9px', borderRadius: 6, background: i === 1 ? '#EEF2FF' : '#F2F2F4', color: '#555'}}>{t}</span>
               ))}
             </span>
@@ -77,15 +91,18 @@ const Pagina: React.FC<Cena21Props & {rolagem: number; clique: number; cursor: [
               );
             })}
           </div>
-        </div>
+        </div>}
       </div>
-      {/* cursor */}
-      <svg width={22} height={28} viewBox="0 0 22 28" style={{position: 'absolute', left: p.cursor[0], top: p.cursor[1], opacity: p.cursorVis, transform: `scale(${1 - 0.15 * p.clique})`, transformOrigin: '2px 2px'}}>
-        <path d="M2 2 L2 22 L7.5 17 L11 25 L14.5 23.5 L11 15.8 L18 15.8 Z" fill="#111" stroke="#fff" strokeWidth={1.6} strokeLinejoin="round" />
-      </svg>
+      <Cursor {...p} />
     </div>
   );
 };
+
+const Cursor: React.FC<{cursor: [number, number]; cursorVis: number; clique: number}> = (p) => (
+      <svg width={22} height={28} viewBox="0 0 22 28" style={{position: 'absolute', left: p.cursor[0], top: p.cursor[1], opacity: p.cursorVis, transform: `scale(${1 - 0.15 * p.clique})`, transformOrigin: '2px 2px'}}>
+        <path d="M2 2 L2 22 L7.5 17 L11 25 L14.5 23.5 L11 15.8 L18 15.8 Z" fill="#111" stroke="#fff" strokeWidth={1.6} strokeLinejoin="round" />
+      </svg>
+);
 
 export const Cena21: React.FC<Cena21Props> = (props) => {
   const {width = W, height = H, produto, linha} = props;
@@ -110,7 +127,8 @@ export const Cena21: React.FC<Cena21Props> = (props) => {
   const assenta = interpolate(frame, [26, 40], [24, 0], {...clamp, easing: Easing.out(Easing.cubic)});
   const rolagem = interpolate(frame, [44, 66], [0, 64], {...clamp, easing: Easing.inOut(Easing.cubic)}) - assenta;
   const cursorK = interpolate(frame, [62, 84], [0, 1], {...clamp, easing: Easing.inOut(Easing.cubic)});
-  const cursor: [number, number] = [620 - 150 * cursorK, 360 - 105 * cursorK];
+  const alvo = props.alvo ?? [470, 255];
+  const cursor: [number, number] = [alvo[0] + 150 - 150 * cursorK, alvo[1] + 105 - 105 * cursorK];
   const clique = interpolate(frame, [86, 89, 96], [0, 1, 0], clamp);
   const cursorVis = interpolate(frame, [56, 62], [0, 1], clamp);
 

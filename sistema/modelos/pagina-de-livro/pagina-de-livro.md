@@ -14,6 +14,10 @@ só entra onde a fala nova tiver o mesmo porquê; a ordem e os tempos do aprovad
 vídeo normal da pessoa, com o fundo e a cor reais (prop `fundo: 'real'`, `pb: false`): nada de pessoa recortada, breu
 petróleo, vinheta, máscara, camadas, blur de fundo nem preto e branco; tudo isso só com ordem explícita (G6). A maior
 parte do vídeo é a pessoa com a legenda. O vídeo abre na gravação original, dinâmico, com ênfase no gancho (G29).
+A skill `.claude/skills/pagina-de-livro/SKILL.md` diz a personalidade e como achar, na fala nova, o termo, a cor do
+sentido e o lado do bloco. As palavras do aprovado ("100%", "CLAUDE", "QUALQUER", "APENAS", "EDIÇÃO") são exemplos
+daquela fala; o vídeo novo nasce sem elas (`scripts/plano_novo.tsx`). O modelo não tem tela livre: tudo na tela é a
+própria fala como página de livro.
 
 ---
 
@@ -229,10 +233,13 @@ mostrar a capacidade. Nada disso é o padrão de hoje.
 
 Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do vídeo" (`oficina/<v>/`).
 
+0. **Leia a skill** `.claude/skills/pagina-de-livro/SKILL.md` (a personalidade, as peças e a invenção do destaque).
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py pagina-de-livro <gravacao.mp4> <AAAA-MM-DD-tema>`.
    Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`), mede o rosto (`src/rosto.json`) e
    enquadra a gravação no modelo (rosto no tamanho e na altura do aprovado; a cor e o fundo ficam os da gravação).
-   Folga de resolução ajuda (4K: o close extremo é um recorte de 2,3x).
+   Folga de resolução ajuda (4K: o close extremo é um recorte de 2,3x). **O plano nasce vazio:** o bloco O PLANO de
+   `src/Reel.tsx` vem do `scripts/plano_novo.tsx` do molde (a gravação num plano aberto 1,0, sem corte, sem chicote,
+   `PECAS` vazia, com a lista comentada das peças), nunca com o plano do aprovado.
    Nome que a transcrição errar (ex.: "Cloud" no lugar de "Claude") se corrige já aqui: `--trocar Cloud=Claude` (pode repetir).
 2. **Fundo (só se o dono pediu; o padrão é o fundo real e este passo não existe).** Desfoque leve:
    `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/grade.py --desfoque` grava
@@ -248,7 +255,8 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 3. **Escreva o `plano.md`** na pasta do vídeo, uma linha por frase sobre `src/palavras.json`: tempo, fala, jeito
    (bloco lateral, central, legenda), palavra-chave, cor pelo sentido e plano. Procure o arco da fala (tese, custo,
    virada, fecho): o bloco vai só no termo que importa ao tema (G17, G28); o resto é legenda.
-4. **Monte O PLANO** em `src/Reel.tsx` (na pasta do vídeo). O molde para de propósito ao carregar até o plano bater com
+4. **Monte O PLANO** no bloco marcado de `src/Reel.tsx` (na pasta do vídeo; entre a linha O PLANO e a linha fim do
+   plano). O molde para de propósito ao carregar até o plano bater com
    a fala nova e diz qual lista e qual palavra não batem. Os números são índices das palavras (0 = a 1ª).
    - `CORTE` e `PLANOS`: os cortes, `c(i)` = 2 quadros antes da palavra `i`, com `zoom`, `fx`, `fy` (onde o rosto cai)
      e `pb: true` no plano do custo e `previas: true` no plano das prévias.
@@ -258,11 +266,16 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
      Palavra-chave de duas palavras: `K('CLAUDE CODE', i, ...)` ocupa as palavras i e i+1. Ajudas de tempo: `ler(i)`
      dá à palavra i os 0,4 s de leitura (use como `ate` da página que termina nela); `antes(i)` é 3 centésimos antes da
      palavra i (use como corte ou como `de`).
-     Nenhuma peça atravessa um corte.
+     Nenhuma peça atravessa um corte. O tipo, o alinhamento e a cor vão sem aspas (`tipo: bloco`, `esq`, `dir`,
+     `meio`, `azul`, `vermelho`, `branco`); entre aspas no plano, só o que é dito.
    - `FOLGA`: o corte seco depois da última palavra (0,2 s).
 5. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo) até zerar. Ele confere palavra coberta uma
    vez, tempo de leitura, até 4 linhas, legenda só em 1050 e 1400, texto sem cruzar texto, zona segura, fontes e a
    conta de cortes, e diz o que mexer.
+   **O teste do clone:** no plano de cenas (`cenas.json` → `tools/decupar.py oficina/<v> --plano`, ou o `plano.md`),
+   a linha de cada cena com destaque diz a peça (`bloco`, `CHICOTE`) e a palavra dita entre aspas que pediu ela. Depois
+   `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até sair `SEM CLONE`, e a folha de quadros ao lado da
+   `referencia/folha.jpg`: mesmo modelo, outro vídeo.
 6. **Som (só se o dono pediu efeito ou música, G6; senão pule e apague `public/efeitos.wav` se veio do molde):** ponha em `scripts/trilha.py` o `PB_PALAVRA` (1ª palavra do plano P&B) e o `CHICOTE_PALAVRA` (1ª palavra da
    chamada), ou `None`, e rode `../../.venv/Scripts/python.exe scripts/trilha.py` (na pasta do vídeo). Sai
    `public/efeitos.wav` e `public/trilha.wav`.
@@ -284,7 +297,7 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e o mesmo com `2`), o
 plano com `previas: true` e o render com as props acima.
 
-## 10. O plano do vídeo aprovado (repertório, não roteiro)
+## 10. O plano do vídeo aprovado (repertório, não roteiro; ele fica no molde, o vídeo novo nasce sem ele)
 
 Feito antes de 2026-11-05: fundo escuro recortado, P&B e uma palavra gigante por frase. Cada linha mostra uma tela e o
 porquê dela; num vídeo novo, a tela só entra onde a fala nova tiver o mesmo porquê, e nunca se copia a ordem nem os

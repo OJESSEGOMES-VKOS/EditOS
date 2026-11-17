@@ -1,0 +1,66 @@
+{
+ "_leia": "Para tools/clone.py: os heróis da casa (o nome em heroi: <Heroi comp=\"Nome\" /> no plano de src/Cenas.tsx) e o texto que cada um escreve fixo no código, quando ele é usado. nao_copiar: mídia do vídeo aprovado que o tools/novo-video.py não leva pro vídeo novo.",
+ "telas": [
+  "Cem",
+  "Arquivo",
+  "Mira",
+  "Converge",
+  "Prompt",
+  "Pastas",
+  "Cento",
+  "Frame",
+  "Orbita",
+  "Fichas",
+  "Guias",
+  "Carimbo",
+  "Um",
+  "Barra",
+  "Dial",
+  "Assinatura"
+ ],
+ "fixos": {
+  "Arquivo": [
+   ".mp4"
+  ],
+  "Mira": [
+   "REC"
+  ],
+  "Prompt": [
+   "Claude"
+  ],
+  "Cento": [
+   "vídeos"
+  ],
+  "Frame": [
+   "frame",
+   "quadro"
+  ],
+  "Orbita": [
+   "retenção",
+   "legenda",
+   "movimento",
+   "transições",
+   "som",
+   "ritmo"
+  ],
+  "Fichas": [
+   "corte sem respiração",
+   "legenda no tempo da fala",
+   "a tela encena a frase",
+   "nada cobre o rosto",
+   "número como foi dito",
+   "corte seco entre modos"
+  ],
+  "Carimbo": [
+   "TESTE #01"
+  ],
+  "Um": [
+   "01"
+  ]
+ },
+ "nao_copiar": [
+  "public/foto.jpg",
+  "public/quadros",
+  "public/trilha.wav"
+ ]
+}

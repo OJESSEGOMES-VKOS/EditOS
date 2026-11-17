@@ -7,8 +7,8 @@ import {loadFont} from '@remotion/google-fonts/PlusJakartaSans';
 const {fontFamily: JAKARTA} = loadFont('normal', {weights: ['700', '800'], subsets: ['latin']});
 
 export type Cena30Props = {
-  rotulo?: string;
-  total?: number; // valor final (cada camada = total/camadas)
+  rotulo: string; // a linha pequena acima do número, nas palavras da fala
+  total: number; // valor final exatamente como dito (cada camada = total/camadas; escolha camadas que deem um passo redondo)
   camadas?: number; // padrão 10
   prefixo?: string;
   corFinal?: string;
@@ -49,8 +49,8 @@ const Maco: React.FC<{x: number; y: number; z: number; rz: number; sq: number}> 
 );
 
 export const Cena30: React.FC<Cena30Props> = ({
-  rotulo = 'Como é R$ 1 milhão',
-  total = 1000000,
+  rotulo,
+  total,
   camadas = 10,
   prefixo = 'R$ ',
   corFinal = '#0E7A4C',

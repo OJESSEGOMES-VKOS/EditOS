@@ -8,7 +8,7 @@ import {loadFont} from '@remotion/google-fonts/PatrickHand';
 const {fontFamily} = loadFont('normal', {weights: ['400'], subsets: ['latin', 'latin-ext']});
 
 export type Cena42Props = {
-  rotulo?: string; // o único rótulo manuscrito
+  rotulo?: string; // o único rótulo manuscrito (a pergunta dita, em caixa alta); sem ele, nenhum rótulo
   corCabelo?: string;
   corCeu?: string;
   width?: number;
@@ -22,7 +22,7 @@ const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 const sp = (f: number, s: number, c = {damping: 10, stiffness: 150, mass: 0.7}) => spring({frame: f - s, fps: 30, config: c});
 
 export const Cena42: React.FC<Cena42Props> = ({
-  rotulo = 'ANTES DO CELULAR',
+  rotulo,
   corCabelo = '#6A4126',
   corCeu = '#A9E2EC',
   width = W,
@@ -240,10 +240,10 @@ export const Cena42: React.FC<Cena42Props> = ({
           </g>
 
           {/* rótulo manuscrito (fixo) */}
-          <g transform="translate(540 76)">
+          {rotulo ? <g transform="translate(540 76)">
             <path d="M-200 -42 L202 -44 L204 40 L-198 42 Z" fill="#FFFFFF" stroke={INK} strokeWidth="4" filter="url(#i42boil)" />
             <text x="0" y="16" textAnchor="middle" fontFamily={fontFamily} fontSize={50} letterSpacing={2} fill={INK}>{rotulo}</text>
-          </g>
+          </g> : null}
         </svg>
       </div>
     </AbsoluteFill>

@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: as peças da casa que o plano liga (nome no bloco O PLANO de scripts/plano.py) e o texto que cada uma escreve fixo no código. As cenas (cena(comp='Nome', ...)) o clone.py lê como telas livres: toda cena, da casa ou nova, precisa de dono na fala. Nenhuma cena do molde escreve texto fixo (a legenda e o comando fixo vêm da fala).",
+ "telas": ["PREVIAS", "FIXO"],
+ "fixos": {}
+}

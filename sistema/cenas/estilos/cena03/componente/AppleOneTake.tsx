@@ -8,13 +8,15 @@ import {loadFont} from '@remotion/google-fonts/InterTight';
 const {fontFamily} = loadFont('normal', {weights: ['500', '600', '700'], subsets: ['latin', 'latin-ext']});
 
 export type AppleOneTakeProps = {
-  botao?: string; // palavra do botão
-  rotuloCartao?: string;
-  tituloApp?: string;
-  subtituloApp?: string;
-  acoes?: [string, string, string];
-  acaoFinal?: string;
-  frase?: string; // precisa começar com "O" (o celular vira o "O")
+  // todos os textos vêm da fala (nenhum padrão: os da demo ficam no demo.tsx)
+  botao: string; // palavra do botão
+  rotuloCartao: string;
+  tituloApp: string;
+  subtituloApp: string;
+  acoes: [string, string, string];
+  acaoFinal: string;
+  rotuloQuadro?: string; // texto pequeno no canto do quadro azul do celular (vazio: nada)
+  frase: string; // precisa começar com "O" (o celular vira o "O"); outra frase pede recompor o fim (ver a ficha)
   largura?: number;
   altura?: number;
   cores?: {fundo: string; tinta: string; papel: string; acento: string};
@@ -24,13 +26,14 @@ const CORES = {fundo: '#EEEEEC', tinta: '#111113', papel: '#FBFBF9', acento: '#F
 const cl = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 export const AppleOneTake: React.FC<AppleOneTakeProps> = ({
-  botao = 'Gravar',
-  rotuloCartao = 'Gravando',
-  tituloApp = 'Take 1',
-  subtituloApp = 'sem cortes · agora',
-  acoes = ['Clipe', 'Cortar', 'Enviar'],
-  acaoFinal = 'Salvar take',
-  frase = 'Outro take',
+  botao,
+  rotuloCartao,
+  tituloApp,
+  subtituloApp,
+  acoes,
+  acaoFinal,
+  rotuloQuadro = '',
+  frase,
   largura,
   altura,
   cores = CORES,
@@ -161,7 +164,7 @@ export const AppleOneTake: React.FC<AppleOneTakeProps> = ({
                 <div style={{position: 'absolute', left: 204, top: 120, width: 62, height: 62, borderRadius: 31, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                   <div style={{width: 0, height: 0, borderLeft: '20px solid #111', borderTop: '12px solid transparent', borderBottom: '12px solid transparent', marginLeft: 6}} />
                 </div>
-                <div style={{position: 'absolute', left: 22, bottom: 18, color: '#fff', fontSize: 20, fontWeight: 600}}>4K · 0:04</div>
+                <div style={{position: 'absolute', left: 22, bottom: 18, color: '#fff', fontSize: 20, fontWeight: 600}}>{rotuloQuadro}</div>
               </div>
               <div style={{position: 'absolute', left: 40, top: 540, transform: `translateY(${(1 - conteudoFone(64)) * 30}px)`, opacity: conteudoFone(64) > 0.05 ? 1 : 0}}>
                 <div style={{fontSize: 40, fontWeight: 700}}>{tituloApp}</div>

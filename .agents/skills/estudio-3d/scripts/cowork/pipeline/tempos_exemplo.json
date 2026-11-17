@@ -1,0 +1,21 @@
+{
+  "projeto": "exemplo_app_6s",
+  "fps": 30,
+  "duracao_s": 6.0,
+  "formato": "9:16",
+  "planos": [
+    {"id": 1, "nome": "entrada",  "inicio_s": 0.0, "fim_s": 1.5, "lente_mm": 85, "acao": "celular sobe do chao com BACK e para em pe"},
+    {"id": 2, "nome": "revelacao", "inicio_s": 1.5, "fim_s": 3.5, "lente_mm": 85, "acao": "celular gira 35 graus e mostra a lateral chanfrada"},
+    {"id": 3, "nome": "mensagem", "inicio_s": 3.5, "fim_s": 5.0, "lente_mm": 85, "acao": "tres palavras entram em cascata, 4 quadros de atraso"},
+    {"id": 4, "nome": "assinatura", "inicio_s": 5.0, "fim_s": 6.0, "lente_mm": 85, "acao": "respiro: tudo parado, camera continua 2 por cento de empurrao"}
+  ],
+  "eventos": [
+    {"nome": "whoosh_entrada", "t_s": 0.20, "som": "whoosh curto"},
+    {"nome": "impacto_pouso", "t_s": 1.00, "som": "thump grave"},
+    {"nome": "click_palavra_1", "t_s": 3.60, "som": "click"},
+    {"nome": "click_palavra_2", "t_s": 3.73, "som": "click"},
+    {"nome": "click_palavra_3", "t_s": 3.87, "som": "click"},
+    {"nome": "assinatura", "t_s": 5.00, "som": "acorde de marca"}
+  ],
+  "quadros_chave": [16, 40, 105, 165]
+}

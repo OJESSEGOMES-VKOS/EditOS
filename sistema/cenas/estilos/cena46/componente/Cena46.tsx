@@ -9,8 +9,9 @@ import {loadFont} from '@remotion/google-fonts/Montserrat';
 const {fontFamily} = loadFont('normal', {weights: ['600'], subsets: ['latin', 'latin-ext']});
 
 export type Cena46Props = {
-  titulo?: string;
-  chamadas?: [string, string, string];
+  titulo?: string; // o título dito, no alto à esquerda; sem ele, nada
+  chamadas?: string[]; // de 0 a 3 chamadas, cada uma presa a uma parte do motor da demo (entrada, miolo, saída), na ordem
+  inicios?: number[]; // quadro (na escala de 150) em que cada chamada pousa; padrão 62, 74, 86
   width?: number;
   height?: number;
 };
@@ -85,8 +86,9 @@ const STATIC: Q[] = [
 ];
 
 export const Cena46: React.FC<Cena46Props> = ({
-  titulo = 'Turbofan explicado',
-  chamadas = ['FAN', 'COMPRESSOR', 'ESCAPE'],
+  titulo,
+  chamadas = [],
+  inicios = [62, 74, 86],
   width = W,
   height = H,
 }) => {
@@ -108,7 +110,7 @@ export const Cena46: React.FC<Cena46Props> = ({
     line: interpolate(f, [st + 2, st + 10], [0, 1], cl),
     word: spring({frame: f - st - 8, fps: 30, config: {damping: 10, stiffness: 160, mass: 0.6}}),
   });
-  const C1 = call(62), C2 = call(74), C3 = call(86);
+  const C1 = call(inicios[0] ?? 62), C2 = call(inicios[1] ?? 74), C3 = call(inicios[2] ?? 86);
 
   const TGT: V3 = [54, 0, 0];
   const DIST = 320, FOC = 2500;
@@ -275,10 +277,10 @@ export const Cena46: React.FC<Cena46Props> = ({
           </g>
 
           {/* título e chamadas */}
-          <text x="70" y="140" fontFamily={fontFamily} fontWeight={600} fontSize={72} fill="#F4F7FA" filter="url(#b46shadow)">{titulo}</text>
-          {callout([17, 22, 6], 430, 80, C1, chamadas[0])}
-          {callout([48, 14, 14], 380, 440, C2, chamadas[1])}
-          {callout([100, 6, 4], 1190, 640, C3, chamadas[2], true)}
+          {titulo ? <text x="70" y="140" fontFamily={fontFamily} fontWeight={600} fontSize={72} fill="#F4F7FA" filter="url(#b46shadow)">{titulo}</text> : null}
+          {chamadas[0] ? callout([17, 22, 6], 430, 80, C1, chamadas[0]) : null}
+          {chamadas[1] ? callout([48, 14, 14], 380, 440, C2, chamadas[1]) : null}
+          {chamadas[2] ? callout([100, 6, 4], 1190, 640, C3, chamadas[2], true) : null}
         </svg>
       </div>
     </AbsoluteFill>

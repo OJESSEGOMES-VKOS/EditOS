@@ -8,8 +8,8 @@ import {loadFont} from '@remotion/google-fonts/Montserrat';
 const {fontFamily} = loadFont('normal', {weights: ['800'], subsets: ['latin', 'latin-ext']});
 
 export type Cena39Props = {
-  rotuloQuadro?: string;
-  legenda?: string; // o único cartão
+  rotuloQuadro?: string; // palavra no quadro (vazio = sem)
+  legenda?: string; // o único cartão, curto, a palavra dita (vazio = sem cartão)
   corTerno?: [string, string, string]; // base, sombra, lapela
   corGravata?: string;
   width?: number;
@@ -32,8 +32,8 @@ const NOTES = [
 ];
 
 export const Cena39: React.FC<Cena39Props> = ({
-  rotuloQuadro = 'VENDAS',
-  legenda = 'SEMANA 2',
+  rotuloQuadro = '',
+  legenda = '',
   corTerno = ['#4D4A91', '#352A6E', '#625EAC'],
   corGravata = '#DF1690',
   width = W,
@@ -91,6 +91,7 @@ export const Cena39: React.FC<Cena39Props> = ({
   );
 
   const s = Math.max(width / W, height / H);
+  const cw = Math.max(600, legenda.length * 72 - 20); // cartão cresce com a palavra
   return (
     <AbsoluteFill style={{background: '#E3EDF6', overflow: 'hidden'}}>
       <div style={{position: 'absolute', width: W, height: H, left: (width - W * s) / 2, top: (height - H * s) / 2, transform: `scale(${s})`, transformOrigin: '0 0'}}>
@@ -259,9 +260,9 @@ export const Cena39: React.FC<Cena39Props> = ({
           </g>
 
           {/* cartão único */}
-          <g transform={`translate(540 140) scale(${card})`} opacity={card > 0.02 ? 1 : 0}>
-            <rect x="-300" y="-82" width="600" height="168" rx="22" fill="#2F7DD0" transform="translate(0 14)" />
-            <rect x="-300" y="-82" width="600" height="160" rx="22" fill="#FFFFFF" />
+          <g transform={`translate(540 140) scale(${card})`} opacity={card > 0.02 && legenda ? 1 : 0}>
+            <rect x={-cw / 2} y="-82" width={cw} height="168" rx="22" fill="#2F7DD0" transform="translate(0 14)" />
+            <rect x={-cw / 2} y="-82" width={cw} height="160" rx="22" fill="#FFFFFF" />
             <text x="0" y="30" textAnchor="middle" fontFamily={fontFamily} fontWeight={800} fontSize={104} fill={NAVY}>{legenda}</text>
           </g>
         </svg>

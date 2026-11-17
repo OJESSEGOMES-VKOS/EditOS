@@ -192,6 +192,11 @@ o punch-in leve de 1,2 (`RostoPerto`, 20 s). É a maior parte do vídeo e dura o
   **Nunca atravessa um corte.** Um pedaço por vez na tela, nunca dois empilhados.
 - **Fala sem pausa:** corte só depois de uma palavra com mais de 0,46 s. Se a tela, a cena mínima e o tempo de leitura
   não couberem juntos, o tempo de leitura vence: tire a tela e deixe o trecho no rosto cheio (G9).
+- **O vídeo novo usa a partição equilibrada** (`EQUILIBRA`, ligada pelo começo vazio; a vitrine aprovada saiu sem, com
+  `EQUILIBRA = false` no bloco dela): cada cena é cortada em pedaços pela melhor partição da fala, sem pedaço curto, sem
+  palavra que some antes de 0,4 s e com o corte de preferência numa pontuação ou pausa. A junção gulosa antiga deixava
+  a cauda da frase sozinha em fala rápida ("seu vídeo." em 0,5 s). Se ainda sobrar curto, o corte da cena está fora de
+  uma pausa: mude o corte, ou troque o modo (o palco tem a legenda menor e enche menos).
 - **A junção é gulosa:** se o último pedaço de uma cena ficar curto, mova o corte de entrada da cena, não o de saída.
 - **A última cena** tem de começar a mostrar a legenda pelo menos 1,5 s antes do fim (o vídeo acaba 0,73 s depois da
   última palavra).
@@ -229,7 +234,7 @@ o punch-in leve de 1,2 (`RostoPerto`, 20 s). É a maior parte do vídeo e dura o
 |---|---|---|
 | Rosto cheio como base (G6) | **ligado**: a gravação crua, fundo real, a maior parte do vídeo | — |
 | Recorte, troca de fundo, blur de fundo (G6) | **não existe** no modelo | se o dono pedir algo para o fundo, um desfoque leve é trabalho à parte |
-| Telas de interface (palco, motion, dividido) | só no trecho que pede a interface (G28) e no fecho | cenas em `base()` (`src/tema.ts`); a vitrine aprovada está comentada ali |
+| Telas de interface (palco, motion, dividido) | só no trecho que pede a interface (G28) e no fecho | o bloco "O PLANO" de `src/tema.ts` (o vídeo novo nasce vazio, `scripts/plano_novo.ts`); a vitrine aprovada está comentada logo abaixo do bloco |
 | Voz no render | **ligada** | Prop `voz: false` |
 | Efeitos sonoros do modelo (popup grave, clique, tecla) | **desligados** (G6: só com ordem do dono) | com ordem: o 3º argumento no `mixar.sh` (sem ele sai só a voz) |
 | Música | desligada (o modelo não tem) | não há opção |
@@ -262,28 +267,42 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 
 1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py interface-encenada <gravacao.mp4> <AAAA-MM-DD-tema>`.
    Isso cria `oficina/<AAAA-MM-DD-tema>/`, transcreve a fala (`src/palavras.json`), mede o rosto (`src/rosto.json`) e adapta
-   a gravação ao modelo. Nome que a transcrição erra se corrige já aqui: `--trocar Cloud=Claude` (pode repetir). Ao carregar, o molde para de propósito: primeiro pede o rosto novo, depois diz qual palavra do
-   plano a fala nova não tem.
+   a gravação ao modelo. Nome que a transcrição erra se corrige já aqui: `--trocar Cloud=Claude` (pode repetir; se escapar,
+   `tools/trocar.py oficina/<v> Cloud=Claude`). Ao carregar, o molde para de propósito até o rosto novo ser medido.
+   **O plano nasce vazio** (o jeito, não o clone: `sistema/JEITO.md` e a skill `.claude/skills/interface-encenada/`): o
+   `novo-video.py` troca o bloco "O PLANO" de `src/tema.ts` pelo `scripts/plano_novo.ts` do molde, e o vídeo novo começa
+   como rosto cheio do começo ao fim, com a legenda no peito. Nenhuma tela do aprovado vem junto.
 2. **Meça o rosto médio:** `../../.venv/Scripts/python.exe scripts/rosto.py` (na pasta do vídeo). Grava
    `src/rosto_med.json`.
-3. **Escreva o `plano.md`** na pasta do vídeo, frase a frase sobre `src/palavras.json`: o modo de cada frase, o que a tela
-   encena (a interface de verdade daquele ato), o título de cada seção e as palavras-chave. Siga a gramática da seção 10.
-4. **Monte o plano no código** (na pasta do vídeo). Toda palavra é presa à fala por `w('palavra', n)` (o início da
-   n-ésima vez que ela é dita) ou `iw` (o índice):
-   - `base()` em `src/tema.ts`: uma cena por trecho, `[id, modo, corte(w('palavra que abre'))]`. Modos: `'rosto'` (o
-     padrão, G6: id com `RostoCheio` ou `RostoPerto` em `CENA_COMP`), `'palco'`, `'motion'`, `'dividido'` (só no trecho
-     que pede a tela, com a linha "por quê" no `plano.md`, G28, G30). O 4º item `true` põe a legenda do motion no topo (fecho).
-   - As cenas em `src/Cenas.tsx` (`CENA_COMP`): uma por id. Os textos de tela da cena aprovada (lista de pastas, nomes de
-     arquivo, comentário fixado) são daquele vídeo: troque pelo que a fala nova diz.
-   - **Para remover uma cena:** tire a linha dela de `base()` e a entrada dela de `CENA_COMP`; tire os eventos dela de
-     `scripts/som.py`; tire de `CHAVE`, `CAIXA_ALTA` e `SELECAO` as palavras que eram dela. O componente pode ficar no
-     arquivo: o conferidor só cobra palavras e títulos das cenas que `base()` usa. A primeira cena de `base()` começa em 0.
-   - Antes de fechar `base()`, some o tempo de cada modo: o rosto cheio é a maior parte (G19).
-   - Em `src/Legenda.tsx`: `CHAVE` (palavras-chave), `CAIXA_ALTA` (a palavra do pedido), `SELECAO` (a que ganha alças).
-     `MIN_PEDACO = 1.5` e `LUGAR` já vêm certos.
+3. **Escreva o `plano.md`** na pasta do vídeo, sobre `src/palavras.json`: abre com o plano de cenas (o do
+   `tools/decupar.py`), e cada cena com tela diz o nome dela como está no plano (`Repositorio`, `comenta`...), a palavra
+   dita entre aspas que pediu a interface e o porquê. Uma tela por trecho que pede a interface (G28), não por frase.
+4. **Monte o bloco "O PLANO" de `src/tema.ts`** (na pasta do vídeo). Toda palavra é presa à fala por `w('palavra', n)`
+   (o início da n-ésima vez que ela é dita), `corte(w(...))` (2 quadros antes, o corte seco) ou `iw` (o índice):
+   - `rosto = [0, corte(w(...)), ...]`: os inícios de cada trecho de rosto cheio (o padrão, G6; o primeiro é 0, G29);
+     `perto = [corte(w('mas'))]`: o punch-in da virada.
+   - **A tela livre** (a interface que a fala pede e a casa não tem; o normal num tema novo):
+     `livres = [{comp: 'Nome', modo: 'palco' | 'dividido' | 'motion', de: corte(w('palavra')), titulo: 'dito' (só no
+     palco, 1 linha), escuro, topo, em: {...}, textos: {...}, dados: {...}}]`. A moldura é da casa (o palco com o título,
+     o card e o rosto embaixo; o dividido com o rosto embaixo; o motion); o desenho mora em `src/telas/<Nome>.tsx` da
+     pasta do vídeo, dentro do `<Palco>`, com o kit de `src/ui.tsx` (`Entra`, `Janela`, `Linha`, `Pasta`, `Arq`,
+     `Check`, `Digita`, `Enviar`, `Contador`, `Grifo`, `Cursor`, `Selecao`, `Troca`, `pop`), e é registrado em
+     `src/telas/index.ts`. Cada tela vai até a cena seguinte começar.
+   - **As telas da casa** (seção 10) ligam numa linha `<id> = {de: corte(w(...))};` só quando a fala nova tem o mesmo
+     porquê. O fecho é `comenta = {de, palavra, digita, publica, coracao, dm, fixado}` (tudo da fala nova; `dm` e
+     `fixado` só se a fala promete a DM ou diz a frase). As outras escrevem o texto do aprovado e pedem as palavras dele:
+     num tema novo, a interface parecida vira tela livre com o texto da fala nova.
+   - `CHAVE`, `CAIXA_ALTA` e `SELECAO` (as palavras-chave, a do pedido, a que ganha alças) moram no mesmo bloco.
+     `MIN_PEDACO = 1.5` e `LUGAR` (`src/Legenda.tsx`) já vêm certos.
+   - Antes de fechar, some o tempo de cada modo: o rosto cheio é a maior parte (o conferidor reprova abaixo de 50%).
 5. **Confira as regras:** `node scripts/cobertura.mjs` (na pasta do vídeo) até sair `APROVADO`. Ele confere se as palavras
    do plano existem na fala, se toda palavra dita aparece na legenda, o tempo de leitura, repetição, até 2 linhas, um
-   lugar por modo e a zona segura, com e sem prévias, e diz o arquivo e a linha.
+   lugar por modo e a zona segura, com e sem prévias; nas telas livres, o registro, o título dito e de 1 linha, o tempo de
+   1,5 a 8 s e o texto do card que a legenda já mostra na mesma hora (G26); e o rosto cheio como a maior parte. Ele grava
+   `src/tempos.json` para o teste do clone.
+   **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (da raiz) até sair `SEM CLONE`, depois
+   `tools/decupar.py oficina/<v> --conferir`, os quadros e a folha lado a lado com `referencia/folha.jpg`: mesmo modelo,
+   outro vídeo.
 6. **Som:** refaça os eventos de `scripts/som.py` com as mesmas palavras das cenas (`TELAS` = as telas do plano; `cortes` =
    os cortes visíveis) e rode
    `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo). Sai `public/sfx.wav`.
@@ -301,9 +320,31 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 escolhem o trecho), depois `../../.venv/Scripts/python.exe scripts/som.py --previas` (na pasta do vídeo), o render com
 `--props='{"previas":true,"nomesPrevias":["modeloA","modeloB"]}'` e a mixagem com `public/sfx_previas.wav`.
 
-## 10. O plano do vídeo aprovado (para comparar)
+## 10. As telas do aprovado: exemplos com o porquê (repertório, não roteiro)
 
-**O molde, desde 2026-11-05, vem com este plano** (`base()` em `src/tema.ts`): rosto cheio de 0 a 5,2 s ("Esse
+O vídeo aprovado é **uma aplicação** do jeito a uma fala (a do "100% editado pelo Claude"). Cada tela dele existe por um
+porquê da fala; num vídeo novo ela só volta quando a fala nova diz a mesma coisa, e nunca pela ordem ou pelos tempos de
+lá (G30). O que vale levar de cada uma é o jeito (o ato encenado, a microação presa à palavra), não o objeto:
+
+| Tela (id no plano) | O porquê no aprovado | Volta quando a fala nova... | O jeito que serve a qualquer fala |
+|---|---|---|---|
+| `gancho` | "esse vídeo" (o próprio Reel) | fala do próprio vídeo | o objeto real da frase grande no motion, com um selo que conta |
+| `criado` | "foi criado" (a pasta do vídeo) | diz que algo foi criado num computador | uma janela onde as linhas nascem uma a uma na palavra dita |
+| `modelos` | "vários modelos que eu criei" | lista coisas que a pessoa tem | lista que entra item a item e ganha ✓; troca com chicote |
+| `instagram` | "se você está no Instagram agora" | fala de quem está vendo no app | o toque com anel e o coração no celular |
+| `nome` | "um desses modelos" | aponta um entre vários | a caixa de seleção com alças no escolhido, os outros apagam |
+| `previas` | "duas prévias aqui em cima" | promete mostrar vídeos da pessoa | o dividido com os vídeos dela (prop `previas`) |
+| `outros` | "ver outros modelos... usar" | convida a ver e a usar | o cursor que clica; o campo que digita e o botão que fica verde |
+| `comenta` | "comenta edição" | pede um comentário | a folha de comentários, a palavra dita digitada e publicada (DM só se prometida) |
+
+As telas `gancho` a `outros` escrevem os nomes, pastas e comandos daquele vídeo (o `scripts/clone.json` do molde lista
+cada texto, e o `tools/clone.py` acusa quando ele aparece sem ser dito). Num tema novo, a interface parecida é uma
+**tela livre** com o texto da fala nova. **Prova (2026-11-17):** a fala do earshot virou duas telas livres que o aprovado não tem (a pasta do repositório que
+corre para o Claude e o Claude que pousa no vídeo da pessoa, no motion; a estante de sons com a seleção, o ✓ e o
+"nada se encaixar" que apaga tudo, no dividido) e o fecho da casa com "ÁUDIO", com o rosto cheio em 64% do vídeo
+(`oficina/2026-11-17-teste-skill-interface-encenada/`).
+
+**O molde, desde 2026-11-05, vem com este plano** (o bloco "O PLANO" de `src/tema.ts`): rosto cheio de 0 a 5,2 s ("Esse
 vídeo está sendo 100% editado pelo Claude. Ele foi criado justamente para te mostrar a"); o palco dos modelos fecha a
 cena (5,2 a 10,6 s, "diferença ... usando o Claude."); rosto cheio de 10,6 a 19,9 s (com prévias, o dividido de 14,4 a
 19,9 s); punch-in da virada de 19,9 s até o fecho; motion do comentário de 26,7 s ao fim. Rosto 72% sem prévias. O

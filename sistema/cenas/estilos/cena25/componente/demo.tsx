@@ -18,7 +18,13 @@ const Demo: React.FC = () => (
       [22, 21, 12, 11, 27, 7],
       [18, 20, 11, 12, 31, 8],
     ]}
+    unidade="%"
+    maximo={37.2}
+    grade={[10, 20, 30, 40]}
     legendaInicial={['começa', 'em 5º lugar']}
+    palavraPassa="passa"
+    legendaLideranca={['assume', 'a liderança']}
+    chip1="1º"
     legendaFinal={['Quase 1 em 3', 'novos cadastros']}
     width={1080}
     height={1350}

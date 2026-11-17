@@ -1,31 +1,17 @@
 import React from 'react';
-import {AbsoluteFill, Easing, Img, OffthreadVideo, Sequence, getStaticFiles, interpolate, staticFile, useCurrentFrame} from 'remotion';
-import {loadFont as loadInterTight} from '@remotion/google-fonts/InterTight';
+import {AbsoluteFill, Easing, Img, OffthreadVideo, Sequence, getStaticFiles, staticFile, useCurrentFrame} from 'remotion';
 import {Camera, POSE} from './Camera';
 import {FPS, H, W, fr} from './tempos';
-import {ATRAS, CTA, ESTE, FALA_DO_APROVADO, FRASES, Frase, GRADE, GRADES, LISTA, MONTAGEM, NOMES_DO_APROVADO, PREVIAS, REEL, TITULOS, chaves, pare} from './plano';
+import {ATRAS, CTA, ESTE, FALA_DO_APROVADO, FRASES, Frase, GRADE, GRADES, LISTA, LIVRES, MONTAGEM, NOMES_DO_APROVADO, PREVIAS, REEL, TITULOS, chaves, pare} from './plano';
+import {Acende, COR, SANS, SOMBRA_TXT, tw} from './ui';
+import {Livres} from './Livres';
 
 /**
- * youtube-didatico em 9:16 (as regras: modelos/youtube-didatico/youtube-didatico.md). Aqui só o desenho; o plano (tudo
- * o que está preso à fala) mora em ./plano.ts.
- *
- * Identidade "Gelo, tinta e amarelo" (seção 6 do .md):
- *   gelo #F8F8F8 = fundo das explicações
- *   tinta #0A0A0A = texto sobre o gelo e texto ATRÁS da pessoa
- *   branco #FCFCFC = texto na frente da pessoa
- *   amarelo #FCDC00 = o único acento (palavra-chave, fio, contorno, ponto da conta)
- *   ruim #FC0000 = o que risca (não usado no aprovado)
- *   Inter Tight 900/800/700: grotesca pesada de entreletra apertada, caixa alta nos títulos, caixa baixa na chamada
+ * youtube-didatico em 9:16 (as regras: modelos/youtube-didatico/youtube-didatico.md; o jeito: a skill youtube-didatico).
+ * Aqui só o desenho; o plano (tudo o que está preso à fala) mora em ./plano.ts, e a identidade "Gelo, tinta e amarelo"
+ * (cores, fonte, o texto que acende) e o kit da tela livre em ./ui.tsx.
  */
-const it = loadInterTight('normal', {weights: ['600', '700', '800', '900'], subsets: ['latin', 'latin-ext']});
-const SANS = it.fontFamily;
-
-export const COR = {gelo: '#F8F8F8', tinta: '#0A0A0A', branco: '#FCFCFC', amarelo: '#FCDC00', ruim: '#FC0000', cinza: '#7A7A7A'};
-const SOMBRA_TXT = '0 4px 24px rgba(0,0,0,0.45)';
-
-const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
-const OUT = Easing.bezier(0.16, 1, 0.3, 1);
-const tw = (t: number, a: number, b: number, v0: number, v1: number, e = OUT) => interpolate(t, [a, b], [v0, v1], {...clamp, easing: e});
+export {COR};
 
 /** fundo (G6, 2026-11-05): 'real' (padrão) = a gravação crua com o fundo real dela, sem recorte nem camada; 'desfoque' =
  * desfoque leve só no fundo, a pessoa nítida por cima (precisa de public/pessoa.webm); 'recorte' = liga a palavra ATRÁS da
@@ -42,17 +28,6 @@ const falta = (nome: string, como: string) => {
 falta('fala.mp4', 'Rode tools/novo-video.py com a gravação (ele grava public/fala.mp4).');
 if (GRADES.length) for (const n of GRADE) falta(`ex/${n}.mp4`, `A grade usa um vídeo seu pronto em cada modelo: ffmpeg -i <video>.mp4 -an -vf scale=540:960 public/ex/${n}.mp4 (ou tire "${n}" de GRADE, ou GRADES = [] em src/plano.ts).`);
 for (const [, , n] of MONTAGEM?.planos ?? []) falta(`ex/cheio_${n}.mp4`, `A montagem usa 2 s de um vídeo seu pronto: ffmpeg -ss ${MONTAGEM!.recorte} -t 2.0 -i <video>.mp4 -an public/ex/cheio_${n}.mp4 (ou MONTAGEM = null em src/plano.ts).`);
-
-/* ---------------------------------------------------------------- texto que acende: palavra a palavra, do borrão para nítida */
-const Acende: React.FC<{t: number; t0: number; children: React.ReactNode; style?: React.CSSProperties; dy?: number}> = ({t, t0, children, style, dy = 24}) => {
-	if (t < t0) return null;
-	const u = tw(t, t0, t0 + 0.2, 0, 1);
-	return (
-		<span style={{display: 'inline-block', opacity: u, filter: `blur(${(1 - u) * 14}px)`, transform: `translateY(${(1 - u) * dy}px) scale(${0.94 + 0.06 * u})`, ...style}}>
-			{children}
-		</span>
-	);
-};
 
 /* atrás: palavra-título gigante em tinta, entre o fundo e a pessoa recortada */
 const Atras: React.FC<{t: number; t0: number; linhas: string[]; size: number; top: number}> = ({t, t0, linhas, size, top}) => (
@@ -326,13 +301,14 @@ export const VitrineYoutubeEdition01: React.FC<Props> = ({previas, nomesPrevias,
 	let atras: React.ReactNode = null;
 	// G6: a palavra atrás da pessoa é camada sobre recorte, então só existe com fundo: 'recorte'
 	if (fundo === 'recorte') for (const a of ATRAS) if (dentro(t, a)) atras = <Atras t={t} t0={a.de} linhas={a.linhas} size={a.size} top={a.top} />;
-	const telaGelo = GRADES.some((g) => dentro(t, g)) || dentro(t, REEL) || dentro(t, LISTA) || (previas && dentro(t, PREVIAS));
+	const telaGelo = GRADES.some((g) => dentro(t, g)) || LIVRES.some((L) => dentro(t, L)) || dentro(t, REEL) || dentro(t, LISTA) || (previas && dentro(t, PREVIAS));
 	return (
 		<AbsoluteFill style={{background: telaGelo ? COR.gelo : '#000'}}>
 			{GRADES.map((g, k) => (
 				<Grade key={k} t={t} de={g.de} ate={g.ate} par={g.par} />
 			))}
 			{LISTA && <Lista t={t} l={LISTA} />}
+			<Livres t={t} />
 			{previas && PREVIAS && <PreviasEmCima t={t} p={PREVIAS} nomes={nomesPrevias} />}
 			<Camera chaves={ch} t={t} atras={atras} desfoque={fundo === 'desfoque'} />
 			{REEL && <Reel t={t} r0={REEL} arroba={arroba} />}

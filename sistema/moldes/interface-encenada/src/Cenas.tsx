@@ -1,7 +1,7 @@
 import React from 'react';
 import {Freeze, Img, OffthreadVideo, Sequence, staticFile} from 'remotion';
-import {C, DIVISA, E, FPS, MONO, Previas, R, SANS, SERIF, SOMBRA, montaCenas, mola, rostoX, tw, useT, w} from './tema';
-import {CardPalco, ChipClaude, Cursor, Faisca, Fala, FalaEm, RostoPalco, Selecao, Titulo, Troca, pop} from './ui';
+import {C, E, FECHO, FPS, MONO, Previas, SANS, SERIF, SOMBRA, montaCenas, mola, rostoX, tw, useT, w} from './tema';
+import {Arq, CardPalco, ChipClaude, Cursor, Dividido, Faisca, Fala, FalaEm, Pasta, RostoPalco, Selecao, Titulo, Troca, pop} from './ui';
 
 /** os tempos dos cortes são os mesmos com ou sem prévias (só o modo da cena das prévias muda) */
 const CENAS = montaCenas(false);
@@ -84,32 +84,6 @@ const TelaReels: React.FC<{largura: number; altura: number; raio: number; s: num
 		</div>
 	);
 };
-
-/* ---------------------------------------------------------------- M3: dividido. Em cima o visual, embaixo o rosto */
-/** largura do rosto (px) da gravação do vídeo aprovado: no dividido o rosto fica do mesmo tamanho que lá (26% a 28% da
- * altura do quadro) mesmo que a gravação nova tenha o rosto mais perto ou mais longe; no aprovado a escala dá 1 */
-const LARGURA_APROVADO = 398.6;
-const Dividido: React.FC<{children: React.ReactNode}> = ({children}) => (
-	<>
-		<div style={ab(0, 0, {width: 1080, height: DIVISA, overflow: 'hidden'})}>{children}</div>
-		<div style={ab(0, 0, {width: 1080, height: 1920, clipPath: `inset(${DIVISA}px 0 0 0)`})}>
-			<FalaEm s={LARGURA_APROVADO / R.largura} cx={540} oy={1170} />
-		</div>
-	</>
-);
-
-/** pasta e arquivo (ícones desenhados) */
-const Pasta: React.FC<{cor?: string; cheia?: number}> = ({cor = C.destaque, cheia = 1}) => (
-	<svg width={36} height={30} viewBox="0 0 36 30" style={{flex: 'none'}}>
-		<path d="M2 5 Q2 2 5 2 L13 2 L16 6 L31 6 Q34 6 34 9 L34 25 Q34 28 31 28 L5 28 Q2 28 2 25 Z" fill={cor} fillOpacity={0.18 + 0.72 * cheia} stroke={cor} strokeWidth={2.5} />
-	</svg>
-);
-const Arq: React.FC<{cor?: string}> = ({cor = '#9C958A'}) => (
-	<svg width={36} height={30} viewBox="0 0 36 30" style={{flex: 'none'}}>
-		<path d="M9 2 L22 2 L29 9 L29 28 L9 28 Z" fill="none" stroke={cor} strokeWidth={2.5} strokeLinejoin="round" />
-		<path d="M22 2 L22 9 L29 9" fill="none" stroke={cor} strokeWidth={2.5} strokeLinejoin="round" />
-	</svg>
-);
 
 /* ---------------------------------------------------------------- M3: "Ele foi criado justamente para te mostrar" */
 export const Criado: React.FC = () => {
@@ -486,16 +460,16 @@ const PromptSkill: React.FC<{de: number}> = ({de}) => {
 export const Comenta: React.FC = () => {
 	const {t} = useT();
 	const {arroba, foto} = React.useContext(Previas);
+	// tudo vem do plano (comenta = {...} no bloco do plano de src/tema.ts): a palavra dita, quando ela é digitada e publicada
+	const F = FECHO!;
 	const c = cena('comenta');
 	const e = mola(t, c.de, {damping: 18});
-	const edicao = w('edição', 2);
-	const aqui = w('aqui', 2);
-	const embaixo = w('embaixo');
-	const dm = w('dm');
-	const palavra = 'EDIÇÃO';
+	const edicao = F.digita;
+	const palavra = F.palavra;
 	const n = Math.round(tw(t, edicao, edicao + 0.42, 0, palavra.length, (x) => x));
-	const publica = aqui + 0.06;
+	const publica = F.publica;
 	const postado = t >= publica;
+	const embaixo = (F.coracao ?? 999) - 0.15;
 	const coracao = t >= embaixo + 0.15;
 	const toque1 = c.de + 0.22;
 	// o cursor: entra pelo canto, toca no campo, depois em Publicar
@@ -504,7 +478,8 @@ export const Comenta: React.FC = () => {
 	const cx = 1100 + (420 - 1100) * k1 + (905 - 420) * k2;
 	const cy = 1900 + (1690 - 1900) * k1;
 	const clique = Math.abs(t - toque1) < 0.07 || Math.abs(t - publica) < 0.07 ? 1 : 0;
-	const que = w('que', 2);
+	const que = F.dm ? F.dm.chega : 999;
+	const dm = F.dm ? F.dm.ponto : 999;
 	const banner = mola(t, que, {damping: 16});
 	const bate = 1 + 0.04 * Math.max(0, 1 - Math.abs(t - dm - 0.08) / 0.12);
 	const kp = mola(t, publica, {damping: 15});
@@ -515,17 +490,19 @@ export const Comenta: React.FC = () => {
 				<div style={ab(0, 50, {width: 1000, textAlign: 'center', fontFamily: SANS, fontWeight: 700, fontSize: 34, color: C.tinta})}>Comentários</div>
 				<div style={ab(0, 116, {width: 1000, borderTop: '1px solid #EDEDED'})} />
 				{/* a legenda fixada do próprio post */}
-				<div style={ab(44, 160, {display: 'flex', gap: 22, alignItems: 'flex-start'})}>
-					{foto && <Img src={staticFile(foto)} style={{width: 80, height: 80, borderRadius: 40, objectFit: 'cover'}} />}
-					<div style={{width: 780}}>
-						{arroba && (
-							<div style={{fontFamily: SANS, fontWeight: 700, fontSize: 30, color: C.tinta}}>
-								{arroba} <span style={{fontWeight: 500, color: '#8E8E8E', fontSize: 26}}>· Fixado</span>
-							</div>
-						)}
-						<div style={{fontFamily: SANS, fontWeight: 500, fontSize: 32, color: C.tinta, marginTop: 6, lineHeight: 1.3}}>Comenta EDIÇÃO que eu te mando na DM</div>
+				{F.fixado ? (
+					<div style={ab(44, 160, {display: 'flex', gap: 22, alignItems: 'flex-start'})}>
+						{foto && <Img src={staticFile(foto)} style={{width: 80, height: 80, borderRadius: 40, objectFit: 'cover'}} />}
+						<div style={{width: 780}}>
+							{arroba && (
+								<div style={{fontFamily: SANS, fontWeight: 700, fontSize: 30, color: C.tinta}}>
+									{arroba} <span style={{fontWeight: 500, color: '#8E8E8E', fontSize: 26}}>· Fixado</span>
+								</div>
+							)}
+							<div style={{fontFamily: SANS, fontWeight: 500, fontSize: 32, color: C.tinta, marginTop: 6, lineHeight: 1.3}}>{F.fixado}</div>
+						</div>
 					</div>
-				</div>
+				) : null}
 				{/* o comentário publicado */}
 				{postado && (
 					<div style={ab(44, 520, {width: 912, display: 'flex', gap: 22, alignItems: 'center', opacity: Math.min(1, kp * 1.6), transform: `translateY(${(1 - kp) * 40}px)`})}>
@@ -535,7 +512,7 @@ export const Comenta: React.FC = () => {
 						<div>
 							<div style={{fontFamily: SANS, fontWeight: 600, fontSize: 28, color: '#8E8E8E'}}>você · agora</div>
 							<div style={{position: 'relative', display: 'inline-block', fontFamily: SANS, fontWeight: 800, fontSize: 96, letterSpacing: '-0.02em', color: C.tinta, lineHeight: 1.05, marginTop: 6, padding: '0 10px'}}>
-								EDIÇÃO
+								{palavra}
 								<Selecao o={tw(t, publica + 0.1, publica + 0.25, 0, 1)} pad={4} />
 							</div>
 						</div>
@@ -580,6 +557,8 @@ export const Comenta: React.FC = () => {
 /** as cenas pelo id. As de rosto cheio (abre, fala, ver) são o vídeo normal (G6); as outras são as telas de interface, que
  * entram só onde o plano (base() em src/tema.ts) as chama */
 export const CENA_COMP: Record<string, React.FC> = {
+	rosto: RostoCheio,
+	perto: RostoPerto,
 	abre: RostoCheio,
 	fala: RostoCheio,
 	ver: RostoCheio,

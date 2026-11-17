@@ -10,11 +10,24 @@ import {loadFont as loadFell} from '@remotion/google-fonts/IMFellEnglishSC';
 const marker = loadMarker('normal', {weights: ['400'], subsets: ['latin']}).fontFamily;
 const fell = loadFell('normal', {weights: ['400'], subsets: ['latin']}).fontFamily;
 
+// O mapa em coordenadas de um plano 1600x1600 (y para baixo). O padrão é uma terra fictícia; para um lugar real,
+// trace o contorno (terra, regiao) a partir de um mapa de verdade e marque capital, destino e rota.
+export type Mapa41 = {
+  terra: string; // path da terra cinza (pode ter várias ilhas)
+  regiao: string; // path da região que vira vermelha
+  mascaraRegiao: string; // área que limita a região (corta a região da terra vizinha)
+  fronteira?: string; // path da fronteira tracejada branca
+  capital: [number, number]; // onde a inundação começa e a rota sai
+  destino?: [number, number]; // onde a rota chega (sem destino: sem rota)
+  rotaTerra?: string; // trecho da rota em terra (linha cheia)
+  rotaMar?: string; // trecho da rota sobre a água (tracejado)
+};
 export type Cena41Props = {
-  origem?: string; // nome do lugar da região
+  origem?: string; // nome do lugar da região (a palavra dita; vazio = sem nome)
   destino?: string;
-  cartaoTitulo?: string;
+  cartaoTitulo?: string; // vazio nos dois = sem cartão
   cartaoData?: string;
+  mapa?: Mapa41;
   corRegiao?: string;
   width?: number;
   height?: number;
@@ -28,17 +41,23 @@ const MAINLAND = 'M0 0 L1600 0 L1600 380 Q1450 440 1300 400 Q1150 360 1050 430 Q
 const ISLES = 'M1380 560 Q1430 540 1460 580 Q1440 620 1390 610 Z M1480 700 Q1520 690 1540 720 Q1510 750 1480 735 Z';
 const PENIN =
   'M150 640 Q300 600 500 610 Q800 620 1000 640 Q1250 660 1380 760 Q1450 860 1350 940 Q1300 1000 1330 1100 Q1360 1250 1260 1300 Q1200 1200 1150 1060 Q1080 1000 1040 1100 Q1020 1250 960 1400 Q900 1300 890 1150 Q850 1050 760 1080 Q700 1150 720 1300 Q690 1420 600 1450 Q580 1300 560 1150 Q500 1050 420 1100 Q380 1200 300 1220 Q200 1150 240 1000 Q180 900 120 820 Q100 720 150 640 Z';
-const REGION_MASK = 'M0 1700 L0 740 L150 640 Q230 610 320 605 L1600 560 L1600 1700 Z';
-const CAP = [640, 880];
-const DEST = [1160, 330];
-const ROUTE_LAND = 'M640 880 C560 800 500 690 600 600';
-const ROUTE_SEA = 'M600 600 C760 520 980 480 1160 330';
+export const MAPA_FICTICIO: Mapa41 = {
+  terra: `${MAINLAND} ${ISLES}`,
+  regiao: PENIN,
+  mascaraRegiao: 'M0 1700 L0 740 L150 640 Q230 610 320 605 L1600 560 L1600 1700 Z',
+  fronteira: 'M30 760 L150 640 Q230 610 320 605',
+  capital: [640, 880],
+  destino: [1160, 330],
+  rotaTerra: 'M640 880 C560 800 500 690 600 600',
+  rotaMar: 'M600 600 C760 520 980 480 1160 330',
+};
 
 export const Cena41: React.FC<Cena41Props> = ({
-  origem = 'VALE',
-  destino = 'PORTO',
-  cartaoTitulo = 'TERRA DO SUL',
-  cartaoData = 'ANO 300',
+  origem = '',
+  destino = '',
+  cartaoTitulo = '',
+  cartaoData = '',
+  mapa = MAPA_FICTICIO,
   corRegiao = '#FF5A50',
   width = W,
   height = H,
@@ -46,6 +65,11 @@ export const Cena41: React.FC<Cena41Props> = ({
   const frame = useCurrentFrame();
   const {durationInFrames} = useVideoConfig();
   const f = frame * (150 / durationInFrames);
+  const CAP = mapa.capital;
+  const DEST = mapa.destino ?? mapa.capital;
+  const REGION_MASK = mapa.mascaraRegiao;
+  const PENIN_R = mapa.regiao;
+  const temCartao = !!(cartaoTitulo || cartaoData);
 
   const cam = interpolate(f, [0, 118], [0, 1], {...cl, easing: Easing.out(Easing.cubic)});
   const write1 = interpolate(f, [4, 26], [0, 1], cl);
@@ -134,17 +158,17 @@ export const Cena41: React.FC<Cena41Props> = ({
               </g>
 
               {/* névoa vermelha sobre o mar */}
-              <g mask="url(#r41reg)" opacity={0.25 + 0.4 * flood}><path d={PENIN} fill="#FF2933" filter="url(#r41haze)" /></g>
+              <g mask="url(#r41reg)" opacity={0.25 + 0.4 * flood}><path d={PENIN_R} fill="#FF2933" filter="url(#r41haze)" /></g>
 
               {/* terra cinza em relevo */}
-              <path d={`${MAINLAND} ${ISLES} ${PENIN}`} fill="#fff" filter="url(#r41g)" />
+              <path d={`${mapa.terra} ${PENIN_R}`} fill="#fff" filter="url(#r41g)" />
               {/* terra vermelha, revelada pela inundação */}
-              <clipPath id="r41fc"><circle cx={CAP[0]} cy={CAP[1]} r={flood * 1050} /></clipPath><g clipPath="url(#r41fc)"><g mask="url(#r41reg)"><path d={PENIN} fill="#fff" filter="url(#r41r)" /></g></g>
+              <clipPath id="r41fc"><circle cx={CAP[0]} cy={CAP[1]} r={flood * 1050} /></clipPath><g clipPath="url(#r41fc)"><g mask="url(#r41reg)"><path d={PENIN_R} fill="#fff" filter="url(#r41r)" /></g></g>
               {/* contorno vermelho da região, já aceso */}
-              <g mask="url(#r41reg)"><path d={PENIN} fill="#fff" filter="url(#r41edge)" /></g>
+              <g mask="url(#r41reg)"><path d={PENIN_R} fill="#fff" filter="url(#r41edge)" /></g>
 
               {/* fronteira tracejada branca */}
-              <path d="M30 760 L150 640 Q230 610 320 605" stroke="#FFFFFF" strokeWidth="5" strokeDasharray="16 12" fill="none" />
+              {mapa.fronteira && <path d={mapa.fronteira} stroke="#FFFFFF" strokeWidth="5" strokeDasharray="16 12" fill="none" />}
 
               {/* capital */}
               <circle cx={CAP[0]} cy={CAP[1]} r="10" fill="#FFFFFF" />
@@ -154,22 +178,22 @@ export const Cena41: React.FC<Cena41Props> = ({
 
               {/* rota */}
               <g filter="url(#r41glow)">
-                <path d={ROUTE_LAND} stroke="#FF2933" strokeWidth="9" fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${rLand} 1`} />
-                <path d={ROUTE_LAND} stroke="#FFC9CC" strokeWidth="3" fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${rLand} 1`} />
+                {mapa.rotaTerra && <path d={mapa.rotaTerra} stroke="#FF2933" strokeWidth="9" fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${rLand} 1`} />}
+                {mapa.rotaTerra && <path d={mapa.rotaTerra} stroke="#FFC9CC" strokeWidth="3" fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${rLand} 1`} />}
               </g>
-              {rSea > 0 && (
+              {rSea > 0 && mapa.rotaMar && (
                 <g filter="url(#r41glow)">
-                  <mask id="r41sea"><path d={ROUTE_SEA} stroke="white" strokeWidth="20" fill="none" pathLength={1} strokeDasharray={`${rSea} 1`} /></mask>
+                  <mask id="r41sea"><path d={mapa.rotaMar} stroke="white" strokeWidth="20" fill="none" pathLength={1} strokeDasharray={`${rSea} 1`} /></mask>
                   <g mask="url(#r41sea)">
-                    <path d={ROUTE_SEA} stroke="#FF2933" strokeWidth="9" fill="none" strokeDasharray="34 26" strokeLinecap="round" />
-                    <path d={ROUTE_SEA} stroke="#FFC9CC" strokeWidth="3" fill="none" strokeDasharray="34 26" strokeLinecap="round" />
+                    <path d={mapa.rotaMar} stroke="#FF2933" strokeWidth="9" fill="none" strokeDasharray="34 26" strokeLinecap="round" />
+                    <path d={mapa.rotaMar} stroke="#FFC9CC" strokeWidth="3" fill="none" strokeDasharray="34 26" strokeLinecap="round" />
                   </g>
                 </g>
               )}
 
               {/* destino */}
-              <circle cx={DEST[0]} cy={DEST[1]} r={11 * dot} fill="#FFFFFF" />
-              {ripple > 0 && ripple < 1 && <circle cx={DEST[0]} cy={DEST[1]} r={14 + ripple * 60} fill="none" stroke="#FF5A50" strokeWidth="4" opacity={1 - ripple} />}
+              {mapa.destino && <circle cx={DEST[0]} cy={DEST[1]} r={11 * dot} fill="#FFFFFF" />}
+              {mapa.destino && ripple > 0 && ripple < 1 && <circle cx={DEST[0]} cy={DEST[1]} r={14 + ripple * 60} fill="none" stroke="#FF5A50" strokeWidth="4" opacity={1 - ripple} />}
               <g filter="url(#r41chalk)">
                 <text x={DEST[0] - 150} y={DEST[1] - 50} fontFamily={marker} fontSize={72} letterSpacing={6} fill="#FFFFFF">{destino.split("").map((c, i) => <tspan key={i} opacity={write2 * destino.length > i ? 1 : 0}>{c}</tspan>)}</text>
               </g>
@@ -181,7 +205,7 @@ export const Cena41: React.FC<Cena41Props> = ({
         <div
           style={{
             position: 'absolute', left: 470, top: 800, width: 184, height: 240, perspective: 900,
-            opacity: card > 0.02 ? 1 : 0,
+            opacity: card > 0.02 && temCartao ? 1 : 0,
           }}
         >
           <div style={{

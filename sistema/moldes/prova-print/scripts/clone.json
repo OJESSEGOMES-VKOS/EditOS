@@ -1,0 +1,50 @@
+{
+ "_leia": "Para tools/clone.py: as telas da casa que o plano liga (a linha `<tela> = true` no bloco O PLANO de src/tema.ts) e o texto que cada uma mostra fixo (o que o print do aprovado diz), quando ela é usada. src/tempos.json (gravado pelo scripts/cobertura.mjs) traz as telas livres e o início de cada tela.",
+ "telas": [
+  "gancho",
+  "criado",
+  "modelos",
+  "editar",
+  "vendo",
+  "previas",
+  "tres",
+  "outros",
+  "aprender"
+ ],
+ "fixos": {
+  "gancho": [
+   "Você grava. O assistente edita.",
+   "Claude Code"
+  ],
+  "criado": [
+   "Estúdio 2D por Jessé Gomes",
+   "Modelos de edição de vídeo para o Claude Code"
+  ],
+  "modelos": [
+   "sistema/modelos"
+  ],
+  "editar": [
+   "Modelos de edição de vídeo para o Claude Code",
+   "Estúdio 2D por Jessé Gomes"
+  ],
+  "vendo": [
+   "sistema/modelos"
+  ],
+  "previas": [
+   "Você grava. O assistente edita."
+  ],
+  "tres": [
+   "Você grava. O assistente edita.",
+   "3 vezes"
+  ],
+  "outros": [
+   "sistema/modelos"
+  ],
+  "aprender": [
+   "Como funciona, em 4 passos"
+  ]
+ },
+ "nao_copiar": [
+  "public/ORIGEM.md"
+ ]
+}

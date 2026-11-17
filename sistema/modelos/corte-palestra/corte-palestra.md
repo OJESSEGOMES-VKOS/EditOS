@@ -265,10 +265,18 @@ trava.
 2. **Ache o ponto certo** (seção 3): `../../.venv/Scripts/python.exe scripts/ponto.py`, escolha, escreva `trecho.json`,
    e `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recortar.py` (na pasta do vídeo).
    Escreva o `plano.md` (ou `roteiro.md`) com o trecho, o porquê da entrada e da saída e as palavras de destaque.
+   O `recortar.py` chama `ffmpeg` e `ffprobe` pelo PATH: no Git Bash, antes dele,
+   `export PATH="$(cd ../../tools/.cache/ffmpeg && pwd):$PATH:$(cd ../../node_modules/@remotion/compositor-win32-x64-msvc && pwd)"`.
 3. **Escolha a cor:** `../../.venv/Scripts/python.exe scripts/cor.py` e ponha a sugestão (ou a do usuário) em `COR`.
-4. **Monte o plano** em `src/Corte.tsx` (na pasta do vídeo): `GANCHO_ATE` (onde acaba o gancho) e `PEDACOS`, as páginas
+4. **Monte o plano** em `src/Corte.tsx` (na pasta do vídeo), no bloco entre as linhas `O PLANO` e `fim do plano`. O
+   vídeo novo **nasce vazio** (`scripts/plano_novo.tsx`, aplicado pelo `tools/novo-video.py`): `PEDACOS = legendaPadrao()`,
+   só a legenda padrão da fala nova, uma página por trecho, nenhum destaque, e nenhuma página da vitrine. Rode o
+   checador uma vez, copie as páginas que ele lista para uma lista escrita e ponha os destaques que a fala nova pede:
+   `GANCHO_ATE` (onde acaba o gancho), `COR` (a do passo 3) e `PEDACOS`, as páginas
    `[índice da 1ª palavra, 'texto']`, com `*palavra*` (serifa na COR) e `_palavra_` (serifa branca) só onde a gramática
-   da seção 1 manda. Uma página por trecho (vírgula, ponto, interrogação fecham a página), até 2 linhas na legenda, até
+   da seção 1 manda. No bloco, entre aspas, só o que foi dito (o `tools/clone.py` lê toda string do bloco como texto na
+   tela). Escreva no `plano.md` cada destaque com a palavra dita entre aspas e a função da frase (pergunta, resposta,
+   contradição, paralelismo). Uma página por trecho (vírgula, ponto, interrogação fecham a página), até 2 linhas na legenda, até
    4 degraus no bloco. O índice é a posição da palavra em `src/palavras.json` (0 é a primeira).
 5. **Meça as mãos** (pela trava): `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/maos.py`.
    **Confira:** `node scripts/cobertura.mjs` (na pasta do vídeo; ele pega a trava sozinho, não rode dentro do
@@ -276,7 +284,13 @@ trava.
    densidade do destaque, emendas, queixo, mãos e zona segura, e diz o que mudar. A página que ainda está na tela quando
    chega uma emenda acaba nela sozinha. Conta de bolso para quebrar páginas: a página nasce 1 quadro antes da 1ª
    palavra e acaba 1 quadro antes da 1ª palavra da seguinte; a última palavra de cada página precisa de 0,4 s até lá,
-   então a página só pode acabar onde a fala dá esse fôlego (vírgula, ponto, palavra longa).
+   então a página só pode acabar onde a fala dá esse fôlego (vírgula, ponto, palavra longa); a última palavra de uma
+   página que já ficou 1,5 s precisa de 0,25 s. Subtrecho curto demais para ler sozinho segue junto com o vizinho do
+   mesmo trecho (G9: a vírgula fica dentro da página). Fala rápida: o fim de um trecho que não cabe em 2 linhas com a
+   página anterior pode ficar de 1,2 a 1,5 s (aviso, não reprova). Fala acima de ~3,3 palavras/s com frases longas
+   aperta tudo isso: conte as páginas antes de escolher o trecho.
+   **O teste do clone:** `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (de `sistema/`) até `SEM CLONE`, e
+   `tools/decupar.py oficina/<v> --conferir` com a resposta de cada cena (legenda ou destaque, e o porquê).
 6. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 0.5 3 ...` (na pasta do vídeo).
 7. **Renderize** (na pasta do vídeo):
    `QUEM=<nome> sh ../../tools/com-trava.sh npx remotion render src/index.ts CortePalestra out/so-video.mp4 --codec=h264 --crf=16 --concurrency=2`
@@ -290,7 +304,15 @@ vale sozinha, com uma palavra de peso em serifa; no corpo, sem pergunta retóric
 sentenças de efeito da 1ª metade; o resto é legenda. Se o `ponto.py` não acha janela de 45 s, rode `--min 35`: o corte
 tem o tamanho do pensamento.
 
-## 10. O plano da vitrine (para comparar)
+## 10. A vitrine: um exemplo do jeito, com o porquê (nunca o roteiro do vídeo novo)
+
+Tudo desta seção é **exemplo**: mostra a gramática aplicada a uma fala. Num vídeo novo nada daqui volta sozinho (as
+páginas, as palavras de destaque, "Claude Code", "iguais", "próprio", "editáveis", a cor): o trecho, os destaques e a
+cor nascem da fala e da gravação novas (skill `.claude/skills/corte-palestra/SKILL.md`, `sistema/JEITO.md`). O porquê de
+cada destaque da vitrine: *Claude Code.* em branco porque é a palavra de peso do gancho de contradição; *iguais.* na COR
+porque é a crença que o gancho nega; *próprio* na COR porque é a resposta; *editáveis* porque é a sentença de peso da 1ª
+metade; nada no fecho porque a força ali é da fala. Prova com outra fala (o earshot, 2026-11-17):
+`sistema/oficina/2026-11-17-teste-skill-corte-palestra/` (`plano.md`, `conferencia/lado-a-lado.jpg`).
 
 Vitrine: `sistema/oficina/2026-11-03-corte-palestra-vitrine/` (`out/final.mp4`, `plano.md`, `trecho.json`,
 `trecho-mapa.txt`, `conferencia/folha-1qps.jpg`, `conferencia/lado-a-lado.png`). É prova do sistema, não conteúdo.

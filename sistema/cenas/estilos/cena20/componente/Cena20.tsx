@@ -236,7 +236,7 @@ export const Cena20: React.FC<Cena20Props> = ({
   });
 
   // rótulos de cidade (origem + destinos com nome)
-  const rotulos = [{nome: origem.nome, lon: origem.lon, lat: origem.lat, vis: true, dx: -14, alinhar: 'right' as const}]
+  const rotulos = [{nome: origem.nome, lon: origem.lon, lat: origem.lat, vis: true, dx: -14, alinhar: 'right' as 'right' | 'center'}]
     .concat(
       voos
         .filter((v) => v.nome)

@@ -8,10 +8,12 @@ const {fontFamily: BARLOW} = loadBarlow('normal', {weights: ['700'], subsets: ['
 const {fontFamily: MONT} = loadMont('normal', {weights: ['600'], subsets: ['latin']});
 
 export type Cena36Props = {
-  meta?: number; // o marco (ex.: 100000)
-  inicio?: number; // de onde a contagem parte
-  palavra?: string;
+  meta: number; // o marco como foi dito (ex.: 100000)
+  inicio?: number; // de onde a contagem parte (padrão: 72% da meta)
+  palavra: string; // a unidade dita, em caixa alta (CLIENTES, ANOS, VENDAS)
+  prefixo?: string; // fixo antes das rodas, ex.: "R$"
   separador?: string;
+  viradaEm?: number; // quadro em que tudo vira para a meta (na palavra do número); padrão 76 * duracao/150
   width?: number;
   height?: number;
   duracao?: number;
@@ -23,9 +25,11 @@ const PT = 46;
 const CROMO = 'linear-gradient(180deg, #ffffff 0%, #d9dee2 30%, #8f979d 50%, #eef2f4 54%, #aab1b6 80%, #ffffff 100%)';
 
 export const Cena36: React.FC<Cena36Props> = ({
-  meta = 100000,
-  inicio = 72000,
-  palavra = 'SEGUIDORES',
+  meta,
+  inicio = Math.round(meta * 0.72),
+  palavra,
+  prefixo = '',
+  viradaEm,
   separador = '.',
   width = 1080,
   height = 1350,
@@ -46,15 +50,23 @@ export const Cena36: React.FC<Cena36Props> = ({
 
   // contagem: corre, desacelera perto da meta, para em meta-1, depois vira tudo junto
   const quase = meta - 1;
-  const pc = interpolate(frame, [0, 66 * s], [0, 1], {extrapolateRight: 'clamp'});
+  const fc = frame - (viradaEm === undefined ? 0 : viradaEm - 76 * s); // relógio da contagem, ancorado na virada
+  const pc = interpolate(fc, [0, 66 * s], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   let v = quase - (quase - inicio) * Math.pow(1 - pc, 3.2);
-  const virada = interpolate(frame, [76 * s, 86 * s], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
+  const virada = interpolate(fc, [76 * s, 86 * s], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
   v = v + virada * (meta - v);
-  const quique = frame > 86 * s ? Math.sin((frame - 86 * s) * 0.7) * Math.exp(-(frame - 86 * s) * 0.35) * 10 : 0;
+  const quique = fc > 86 * s ? Math.sin((fc - 86 * s) * 0.7) * Math.exp(-(fc - 86 * s) * 0.35) * 10 : 0;
 
   const casas = String(meta).length;
   const CEL = 128;
   const rodas: React.ReactNode[] = [];
+  if (prefixo) {
+    rodas.push(
+      <div key="pre" style={{height: CEL, lineHeight: `${CEL}px`, paddingRight: 0.12 * CEL, fontSize: '0.7em'}}>
+        <span style={{background: CROMO, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', filter: 'drop-shadow(0 2px 1px rgba(0,0,0,0.9))'}}>{prefixo}</span>
+      </div>,
+    );
+  }
   for (let i = casas - 1; i >= 0; i--) {
     const pot = Math.pow(10, i);
     let pos = i === 0 ? v % 10 : Math.floor(v / pot + 1e-9) % 10;

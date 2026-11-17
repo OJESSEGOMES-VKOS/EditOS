@@ -15,24 +15,89 @@ export const FPS = 30;
 const _ps = (PALAVRAS as {text: string; start: number; end: number}[]).map((p) => ({texto: p.text, de: p.start, ate: p.end}));
 if (!_ps.length) throw new Error('src/palavras.json está vazio: rode scripts/ponto.py e scripts/recortar.py (corte-palestra.md, seção 9).');
 
-/* ================================================================ O PLANO (num vídeo novo, refazer daqui até PEDACOS)
- * FOLGA: quanto a imagem segue depois da última palavra (a última frase respira 1 a 2 s; scripts/recortar.py lê daqui).
- * ESCURECE: true = a imagem escurece até o preto com a última página ainda na tela (ref1); false = segura a imagem (ref2).
- * GANCHO_ATE: onde acaba o gancho (s). Antes dele o destaque é denso; depois, raro (o checador conta).
- * COR: a cor do destaque colorido, escolhida CONTRA o fundo da gravação (scripts/cor.py mede e sugere).
- * REENQUADRA_EMENDAS: opção desligada; liga um corte de reenquadramento (1,0 ↔ 1,08) em cada emenda do recorte. */
+/** A cor de destaque de partida (a da vitrine). Num vídeo novo, COR recebe a sugestão do scripts/cor.py. */
+const COR_PADRAO = '#6D87C5';
+
+/**
+ * A legenda padrão do modelo, sem nenhum destaque: o começo vazio de todo vídeo novo (sistema/JEITO.md). Uma página por
+ * trecho (acaba na pontuação, G14), até 2 linhas de ~26 letras; trecho longo vira mais de uma página só onde os dois
+ * lados ficam com pelo menos 1,5 s e a última palavra com 0,4 s (G9). Devolve a lista no formato de PEDACOS.
+ */
+function legendaPadrao(): [number, string][] {
+	const ws = _ps.map((p) => p.texto.trim());
+	const fecha = (i: number) => /[.,?!:;…]["”»)]*$/.test(ws[i]);
+	const ini = (i: number) => (i < _ps.length ? _ps[i].de : _ps[_ps.length - 1].ate + 1.6);
+	const linhas = (a: number, b: number) => {
+		const ls: string[] = [];
+		for (let i = a; i <= b; i++) {
+			const u = ls.length - 1;
+			if (u >= 0 && (ls[u] + ' ' + ws[i]).length <= 26) ls[u] += ' ' + ws[i];
+			else ls.push(ws[i]);
+		}
+		return ls;
+	};
+	// pode acabar uma página na palavra b (a próxima começa em b + 1)? a página fica 1,5 s e a última palavra 0,25 s (G9;
+	// a última de uma página que já ficou 1,5 s não é palavra solta, como no checador)
+	const cabe = (a: number, b: number) => ini(b + 1) - ini(a) >= 1.5 && ini(b + 1) - 1 / FPS - _ps[b].de >= 0.25;
+	const out: [number, string][] = [];
+	let a = 0;
+	while (a < ws.length) {
+		// o trecho a..fim; G9 (dono, 2026-11-07): subtrecho (até a vírgula) curto demais para ler segue junto com o vizinho do
+		// MESMO trecho (a vírgula fica dentro da página); trechos diferentes (ponto, interrogação...) nunca se juntam
+		let fim = a;
+		for (;;) {
+			while (fim < ws.length - 1 && !fecha(fim)) fim++;
+			const curto = ini(fim + 1) - ini(a) < 1.5 || (fim + 1 < ws.length && /,["”»)]*$/.test(ws[fim]) && (() => {
+				let n = fim + 1;
+				while (n < ws.length - 1 && !fecha(n)) n++;
+				return ini(n + 1) - ini(fim + 1) < 1.5; // o subtrecho seguinte é que fica curto
+			})());
+			if (!(curto && fim < ws.length - 1 && /,["”»)]*$/.test(ws[fim]))) break;
+			fim++;
+		}
+		let s = a;
+		while (s <= fim) {
+			let b = s;
+			// estica a página enquanto couber em 2 linhas; depois volta até um ponto em que o tempo deixe quebrar
+			while (b < fim && linhas(s, b + 1).length <= 2) b++;
+			if (b < fim) {
+				let k = b;
+				while (k > s && !(cabe(s, k) && cabe(k + 1, fim))) k--;
+				if (k > s) b = k;
+				else {
+					// fala rápida: a 1ª palavra depois das 2 linhas em que o tempo deixa quebrar (a página passa de 2 linhas e o
+					// checador avisa; aí junte ou quebre à mão); sem nenhuma, o trecho inteiro
+					k = b + 1;
+					while (k < fim && !(cabe(s, k) && cabe(k + 1, fim))) k++;
+					b = k;
+				}
+			}
+			out.push([s, linhas(s, b).join(' / ')]);
+			s = b + 1;
+		}
+		a = fim + 1;
+	}
+	return out;
+}
+
+// ================================================================ O PLANO (num vídeo novo, nasce de scripts/plano_novo.tsx)
+// FOLGA: quanto a imagem segue depois da última palavra (a última frase respira 1 a 2 s; scripts/recortar.py lê daqui).
+// ESCURECE: true = a imagem escurece até o preto com a última página ainda na tela (ref1); false = segura a imagem (ref2).
+// GANCHO_ATE: onde acaba o gancho (s). Antes dele o destaque é denso; depois, raro (o checador conta).
+// COR: a cor do destaque colorido, escolhida CONTRA o fundo da gravação (scripts/cor.py mede e sugere).
+// REENQUADRA_EMENDAS: opção desligada; liga um corte de reenquadramento (1,0 ↔ 1,08) em cada emenda do recorte.
 const FOLGA = 1.6;
 const ESCURECE = true;
 const GANCHO_ATE = 9.0;
 const COR = '#6D87C5'; // scripts/cor.py: fundo bege quase sem cor, camiseta preta atrás da legenda (contraste 4,6:1)
 const REENQUADRA_EMENDAS = false;
-/* PEDACOS: as páginas, na ordem da fala: [índice da 1ª palavra em src/palavras.json, 'texto', até (s)?].
- * O texto é o que foi DITO (a transcrição errou? escreva o certo e use tools/trocar.py). ' / ' quebra a linha.
- * Marcas (só onde o modelo pede destaque, corte-palestra.md seção 4):
- *   *palavra*  serifa itálica grande na COR (a palavra da pergunta, a resposta-chave da pergunta retórica)
- *   _palavra_  serifa itálica grande branca (a resposta em imperativo, a palavra de peso sobre fundo frio)
- * Página sem marca = legenda: no máximo 2 linhas, um trecho só (nunca atravessa . , ? ! :). Página com marca = bloco: até
- * 4 linhas (degraus), monta-se palavra por palavra com a voz e zera na próxima página. */
+// PEDACOS: as páginas, na ordem da fala: [índice da 1ª palavra em src/palavras.json, 'texto', até (s)?].
+// O texto é o que foi DITO (a transcrição errou? escreva o certo e use tools/trocar.py). ' / ' quebra a linha.
+// Marcas (só onde o modelo pede destaque, corte-palestra.md seção 4):
+//   *palavra*  serifa itálica grande na COR (a palavra da pergunta, a resposta-chave da pergunta retórica)
+//   _palavra_  serifa itálica grande branca (a resposta em imperativo, a palavra de peso sobre fundo frio)
+// Página sem marca = legenda: no máximo 2 linhas, um trecho só (nunca atravessa . , ? ! :). Página com marca = bloco: até
+// 4 linhas (degraus), monta-se palavra por palavra com a voz e zera na próxima página.
 const PEDACOS: [number, string, number?][] = [
 	// gancho (contradição): "é mais um vídeo editado pelo Claude Code… mas não é como os outros, todos iguais."
 	[0, 'Esse é mais um daqueles / vídeos que você vê por aí / totalmente editados pelo / _Claude Code._'],
@@ -51,8 +116,8 @@ const PEDACOS: [number, string, number?][] = [
 	// fecho: a palavra que resolve fica na legenda comum e respira
 	[101, 'quem decide é você.'],
 ];
+// ================================================================ fim do plano (daqui para baixo, o modelo: não muda por vídeo)
 
-/* ================================================================ daqui para baixo, o modelo (não muda por vídeo) */
 export const DURACAO = Number((_ps[_ps.length - 1].ate + FOLGA).toFixed(2));
 export const QUADROS = Math.floor(DURACAO * FPS);
 export const FIM_VIDEO = QUADROS / FPS;

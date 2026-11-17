@@ -3,7 +3,7 @@ import {AbsoluteFill, Img, staticFile, useCurrentFrame} from 'remotion';
 import {loadFont as loadPlayfair} from '@remotion/google-fonts/PlayfairDisplay';
 import {loadFont as loadPoppins} from '@remotion/google-fonts/Poppins';
 import PB from './palavras.json';
-import PLANO from './plano.json';
+import PLANO from './plano'; // o plano desta fala (src/plano.ts; o checador grava a cópia src/plano.json)
 import DADOS from './dados.json';
 
 /**
@@ -11,7 +11,7 @@ import DADOS from './dados.json';
  * narração. Família A (gráfico vivo): a imagem-mãe é um gráfico feito por código a partir de dado real (src/dados.json,
  * com as fontes). Família B (arquivo): a imagem-mãe é um documento, mapa ou pintura de domínio público (public/), com
  * pontos e fios que se desenham. O texto mora em três camadas fixas: rótulo (topo), título ou número (meio de cima),
- * legenda de uma palavra (66% da altura). A história desta fala (tempos, telas, números, eventos) mora em ./plano.json;
+ * legenda de uma palavra (66% da altura). A história desta fala (tempos, telas, números, eventos) mora em ./plano.ts;
  * aqui só o desenho. Nenhum corte: o plano é um só.
  */
 export const FPS = 30;
@@ -55,7 +55,7 @@ if (!PS.length) pare('src/palavras.json está vazio: rode tools/novo-video.py co
 		const j = k >= 0 ? k : Math.min(plano.length, fala.length);
 		pare(
 			`O plano não bate com a fala: na palavra ${j + 1} o plano tem "${plano[j] ?? '(fim)'}" e src/palavras.json tem "${fala[j] ?? '(fim)'}". ` +
-				'Refaça a história sobre a fala nova em src/plano.json (documental-dados.md, seção 9) e cole o texto da fala nova no campo "fala".',
+				'Refaça a história sobre a fala nova no bloco O PLANO de src/plano.ts (documental-dados.md, seção 9; fala = FALA usa a fala transcrita).',
 		);
 	}
 }
@@ -65,8 +65,8 @@ const tempo = (x: Tempo, onde: string): number => {
 	if (typeof x === 'number') return x;
 	const [i, palavra, mais] = x as [number, string, number?];
 	const p = PS[i];
-	if (!p) return pare(`src/plano.json, ${onde}: a palavra ${i} não existe (a fala tem ${PS.length}, de 0 a ${PS.length - 1}).`);
-	if (limpa(p.text) !== limpa(palavra)) return pare(`src/plano.json, ${onde}: espera "${palavra}" na palavra ${i}, e a fala tem "${p.text}" (${p.start.toFixed(2)} s).`);
+	if (!p) return pare(`src/plano.ts, ${onde}: a palavra ${i} não existe (a fala tem ${PS.length}, de 0 a ${PS.length - 1}).`);
+	if (limpa(p.text) !== limpa(palavra)) return pare(`src/plano.ts, ${onde}: espera "${palavra}" na palavra ${i}, e a fala tem "${p.text}" (${p.start.toFixed(2)} s).`);
 	return mais === undefined ? p.start : p.start + mais;
 };
 const talvez = (x: Tempo | null | undefined, onde: string) => (x === undefined || x === null ? null : tempo(x, onde));
@@ -90,7 +90,7 @@ type PlanoJson = {
 	divisao?: {de: Tempo; ate: Tempo; depois: number; rotulos: {t: Tempo; txt: string; grupo: number}[]} | null;
 	pilha?: {de: Tempo; ate: Tempo; itens: number[]; junto: number; dur: number} | null;
 	documento?: {arquivo: string; largura: number; altura: number; y: number; credito: string; de?: Tempo; pontos?: {t: Tempo; x: number; y: number; nome: string}[]; fios?: {de: Tempo; ate: Tempo; pontos: [number, number][]}[]} | null;
-	credito: {de: Tempo; txt: string};
+	credito?: {de: Tempo; txt: string};
 };
 const PL = PLANO as unknown as PlanoJson;
 export const FAMILIA = PL.familia;
@@ -98,7 +98,7 @@ export const COR: Paleta = PALETAS[PL.paleta] ?? pare(`paleta "${PL.paleta}" nã
 export const DURACAO = Math.round((PS[PS.length - 1].end + PL.cauda) * 100) / 100;
 
 /* telas (camadas 1 e 2) */
-export const TELAS = PL.telas.map((t, i) => ({
+export const TELAS = (PL.telas ?? []).map((t, i) => ({
 	...t,
 	de: tempo(t.de, `telas[${i}].de`),
 	numeros: (t.numeros ?? []).map((n, j) => ({...n, inicio: n.inicio ?? 0, de: tempo(n.de, `telas[${i}].numeros[${j}].de`), para: tempo(n.para, `telas[${i}].numeros[${j}].para`)})),
@@ -107,7 +107,7 @@ export const TELAS = PL.telas.map((t, i) => ({
 export const DESTAQUES = new Set(PL.destaques ?? []);
 export const APAGAO = talvez(PL.apagao, 'apagao');
 export const SEM_APAGAO = PL.apagao === null; // desligado de propósito (vídeo sem clímax; o motivo vai no plano.md)
-export const CREDITO = {de: tempo(PL.credito.de, 'credito.de'), txt: PL.credito.txt};
+export const CREDITO = PL.credito ? {de: tempo(PL.credito.de, 'credito.de'), txt: PL.credito.txt} : {de: Infinity, txt: ''}; // sem crédito o checador reprova
 
 /* legenda (camada 3): uma palavra por vez, presa ao início dela. Palavra que ficaria menos de 0,4 s junta a vizinha do
    mesmo trecho (a seguinte; se ela fecha o trecho, a anterior), nunca através de pontuação (G11, G14), máx. 3 curtas numa linha só. */
@@ -156,15 +156,20 @@ if (PL.legenda ?? FAMILIA === 'A') {
 
 /* barras (imagem-mãe da família A) */
 type Item = {nome: string; valor: number; grupo: number};
-export const ITENS = (DADOS as {itens: Item[]}).itens;
+/* o dado é do vídeo: src/dados.json leva a fala dele ("fala"). Dado de outra fala (o do vídeo de exemplo, que veio junto
+   com o molde) não desenha nada e o checador reprova: o gráfico nunca mostra a prova de outro vídeo. */
+const DD = DADOS as {fala?: string; itens?: Item[]};
+const mesmaFala = (s: string) => s.split(/\s+/).map(limpa).filter(Boolean).join(' ') === PS.map((p) => limpa(p.text)).filter(Boolean).join(' ');
+export const DADOS_DE_OUTRO = !!DD.itens?.length && !mesmaFala(DD.fala ?? '');
+export const ITENS: Item[] = DADOS_DE_OUTRO ? [] : (DD.itens ?? []);
 const N = ITENS.length;
 const X0 = 60;
 const X1 = 1020; // o gráfico vai de borda a borda (não é texto)
 const PASSO = (X1 - X0) / Math.max(1, N);
 const BW = Math.max(3, PASSO * 0.78);
 const HMAX = 420; // topo da barra mais alta em y 732 (38%), abaixo do título
-const FATIA = HMAX / Math.max(1, Math.max(...(DADOS as {itens: {valor: number}[]}).itens.map((d) => d.valor))); // 1 unidade (1 capítulo) em px
-const VMAX = Math.max(...ITENS.map((d) => d.valor));
+const VMAX = Math.max(1e-9, ...ITENS.map((d) => d.valor));
+const FATIA = HMAX / Math.max(1, VMAX); // 1 unidade (1 capítulo) em px
 export const barraX = (k: number) => X0 + (k + 0.5) * PASSO;
 export const barraH = (k: number) => Math.max(2, (ITENS[k].valor / VMAX) * HMAX);
 const acum = ITENS.reduce<number[]>((a, d) => [...a, (a[a.length - 1] ?? 0) + d.valor], []);
@@ -330,7 +335,7 @@ const Barras: React.FC<{t: number}> = ({t}) => {
 				</filter>
 			</defs>
 			{/* a luz que as barras acesas jogam em volta (a ref1 é um domo luminoso): cresce com o quanto o gráfico está aceso */}
-			<ellipse cx={CENTRO_X} cy={Y.eixo} rx={560} ry={480} fill="url(#gLuz)" opacity={0.5 * cl(niveis.reduce((a, b) => a + Math.min(1, b), 0) / N)} />
+			<ellipse cx={CENTRO_X} cy={Y.eixo} rx={560} ry={480} fill="url(#gLuz)" opacity={0.5 * cl(niveis.reduce((a, b) => a + Math.min(1, b), 0) / Math.max(1, N))} />
 			<g transform={tr}>
 				{brilho.map((k) => (
 					<rect key={'g' + k} x={barraX(k) - BW} y={Y.eixo - barraH(k) - 6} width={BW * 2} height={barraH(k) + 6} fill={COR.barraTopo} opacity={cl((niveis[k] - 1) * 1.6)} filter="url(#fBrilho)" />

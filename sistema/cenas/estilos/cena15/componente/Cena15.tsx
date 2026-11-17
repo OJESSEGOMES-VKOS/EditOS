@@ -20,30 +20,19 @@ export type Cena15Props = {
   menu?: string[];
   menuAtivo?: number;
   secao?: string;
-  manchete?: string[];
+  manchete: string[]; // a manchete real (1 a 3 linhas), do print com origem
   autor?: string;
   autorLinha?: string;
   capitular?: string;
-  corpo?: Trecho[][];
+  corpo: Trecho[][]; // o parágrafo real, linha a linha; g=true é o que a fala lê
   postNome?: string;
   postArroba?: string;
-  postTexto?: string[];
+  postTexto?: string[]; // sem postTexto, o post (recibo) não entra
   postNumeros?: string[];
   marcaTexto?: string;
   /** quadro em que o marca-texto começa */
   inicioGrifo?: number;
 };
-
-const corpoDemo: Trecho[][] = [
-  [{t: 'uando a Casa Ventura passou as ligações'}],
-  [{t: 'dos clientes para um atendente automático,'}],
-  [{t: 'a diretoria chamou de piloto. '}, {t: 'Em setembro,', g: true}],
-  [{t: 'o custo do suporte tinha caído 58% enquanto', g: true}],
-  [{t: 'uma equipe de onze dava conta do dobro.', g: true}, {t: ' Os'}],
-  [{t: 'documentos internos mostram que o plano foi'}],
-  [{t: 'aprovado no começo do ano, muito antes de a'}],
-  [{t: 'equipe saber.'}],
-];
 
 const RuidoFiltro: React.FC = () => (
   <svg width={0} height={0} style={{position: 'absolute'}}>
@@ -61,21 +50,21 @@ const RuidoFiltro: React.FC = () => (
 export const Cena15: React.FC<Cena15Props> = ({
   width = 1080,
   height = 1350,
-  jornal = 'O Mensageiro Austral',
-  dataLinha = 'QUARTA, 29 DE OUTUBRO DE 2026',
-  edicao = 'EDIÇÃO DE NEGÓCIOS',
-  menu = ['Mundo', 'Negócios', 'Mercado', 'Tecnologia', 'Opinião', 'Trabalho'],
-  menuAtivo = 1,
-  secao = 'NEGÓCIOS / TRABALHO',
-  manchete = ['Uma loja regional passou o', 'atendimento para a IA.', 'Depois, a margem dobrou.'],
-  autor = 'Por Helena Duarte',
-  autorLinha = '28 out 2026 · 7 min de leitura',
-  capitular = 'Q',
-  corpo = corpoDemo,
-  postNome = 'Clara Moura',
-  postArroba = '@claramoura · 2 h',
-  postTexto = ['Leia o primeiro parágrafo de novo.', 'Uma equipe de onze. Essa é a', 'história toda.'],
-  postNumeros = ['1,2 mil', '4,8 mil', '21 mil'],
+  jornal = '',
+  dataLinha = '',
+  edicao = '',
+  menu = [],
+  menuAtivo = -1,
+  secao = '',
+  manchete,
+  autor = '',
+  autorLinha = '',
+  capitular = '',
+  corpo,
+  postNome = '',
+  postArroba = '',
+  postTexto = [],
+  postNumeros = [],
   marcaTexto = '#C9F52A',
   inicioGrifo = 48,
 }) => {
@@ -149,11 +138,11 @@ export const Cena15: React.FC<Cena15Props> = ({
             <div style={{fontFamily: NEWS, fontWeight: 800, fontSize: 56, letterSpacing: -1.5, color: INK, textAlign: 'center', marginTop: 6, lineHeight: 1.1, fontVariationSettings: '"opsz" 72'}}>{jornal}</div>
             <div style={{height: 2, background: INK, marginTop: 8}} />
             <div style={{display: 'flex', justifyContent: 'center', gap: 22, fontFamily: INTER, fontSize: 14, color: BODY, padding: '9px 0', borderBottom: `1px solid ${RULE}`}}>
-              {menu.map((m, i) => <span key={m} style={{fontWeight: i === menuAtivo ? 700 : 500, borderBottom: i === menuAtivo ? `2px solid ${INK}` : 'none'}}>{m}</span>)}
+              {menu.map((m, i) => <span key={i} style={{fontWeight: i === menuAtivo ? 700 : 500, borderBottom: i === menuAtivo ? `2px solid ${INK}` : 'none'}}>{m}</span>)}
             </div>
             <div style={{fontFamily: INTER, fontSize: 13, fontWeight: 700, letterSpacing: 1.4, color: '#C1272D', marginTop: 22}}>{secao}</div>
             <div style={{fontFamily: NEWS, fontWeight: 700, fontSize: 43, lineHeight: 1.08, letterSpacing: -0.8, color: INK, marginTop: 8}}>
-              {manchete.map((l) => <div key={l}>{l}</div>)}
+              {manchete.map((l, i) => <div key={i}>{l}</div>)}
             </div>
             <div style={{display: 'flex', alignItems: 'center', gap: 12, marginTop: 20, paddingBottom: 16, borderBottom: `1px solid ${RULE}`, fontFamily: INTER}}>
               <div style={{width: 34, height: 34, borderRadius: 17, background: 'linear-gradient(135deg,#b9a48f,#6d5b4c)'}} />
@@ -192,7 +181,7 @@ export const Cena15: React.FC<Cena15Props> = ({
             </div>
           </div>
           {/* o post (recibo) */}
-          {post > 0.01 && (
+          {postTexto.length > 0 && post > 0.01 && (
             <div style={{position: 'absolute', left: 590, top: 930, width: 440, padding: '20px 24px', background: '#fff', borderRadius: 16, fontFamily: INTER, color: INK, transform: `scale(${post}) rotate(${interpolate(postRot, [0, 1], [-6, 2.5])}deg)`, transformOrigin: '30% 30%', boxShadow: '0 30px 60px rgba(0,0,0,0.5), 0 8px 18px rgba(0,0,0,0.3)'}}>
               <div style={{display: 'flex', alignItems: 'center', gap: 12}}>
                 <div style={{width: 40, height: 40, borderRadius: 20, background: 'linear-gradient(135deg,#8c97a6,#3e4652)'}} />
@@ -204,9 +193,9 @@ export const Cena15: React.FC<Cena15Props> = ({
                   <div style={{fontSize: 14, color: GR}}>{postArroba}</div>
                 </div>
               </div>
-              <div style={{fontSize: 19, lineHeight: 1.35, marginTop: 12}}>{postTexto.map((l) => <div key={l}>{l}</div>)}</div>
+              <div style={{fontSize: 19, lineHeight: 1.35, marginTop: 12}}>{postTexto.map((l, i) => <div key={i}>{l}</div>)}</div>
               <div style={{display: 'flex', gap: 26, fontSize: 14, color: GR, marginTop: 12}}>
-                <span>↩ {postNumeros[0]}</span><span>⇄ {postNumeros[1]}</span><span>♡ {postNumeros[2]}</span>
+                {postNumeros.length > 0 && (<><span>↩ {postNumeros[0]}</span><span>⇄ {postNumeros[1]}</span><span>♡ {postNumeros[2]}</span></>)}
               </div>
             </div>
           )}

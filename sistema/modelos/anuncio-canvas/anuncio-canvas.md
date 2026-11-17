@@ -11,6 +11,9 @@ escrito) e o `mapa.json` (luz e trocas medidas a cada 0,25 s). Antes de editar, 
 
 **A referência mostra o jeito do modelo, não um roteiro para copiar.** Siga a cara, os números e as regras; as telas, os textos e os cortes do vídeo novo nascem da fala nova. Não repita as cenas do aprovado só porque estão lá.
 
+**A entrada do modelo é a skill `.claude/skills/anuncio-canvas/SKILL.md`** (a personalidade, as peças e como inventar a
+peça que o anúncio novo pede, pelo método de `sistema/JEITO.md`). Leia ela antes deste arquivo.
+
 **A marca do vídeo aprovado é só exemplo.** Ele é um anúncio de um app de agenda para salão, com o nome "marcai", telas
 de app, um estúdio, nomes de profissionais e preços. Tudo isso é adereço daquele vídeo, para mostrar como o modelo se
 comporta. Num vídeo novo, a marca, o logo, as cores, as telas, os nomes, os números e a oferta vêm de quem pede o
@@ -128,25 +131,30 @@ contraste têm que ficar perto destes.
 | dor | `#0B0506` | vermelho `rgba(255,42,42,0.26)` | (8 s a 12 s) |
 | claro | `#F6F4FA` | cor da marca a 24% | (5 s a 7 s, 15 s, 21 s, 25 s, 33 s) |
 
-- **O repertório de peças** (em `src/ui.tsx` e no topo de `src/Canvas.tsx`):
-  - balões de mensagem, de entrada e de saída, com hora e checks (1 s a 7 s);
-  - hora grande fina com a lua (Sora 300, 210 px, 4 s);
-  - cartão de data que fica cinza na negação (10 s);
-  - relógio com o arco vermelho que corre e o objeto parado no meio (12 s);
+- **As peças do aprovado são exemplos com o porquê, não o catálogo do anúncio novo** (skill
+  `.claude/skills/anuncio-canvas/SKILL.md`, "A invenção"). Cada uma existe porque a fala do Marcaí disse aquilo; num
+  anúncio novo ela só volta quando a fala nova diz a mesma coisa, e o normal é desenhar a peça que a frase nova pede
+  (`src/telas/<Nome>.tsx` com o kit de `src/kit.tsx`, `<Tela comp="Nome" />` no plano). As primitivas (pílula, glitch,
+  risco, marca-texto, ícone de vidro, celular com print real, neon, wordmark) servem a qualquer tema. No aprovado:
+  - balões de mensagem, de entrada e de saída, com hora e checks (1 s a 7 s): a fala falava de mensagens trocadas;
+  - hora grande fina com a lua (Sora 300, 210 px, 4 s; tela `Hora2347`): "às onze da noite";
+  - cartão de data que fica cinza na negação (10 s; `Data15`): "no dia, não aparece";
+  - relógio com o arco vermelho que corre e o objeto parado no meio (12 s; `Relogio`): "uma hora parada";
   - **glitch vermelho** na palavra de dor, caixa alta (10 s "NÃO APARECE", 12 s "NINGUÉM PAGA.");
   - **risco vermelho** que corre da esquerda para a direita sobre o que deu errado (8 s);
   - **ícone de vidro** na cor da marca, que entra girando com mola (14 s, 22 s);
-  - campo de link que se digita sozinho (15 s);
+  - campo de link que se digita sozinho (15 s; `Campo`, com o texto fixo do aprovado): "manda o seu link";
   - **celular inclinado com a tela do produto**, que sobe com mola e balança devagar (16 s a 22 s);
   - **pílulas** sólidas que se acumulam ao lado do celular, uma por palavra (18 s a 20 s);
   - notificações empilhadas (24 s);
-  - cartão de valor com check (26 s);
-  - painel inclinado em perspectiva com brilho na borda (28 s a 29 s);
-  - **número que conta** com 12 pontos que acendem em volta (30 s a 32 s);
-  - objeto que age (a tesoura que corta, 33 s);
-  - **neons coloridos**, um por público, cada um num ponto (35 s a 36 s);
-  - botão que destrava com cadeado e o selo da oferta (38 s a 39 s);
-  - **marca se montando**, letra a letra (40 s a 41 s).
+  - cartão de valor com check (26 s; `SinalPago`, texto e valor fixos do aprovado): "quem já pagou o sinal";
+  - painel inclinado em perspectiva com brilho na borda (28 s a 29 s; `PainelImg`, só com o print real): "o painel";
+  - **número que conta** com 12 pontos que acendem em volta (30 s a 32 s; `Doze`): "Doze atendimentos";
+  - objeto que age (a tesoura que corta, 33 s): "o corte";
+  - **neons coloridos**, um por público, cada um num ponto (35 s a 36 s): "salão, barbearia e estúdio";
+  - botão que destrava com cadeado e o selo da oferta (38 s a 39 s; `Botao`): "Teste grátis";
+  - **marca se montando**, letra a letra (40 s a 41 s; `Marca`, a do Marcaí: nunca num anúncio de outra marca).
+  As telas com nome ficam em `CASA` (`src/Canvas.tsx`) e entram por `<Tela comp="Nome" />`.
 - **Menos é mais:** no máximo 4 ou 5 peças por frase, e o gancho com no máximo 4 balões. Anel fino e brilho são o
   único adorno. Sem trilho, partículas, selos soltos no fundo ou bordas esfumadas.
 - **Representa o ato que a fala diz**, no instante da palavra: "chega na hora" ganha marca-texto (21 s), "corte" faz a
@@ -222,7 +230,10 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    `ffmpeg -f lavfi -i color=c=black:s=1080x1920:r=30 -i narracao.wav -shortest -c:v libx264 -pix_fmt yuv420p -c:a aac narracao.mp4`.
 2. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py anuncio-canvas <narracao.mp4> <AAAA-MM-DD-tema>`.
    Isso copia o molde, grava `public/voz.wav` e transcreve a fala em `src/palavras.json` (a gravação de vídeo e o
-   `rosto.json` não vêm: o modelo não tem rosto). O que vem do aprovado e você apaga da pasta do vídeo:
+   `rosto.json` não vêm: o modelo não tem rosto). **O plano nasce vazio** (`scripts/plano_novo.tsx` entra no lugar do
+   bloco O PLANO de `src/Canvas.tsx`): a fala transcrita, uma frase por ponto final, nenhuma peça. Ele carrega e
+   renderiza (só o fundo e a câmera) e o `conferir.mjs` reprova até o plano ter peças. O que vem do aprovado e você
+   apaga da pasta do vídeo:
    `public/som.m4a` (o mix do aprovado; sem apagar, o render toca a voz velha) e `public/reserva.png`,
    `public/confirmado.png` e `public/painel.png` (as telas do aprovado). Troque o `roteiro.txt` pelo texto novo.
    Narração gerada: `kit/.venv/Scripts/python.exe kit/voz.py oficina/<v>/roteiro.txt oficina/<v>/public/voz.mp3 --voz <voice_id>`
@@ -231,19 +242,31 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 3. **Identidade de quem pede, num lugar só:** a paleta `C` em `src/tema.ts`. Dela saem a cor da marca, o texto fino,
    o volume do ícone de vidro e do símbolo e as manchas do fundo (`AMB` lê `C.v` e `C.vBrilho`). O vermelho `#FF2A2A`
    e os tons `dor` e `noite` continuam fixos. Ponha os prints reais em `public/` e troque a marca (§6).
-4. **Monte O PLANO em `src/Canvas.tsx`** (na pasta do vídeo). O molde para de propósito enquanto o plano não bater com
-   a fala nova e diz a palavra que difere.
-   - `const FALA`: o texto da fala nova.
-   - `const FRASES`: `[1ª palavra, última palavra, tom]` com tom `marca`, `dor`, `noite` ou `claro`. As frases
-     cobrem a fala inteira, em ordem (curtas coladas se juntam, longas em fala corrida se dividem: §3 e §5).
-   - `const VIRADA` (logo abaixo de `FRASES`): o índice da frase em que o produto aparece (5 no aprovado). Nem a
-     primeira nem o fecho.
+4. **Monte O PLANO em `src/Canvas.tsx`** (na pasta do vídeo), entre a linha `// O PLANO` e a linha `// fim do plano`,
+   a partir do que a fala nova pede (a skill `anuncio-canvas`, "A invenção"), com um `plano.md` de uma linha por
+   frase: a peça, a palavra dita entre aspas que pediu ela e o porquê. O molde para de propósito enquanto o plano não
+   bater com a fala nova e diz a palavra que difere.
+   - `const FALA`: o texto da fala nova (o começo vazio já traz `FALA_DITA`, a transcrição).
+   - `export const FRASES`: `[1ª palavra, última palavra, tom]` com tom `TOM.marca`, `TOM.dor`, `TOM.noite` ou
+     `TOM.claro` (constantes: o plano não escreve palavra que não é dita). As frases cobrem a fala inteira, em ordem
+     (curtas coladas se juntam, longas em fala corrida se dividem: §3 e §5).
+   - `export const VIRADA`: o índice da frase em que o produto aparece (5 no aprovado). Nem a primeira nem o fecho;
+     `null` sem virada.
    - A `Coreografia`: um grupo por frase, `<El k={frase} x={...} y={...} z={...} rot={...}>`. Cada linha escrita é
-     `<L de={segundos} txt="..." tam={px} cor={...} peso={...} />`, com as palavras como foram ditas, e os instantes
-     vêm de `w('palavra', n)` e `wf('palavra', n)`. O fecho leva `fica`. O wordmark é a prop `texto` do `<Wordmark>`.
-5. **Confira:** não há checador separado. A conferência do plano contra a fala roda ao carregar. Para cada frase,
-   olhe um quadro logo depois da 1ª palavra e um logo antes da viagem seguinte: os dois têm que mostrar todo o texto
-   dito, dentro da zona segura.
+     `<L de={segundos} txt="..." tam={px} cor={B | T | FINO | SUB | FINOC | SUBC} peso={...} />`, com as palavras como
+     foram ditas, e os instantes vêm de `w('palavra', n)` e `wf('palavra', n)`. O fecho leva `fica`. O wordmark é a
+     prop `texto` do `<Wordmark>`. Balão: `lado={LADO.entra}` ou `lado={LADO.sai}`.
+   - **Tela nova** (o normal): `src/telas/<Nome>.tsx` com o kit de `src/kit.tsx` (desenhe dentro do `<Palco>`),
+     registrada em `src/telas/index.ts`, no plano como `<Tela comp="Nome" de={w('palavra')} />`. Tela da casa
+     (`CASA`, §4) só com o mesmo porquê na fala nova.
+5. **Confira:** `node scripts/conferir.mjs` (na pasta do vídeo) até `0 erros`: o plano carrega, não está vazio, toda
+   frase tem peça e 1,5 s ou mais, toda `<Tela comp>` existe e todo `src/telas/*.tsx` está registrado, toda palavra
+   pedida por `w()`/`wf()` (no plano e nas telas novas) e toda linha escrita é dita, sem travessão nem nome do modelo.
+   Avisa (sem reprovar) mais de 5 peças numa frase e texto de balão que a fala não diz. Depois,
+   `.venv/Scripts/python.exe tools/clone.py oficina/<v>` (da raiz) até `SEM CLONE`. A zona segura se confere nos
+   quadros: para cada frase, um logo depois da 1ª palavra e um logo antes da viagem seguinte, os dois com todo o texto
+   dito dentro da zona segura. (O anúncio aprovado tem duas frases com menos de 1,5 s, "Agora tem o Marcaí." e "A
+   confirmação chega na hora.", feitas antes da regra: o `conferir.mjs` acusa as duas no molde.)
 6. **Som:** sem música, o render toca `public/voz.wav`. Com música, mixe voz, trilha e efeitos fora e grave
    `public/som.m4a` antes do render.
 7. **Olhe quadros** (na pasta do vídeo), escolhendo o meio e as pontas de cada frase e cada troca (em fala corrida,

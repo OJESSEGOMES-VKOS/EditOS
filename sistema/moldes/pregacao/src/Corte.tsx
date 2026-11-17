@@ -77,14 +77,18 @@ const idx = (texto: string, n = 1, lista = 'T') => {
 };
 const w = (texto: string, n = 1, lista = 'T') => PS[idx(texto, n, lista)].de;
 
-/* ================================================================ O PLANO (preso à fala; num vídeo novo, refazer daqui
- * até BLOCOS). Cada trecho entra numa palavra: w('palavra', n) = início da n-ésima vez que ela é dita; c() é o corte
- * seco 2 quadros antes. null desliga um trecho opcional sem mexer no desenho: destaque (tela creme), previas (a janela
- * das prévias), base3b, bloco2 (a virada), base4, cta (Comenta “…”) e fecho (dissolve para o preto). Cada trecho
- * desligado passa o tempo dele para o próximo ligado. bloco1 e base1 são obrigatórios. */
 const c = (t: number) => t - 0.06;
 type Tempo = number | null;
-const T: {bloco1: number; base1: number; base2: Tempo; base3: Tempo; destaque: Tempo; previas: Tempo; base3b: Tempo; bloco2: Tempo; base4: Tempo; cta: Tempo; fecho: Tempo} = {
+const FIM = DURACAO + 1;
+
+/* ================================================================ O PLANO (preso à fala; num vídeo novo, refazer o bloco
+ * inteiro, até a linha do fim; o resto do arquivo é o modelo). Um vídeo novo nasce com este bloco vazio
+ * (scripts/plano_novo.tsx, aplicado pelo tools/novo-video.py); o que está aqui é o plano do vídeo aprovado (exemplo).
+ * Cada trecho entra numa palavra: w('palavra', n) = início da n-ésima vez que ela é dita; c() é o corte
+ * seco 2 quadros antes. null desliga um trecho opcional sem mexer no desenho: destaque (tela creme), previas (a janela
+ * das prévias), base3b, bloco2 (a virada), base4, cta (Comenta “…”) e fecho (dissolve para o preto). Cada trecho
+ * desligado passa o tempo dele para o próximo ligado. bloco1 (0) é obrigatório; base1 (a 1ª legenda depois da abertura) pode ser null quando não há ABERTURA. */
+const T: {bloco1: number; base1: Tempo; base2: Tempo; base3: Tempo; destaque: Tempo; previas: Tempo; base3b: Tempo; bloco2: Tempo; base4: Tempo; cta: Tempo; fecho: Tempo} = {
 	bloco1: 0, // "Esse vídeo está sendo 100% editado pelo Claude." (frase-bloco, 3 linhas)
 	base1: c(w('ele')), // legenda corrida; letreiro MODELOS atrás no "modelos"
 	base2: c(w('para', 2)), // "para editar qualquer tipo de vídeo usando o Claude."
@@ -101,6 +105,58 @@ const T: {bloco1: number; base1: number; base2: Tempo; base3: Tempo; destaque: T
  * G6 (dono, 2026-11-05): recortar a pessoa e trabalhar camadas não é o esquema do modelo. O letreiro vem DESLIGADO
  * (null); só liga a pedido do dono, com o scripts/recorte.py rodado. O aprovado usou {palavra: 'modelos', texto: 'MODELOS'}. */
 const LETREIRO = null as {palavra: string; n?: number; texto: string} | null;
+/* o zoom de cada trecho de T (G6: 1,0 sem motivo; até 1,18 só onde a fala pede aproximar). Trecho fora daqui fica em 1,0.
+ * destaque (a tela creme) e fecho (o preto) não mudam o zoom. */
+const ZOOM: Partial<Record<keyof typeof T, number>> = {bloco1: 1.0, base1: 1.1, base2: 1.18, base3: 1.06, previas: 1.0, base3b: 1.14, bloco2: 1.04, base4: 1.16, cta: 1.0};
+// Posição de leitura medida do modelo (pregacao.md: no peito, logo abaixo do queixo). O queixo fica em ~y 940-990 nos
+// planos (rosto.json + zoom); a legenda começa no peito, numa posição só no vídeo inteiro, nunca no pé do quadro.
+// null = automática: LEG_FOLGA px abaixo do queixo medido (R.queixo) no maior zoom dos planos em que há legenda (LEG_Y,
+// logo depois de PAGINAS). Um número fixa a posição; a vitrine fixa a dela, 1060.
+export const LEG_Y_PLANO: number | null = 1060;
+/* a legenda corrida: [primeira palavra, texto ('/' quebra a linha), até (s); sem "até", fica até a próxima página
+ * começar; aceito (só a vitrine): ver Pagina; tam: corpo da página (padrão 60), só para a página longa de fala rápida
+ * caber na largura sem empilhar 3 linhas] */
+const PEDACOS: [number, string, Tempo?, string?, number?][] = [
+	[8, 'Ele foi criado / justamente para'],
+	// G12: sem o letreiro, "modelos" volta para a legenda. A fala aqui é rápida demais para uma página de 1,5 s acabar
+	// antes de "melhorei": a página longa encolhe a letra (como o trailer faz) em vez de empilhar ou picar.
+	[13, 'te mostrar a diferença entre vários / modelos que eu criei e melhorei', undefined, undefined, 50],
+	[25, 'para editar qualquer tipo / de vídeo usando o Claude.'],
+	[34, 'Inclusive, se você / estiver no Instagram agora,', T.destaque, 'vitrine'],
+	[48, 'Eu posso até colocar / duas prévias rápidas'],
+	[55, 'aqui em cima, aceleradas / em três vezes.'],
+	[62, 'Mas se você quiser / realmente ver outros modelos'],
+	[70, 'de edição como esse / e aprender'],
+	[76, 'a como usar isso / nos seus vídeos,', T.cta],
+	[85, 'aqui embaixo que eu vou te / mandar na sua DM agora.', FIM],
+];
+/* os textos de cada momento de ênfase ({txt, tam, serif?, vermelho?, quebra?, pincel?}; no máximo 4 linhas; quebra abre
+ * linha; null desliga). A 1ª palavra de cada um é achada pelo texto, perto do trecho dele em T. ABERTURA vai de T.bloco1 a
+ * T.base1, sobre a gravação; DESTAQUE é a tela creme (T.destaque); VIRADA é a frase-bloco de T.bloco2; COMANDO é o
+ * Comenta (T.cta), fixo até o fim. */
+const ABERTURA: Item[] | null = [
+	{txt: 'Esse vídeo está sendo', tam: 84},
+	{txt: '100%', tam: 150, quebra: true},
+	{txt: 'editado', tam: 114},
+	{txt: 'pelo', tam: 84, quebra: true},
+	{txt: 'Claude.', tam: 190, serif: true, vermelho: true},
+];
+const DESTAQUE: Item[] | null = [
+	{txt: 'você está vendo', tam: 96},
+	{txt: 'apenas um desses', tam: 96, quebra: true},
+	{txt: 'modelos.', tam: 250, serif: true, vermelho: true, quebra: true},
+];
+const VIRADA: Item[] | null = [
+	{txt: 'Mas se você quiser', tam: 80},
+	{txt: 'realmente ver outros', tam: 80, quebra: true},
+	{txt: 'modelos', tam: 210, serif: true, vermelho: true, quebra: true},
+	{txt: 'de edição', tam: 110, quebra: true},
+];
+const COMANDO: Item[] | null = [
+	{txt: 'Comenta', tam: 92},
+	{txt: '“edição”', tam: 180, pincel: true, quebra: true},
+];
+/* ================================================================ fim do plano */
 
 /* os trechos ligados seguem a ordem da lista no tempo (FIM_DESTAQUE, FIM_PREVIAS, FIM_VIRADA e ENQ contam com isso) */
 (Object.entries(T) as [string, Tempo][]).reduce<[string, number] | null>((ant, [k, v]) => {
@@ -110,7 +166,6 @@ const LETREIRO = null as {palavra: string; n?: number; texto: string} | null;
 		throw errPlano('T', `o trecho ${k} (${v.toFixed(2)} s) vem depois de ${ant[0]} na lista, mas cai antes dele na fala (${ant[0]} em ${ant[1].toFixed(2)} s). Os trechos ligados seguem a ordem do modelo (bloco1, base1, base2, base3, destaque, previas, base3b, bloco2, base4, cta, fecho): ponha cada um numa palavra depois da do anterior, ou desligue com null o que a fala nova não tem nessa ordem`);
 	return [k, v];
 }, null);
-const FIM = DURACAO + 1;
 const primeiro = (...v: Tempo[]) => v.find((x): x is number => x !== null) ?? FIM;
 const proximoCorte = (t: number) => Math.min(FIM, ...Object.values(T).filter((x): x is number => x !== null && x > t));
 /* onde cada trecho opcional acaba: no próximo trecho ligado (na vitrine, o mesmo de sempre) */
@@ -130,17 +185,9 @@ function cremeEm(t: number) {
 	return Math.min(tw(t, CREME.de, CREME.cheio, 0, 1, Easing.linear), CREME_SAI ? 1 - tw(t, CREME.ate - DISSOLVE, CREME.ate, 0, 1, Easing.linear) : 1);
 }
 
-const ENQ = ([
-	[T.bloco1, 1.0],
-	[T.base1, 1.1],
-	[T.base2, 1.18],
-	[T.base3, 1.06],
-	[T.previas, 1.0],
-	[T.base3b, 1.14],
-	[T.bloco2, 1.04],
-	[T.base4, 1.16],
-	[T.cta, 1.0],
-] as [Tempo, number][]).filter((e): e is [number, number] => e[0] !== null);
+const ENQ = (['bloco1', 'base1', 'base2', 'base3', 'previas', 'base3b', 'bloco2', 'base4', 'cta'] as const)
+	.map((k) => [T[k], ZOOM[k] ?? 1.0] as [Tempo, number])
+	.filter((e): e is [number, number] => e[0] !== null);
 /** para o checador: o trecho de ENQ em t (o nome dele em T, o zoom com que começa e quando começa) */
 export const trechoEm = (t: number) => {
 	let i = 0;
@@ -169,11 +216,7 @@ const enquadramento = (t: number, previas: boolean) => {
  * próxima começar (ou até o destaque seguinte). Páginas escolhidas para nenhuma ficar < 1,5 s e nenhuma palavra
  * < 0,4 s visível (scripts/cobertura.mjs). Sem palavra colorida na legenda: destaque só no termo protagonista.
  * "modelos" (6,12) não entra na legenda: ele é o letreiro atrás da pessoa. */
-// Posição de leitura medida do modelo (pregacao.md: no peito, logo abaixo do queixo). O queixo fica em ~y 940-990 nos
-// planos (rosto.json + zoom); a legenda começa no peito, numa posição só no vídeo inteiro, nunca no pé do quadro.
-// null = automática: LEG_FOLGA px abaixo do queixo medido (R.queixo) no maior zoom dos planos em que há legenda (LEG_Y,
-// logo depois de PAGINAS). Um número fixa a posição; a vitrine fixa a dela, 1060.
-export const LEG_Y_PLANO: number | null = 1060;
+// LEG_Y_PLANO (no plano): a posição da legenda, fixa ou automática (null)
 // 2ª posição (só com prévias, só nas páginas da janela, entra e sai no corte): abaixo do queixo descido
 export const LEG_Y2 = 1352;
 export const QUEIXO_PREVIAS = R.queixo + DESCE;
@@ -186,22 +229,6 @@ const LET = LETREIRO && (() => {
 if (LET && T.fecho !== null && LET.de >= T.fecho)
 	throw errPlano('LETREIRO', `a palavra "${LETREIRO?.palavra}" é dita em ${PS[LET.i].de.toFixed(2)} s, depois do fecho (o preto, ${T.fecho.toFixed(2)} s): escolha uma palavra antes do fecho, mova o fecho ou desligue o letreiro (null)`);
 const PULA = new Set(LET ? [LET.i] : []);
-const PEDACOS: [number, string, Tempo?, string?, number?][] = [
-	// [primeira palavra, texto, até (s); sem "até", fica até a próxima página começar; aceito (só a vitrine): ver Pagina;
-	//  tam: corpo da página (padrão 60), só para a página longa de fala rápida caber na largura sem empilhar 3 linhas]
-	[8, 'Ele foi criado / justamente para'],
-	// G12: sem o letreiro, "modelos" volta para a legenda. A fala aqui é rápida demais para uma página de 1,5 s acabar
-	// antes de "melhorei": a página longa encolhe a letra (como o trailer faz) em vez de empilhar ou picar.
-	[13, 'te mostrar a diferença entre vários / modelos que eu criei e melhorei', undefined, undefined, 50],
-	[25, 'para editar qualquer tipo / de vídeo usando o Claude.'],
-	[34, 'Inclusive, se você / estiver no Instagram agora,', T.destaque, 'vitrine'],
-	[48, 'Eu posso até colocar / duas prévias rápidas'],
-	[55, 'aqui em cima, aceleradas / em três vezes.'],
-	[62, 'Mas se você quiser / realmente ver outros modelos'],
-	[70, 'de edição como esse / e aprender'],
-	[76, 'a como usar isso / nos seus vídeos,', T.cta],
-	[85, 'aqui embaixo que eu vou te / mandar na sua DM agora.', FIM],
-];
 /* aceito: a página fica por cima da entrada da tela creme (branco sobre o creme nos 6 quadros do dissolve), como saiu na
  * vitrine aprovada. Sem ele (o padrão; num vídeo novo, não use), a página que ainda está na tela quando o creme entra
  * fica por baixo dele e some com ele: branco nunca fica sobre o creme (pregacao.md). */
@@ -395,8 +422,8 @@ const Video: React.FC<{t: number; s: number; previas: boolean; fundoCor: boolean
 	if (T.fecho !== null && t >= T.fecho + DISSOLVE) return null; // daqui em diante é o preto
 	const ch = CHICOTES.map((a) => (t >= a && t < a + 3 / FPS ? 1 - (t - a) / (3 / FPS) : 0)).reduce((x, y) => Math.max(x, y), 0);
 	const filtro = ch ? `blur(${ch * 16}px)` : 'none';
-	const vinho = fundoCor && t < T.base1;
-	const frio = fundoCor && t >= T.base1 && t < proximoCorte(T.base1);
+	const vinho = fundoCor && t < proximoCorte(0);
+	const frio = fundoCor && t >= proximoCorte(0) && t < proximoCorte(proximoCorte(0));
 	const pessoa = desfoque || vinho || frio || (LET !== null && t >= LET.de && t < LET.ate);
 	if (pessoa) exige('pessoa.webm', 'rode scripts/recorte.py (modelos/pregacao/pregacao.md, seção do vídeo novo), ou volte ao padrão: fundo real, LETREIRO = null.');
 	const desce = emPrevias(t, previas) ? DESCE : 0; // 3ª rodada: ele nítido embaixo, topo sobre o próprio vídeo desfocado
@@ -456,20 +483,8 @@ const bloco = (b: Omit<BlocoDef, 'i0'>): BlocoDef => {
 	return {...b, i0};
 };
 export const BLOCOS: BlocoDef[] = [
-	bloco({
-		nome: 'abertura',
-		de: 0,
-		ate: T.base1,
-		top: topoBloco(1.0),
-		itens: [
-			{txt: 'Esse vídeo está sendo', tam: 84},
-			{txt: '100%', tam: 150, quebra: true},
-			{txt: 'editado', tam: 114},
-			{txt: 'pelo', tam: 84, quebra: true},
-			{txt: 'Claude.', tam: 190, serif: true, vermelho: true},
-		],
-	}),
-	...(T.destaque === null ? [] : [bloco({
+	...(ABERTURA === null ? [] : [bloco({nome: 'abertura', de: 0, ate: proximoCorte(0), top: topoBloco(ZOOM.bloco1 ?? 1.0), itens: ABERTURA})]),
+	...(T.destaque === null || DESTAQUE === null ? [] : [bloco({
 		nome: 'tela de destaque',
 		de: T.destaque,
 		ate: CREME_SAI ? FIM_DESTAQUE : FIM,
@@ -480,35 +495,10 @@ export const BLOCOS: BlocoDef[] = [
 		sombra: 'none',
 		chicote: false,
 		vermelhoCor: VERMELHO_ESCURO,
-		itens: [
-			{txt: 'você está vendo', tam: 96},
-			{txt: 'apenas um desses', tam: 96, quebra: true},
-			{txt: 'modelos.', tam: 250, serif: true, vermelho: true, quebra: true},
-		],
+		itens: DESTAQUE,
 	})]),
-	...(T.bloco2 === null ? [] : [bloco({
-		nome: 'virada',
-		de: T.bloco2,
-		ate: FIM_VIRADA,
-		top: topoBloco(1.04),
-		itens: [
-			{txt: 'Mas se você quiser', tam: 80},
-			{txt: 'realmente ver outros', tam: 80, quebra: true},
-			{txt: 'modelos', tam: 210, serif: true, vermelho: true, quebra: true},
-			{txt: 'de edição', tam: 110, quebra: true},
-		],
-	})]),
-	...(T.cta === null ? [] : [bloco({
-		nome: 'Comenta “EDIÇÃO”',
-		de: T.cta,
-		ate: Infinity,
-		top: 1222,
-		chicote: false,
-		itens: [
-			{txt: 'Comenta', tam: 92},
-			{txt: '“edição”', tam: 180, pincel: true, quebra: true},
-		],
-	})]),
+	...(T.bloco2 === null || VIRADA === null ? [] : [bloco({nome: 'virada', de: T.bloco2, ate: FIM_VIRADA, top: topoBloco(ZOOM.bloco2 ?? 1.0), itens: VIRADA})]),
+	...(T.cta === null || COMANDO === null ? [] : [bloco({nome: 'comando', de: T.cta, ate: Infinity, top: 1222, chicote: false, itens: COMANDO})]),
 ];
 export const linhasDoBloco = (b: BlocoDef) => 1 + b.itens.filter((it, k) => it.quebra && k).length;
 /** altura aproximada do bloco (px): em cada linha o maior item, com a entrelinha 0,92 dos blocos */

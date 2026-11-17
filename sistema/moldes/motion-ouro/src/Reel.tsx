@@ -3,6 +3,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, getStaticFiles, staticFile, useCurrentFrame} from 'remotion';
 import {BLOCOS, BlocoView, COR, E, Flashes, HALO_TEXTO, INTER, Palavra, T, Vinheta, cena, ini, pare, tw, txt, useFonte} from './base';
 import {C1, C10, C2, C3, C4, C5, C6, C7, C8, C9, LinhaAssinatura, LinhaContador, linhaGigante} from './cenas';
+import {TELAS as NOVAS} from './telas';
 
 export const FPS = 30;
 export const DURACAO_Q = T.duracao_q;
@@ -14,9 +15,12 @@ export type Props = {
 	efeitos: boolean;
 };
 
-/* as telas desenhadas em src/cenas.tsx; o plano só usa estas (o "tela" de cada cena no src/tempos.json é só anotação) */
+/* as telas da casa (src/cenas.tsx) e as novas deste vídeo (src/telas/, registradas em src/telas/index.ts); o "tela" de
+ * cada cena no src/tempos.json é só anotação */
 const TELAS = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10'];
-for (const c of T.cenas) if (!TELAS.includes(c.id)) pare(`a cena "${c.id}" de src/tempos.json não está desenhada em src/cenas.tsx. Use uma de ${TELAS.join(', ')} ou desenhe a nova (e ponha em Reel.tsx).`);
+for (const c of T.cenas)
+	if (!TELAS.includes(c.id) && !NOVAS[c.id])
+		pare(`a cena "${c.id}" do plano não é uma tela da casa (${TELAS.join(', ')}) nem uma tela nova registrada em src/telas/index.ts. Desenhe src/telas/${c.id}.tsx com o kit de src/kit.tsx e registre lá.`);
 const em = (f: number, id: string) => {
 	const c = T.cenas.find((x) => x.id === id);
 	return !!c && f >= c.de_q && f < c.ate_q;
@@ -54,6 +58,10 @@ export const VitrineSofistMotion01: React.FC<Props> = ({previas = false, nomesPr
 			{em(f, 'C8') && <C8 f={f} />}
 			{em(f, 'C9') && <C9 f={f} />}
 			{em(f, 'C10') && <C10 f={f} />}
+			{T.cenas.map((c) => {
+				const Nova = TELAS.includes(c.id) ? null : NOVAS[c.id];
+				return Nova && em(f, c.id) ? <Nova key={c.id} f={f} c={c} /> : null;
+			})}
 			{ok &&
 				// cada bloco do plano; as linhas de "tipo" especial (gigante, contador, assinatura) têm desenho próprio.
 				// A assinatura vem por último (fica por cima do resto do fecho).

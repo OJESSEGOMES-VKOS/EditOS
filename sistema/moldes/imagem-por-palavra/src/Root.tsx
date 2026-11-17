@@ -2,7 +2,7 @@ import React from 'react';
 import {Composition} from 'remotion';
 import {DURACAO, FPS, VitrineSuperDopamina01} from './Reel';
 
-// paleta "" = a do plano (src/plano.json) ou a padrão do modelo; cores = cores soltas por cima da paleta
+// paleta "" = a do plano (src/plano.ts) ou a padrão do modelo; cores = cores soltas por cima da paleta
 export const Root: React.FC = () => (
 	<Composition
 		id="VitrineSuperDopamina01"

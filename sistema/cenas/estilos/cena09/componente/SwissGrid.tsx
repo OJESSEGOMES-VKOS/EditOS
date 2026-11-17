@@ -8,8 +8,8 @@ import {loadFont} from '@remotion/google-fonts/PublicSans';
 const {fontFamily} = loadFont('normal', {weights: ['600', '800'], subsets: ['latin', 'latin-ext']});
 
 export type SwissGridProps = {
-  linhas?: [string, string, string];
-  legendas?: [string, string, string, string];
+  linhas: string[]; // 1 a 3 linhas da frase dita, quebradas onde a fala respira (a letra encolhe se a linha for longa)
+  legendas?: string[]; // 0 a 4 legendas numeradas, uma por coluna (só palavra dita ou a parte que a cena nomeia)
   largura?: number;
   altura?: number;
   cores?: {papel: string; tinta: string; vermelho: string};
@@ -25,8 +25,8 @@ const gx = (c: number) => X0 + c * M;
 const gy = (r: number) => Y0 + r * M;
 
 export const SwissGrid: React.FC<SwissGridProps> = ({
-  linhas = ['A forma', 'segue o', 'ritmo.'],
-  legendas = ['Grade', 'Campo', 'Tipo', 'Círculo'],
+  linhas,
+  legendas = [],
   largura,
   altura,
   cores = CORES,
@@ -79,6 +79,9 @@ export const SwissGrid: React.FC<SwissGridProps> = ({
   const velCampo = Math.abs(c2 - sp(23, 12, 200)) + Math.abs(c3 - sp(29, 12, 200));
 
   const linhaD = (i: number) => 36 + i * 6;
+  // Public Sans 800 com -0.05em: ~0,56 em por letra; a linha cabe em ~990 px
+  const maior = Math.max(1, ...linhas.slice(0, 3).map((l) => Array.from(l).length));
+  const tamanho = Math.max(110, Math.min(228, 990 / (maior * 0.56)));
 
   return (
     <AbsoluteFill style={{backgroundColor: cores.papel, overflow: 'hidden'}}>
@@ -100,17 +103,17 @@ export const SwissGrid: React.FC<SwissGridProps> = ({
         {/* círculo */}
         <div style={{position: 'absolute', left: ccx - raio, top: ccy - raio, width: raio * 2, height: raio * 2, borderRadius: '50%', background: cores.tinta, filter: f < 22 && vel > 0.01 ? 'url(#mbc09)' : velC > 0.01 ? 'url(#mbg09)' : undefined}} />
         {/* texto empurrado para fora da linha da margem, alinhado à esquerda, linha de base na grade */}
-        {linhas.map((l, i) => {
+        {linhas.slice(0, 3).map((l, i) => {
           const p = sp(linhaD(i), 11, 190);
           const base = gy(3) + i * M;
           return (
             <div key={i} style={{position: 'absolute', left: X0, top: base - 238, height: 260, width: 990, overflow: 'hidden'}}>
-              <div style={{position: 'absolute', left: -10, bottom: 18, fontSize: 228, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1, whiteSpace: 'pre', transform: `translateX(${(1 - p) * -105}%)`}}>{l}</div>
+              <div style={{position: 'absolute', left: -10, bottom: 18, fontSize: tamanho, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1, whiteSpace: 'pre', transform: `translateX(${(1 - p) * -105}%)`}}>{l}</div>
             </div>
           );
         })}
         {/* legendas numeradas caem de uma linha da grade */}
-        {legendas.map((l, i) => {
+        {legendas.slice(0, 4).map((l, i) => {
           const d = [24, 30, 48, 64][i];
           const p = sp(d, 12, 200);
           return (

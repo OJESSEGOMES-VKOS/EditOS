@@ -77,34 +77,131 @@ const de = (i: number, lista: string) => {
 	return PS[i].de;
 };
 
-/* ================================================================ O PLANO (preso à fala; num vídeo novo, refazer PLANOS,
- * VAZAMENTOS, blocos e TERCOS, e os vazamentos de scripts/trilha.py). Os ids são índices de src/palavras.json. */
-/* ---------------------------------------------------------------- planos (a lista de cortes vem primeiro)
- * mundo: rosto (a gravação), papel (fundo claro; papel.tipo põe a colagem, os celulares ou os prints dos cards),
- * palco (img palco.png ou o palco desenhado), arquivo (img = B-roll do usuário ou gerado; sem img, a própria gravação em
- * tom de arquivo), dividida (palco em cima, rosto embaixo: a janela das prévias). */
 type Mundo = 'palco' | 'rosto' | 'papel' | 'arquivo' | 'dividida';
 type Quadro = {s: number; ox: number; oy: number}; // escala e onde o centro do rosto cai na tela
 type PapelDef = {tipo: 'colagem'; entra: number; foco: number} | {tipo: 'celulares'; explode: number} | {tipo: 'prints'};
 type Plano = {id: string; de: number; ate: number; mundo: Mundo; q?: Quadro; img?: string; papel?: PapelDef; camera?: string}; // camera: outro ângulo GRAVADO do set (M1)
+/* os nomes do plano (sem aspas, para o plano só ter entre aspas o que é dito): o mundo do plano, o tema do texto, o
+ * alinhamento das pequenas e o tipo do papel (minidocumentario.md §1 e §10) */
+const rosto: Mundo = 'rosto', papel: Mundo = 'papel', arquivo: Mundo = 'arquivo', palco: Mundo = 'palco', dividida: Mundo = 'dividida';
+const escuro: Tema = 'escuro';
+const kwL = 'kwL' as const, kwR = 'kwR' as const;
+const colagem = 'colagem' as const, celulares = 'celulares' as const, prints = 'prints' as const;
+type Terco = {de: number; ate: number; x: number; y: number};
+
+/* ================================================================ O PLANO (preso à fala; num vídeo novo, refazer PLANOS,
+ * VAZAMENTOS, blocos e TERCOS, até a linha do fim, e os vazamentos de scripts/trilha.py). Os ids são índices de
+ * src/palavras.json. Um vídeo novo nasce com este bloco vazio (scripts/plano_novo.tsx, aplicado pelo
+ * tools/novo-video.py); o que está aqui é o plano do vídeo aprovado (exemplo). */
+/* ---------------------------------------------------------------- planos (a lista de cortes vem primeiro)
+ * mundo: rosto (a gravação), papel (fundo claro; papel.tipo põe a colagem, os celulares ou os prints dos cards),
+ * palco (img palco.png ou o palco desenhado), arquivo (img = B-roll do usuário ou gerado; sem img, a própria gravação em
+ * tom de arquivo), dividida (palco em cima, rosto embaixo: a janela das prévias). */
 const PLANOS: Plano[] = [
-	{id: 'P1', de: 0, ate: 3.02, mundo: 'rosto', q: {s: 1.0, ox: 0.5, oy: 0.33}}, // G29 (2026-11-05): abre na gravação, nunca no palco (o aprovado abria no palco)
-	{id: 'P2', de: 3.02, ate: 5.18, mundo: 'rosto', q: {s: 1.1, ox: 0.55, oy: 0.33}},
-	{id: 'P3', de: 5.18, ate: 8.04, mundo: 'papel', papel: {tipo: 'colagem', entra: 18, foco: 22}}, // fotos a partir de "vários", câmera no "criei"
-	{id: 'P4', de: 8.04, ate: 9.52, mundo: 'arquivo', img: 'broll_edicao.png'},
-	{id: 'P5', de: 9.52, ate: 10.64, mundo: 'rosto', q: {s: 1.32, ox: 0.53, oy: 0.31}},
-	{id: 'P6', de: 10.64, ate: 12.58, mundo: 'papel', papel: {tipo: 'celulares', explode: 39}}, // explode no "Instagram"
-	{id: 'P7', de: 12.58, ate: 14.5, mundo: 'rosto', q: {s: 1.18, ox: 0.58, oy: 0.3}},
-	{id: 'P8', de: 14.5, ate: 19.99, mundo: 'dividida'},
-	{id: 'P9', de: 19.99, ate: 21.85, mundo: 'rosto', q: {s: 1.1, ox: 0.45, oy: 0.33}},
-	{id: 'P10', de: 21.85, ate: 23.95, mundo: 'papel', papel: {tipo: 'prints'}},
-	{id: 'P11', de: 23.95, ate: 25.47, mundo: 'palco'},
-	{id: 'P12', de: 25.47, ate: 26.69, mundo: 'arquivo', img: 'broll_celular.png'},
-	{id: 'P13', de: 26.69, ate: DURACAO, mundo: 'rosto', q: {s: 1.1, ox: 0.55, oy: 0.31}},
+	{id: 'P1', de: 0, ate: 3.02, mundo: rosto, q: {s: 1.0, ox: 0.5, oy: 0.33}}, // G29 (2026-11-05): abre na gravação, nunca no palco (o aprovado abria no palco)
+	{id: 'P2', de: 3.02, ate: 5.18, mundo: rosto, q: {s: 1.1, ox: 0.55, oy: 0.33}},
+	{id: 'P3', de: 5.18, ate: 8.04, mundo: papel, papel: {tipo: colagem, entra: 18, foco: 22}}, // fotos a partir de "vários", câmera no "criei"
+	{id: 'P4', de: 8.04, ate: 9.52, mundo: arquivo, img: 'broll_edicao.png'},
+	{id: 'P5', de: 9.52, ate: 10.64, mundo: rosto, q: {s: 1.32, ox: 0.53, oy: 0.31}},
+	{id: 'P6', de: 10.64, ate: 12.58, mundo: papel, papel: {tipo: celulares, explode: 39}}, // explode no "Instagram"
+	{id: 'P7', de: 12.58, ate: 14.5, mundo: rosto, q: {s: 1.18, ox: 0.58, oy: 0.3}},
+	{id: 'P8', de: 14.5, ate: 19.99, mundo: dividida},
+	{id: 'P9', de: 19.99, ate: 21.85, mundo: rosto, q: {s: 1.1, ox: 0.45, oy: 0.33}},
+	{id: 'P10', de: 21.85, ate: 23.95, mundo: papel, papel: {tipo: prints}},
+	{id: 'P11', de: 23.95, ate: 25.47, mundo: palco},
+	{id: 'P12', de: 25.47, ate: 26.69, mundo: arquivo, img: 'broll_celular.png'},
+	{id: 'P13', de: 26.69, ate: DURACAO, mundo: rosto, q: {s: 1.1, ox: 0.55, oy: 0.31}},
 ];
+const VAZAMENTOS = [0.0, 19.99]; // abertura (ref2 0,0) e virada para a conclusão (ref1 25,1); [] desliga
+/* blocos de texto, plano a plano (posições em px no quadro 1080x1920) */
+const blocos = (prev: boolean): Bloco[] => {
+	const dv = DIV(prev);
+	const yb = (v: number) => dv + v; // y dentro da metade de baixo da tela dividida
+	return [
+		// P1 rosto (G29): o gancho na legenda padrão do peito, sem palavra-chave (G17: o termo forte vem depois)
+		{de: 0, ate: 3.02, tema: escuro, linhas: [
+			{tipo: 'p', ids: rg(0, 4), y: 1215, al: 'c'},
+			{tipo: 'p', ids: [5, 6, 7], y: 1298, al: 'c'},
+		]},
+		// P2 rosto: só pequenas no peito, abaixo do queixo
+		{de: 3.02, ate: 5.18, tema: escuro, aceito: 'vitrine', linhas: [
+			{tipo: 'p', ids: rg(8, 11), y: 1215, al: 'c'},
+			{tipo: 'p', ids: rg(12, 15), y: 1298, al: 'c'},
+		]},
+		// P3 papel: faixa livre entre as fotos ("a" cortado: palavra vazia)
+		{de: 5.18, ate: 8.04, tema: papel, linhas: [
+			{tipo: 'k', id: 16, y: 800, cor: COR.sinal},
+			{tipo: 'p', ids: rg(17, 19), y: 925, al: kwR},
+			{tipo: 'p', ids: rg(20, 24), y: 1010, al: kwR},
+		]},
+		// P4 arquivo
+		{de: 8.04, ate: 9.52, tema: escuro, aceito: 'vitrine', linhas: [
+			{tipo: 'p', ids: [25, 26], y: 900, al: kwL},
+			{tipo: 'k', id: 27, y: 1022, cor: COR.sinal},
+			{tipo: 'p', ids: rg(28, 30), y: 1148, al: kwR},
+		]},
+		// P5 rosto close
+		{de: 9.52, ate: 10.64, tema: escuro, aceito: 'vitrine', linhas: [{tipo: 'p', ids: rg(31, 33), y: 1215, al: 'c', caixa: 33}]},
+		// P6 papel: Instagram em tinta preta, como o "Twitter" da ref1
+		{de: 10.64, ate: 12.58, tema: papel, linhas: [
+			{tipo: 'p', ids: rg(34, 38), y: 905, al: kwL},
+			{tipo: 'k', id: 39, y: 1025, cor: COR.tinta},
+			{tipo: 'p', ids: [40], y: 1150, al: kwR},
+		]},
+		// P7 rosto close: abaixo do queixo
+		{de: 12.58, ate: 14.5, tema: escuro, linhas: [
+			{tipo: 'p', ids: rg(41, 43), y: 1200, al: kwL},
+			{tipo: 'k', id: 44, y: 1322, cor: COR.sinal},
+			{tipo: 'p', ids: rg(45, 47), y: 1448, al: kwR},
+		]},
+		// P8 tela dividida: texto embaixo do queixo do close
+		{de: 14.5, ate: 16.66, tema: escuro, aceito: 'vitrine', clipTop: dv, linhas: [
+			{tipo: 'p', ids: rg(48, 51), y: yb(prev ? 600 : 620), al: 'c'},
+			{tipo: 'p', ids: [52, 53], y: yb(prev ? 683 : 703), al: 'c'},
+		]},
+		{de: 16.66, ate: 17.86, tema: escuro, aceito: 'vitrine', clipTop: dv, linhas: [{tipo: 'p', ids: rg(54, 57), y: yb(prev ? 600 : 620), al: 'c'}]},
+		{de: 17.86, ate: 19.99, tema: escuro, aceito: 'vitrine', clipTop: dv, linhas: [
+			{tipo: 'p', ids: [58, 59], y: yb(prev ? 515 : 620), al: kwL},
+			{tipo: 'k', id: 60, id2: 61, texto: 'três vezes.', y: yb(prev ? 620 : 732), cor: COR.sinal},
+		]},
+		// P9 rosto médio (rosto à esquerda, texto no peito)
+		{de: 19.99, ate: 21.85, tema: escuro, aceito: 'vitrine', linhas: [
+			{tipo: 'p', ids: rg(62, 65), y: 1215, al: 'c'},
+			{tipo: 'p', ids: [66, 67], y: 1298, al: 'c'},
+		]},
+		// P10 papel: texto no alto, prints embaixo (ref1 29,5)
+		{de: 21.85, ate: 23.95, tema: papel, aceito: 'vitrine', linhas: [
+			{tipo: 'p', ids: rg(68, 70), y: 470, al: kwL, cor: COR.petroleo},
+			{tipo: 'k', id: 71, y: 595, cor: COR.sinal},
+			{tipo: 'p', ids: [72, 73], y: 722, al: kwR, cor: COR.petroleo},
+		]},
+		// P11 palco
+		{de: 23.95, ate: 25.47, tema: escuro, aceito: 'vitrine', linhas: [
+			{tipo: 'p', ids: [74], y: 742, al: kwL},
+			{tipo: 'k', id: 75, y: 868, cor: COR.sinal},
+			{tipo: 'p', ids: rg(76, 78), y: 1000, al: kwR},
+		]},
+		// P12 arquivo: legenda pequena
+		{de: 25.47, ate: 26.69, tema: escuro, aceito: 'vitrine', linhas: [{tipo: 'p', ids: rg(79, 82), y: 1215, al: 'c'}]},
+		// P13 rosto: EDIÇÃO embaixo (momento 3); no "que" as pequenas trocam, a palavra-chave fica
+		{de: 26.69, ate: 28.27, tema: escuro, aceito: 'vitrine', linhas: [
+			{tipo: 'p', ids: [83], y: 1135, al: kwL},
+			{tipo: 'p', ids: [85, 86], y: 1395, al: kwR},
+		]},
+		{de: 26.69, ate: DURACAO, tema: escuro, linhas: [{tipo: 'k', id: 84, texto: '“edição”', y: 1262, cor: COR.sinal}]},
+		{de: 28.27, ate: DURACAO, tema: escuro, linhas: [
+			{tipo: 'p', ids: rg(87, 91), y: 1135, al: kwL},
+			{tipo: 'p', ids: rg(92, 95), y: 1395, al: kwR},
+		]},
+	];
+};
+
+/* quando e onde entra o terço inferior (1ª aparição do rosto); o texto vem das props nome e arroba, vazias por padrão */
+const TERCOS: Terco[] = [{de: 3.1, ate: 5.18, x: 0.14, y: 0.5}];
+/* ================================================================ fim do plano */
+
 export const CORTES = PLANOS.slice(1).map((p) => p.de);
 const planoEm = (t: number) => PLANOS.find((p) => t >= p.de && t < p.ate) ?? PLANOS[PLANOS.length - 1];
-const VAZAMENTOS = [0.0, 19.99]; // abertura (ref2 0,0) e virada para a conclusão (ref1 25,1); [] desliga
 /* a janela das prévias é o plano 'dividida' (sem ele, previas: true não faz nada) */
 const P_DIV = PLANOS.find((p) => p.mundo === 'dividida');
 export const JANELA_PREVIAS = P_DIV ? {de: P_DIV.de, ate: P_DIV.ate} : null;
@@ -252,89 +349,6 @@ const BlocoView: React.FC<{b: Bloco; t: number}> = ({b, t}) => {
 	);
 };
 
-/* blocos de texto, plano a plano (posições em px no quadro 1080x1920) */
-const blocos = (prev: boolean): Bloco[] => {
-	const dv = DIV(prev);
-	const yb = (v: number) => dv + v; // y dentro da metade de baixo da tela dividida
-	return [
-		// P1 rosto (G29): o gancho na legenda padrão do peito, sem palavra-chave (G17: o termo forte vem depois)
-		{de: 0, ate: 3.02, tema: 'escuro', linhas: [
-			{tipo: 'p', ids: rg(0, 4), y: 1215, al: 'c'},
-			{tipo: 'p', ids: [5, 6, 7], y: 1298, al: 'c'},
-		]},
-		// P2 rosto: só pequenas no peito, abaixo do queixo
-		{de: 3.02, ate: 5.18, tema: 'escuro', aceito: 'vitrine', linhas: [
-			{tipo: 'p', ids: rg(8, 11), y: 1215, al: 'c'},
-			{tipo: 'p', ids: rg(12, 15), y: 1298, al: 'c'},
-		]},
-		// P3 papel: faixa livre entre as fotos ("a" cortado: palavra vazia)
-		{de: 5.18, ate: 8.04, tema: 'papel', linhas: [
-			{tipo: 'k', id: 16, y: 800, cor: COR.sinal},
-			{tipo: 'p', ids: rg(17, 19), y: 925, al: 'kwR'},
-			{tipo: 'p', ids: rg(20, 24), y: 1010, al: 'kwR'},
-		]},
-		// P4 arquivo
-		{de: 8.04, ate: 9.52, tema: 'escuro', aceito: 'vitrine', linhas: [
-			{tipo: 'p', ids: [25, 26], y: 900, al: 'kwL'},
-			{tipo: 'k', id: 27, y: 1022, cor: COR.sinal},
-			{tipo: 'p', ids: rg(28, 30), y: 1148, al: 'kwR'},
-		]},
-		// P5 rosto close
-		{de: 9.52, ate: 10.64, tema: 'escuro', aceito: 'vitrine', linhas: [{tipo: 'p', ids: rg(31, 33), y: 1215, al: 'c', caixa: 33}]},
-		// P6 papel: Instagram em tinta preta, como o "Twitter" da ref1
-		{de: 10.64, ate: 12.58, tema: 'papel', linhas: [
-			{tipo: 'p', ids: rg(34, 38), y: 905, al: 'kwL'},
-			{tipo: 'k', id: 39, y: 1025, cor: COR.tinta},
-			{tipo: 'p', ids: [40], y: 1150, al: 'kwR'},
-		]},
-		// P7 rosto close: abaixo do queixo
-		{de: 12.58, ate: 14.5, tema: 'escuro', linhas: [
-			{tipo: 'p', ids: rg(41, 43), y: 1200, al: 'kwL'},
-			{tipo: 'k', id: 44, y: 1322, cor: COR.sinal},
-			{tipo: 'p', ids: rg(45, 47), y: 1448, al: 'kwR'},
-		]},
-		// P8 tela dividida: texto embaixo do queixo do close
-		{de: 14.5, ate: 16.66, tema: 'escuro', aceito: 'vitrine', clipTop: dv, linhas: [
-			{tipo: 'p', ids: rg(48, 51), y: yb(prev ? 600 : 620), al: 'c'},
-			{tipo: 'p', ids: [52, 53], y: yb(prev ? 683 : 703), al: 'c'},
-		]},
-		{de: 16.66, ate: 17.86, tema: 'escuro', aceito: 'vitrine', clipTop: dv, linhas: [{tipo: 'p', ids: rg(54, 57), y: yb(prev ? 600 : 620), al: 'c'}]},
-		{de: 17.86, ate: 19.99, tema: 'escuro', aceito: 'vitrine', clipTop: dv, linhas: [
-			{tipo: 'p', ids: [58, 59], y: yb(prev ? 515 : 620), al: 'kwL'},
-			{tipo: 'k', id: 60, id2: 61, texto: 'três vezes.', y: yb(prev ? 620 : 732), cor: COR.sinal},
-		]},
-		// P9 rosto médio (rosto à esquerda, texto no peito)
-		{de: 19.99, ate: 21.85, tema: 'escuro', aceito: 'vitrine', linhas: [
-			{tipo: 'p', ids: rg(62, 65), y: 1215, al: 'c'},
-			{tipo: 'p', ids: [66, 67], y: 1298, al: 'c'},
-		]},
-		// P10 papel: texto no alto, prints embaixo (ref1 29,5)
-		{de: 21.85, ate: 23.95, tema: 'papel', aceito: 'vitrine', linhas: [
-			{tipo: 'p', ids: rg(68, 70), y: 470, al: 'kwL', cor: COR.petroleo},
-			{tipo: 'k', id: 71, y: 595, cor: COR.sinal},
-			{tipo: 'p', ids: [72, 73], y: 722, al: 'kwR', cor: COR.petroleo},
-		]},
-		// P11 palco
-		{de: 23.95, ate: 25.47, tema: 'escuro', aceito: 'vitrine', linhas: [
-			{tipo: 'p', ids: [74], y: 742, al: 'kwL'},
-			{tipo: 'k', id: 75, y: 868, cor: COR.sinal},
-			{tipo: 'p', ids: rg(76, 78), y: 1000, al: 'kwR'},
-		]},
-		// P12 arquivo: legenda pequena
-		{de: 25.47, ate: 26.69, tema: 'escuro', aceito: 'vitrine', linhas: [{tipo: 'p', ids: rg(79, 82), y: 1215, al: 'c'}]},
-		// P13 rosto: EDIÇÃO embaixo (momento 3); no "que" as pequenas trocam, a palavra-chave fica
-		{de: 26.69, ate: 28.27, tema: 'escuro', aceito: 'vitrine', linhas: [
-			{tipo: 'p', ids: [83], y: 1135, al: 'kwL'},
-			{tipo: 'p', ids: [85, 86], y: 1395, al: 'kwR'},
-		]},
-		{de: 26.69, ate: DURACAO, tema: 'escuro', linhas: [{tipo: 'k', id: 84, texto: '“edição”', y: 1262, cor: COR.sinal}]},
-		{de: 28.27, ate: DURACAO, tema: 'escuro', linhas: [
-			{tipo: 'p', ids: rg(87, 91), y: 1135, al: 'kwL'},
-			{tipo: 'p', ids: rg(92, 95), y: 1395, al: 'kwR'},
-		]},
-	];
-};
-
 /* ---------------------------------------------------------------- terço inferior (mono, letras embaralhando) */
 const EMBARALHO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const Embaralha: React.FC<{txt: string; t: number; t0: number; f: number; seed: string}> = ({txt, t, t0, f, seed}) => {
@@ -350,9 +364,6 @@ const Embaralha: React.FC<{txt: string; t: number; t0: number; f: number; seed: 
 		</>
 	);
 };
-/* quando e onde entra o terço inferior (1ª aparição do rosto); o texto vem das props nome e arroba, vazias por padrão */
-type Terco = {de: number; ate: number; x: number; y: number};
-const TERCOS: Terco[] = [{de: 3.1, ate: 5.18, x: 0.14, y: 0.5}];
 const TercoView: React.FC<{tc: Terco; l1: string; l2: string; t: number; f: number}> = ({tc, l1, l2, t, f}) => {
 	if ((!l1 && !l2) || t < tc.de || t >= tc.ate) return null;
 	const e = tw(t, tc.de, tc.de + 0.12, 0, 1);

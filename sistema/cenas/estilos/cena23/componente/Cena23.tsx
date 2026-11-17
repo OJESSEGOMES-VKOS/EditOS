@@ -6,7 +6,7 @@ import {loadFont} from '@remotion/google-fonts/Inter';
 
 const {fontFamily: INTER} = loadFont('normal', {weights: ['500', '600', '700'], subsets: ['latin', 'latin-ext']});
 
-export type Pedido = {valor: number; itens: number};
+export type Pedido = {valor: number; itens?: number}; // sem itens: a linha mostra só o valor
 export type Cena23Props = {
   data: string;
   hora: string;
@@ -20,9 +20,10 @@ export type Cena23Props = {
   contagemInicial: number;
   pedidos: Pedido[]; // o primeiro já está na tela no quadro 1; o último é o que chega sozinho no fim
   chegadas?: number[]; // quadro de chegada de cada pedido (mesmo tamanho de pedidos)
-  maisTexto: string; // "+38 mais"
+  maisTexto: string; // a pílula "+N" (vazio: sem pílula)
   quadroMais?: number;
   verde?: string;
+  palavraItens?: [string, string]; // singular e plural (padrão: item, itens)
   width?: number;
   height?: number;
 };
@@ -76,7 +77,7 @@ const Rolante: React.FC<{atual: string; anterior: string; t: number; altura: num
 
 export const Cena23: React.FC<Cena23Props> = ({
   data, hora, app, hoje, rotuloPedidos, agora, linhaPedido, moeda, totalInicial, contagemInicial, pedidos,
-  chegadas, maisTexto, quadroMais = 76, verde = '#1FB872', width = W, height = H,
+  chegadas, maisTexto, quadroMais = 76, verde = '#1FB872', palavraItens = ['item', 'itens'], width = W, height = H,
 }) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
@@ -146,7 +147,7 @@ export const Cena23: React.FC<Cena23Props> = ({
                       <span style={{fontWeight: 500, fontSize: 24, color: 'rgba(255,255,255,0.55)'}}>{agora}</span>
                     </div>
                     <div style={{fontWeight: 500, fontSize: 31, marginTop: 6, fontVariantNumeric: 'tabular-nums', color: 'rgba(255,255,255,0.94)'}}>
-                      {linhaPedido}: {moeda} {fmt(p.valor, 2)} · {p.itens} {p.itens === 1 ? 'item' : 'itens'}
+                      {linhaPedido}: {moeda} {fmt(p.valor, 2)}{p.itens ? ` · ${p.itens} ${p.itens === 1 ? palavraItens[0] : palavraItens[1]}` : ''}
                     </div>
                   </div>
                 </div>
@@ -155,7 +156,7 @@ export const Cena23: React.FC<Cena23Props> = ({
           })}
         </div>
         {/* "+N mais" */}
-        {frame >= quadroMais && (
+        {maisTexto !== '' && frame >= quadroMais && (
           <div style={{position: 'absolute', top: 1230, width: W, display: 'flex', justifyContent: 'center'}}>
             <div style={{transform: `scale(${spring({frame: frame - quadroMais, fps, config: {damping: 10, stiffness: 200}})})`, background: 'rgba(255,255,255,0.18)', borderRadius: 999, padding: '10px 34px', fontWeight: 600, fontSize: 28, boxShadow: 'inset 0 0 0 1.5px rgba(255,255,255,0.14)'}}>{maisTexto}</div>
           </div>

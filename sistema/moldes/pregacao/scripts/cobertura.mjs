@@ -61,7 +61,8 @@ for (const e of ex) {
 	const dur = e.ate - e.de;
 	if (dur < MIN_PEDACO && e.nome.startsWith('letreiro')) curtos.push(`"${e.nome}" ${dur.toFixed(2)} s: o letreiro vai da palavra dele até o próximo trecho de T (${e.ate.toFixed(2)} s; perto do fim, o fecho); escolha uma palavra mais cedo ou ponha o próximo trecho mais tarde`);
 	else if (dur < MIN_PEDACO) curtos.push(`"${e.nome}" ${dur.toFixed(2)} s`);
-	for (const i of e.is) if (e.ate - P[i].de < MIN_PALAVRA) curtos.push(`"${P[i].texto}" em "${e.nome}" só ${(e.ate - P[i].de).toFixed(2)} s`);
+	// a última de um pedaço que já ficou 1,5 s pode ter 0,25 s (não é palavra solta; a mesma régua do rosto-telas, fala rápida)
+	e.is.forEach((i, k) => { const min = k === e.is.length - 1 && dur >= MIN_PEDACO ? 0.25 : MIN_PALAVRA; if (e.ate - P[i].de < min) curtos.push(`"${P[i].texto}" em "${e.nome}" só ${(e.ate - P[i].de).toFixed(2)} s`); });
 }
 const vezes = P.map(() => 0);
 ex.forEach((e) => e.is.forEach((i) => vezes[i]++));

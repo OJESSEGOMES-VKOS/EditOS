@@ -1,0 +1,9 @@
+{
+ "_leia": "Para tools/clone.py: as telas da casa que o plano liga (chave do plano) e o texto que cada uma escreve fixo no código, quando ela é usada.",
+ "telas": ["editor", "modelos", "celular", "previas", "outros", "prompt", "fecho"],
+ "fixos": {
+  "editor": ["Claude Code", "Claude"],
+  "prompt": ["Claude"],
+  "modelos": ["Claude"]
+ }
+}

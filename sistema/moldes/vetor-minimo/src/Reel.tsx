@@ -3,14 +3,17 @@ import {AbsoluteFill, Audio, OffthreadVideo, Sequence, getStaticFiles, random, s
 import {loadFont as loadDidact} from '@remotion/google-fonts/DidactGothic';
 import PB from './palavras.json';
 import PLANO from './plano.json';
+import {COR, DEG, EstadoTela, ObjetoProps, c01, lerp, mistura, saida, suave, vaiVem} from './kit';
+import {TELAS} from './telas';
 
 /**
  * Vitrine no vetor-minimo (../../modelos/vetor-minimo/vetor-minimo.md), 1º vídeo do modelo.
  * Forma C (corrente com virada, ref4): bonecos palito idênticos chegam um depois do outro segurando a mesma tela crua;
  * quando param, uma varredura edita a tela, cada uma de um jeito. Na virada ("outros modelos de edição") todas acendem
  * verde; o último a chegar (você) tem a tela crua até "usar isso nos seus vídeos". Apagão e moral: COMENTA “EDIÇÃO”.
- * Plano frase a frase em ../plano.md. Um plano só, câmera parada, fundo #000.
- * A história desta fala (tempos, quem chega, as frases, a moral) mora em ./plano.json; aqui só o desenho.
+ * Um plano só, câmera parada, fundo #000. A história desta fala (tempos, quem chega e o que segura, as frases, a moral)
+ * mora em ./plano.json, escrito por scripts/plano.py (o bloco O PLANO); aqui só o desenho. O objeto que cada um segura é
+ * a tela da casa ('Tela', o exemplo do aprovado) ou um objeto novo de src/telas/ (o kit em ./kit.tsx).
  */
 export const FPS = 30;
 const W = 1080;
@@ -24,9 +27,6 @@ const didact = loadDidact('normal', {weights: ['400'], subsets: ['latin', 'latin
 const LETRA = didact.fontFamily;
 export const FONTES = [LETRA]; // uma fonte, um peso (geométrica com o I de serifa, como as frases da ref4)
 const CORPO = 34; // altura da maiúscula ~24 px = 1,25% da altura (vetor-minimo.md; medido na ref4: 22 a 23 px)
-
-/* identidade do modelo (vetor-minimo.md) */
-const COR = {giz: '#FCFCFC', c1: '#2C2C2C', c2: '#363636', c3: '#6A6A6A', c4: '#9B9B9B', verde: '#00FB10', verdeLuz: '#88FF8C'};
 
 export type Props = {previas: boolean; nomesPrevias: [string, string]; musica?: boolean; efeitos?: boolean};
 
@@ -69,7 +69,7 @@ type PlanoJson = {
 	previas?: {ergue: Tempo; sobe: Tempo; desce: Tempo} | null;
 	virada?: Tempo | null;
 	apagao?: Tempo | null;
-	chegadas: {x0: number; x1: number; t0: Tempo; d: number; edita?: Tempo | null; previa?: number; destaque?: boolean; voce?: boolean}[];
+	chegadas: {x0: number; x1: number; t0: Tempo; d: number; edita?: Tempo | null; previa?: number; destaque?: boolean; voce?: boolean; comp?: string}[];
 	frases: {txt: string; de: Tempo; dig: number; ate: Tempo}[];
 	moral: {txt: string; de: Tempo; dig: number}[];
 };
@@ -78,24 +78,6 @@ const PL = PLANO as unknown as PlanoJson;
 /** o fim: `cauda` s depois da última palavra (a moral segura até aqui) */
 export const DURACAO = Math.round((PS[PS.length - 1].end + PL.cauda) * 100) / 100;
 
-const c01 = (x: number) => Math.max(0, Math.min(1, x));
-const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
-const suave = (t: number, a: number, b: number) => {
-	const x = c01((t - a) / (b - a));
-	return x * x * (3 - 2 * x);
-};
-const saida = (x: number, k = 3) => 1 - Math.pow(1 - c01(x), k);
-const vaiVem = (x: number) => {
-	const v = c01(x);
-	return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
-};
-const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-const mistura = (a: string, b: string, k: number) => {
-	const A = hex(a);
-	const B = hex(b);
-	return '#' + A.map((v, i) => Math.round(lerp(v, B[i], c01(k))).toString(16).padStart(2, '0')).join('');
-};
-const DEG = Math.PI / 180;
 
 /* ---------------------------------------------------------------- relógio da história (src/plano.json; null desliga a parte) */
 const PV = PL.previas ? {ergue: tempo(PL.previas.ergue, 'previas.ergue'), sobe: tempo(PL.previas.sobe, 'previas.sobe'), desce: tempo(PL.previas.desce, 'previas.desce')} : null;
@@ -110,8 +92,12 @@ const VARRE = 0.28; // duração da varredura
 /* chegadas: entra pela esquerda e freia longo (vetor-minimo.md: 1,9 a 2,7 s). `edita`: a varredura na tela dele; `previa` (0
    esquerda, 1 direita): a tela que sobe com a prévia; `destaque`: o que acende no apenasUm; `voce`: o último, que só
    fica verde quando edita */
-type Chegada = {x0: number; x1: number; t0: number; d: number; edita: number | null; previa?: number; destaque?: boolean; voce?: boolean};
+type Chegada = {x0: number; x1: number; t0: number; d: number; edita: number | null; previa?: number; destaque?: boolean; voce?: boolean; comp?: string};
 export const CHEGADAS: Chegada[] = PL.chegadas.map((c, k) => ({...c, t0: tempo(c.t0, `chegadas[${k}].t0`), edita: talvez(c.edita, `chegadas[${k}].edita`)}));
+/* o objeto de cada chegada: 'Tela' (a da casa) ou um objeto novo registrado em src/telas/index.ts */
+for (const [k, c] of CHEGADAS.entries())
+	if (c.comp && c.comp !== 'Tela' && !(c.comp in TELAS))
+		pare(`chegadas[${k}] segura o objeto "${c.comp}", que não existe: desenhe src/telas/${c.comp}.tsx com o kit (src/kit.tsx) e registre em src/telas/index.ts, ou use 'Tela' (a da casa).`);
 const K_FREIO = 1.8;
 export const posX = (c: Chegada, t: number) => c.x0 + (c.x1 - c.x0) * (1 - Math.pow(1 - c01((t - c.t0) / c.d), K_FREIO));
 const velX = (c: Chegada, t: number) => {
@@ -240,7 +226,6 @@ const Cru: React.FC = () => (
 	</g>
 );
 
-type EstadoTela = {m: number; varre: number; verde: number; apaga: number; t: number; i: number};
 const Tela: React.FC<{id: string; e: EstadoTela; semConteudo?: number}> = ({id, e, semConteudo = 0}) => {
 	const corBorda = e.varre <= 0 ? '#555555' : mistura(mistura(COR.giz, COR.verde, e.verde), COR.c3, e.apaga);
 	const texto = mistura(mistura(COR.giz, COR.verdeLuz, e.verde), COR.c3, e.apaga);
@@ -354,7 +339,8 @@ const Elenco: React.FC<{t: number; previas: boolean; sufixo: string}> = ({t, pre
 			const ergue = sobe && PV ? 18 * suave(t, PV.ergue, PV.ergue + 0.4) * (1 - suave(t, PV.desce + 0.5, PV.desce + 0.9)) : 0;
 			const olha = !c.voce && PV ? suave(t, PV.ergue, PV.ergue + 0.35) * (1 - suave(t, PV.desce, PV.desce + 0.4)) : 0;
 			const fora = sobe && voo(t) > 0.001;
-			const pose: Pose = {x, v: velX(c, t), fase: ((x - c.x0) / PASSO) * Math.PI, ergue, olha, t, i, tela: fora ? null : <Tela id={`t${i}${sufixo}`} e={estadoTela(i, t)} />};
+			const Obj: React.FC<ObjetoProps> = c.comp && c.comp !== 'Tela' ? TELAS[c.comp] : Tela;
+			const pose: Pose = {x, v: velX(c, t), fase: ((x - c.x0) / PASSO) * Math.PI, ergue, olha, t, i, tela: fora ? null : <Obj id={`t${i}${sufixo}`} e={estadoTela(i, t)} />};
 			return <Palito key={i} p={pose} />;
 		})}
 	</g>

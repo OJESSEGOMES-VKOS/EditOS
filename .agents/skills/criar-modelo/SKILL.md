@@ -104,6 +104,10 @@ acusa. Tudo que a G6 cobre (efeito sonoro, inclusive de zoom; música; tratament
 troca de fundo) nasce desligado e só liga por opção explícita do pedido; zoom só por plano explícito, nunca automático;
 texto sem contorno, sombra colada ou brilho (G16). Sem `public/pessoa.webm` ou `src/maos.json` do
 vídeo de origem (o `novo-video.py` já os ignora).
+**O modelo nasce como skill** (`sistema/JEITO.md` §6): o bloco do plano marcado com `O PLANO` e `fim do plano`, o
+`scripts/plano_novo.*` (começo vazio), o `scripts/clone.json` (telas da casa e textos fixos), o caminho das telas
+livres no jeito da casa e a skill `.claude/skills/<m>/SKILL.md` no formato da do `rosto-telas` (personalidade, peças,
+invenção, teste do clone, caminho, nunca). Sem isso o modelo vira um clone do aprovado.
 
 ### Etapa 6: a vitrine
 A gravação comum é `sistema/teste-comum/gravacao.mp4` (base em `sistema/teste-comum/base/`), porque a prova é **o modelo

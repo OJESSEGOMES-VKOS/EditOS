@@ -304,9 +304,13 @@ sinal "escuro sem rosto": foi o primeiro defeito da revisão).
 
 Os comandos rodam de dentro de `sistema/`, menos onde está escrito "na pasta do vídeo".
 
-1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py prova-print <gravacao.mp4> <AAAA-MM-DD-tema> --sem-adaptar`
-   (o `--sem-adaptar` cai depois da aprovação, quando existir `assinatura.json`). Nome que a transcrição errar:
-   `--trocar Cloud=Claude`. Ao carregar, o molde para de propósito e pede o rosto novo e as palavras do plano.
+**Antes de tudo, a skill** `.claude/skills/prova-print/SKILL.md` (a personalidade, as peças e a invenção da prova que a
+fala nova pede; o método comum é `sistema/JEITO.md`).
+
+1. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py prova-print <gravacao.mp4> <AAAA-MM-DD-tema>`. Nome
+   que a transcrição errar: `tools/trocar.py oficina/<pasta> Cloud=Claude` depois. **O plano nasce vazio:** o bloco entre
+   `O PLANO` e `fim do plano` de `src/tema.ts` vem de `scripts/plano_novo.ts` (a pessoa do começo ao fim, nenhuma tela do
+   aprovado). Ao carregar, o molde para de propósito e pede o rosto novo.
 2. **Meça o rosto:** `../../.venv/Scripts/python.exe scripts/rosto.py` (na pasta do vídeo). **Recorte só se o dono pediu
    palco ou desfoque** (G6): `QUEM=<nome> sh ../../tools/com-trava.sh ../../.venv/Scripts/python.exe scripts/recorte.py`
    (grava `public/pessoa.webm` e o topo da cabeça em `src/rosto_med.json`; sem palco no plano o molde não precisa dele).
@@ -316,16 +320,19 @@ Os comandos rodam de dentro de `sistema/`, menos onde está escrito "na pasta do
 4. **Escreva o `plano.md`** frase a frase sobre `src/palavras.json`, abrindo com a decupagem limpa (cortes nas pausas) e o
    plano de cenas: a função de cada cena (seção 4), o modo (a pessoa por padrão; a vitrine só onde a cena fecha forte
    com prova, com a linha "por quê" ligada à fala, G30), o print, o grifo (palavra exata), o contador (número dito).
-5. **Monte no código** (na pasta do vídeo):
-   - `base()`, `titulo()`, `contadores()` e `comando()` em `src/tema.ts`: uma cena por frase, `[id, modo, corte(w('palavra que abre'))]`, o 4º item
-     `true` no fecho. Modos: `'pessoa'` (o padrão, G6), `'vitrine'`, `'capitulo'`, `'rosto'` e `'palco'` (só com
-     `fundo: 'recorte'`). Cena `'pessoa'` não precisa de componente em `CENA_COMP`.
-   - `src/Cenas.tsx`: `PV` (os prints e a largura deles) e uma cena por id em `CENA_COMP`. Use `<Palco>`, `<Vitrine>`,
-     `<Prova vistas={[...]} grifos={[{at: w('palavra'), x, y, w, h}]}>` (coordenadas em px do print) e
-     `<ContadorDa c={c} />` (os contadores vêm de `contadores()`: cena, palavras do número como foram ditas, início,
-     valor, sufixo, y).
-   - `src/Legenda.tsx`: `CHAVE` (palavras-chave). O que sai da legenda (`FIXO`) vem sozinho do título, dos contadores e do
-     comando.
+5. **Monte no código** (na pasta do vídeo). Tudo o que é do vídeo mora no bloco O PLANO de `src/tema.ts`:
+   - `base()`: uma linha por cena, `[modo, corte(w('palavra que abre')), tela?]`. `[PESSOA, t]` (o padrão, G6),
+     `[ROSTO, t]` (emoção), `[ROSTO, t, FECHO]` (o fecho), `[VITRINE, t, 'Nome']`, `[CAPITULO, t, 'Nome']`,
+     `[PALCO, t, 'Nome']` (só com `fundo: 'recorte'`). A 1ª começa em 0; `w('e', n)` conta também "é".
+   - `contadores()` (a tela da cena, as palavras do número como foram ditas, início, valor, sufixo, y), `comando()`
+     (`{palavras: ['comenta', 'x'], chamada: 'comenta', pedido: '“X”'}`), `chave()` (palavras-chave da legenda) e
+     `titulo()` (só com palco). O que sai da legenda (`FIXO`) vem sozinho do título, dos contadores e do comando.
+   - **A tela de prova é uma tela livre** em `src/telas/<Nome>.tsx`, registrada em `src/telas/index.ts`, feita com o kit
+     de `src/ui.tsx`: `<Vitrine c={c} fundo={<ImgFundo src=... />}>` com `<Prova {...print} caixaW={LARG_VITRINE}
+     vistas={[...]} grifos={[{at: w('palavra'), x, y, w, h}]}>` (coordenadas em px do print; `cor: 'vermelho'` no defeito)
+     e `<ContadorDa c={c} />`. O print real em `public/` com a linha em `public/ORIGEM.md`.
+   - As telas da casa (`src/Cenas.tsx`, as do aprovado com os prints do EditOS, seção 10) só ligam com a linha
+     `<tela> = true` no bloco e o mesmo porquê na fala.
    - Para achar o x/y de um grifo: desenhe a caixa no print com Pillow e olhe antes de renderizar.
 6. **Confira:** `node scripts/cobertura.mjs` (na pasta do vídeo) até `APROVADO`. Ele cobra: palavras do plano, cobertura
    da legenda, tempo de leitura, 2 linhas, G14, um lugar de legenda, zona segura, nada atravessa corte, **contador =
@@ -333,7 +340,10 @@ Os comandos rodam de dentro de `sistema/`, menos onde está escrito "na pasta do
    vitrine seguida até 8 s, sem sombra justa na letra, **PV4** (palavra repetida entre elementos simultâneos), **PV5**
    (texto fixo pendurado), a regra antiga da pessoa em 50% e da vitrine só fechando cena no ponto (o checador ainda cobra; a vitrine agora segue a G28),
    **PV6/PV8** (só com palco: topo da cabeça entre a legenda e a borda do cartão, olhos abaixo da borda, rosto centrado
-   no cartão, recorte presente) e **PV7** (velocidade, tranco e vaivém da câmera).
+   no cartão, recorte presente), **PV7** (velocidade, tranco e vaivém da câmera) e as telas (livre registrada ou da casa
+   ligada; texto de tela livre dito e fora da legenda na mesma hora). Grava `src/tempos.json`, o resumo das telas que o
+   teste do clone lê. Depois, de dentro de `sistema/`: `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até
+   `SEM CLONE` e `tools/decupar.py oficina/<v> --conferir`.
 7. **Som:** refaça `CORTES`, `GRIFOS`, `CONTADORES` e `EXTRAS` em `scripts/som.py` e rode
    `../../.venv/Scripts/python.exe scripts/som.py` (na pasta do vídeo).
 8. **Quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1 3 6 ...` (na pasta do vídeo).
@@ -343,7 +353,20 @@ Os comandos rodam de dentro de `sistema/`, menos onde está escrito "na pasta do
 11. **Prove:** folha de 1 quadro por segundo e a lado a lado (`scripts/lado_a_lado.py`) contra os quadros de
     `analise/q/`. Depois da aprovação, `tools/parece.py`.
 
-## 10. O plano da vitrine (para comparar)
+## 10. O vídeo aprovado: exemplos com o porquê (nunca o roteiro do vídeo novo)
+
+Cada tela abaixo existe por causa daquela fala e daqueles prints (o repositório do EditOS). Num vídeo novo ela só volta
+se a fala nova tiver o mesmo porquê; o normal é a tela livre com a prova do vídeo novo (G30, `JEITO.md`). Os nomes das
+telas da casa no código: `gancho`, `criado`, `modelos`, `editar`, `vendo`, `previas`, `tres`, `outros`, `aprender`.
+
+- `editar`: "qualquer tipo de vídeo usando o Claude" → o About diz "Modelos de edição de vídeo para o Claude Code". Porquê:
+  a afirmação tem prova pública.
+- `tres`: "aceleradas em três vezes" → o contador sobe até 3. Porquê: número dito com a coisa na tela.
+- O rosto fechado em "Mas se você quiser realmente ver": a virada. O fecho "comenta “EDIÇÃO”": a fala pede comentário.
+
+**Uma aplicação a outra fala** (2026-11-17, `oficina/2026-11-17-teste-skill-prova-print/`): a fala do earshot virou
+`Repositorio`, `Biblioteca` e `Criar` (prints reais da página do earshot), rosto fechado na dor e o fecho "comentar
+“ÁUDIO”"; nenhuma tela do aprovado. Pessoa 50% + rosto 18%.
 
 **O molde, desde 2026-11-05, vem com este plano padrão** (a mesma gravação comum):
 

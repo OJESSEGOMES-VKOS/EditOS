@@ -1,3 +1,3 @@
 # cena26 Social post receipt: componente
 
-**Props:** `contexto [2]`, `iniciais`, `nome`, `arroba`, `cargo`, `textoAntes`, `fraseChave`, `hora`, `numeros {respostas, reposts, curtidas, views}`, `respostas [2]`, `vermelho`, `width`, `height`. Pessoa, empresa e rede inventadas; num vídeo de recibo, só o post real.
+**Props:** `contexto[]` (1 ou 2 partes; a última em negrito), `iniciais`, `nome`, `arroba`, `cargo`, `textoAntes`, `fraseChave` (sublinhada), `textoDepois` (opcional), `hora`, `numeros {respostas, reposts, curtidas, views}`, `respostas[]` (0 a 3, uma a cada 16 quadros), `vermelho`, `width`, `height`. Pessoa, empresa e rede da demo inventadas; num vídeo de recibo, só o post real, recriado fiel ao print (G25). Os textos da demo estão em `textos-demo.json`: nenhum deles vai para um vídeo novo. Como compor uma cena nova: `../cena26.md` (A personalidade, Como variar).

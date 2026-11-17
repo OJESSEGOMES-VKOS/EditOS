@@ -16,12 +16,15 @@ export type Trecho = {t: string; g?: boolean};
 export type Cena14Props = {
   width?: number;
   height?: number;
-  figura?: string;
-  tituloGrafico?: string[];
+  // cada peça só entra se tiver conteúdo: 1 a 3 papéis na mesa, conforme a fala
+  figura?: string; // rótulo mono da folha do gráfico
+  tituloGrafico?: string[]; // manchete da folha do gráfico (1 ou 2 linhas)
+  pontos?: number[]; // a curva do dado real, valores de 0 (base) a 1 (topo), espaçados por igual; sem pontos, sem curva
+  eixo?: {topo: string; inicio: string; fim: string}; // rótulos do eixo, do dado real
   citacaoRotulo?: string;
-  citacao?: Trecho[][];
-  etiqueta?: string;
-  nota?: string;
+  citacao?: Trecho[][]; // a citação real, linha a linha; g=true é o trecho grifado
+  etiqueta?: string; // a etiqueta recortada (1 a 3 palavras ditas)
+  nota?: string; // o que a caneta escreve ao lado do círculo (vazio: só o círculo)
   vermelho?: string;
   amarelo?: string;
 };
@@ -58,18 +61,14 @@ const usaFolha = (frame: number, fps: number, q: number, de: [number, number], r
 export const Cena14: React.FC<Cena14Props> = ({
   width = 1080,
   height = 1350,
-  figura = 'FIG. 2 · RETENÇÃO, PRIMEIROS 30 SEGUNDOS',
-  tituloGrafico = ['A maioria decide nos', 'três primeiros segundos'],
-  citacaoRotulo = 'DAS ANOTAÇÕES · P. 14',
-  citacao = [
-    [{t: 'Nos últimos vídeos, a maior'}],
-    [{t: 'queda veio sempre cedo.'}],
-    [{t: 'Quem passou do terceiro segundo', g: true}],
-    [{t: 'quase sempre ficou até o fim.', g: true}],
-    [{t: 'Depois disso, a linha ficou reta.'}],
-  ],
-  etiqueta = 'O GANCHO',
-  nota = 'SAEM AQUI',
+  figura = '',
+  tituloGrafico = [],
+  pontos,
+  eixo,
+  citacaoRotulo = '',
+  citacao = [],
+  etiqueta = '',
+  nota = '',
   vermelho = '#D4231B',
   amarelo = '#FFE024',
 }) => {
@@ -98,11 +97,8 @@ export const Cena14: React.FC<Cena14Props> = ({
   const linhasG = citacao.map((l, i) => (l.some((s) => s.g) ? i : -1)).filter((i) => i >= 0);
   const grifo = (o: number) => interpolate(frame, [98 + o * 9, 98 + o * 9 + 7], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.4, 0, 0.3, 1)});
 
-  const curva = Array.from({length: 40}, (_, i) => {
-    const x = i / 39;
-    const y = 0.15 + 0.62 * (1 - Math.exp(-x * 9)) + Math.sin(x * 26) * 0.02;
-    return `${i ? 'L' : 'M'}${70 + x * 560},${60 + y * 230}`;
-  }).join(' ');
+  const curva = (pontos ?? []).map((v, i, a) => `${i ? 'L' : 'M'}${70 + (i / Math.max(1, a.length - 1)) * 560},${60 + (1 - v) * 230}`).join(' ');
+  const temGrafico = tituloGrafico.length > 0 || !!pontos;
 
   const linhasGrade: React.ReactNode[] = [];
   for (let i = -2; i < 50; i++) {
@@ -124,32 +120,32 @@ export const Cena14: React.FC<Cena14Props> = ({
             <ellipse cx={420} cy={1380} rx={120} ry={30} fill="#3a7c5c" opacity={0.25} />
           </svg>
           {/* folha do gráfico */}
-          {fA.visivel && (
+          {temGrafico && fA.visivel && (
             <div style={{position: 'absolute', left: 80, top: 160, width: 760, height: 560, background: PAPEL, transform: `translate(${fA.x}px, ${fA.y}px) scale(${fA.esc}) rotate(${fA.rot}deg)`, boxShadow: fA.sombra}}>
               <Grao id="as14g1" seed={2} />
               <div style={{position: 'absolute', left: 40, top: 34, fontFamily: MONO, fontSize: 13, letterSpacing: 2.5, color: CINZA}}>{figura}</div>
-              <div style={{position: 'absolute', left: 40, top: 60, fontFamily: CASLON, fontWeight: 700, fontSize: 36, lineHeight: 1.12, color: PRETO}}>{tituloGrafico.map((l) => <div key={l}>{l}</div>)}</div>
-              <svg width={700} height={420} style={{position: 'absolute', left: 0, top: 130}}>
+              <div style={{position: 'absolute', left: 40, top: 60, fontFamily: CASLON, fontWeight: 700, fontSize: 36, lineHeight: 1.12, color: PRETO}}>{tituloGrafico.map((l, i) => <div key={i}>{l}</div>)}</div>
+              {pontos && <svg width={700} height={420} style={{position: 'absolute', left: 0, top: 130}}>
                 <line x1={70} y1={40} x2={70} y2={330} stroke={PRETO} strokeWidth={2} />
                 <line x1={70} y1={330} x2={650} y2={330} stroke={PRETO} strokeWidth={2} />
                 <line x1={70} y1={160} x2={650} y2={160} stroke="#bdb8ad" strokeDasharray="3 6" />
-                <text x={36} y={64} fontFamily={MONO} fontSize={13} fill={CINZA}>100%</text>
-                <text x={70} y={356} fontFamily={MONO} fontSize={13} fill={CINZA}>0 s</text>
-                <text x={610} y={356} fontFamily={MONO} fontSize={13} fill={CINZA}>30 s</text>
+                <text x={36} y={64} fontFamily={MONO} fontSize={13} fill={CINZA}>{eixo?.topo}</text>
+                <text x={70} y={356} fontFamily={MONO} fontSize={13} fill={CINZA}>{eixo?.inicio}</text>
+                <text x={610} y={356} fontFamily={MONO} fontSize={13} fill={CINZA}>{eixo?.fim}</text>
                 <path d={curva} stroke={PRETO} strokeWidth={3.5} fill="none" strokeLinecap="round" />
                 {/* círculo vermelho de marcador */}
                 <path d="M118 70 C 40 90, 40 260, 120 290 C 200 310, 240 170, 190 95 C 160 55, 120 60, 105 80" stroke={vermelho} strokeWidth={7} fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${circ} 1`} opacity={circ > 0 ? 0.95 : 0} />
                 {/* seta: haste e depois um V */}
-                <path d="M330 120 L 222 132" stroke={vermelho} strokeWidth={6} fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${haste} 1`} opacity={haste > 0 ? 1 : 0} />
-                <path d="M244 112 L 220 132 L 246 152" stroke={vermelho} strokeWidth={6} fill="none" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={`${vee} 1`} opacity={vee > 0 ? 1 : 0} />
+                <path d="M330 120 L 222 132" stroke={vermelho} strokeWidth={6} fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${haste} 1`} opacity={nota && haste > 0 ? 1 : 0} />
+                <path d="M244 112 L 220 132 L 246 152" stroke={vermelho} strokeWidth={6} fill="none" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={`${vee} 1`} opacity={nota && vee > 0 ? 1 : 0} />
                 <text x={344} y={134} fontFamily={MARKER} fontSize={38} fill={vermelho}>{nota.slice(0, letras)}</text>
-              </svg>
+              </svg>}
               {/* fita no canto */}
               <div style={{position: 'absolute', right: -40, top: -18, width: 150, height: 40, background: 'rgba(230,217,180,0.85)', transformOrigin: 'center', ...fita(36), rotate: '8deg', boxShadow: '0 1px 2px rgba(0,0,0,0.15)'}} />
             </div>
           )}
           {/* folha da citação */}
-          {fB.visivel && (
+          {citacao.length > 0 && fB.visivel && (
             <div style={{position: 'absolute', left: 445, top: 790, width: 560, height: 330, background: PAPEL, transform: `translate(${fB.x}px, ${fB.y}px) scale(${fB.esc}) rotate(${fB.rot}deg)`, boxShadow: fB.sombra}}>
               <Grao id="as14g2" seed={5} />
               <div style={{position: 'absolute', left: 34, top: 28, fontFamily: MONO, fontSize: 12, letterSpacing: 2.5, color: CINZA}}>{citacaoRotulo}</div>
@@ -172,7 +168,7 @@ export const Cena14: React.FC<Cena14Props> = ({
             </div>
           )}
           {/* etiqueta recortada, presa com fita em dois cantos */}
-          {fC.visivel && (
+          {etiqueta && fC.visivel && (
             <div style={{position: 'absolute', left: 95, top: 870, transform: `translate(${fC.x}px, ${fC.y}px) scale(${fC.esc}) rotate(${fC.rot}deg)`}}>
               <div style={{background: '#fff', padding: '14px 28px', fontFamily: TIGHT, fontWeight: 800, fontSize: 62, letterSpacing: -3, color: PRETO, boxShadow: fC.sombra, position: 'relative'}}>
                 <Grao id="as14g3" seed={8} op={0.12} />

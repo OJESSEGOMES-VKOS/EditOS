@@ -8,9 +8,10 @@ import {loadFont} from '@remotion/google-fonts/BricolageGrotesque';
 const {fontFamily} = loadFont('normal', {weights: ['800'], subsets: ['latin', 'latin-ext']});
 
 export type RisographProps = {
-  palavra1?: string; // topo, nas duas tintas
-  palavra2?: string; // vazada no círculo rosa
-  palavra3?: string; // sobre a faixa listrada
+  palavra1: string; // topo, nas duas tintas (a palavra-herói dita; encolhe para caber)
+  palavra2?: string; // vazada no círculo rosa (curta, 1 a 4 letras; vazia: o círculo fica inteiro)
+  palavra3?: string; // sobre a faixa listrada (vazia: só a faixa e os pontos)
+  inicioSlip?: number; // quadro do deslize de registro (padrão 86): ponha na palavra de impacto
   tam1?: number;
   tam3?: number;
   largura?: number;
@@ -21,9 +22,10 @@ export type RisographProps = {
 const CORES = {papel: '#EDEFEE', rosa: '#FF48B0', azul: '#3255A4'};
 
 export const Risograph: React.FC<RisographProps> = ({
-  palavra1 = 'TINTA',
-  palavra2 = 'EM',
-  palavra3 = 'MOVIMENTO',
+  palavra1,
+  palavra2 = '',
+  palavra3 = '',
+  inicioSlip = 86,
   tam1 = 262,
   tam3 = 128,
   largura,
@@ -42,8 +44,13 @@ export const Risograph: React.FC<RisographProps> = ({
   const desliza = (d: number) => spring({frame: f - d, fps, config: {damping: 9, stiffness: 120}});
 
   // deslize de registro: as chapas chutam ~25px e voltam passando do ponto
-  const slip = f >= 86 ? spring({frame: f - 86, fps, config: {damping: 7, stiffness: 140}}) : 0;
-  const slipAmt = f >= 86 ? (1 - slip) : 0;
+  const slip = f >= inicioSlip ? spring({frame: f - inicioSlip, fps, config: {damping: 7, stiffness: 140}}) : 0;
+  const slipAmt = f >= inicioSlip ? (1 - slip) : 0;
+  // Bricolage 800 em caixa alta: ~0,73 em por letra com o espaçamento; cada palavra encolhe para caber no seu lugar
+  const caber = (t: string, teto: number, larg: number) => Math.min(teto, larg / (Math.max(1, Array.from(t).length) * 0.73));
+  const t1 = Math.max(110, caber(palavra1, tam1, 960));
+  const t2 = Math.max(56, caber(palavra2, 112, 380));
+  const t3 = Math.max(64, caber(palavra3, tam3, 900));
   const rx = 2 + -26 * slipAmt;
   const ry = 1 + -18 * slipAmt;
 
@@ -113,18 +120,18 @@ export const Risograph: React.FC<RisographProps> = ({
             <g transform={tr(carimbo(0) ?? {e: 1, r: 0}, cRosa.x, cRosa.y)}>
               <circle cx={cRosa.x} cy={cRosa.y} r={cRosa.r} fill={cores.rosa} />
             </g>
-            {c1 && <g transform={tr(c1, 540, 230)}>{texto(palavra1, 540, 312, tam1, cores.rosa, 'middle')}</g>}
+            {c1 && <g transform={tr(c1, 540, 230)}>{texto(palavra1, 540, 312 - (tam1 - t1) * 0.4, t1, cores.rosa, 'middle')}</g>}
             {f >= 20 && <rect x={99 + (1 - faixa) * -1100} y={985} width={882} height={232} fill="url(#list08)" />}
           </g>
           {/* palavra vazada no círculo rosa (o papel aparece) */}
-          {c2 && <g transform={tr(c2, cRosa.x - 20, 706)}>{texto(palavra2, cRosa.x - 20, 742, 112, cores.papel, 'middle')}</g>}
+          {c2 && palavra2 !== '' && <g transform={tr(c2, cRosa.x - 20, 706)}>{texto(palavra2, cRosa.x - 20, 706 + t2 * 0.32, t2, cores.papel, 'middle')}</g>}
           {/* chapa azul */}
           <g filter="url(#ta08)" style={{mixBlendMode: 'multiply'}} transform={`translate(${-rx * 0.4} ${-ry * 0.4})`}>
             <g transform={`translate(${cAzul.x} ${cAzul.y})`}>
               {pontos.map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} fill={cores.azul} />)}
             </g>
-            {c1 && <g transform={tr(c1, 540, 230)}>{texto(palavra1, 536, 310, tam1, cores.azul, 'middle')}</g>}
-            {c3 && <g transform={tr(c3, 540, 1100)}>{texto(palavra3, 540, 1155, tam3, cores.azul, 'middle', '0.03em')}</g>}
+            {c1 && <g transform={tr(c1, 540, 230)}>{texto(palavra1, 536, 310 - (tam1 - t1) * 0.4, t1, cores.azul, 'middle')}</g>}
+            {c3 && palavra3 !== '' && <g transform={tr(c3, 540, 1100)}>{texto(palavra3, 540, 1101 + t3 * 0.42, t3, cores.azul, 'middle', '0.03em')}</g>}
             {Array.from({length: nPontos}, (_, i) => {
               const v = interpolate(f, [34 + i * 1.2, 36 + i * 1.2], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
               return v > 0 ? <circle key={i} cx={122 + i * 76} cy={1268} r={(6 + i * 1.3) * v} fill={cores.azul} /> : null;

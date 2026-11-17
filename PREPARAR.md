@@ -63,6 +63,11 @@ Confira as três partes, sem precisar de vídeo:
 
 Se as três responderem sem erro, está pronto. O primeiro vídeo de verdade da pessoa é o teste completo.
 
+**O 3D é opcional e fica para depois.** O Blender (gratuito, blender.org, versão 5.2 ou mais nova) só é preciso para
+as skills de 3D (`estudio-3d`, `3d-como-funciona`, `low-poly-toon`, `anim-3d-bloquinho`). Não instale agora: quando a
+pessoa pedir o primeiro vídeo 3D, peça a permissão dela, instale, rode `sistema/tools/blender.py --conferir` e baixe os
+modelos 3D gratuitos com `sistema/tools/baixar-assets-3d.py` (de dentro de `sistema/`).
+
 ### 6. Avisar a pessoa
 Diga, em poucas linhas:
 - que o estúdio está pronto e em que pasta;
@@ -70,5 +75,7 @@ Diga, em poucas linhas:
   conversa responde três perguntas (nome, @ e materiais) que criam a pasta dela, coloca a gravação em
   `<Nome>/materiais/` e escreve, por exemplo: *"Edite o meu vídeo `gravacao.mp4` no rosto-telas"*; o vídeo pronto
   chega em `<Nome>/conteudo/<nome-do-video>-DD-MM-AA/`;
-- que os modelos disponíveis estão em `sistema/modelos/`, cada um com o vídeo de exemplo em `referencia/referencia.mp4`;
+- que os modelos disponíveis estão em `sistema/modelos/`, cada um com o vídeo de exemplo em `referencia/referencia.mp4`
+  (o exemplo mostra o jeito do modelo; o vídeo dela sai com as telas e os textos do que ela falar, não uma cópia);
+- que também dá pra pedir um vídeo animado sem gravar nada, num dos estilos de `sistema/animacoes/estilos/INDICE.md`;
 - que ela pode deixar o modelo mais com a cara dela preenchendo a seção "Do seu jeito", no topo do arquivo do modelo.

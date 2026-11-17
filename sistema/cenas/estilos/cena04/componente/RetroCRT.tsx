@@ -9,8 +9,8 @@ const {fontFamily: titulo} = loadTitulo('normal', {weights: ['700'], subsets: ['
 const {fontFamily: mono} = loadMono('normal', {weights: ['400'], subsets: ['latin']});
 
 export type RetroCRTProps = {
-  linhas?: [string, string]; // título em duas linhas (maiúsculas)
-  sistema?: string; // linha de sistema digitada
+  linhas: string[]; // o título, 1 a 3 linhas (maiúsculas); a letra encolhe para a linha mais longa caber em ~80% da largura
+  sistema?: string; // linha de sistema digitada (vazia: a linha não aparece)
   duracao?: number; // em quadros; a saída acontece no fim
   largura?: number;
   altura?: number;
@@ -22,8 +22,8 @@ const CORES = {tubo: '#07090F', vidro: '#0B0E16', nucleo: '#FCFBF8', bloom: '#FF
 const cl = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 export const RetroCRT: React.FC<RetroCRTProps> = ({
-  linhas = ['FIQUE', 'LIGADO'],
-  sistema = 'SINAL CAPTURADO',
+  linhas,
+  sistema = '',
   duracao,
   largura,
   altura,
@@ -37,6 +37,9 @@ export const RetroCRT: React.FC<RetroCRTProps> = ({
   const H = altura ?? height;
   const s = Math.min(W / 1080, H / 1350);
   const cy = 735; // linha de abertura (meio do título)
+  const nL = Math.max(1, linhas.length);
+  const maior = Math.max(1, ...linhas.map((l) => l.length));
+  const tam = Math.max(70, Math.min(tamanhoTitulo, 864 / (maior * 0.9))); // Syncopate larga: ~0,9 em por letra
 
   // abertura: linha incha, abre em duas bordas, a imagem desdobra com ~10% de passagem (~12 quadros)
   const incha = interpolate(f, [0, 4], [1, 1.8], cl);
@@ -73,14 +76,14 @@ export const RetroCRT: React.FC<RetroCRTProps> = ({
       <div style={{position: 'absolute', left: (W - 1080 * s) / 2, top: (H - 1350 * s) / 2, width: 1080, height: 1350, transform: `scale(${s})`, transformOrigin: '0 0'}}>
         {/* a imagem: título + sistema, desdobrando a partir da linha */}
         <div style={{position: 'absolute', inset: 0, transform: `translateY(${cy}px) scaleY(${sy}) translateY(${-cy}px) translateX(${wobble}px)`, filter: `brightness(${brilho})`}}>
-          <div style={{position: 'absolute', left: 0, right: 0, top: cy - tamanhoTitulo * 1.25, textAlign: 'center', fontFamily: titulo, fontWeight: 700, fontSize: tamanhoTitulo, letterSpacing: '0.06em', lineHeight: 1.12, color: cores.nucleo, textShadow: `${-franja}px 0 1px rgba(255,60,60,${0.35 * Math.min(1, quente + 0.3)}), ${franja}px 0 1px rgba(80,120,255,${0.3 * Math.min(1, quente + 0.3)}), ${bloom}`}}>
-            {linhas[0]}<br />{linhas[1]}
+          <div style={{position: 'absolute', left: 0, right: 0, top: cy - tam * (0.56 * nL + 0.13), textAlign: 'center', fontFamily: titulo, fontWeight: 700, fontSize: tam, letterSpacing: '0.06em', lineHeight: 1.12, color: cores.nucleo, textShadow: `${-franja}px 0 1px rgba(255,60,60,${0.35 * Math.min(1, quente + 0.3)}), ${franja}px 0 1px rgba(80,120,255,${0.3 * Math.min(1, quente + 0.3)}), ${bloom}`}}>
+            {linhas.map((l, i) => (<div key={i}>{l}</div>))}
           </div>
-          <div style={{position: 'absolute', left: 150, top: cy + tamanhoTitulo * 1.55, fontFamily: mono, fontSize: 44, letterSpacing: '0.22em', color: cores.nucleo, opacity: 0.82, display: 'flex', alignItems: 'center', textShadow: `0 0 8px ${cores.bloom}88`}}>
+          {sistema !== '' && <div style={{position: 'absolute', left: 150, top: cy + tam * (0.56 * nL + 0.43), fontFamily: mono, fontSize: 44, letterSpacing: '0.22em', color: cores.nucleo, opacity: 0.82, display: 'flex', alignItems: 'center', textShadow: `0 0 8px ${cores.bloom}88`}}>
             <div style={{width: 12, height: 12, borderRadius: 6, background: cores.acento, marginRight: 18, transform: `scale(${f >= fimDig ? 0.6 + 0.4 * ponto : 0.6})`, opacity: f >= fimDig ? 1 : 0.35, boxShadow: `0 0 10px ${cores.acento}`}} />
             {f >= tDig - 6 && <span style={{whiteSpace: 'pre'}}>{sistema.slice(0, n)}</span>}
             {f >= tDig - 6 && <span style={{display: 'inline-block', width: 24, height: 44, marginLeft: 4, background: cores.nucleo, opacity: cursor}} />}
-          </div>
+          </div>}
         </div>
         {/* bordas que correm ao abrir */}
         {f >= 4 && f < 18 && [-1, 1].map((d) => (

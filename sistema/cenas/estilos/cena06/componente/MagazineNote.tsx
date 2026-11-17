@@ -14,11 +14,11 @@ loadNews('italic', {weights: ['400'], subsets: ['latin', 'latin-ext']});
 const {fontFamily: nota} = loadNota('normal', {weights: ['400'], subsets: ['latin']});
 
 export type MagazineNoteProps = {
-  titulo?: [string, string]; // linha 2 entra em itálico e recuada
+  titulo: string[]; // 1 ou 2 linhas; a 2ª entra em itálico e recuada; a letra encolhe se a linha for longa
   numero?: string;
-  corpo?: string[]; // linhas da coluna estreita
+  corpo?: string[]; // linhas da coluna estreita (até ~20 letras cada, até 6 linhas); vazio: sem coluna
   legenda?: string;
-  nota?: [string, string]; // a anotação em caneta, duas linhas
+  nota: string[]; // a anotação em caneta, 1 ou 2 linhas curtas (até ~12 letras cada)
   foto?: string; // opcional: foto do dono (vira duotone); sem ela, o mar ao entardecer é pintado
   largura?: number;
   altura?: number;
@@ -113,11 +113,11 @@ const Nota: React.FC<{texto: string; x: number; y: number; inicio: number; vel: 
 };
 
 export const MagazineNote: React.FC<MagazineNoteProps> = ({
-  titulo = ['Notas sobre', 'a luz lenta.'],
-  numero = '(03)',
-  corpo = ['Algumas tardes o mar', 'fica quieto antes do', 'céu. A gente ficou', 'até a cor ir embora', 'e guardou os últimos', 'dez minutos pra nós.'],
-  legenda = 'Prancha 4. O mar, um minuto depois.',
-  nota = ['leia isto', 'duas vezes.'],
+  titulo,
+  numero = '',
+  corpo = [],
+  legenda = '',
+  nota,
   foto,
   largura,
   altura,
@@ -135,8 +135,13 @@ export const MagazineNote: React.FC<MagazineNoteProps> = ({
   const empurra = 1.1 - 0.07 * spring({frame: f, fps, config: {damping: 20, stiffness: 40}}) - f * 0.00025;
 
   const regua = interpolate(f, [-4, 10], [0.6, 1], cl);
-  const seta = interpolate(f, [84, 100], [0, 1], {...cl, easing: (t) => 1 - Math.pow(1 - t, 2)});
-  const ponta = f >= 103;
+  // a 2ª linha da nota começa quando a 1ª termina; a seta, quando a nota termina (na demo: 58 e 84)
+  const inicioNota2 = Math.max(58, 30 + (nota[0] ?? '').length * 2.6 + 4);
+  const tSeta = nota.length > 1 ? Math.max(84, inicioNota2 + nota[1].length * 2.6 - 4) : Math.max(84, 30 + (nota[0] ?? '').length * 2.6 + 6);
+  const seta = interpolate(f, [tSeta, tSeta + 16], [0, 1], {...cl, easing: (t) => 1 - Math.pow(1 - t, 2)});
+  const ponta = f >= tSeta + 19;
+  // Bodoni ~0,46 em por letra (estimativa folgada); a 1ª linha cabe em ~960 px, a 2ª (recuada) em ~880; nunca abaixo de 90
+  const tamTit = Math.max(90, Math.min(158, 960 / (Math.max(1, (titulo[0] ?? '').length) * 0.46), titulo[1] ? 880 / (titulo[1].length * 0.46) : 158));
 
   const photoX = 99;
   const photoY = 531;
@@ -147,8 +152,8 @@ export const MagazineNote: React.FC<MagazineNoteProps> = ({
     <AbsoluteFill style={{backgroundColor: cores.papel, overflow: 'hidden'}}>
       <div style={{position: 'absolute', left: (W - 1080 * s) / 2, top: (H - 1350 * s) / 2, width: 1080, height: 1350, transform: `scale(${s})`, transformOrigin: '0 0', color: cores.tinta}}>
         <div style={{position: 'absolute', left: 90, top: 134, width: 870 * regua, height: 2, background: cores.tinta, opacity: 0.75}} />
-        <Sobe d={-6} style={{position: 'absolute', left: 88, top: 150, fontFamily: bodoni, fontSize: 158, letterSpacing: '-0.03em', lineHeight: 1}}>{titulo[0]}</Sobe>
-        <Sobe d={-2} style={{position: 'absolute', left: 226, top: 318, fontFamily: bodoni, fontStyle: 'italic', fontSize: 158, letterSpacing: '-0.03em', lineHeight: 1}}>{titulo[1]}</Sobe>
+        <Sobe d={-6} style={{position: 'absolute', left: 88, top: titulo[1] ? 150 + (158 - tamTit) : 150 + (158 - tamTit) + 84, fontFamily: bodoni, fontSize: tamTit, letterSpacing: '-0.03em', lineHeight: 1, whiteSpace: 'nowrap'}}>{titulo[0]}</Sobe>
+        {titulo[1] && <Sobe d={-2} style={{position: 'absolute', left: 226, top: 318, fontFamily: bodoni, fontStyle: 'italic', fontSize: tamTit, letterSpacing: '-0.03em', lineHeight: 1, whiteSpace: 'nowrap'}}>{titulo[1]}</Sobe>}
         {/* foto */}
         <div style={{position: 'absolute', left: photoX, top: photoY, width: photoW, height: photoH, overflow: 'hidden', clipPath: `inset(${corte}% 0 0 0)`}}>
           <div style={{width: '100%', height: '100%', transform: `scale(${empurra})`}}>
@@ -168,10 +173,10 @@ export const MagazineNote: React.FC<MagazineNoteProps> = ({
         {/* caneta */}
         <svg width={1080} height={1350} style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
           <g transform="rotate(-7 760 960)">
-            <Nota texto={nota[0]} x={660} y={930} inicio={30} vel={2.6} cor={cores.caneta} tam={64} />
-            <Nota texto={nota[1]} x={705} y={1030} inicio={58} vel={2.6} cor={cores.caneta} tam={64} />
+            {nota[0] && <Nota texto={nota[0]} x={660} y={930} inicio={30} vel={2.6} cor={cores.caneta} tam={64} />}
+            {nota[1] && <Nota texto={nota[1]} x={705} y={1030} inicio={inicioNota2} vel={2.6} cor={cores.caneta} tam={64} />}
           </g>
-          <path d="M700 1048 C676 1060 662 1040 676 1030 C692 1020 700 1050 676 1068 C620 1110 520 1040 452 846" fill="none" stroke={cores.caneta} strokeWidth={3} strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - seta} opacity={f >= 84 ? 1 : 0} />
+          <path d="M700 1048 C676 1060 662 1040 676 1030 C692 1020 700 1050 676 1068 C620 1110 520 1040 452 846" fill="none" stroke={cores.caneta} strokeWidth={3} strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - seta} opacity={f >= tSeta ? 1 : 0} />
           {ponta && <path d="M432 878 L452 846 L470 880" fill="none" stroke={cores.caneta} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />}
         </svg>
       </div>

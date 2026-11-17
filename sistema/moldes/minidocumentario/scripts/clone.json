@@ -1,0 +1,5 @@
+{
+ "_leia": "Para tools/clone.py: as peças da casa que o plano liga (nome da constante no bloco O PLANO de src/Reel.tsx) e o texto que cada uma escreve fixo no código. No minidocumentario nenhuma peça escreve texto fixo: a legenda nos três níveis sai das palavras ditas e o terço inferior, das props nome e arroba. Papel, B-roll e palco só com material real do criador (M1), escolhidos plano a plano em PLANOS.",
+ "telas": ["VAZAMENTOS", "TERCOS"],
+ "fixos": {}
+}

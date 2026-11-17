@@ -3,6 +3,6 @@ import {Composition, registerRoot} from 'remotion';
 import {SwissGrid} from './SwissGrid';
 
 const Root: React.FC = () => (
-  <Composition id="Demo" component={SwissGrid} durationInFrames={150} fps={30} width={1080} height={1350} defaultProps={{}} />
+  <Composition id="Demo" component={SwissGrid} durationInFrames={150} fps={30} width={1080} height={1350} defaultProps={{linhas: ['A forma', 'segue o', 'ritmo.'], legendas: ['Grade', 'Campo', 'Tipo', 'Círculo']}} />
 );
 registerRoot(Root);

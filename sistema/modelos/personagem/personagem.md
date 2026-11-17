@@ -93,10 +93,18 @@ cena quente; o fecho em loop no cenário do começo; cartela com a palavra em ca
 
 ## 4. As cenas (a direção de cena)
 
-- **Uma imagem por frase, que encena a frase ao pé da letra.** "Editado" vira o personagem na mesa de edição com a barra
-  chegando a 100% (0 s a 3 s); "vários modelos" vira três cartões diferentes sob três focos (3 s a 6 s); "no Instagram"
-  vira ele na cama rolando o feed com luz azul no rosto (11 s); "apenas um desses" vira cinco cartões apagados e um aceso
-  (13 s); "outros modelos" vira uma porta que se abre para uma sala cheia de cartões verdes (20 s a 24 s).
+**A skill `.claude/skills/personagem/SKILL.md` é a entrada (o jeito, `sistema/JEITO.md`).** As cenas do aprovado abaixo
+são **exemplos do aprovado com o porquê**, não o catálogo do vídeo novo: cada uma nasceu de uma palavra daquela fala e
+só volta quando a fala nova diz a mesma coisa. Num tema novo, o normal é inventar a cena que a frase pede, com o kit
+(`src/kit.tsx`), em `src/telas/` da pasta do vídeo (§9).
+
+- **Uma imagem por frase, que encena a frase ao pé da letra.** Exemplos do aprovado, cada um com o porquê: "editado"
+  virou o personagem na mesa de edição com a barra chegando a 100% (0 s a 3 s; a fala fala do ato de editar este
+  vídeo); "vários modelos" virou três cartões diferentes sob três focos (3 s a 6 s; quantidade dita); "no Instagram"
+  virou ele na cama rolando o feed com luz azul no rosto (11 s; a fala fala de quem está vendo agora); "apenas um
+  desses" virou cinco cartões apagados e um aceso (13 s; um entre vários); "outros modelos" virou uma porta que se abre
+  para uma sala cheia de cartões verdes (20 s a 24 s; a promessa de ver mais). Os cartões "de modelos de edição" só
+  existem porque aquela fala falava de modelos de edição.
 - **Câmera parada.** Nada de zoom nem pan. O movimento vem do corte para a próxima imagem e de pequenos acontecimentos
   dentro da cena (a barra enchendo, as prévias entrando, o risco se desenhando).
 - **Corte seco no início da palavra** que abre a frase. A última cena vai até o fim do vídeo e escurece nos últimos 15
@@ -104,9 +112,12 @@ cena quente; o fecho em loop no cenário do começo; cartela com a palavra em ca
 - **Metáforas que se repetem:** porta aberta ou fechada (oportunidade), livro aberto brilhando (ensino), feixe de luz
   do alto (o que importa), balança (escolha), ampulheta (espera), corrente ou pedra (fardo), semente (o que cresce sem
   aparecer), caminho que bifurca (decisão), espelho (autoexame).
-- **Cenários prontos no molde:** parede com chão em linha, janela com lua, cama, mesa, luminária, facho, poeira, porta,
-  cartões 9:16 com "jeitos de editar" abstratos, ícones de tipo de vídeo (microfone, câmera, claquete, celular), setas,
-  cadeira, livro, caixa de comentário. Cena nova se desenha no mesmo traço.
+- **Peças prontas no molde (`src/kit.tsx`, servem a qualquer tema):** parede com chão em linha (`Fundo`), facho
+  dourado (`Luz`), poeira, o personagem (`Boneco`, `emPe`, `SENTADO`, `anima`), janela com lua, cama, mesa, luminária,
+  cadeira, notebook, cartões 9:16 (`Cartao`, estados apagado, giz, verde, ouro), ícones (microfone, câmera, claquete,
+  celular), setas. A cena `Base` (ele em pé sob o foco) é o começo vazio. Porta, livro e caixa de comentário existem só
+  dentro das cenas do aprovado (S8 a S11): copie o desenho para a cena nova quando a fala pedir. Cena nova se desenha no
+  mesmo traço.
 - **Paleta** (`src/base.ts`):
 
 | Papel | Cor |
@@ -195,26 +206,29 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
    (da raiz):
    `ffmpeg -f lavfi -i color=c=black:s=1080x1920:r=30 -i narracao.wav -shortest -c:v libx264 -pix_fmt yuv420p -c:a aac narracao.mp4`.
    O roteiro passa pelo `/humanizer` antes de gravar.
-2. **Crie o vídeo:** `.venv/Scripts/python.exe tools/novo-video.py personagem narracao.mp4 <AAAA-MM-DD-tema>`. Isso
-   cria `oficina/<AAAA-MM-DD-tema>/` com a voz (`public/voz.wav`) e as palavras com tempo (`src/palavras.json`). Se a
-   transcrição errar um nome, acrescente `--trocar Cloud=Claude` (uma troca por par).
-3. **Escreva o plano** em `src/tempos.json` (na pasta do vídeo), sobre a fala nova:
-   - `"fala"`: o texto da fala (o conferidor imprime pronto para colar).
-   - `"duracao_q"` (pelo menos o fim da última palavra) e `"fade_q"` (opcional).
-   - `"cenas"`: uma ilustração por frase, `{"id", "de_q", "ate_q", "o_que"}`, cortes no início de uma palavra, sem
-     buraco, a última até `duracao_q`.
-   - `"previas"` (opcional), `"marcas"` (`"nome": [índice, "palavra"]`, os instantes que as cenas usam; o nome é livre,
-     mas o som só toca em três: `barra_cheia`, `barra_fim`, a palavra depois de "100%", e `risco`), `"texto"` (grafia
-     trocada, `{}` se nenhuma), `"legenda"` (`fs`, `y0`, `passo`, `cx`),
-     `"blocos"` (um por cena, as linhas com os índices das palavras, `"verde"` para a protagonista) e `"fixo"`.
-4. **Desenhe as cenas** em `src/Cenas.tsx`: cena nova entra no mapa `CENAS`, no fim do arquivo. Reaproveite as que
-   servem (S1 a S11 do aprovado; N2 grava no celular e manda o arquivo, N3 três cartões que acendem um por vez, N4 a tela
-   que edita sozinha com o visto, cada uma com as marcas citadas no comentário dela). As peças prontas: `Fundo`, `Luz`,
-   `Poeira`, `Cartao` (estado `apagado`, `giz`, `verde` ou `ouro`), `Icone`, `Boneco` (com `celular`) e os helpers
-   `marca`, `cena` e `lerp`. O molde para ao carregar se o plano pede uma cena que não existe.
+2. **Crie o vídeo:** `QUEM=<nome> sh tools/com-trava.sh .venv/Scripts/python.exe tools/novo-video.py personagem narracao.mp4 <AAAA-MM-DD-tema>`.
+   Isso cria `oficina/<AAAA-MM-DD-tema>/` com a voz (`public/voz.wav`) e as palavras com tempo (`src/palavras.json`), e
+   **o plano nasce vazio**: o bloco O PLANO de `scripts/plano.py` vira o `scripts/plano_novo.py` (uma cena `Base` por
+   frase, legenda montada sozinha, nenhuma cena do aprovado). Se a transcrição errar um nome, acrescente
+   `--trocar Cloud=Claude` (uma troca por par).
+3. **Plano de cenas a partir da fala** (a skill `personagem`): leia `src/palavras.json` e escreva o `plano.md`, uma linha
+   por cena com o nome da cena como vai no plano e a palavra dita entre aspas que pediu ela, com o porquê. Ex.:
+   `| 2 | 2,7–9,7 s | mas ele não tem ouvidos | cena Ouvido | "ouvidos": ele com a mão na orelha, sem som |`.
+4. **Monte o bloco O PLANO** de `scripts/plano.py` (na pasta do vídeo), que gera o `src/tempos.json`:
+   - `CENAS`: `cena(comp='Nome', de=w('palavra que abre a frase'))`, uma por frase; `linhas=[[ids]...]` fixa a legenda
+     (sem ela, a legenda se monta sozinha, até 4 linhas); `verde=[ids]` para a protagonista. Sempre `comp=` com o nome
+     entre aspas (o `tools/clone.py` lê assim).
+   - `DURACAO`, `FADE`, `MARCAS` (`dict(nome=m('palavra'))`, os instantes dos acontecimentos; o som só toca em
+     `barra_cheia`, `barra_fim` e `risco`), `TEXTO` (grafia trocada pelo índice), `LEGENDA` (`cx=500` no vídeo novo),
+     `FIXO` (só se a fala pede comentário) e `PREVIAS` (só com vídeos da própria pessoa).
+   - **Desenhe as cenas novas** em `src/telas/<Nome>.tsx` com o kit (`src/kit.tsx`) e registre em `src/telas/index.ts`
+     (o arquivo tem o exemplo). As cenas do aprovado (S1 a S11) e N2 a N4 estão em `src/Cenas.tsx` como exemplos: só
+     com o mesmo porquê na fala nova (§4). O molde para ao carregar se o plano pede uma cena que não existe.
 5. **Confira as regras:** `../../.venv/Scripts/python.exe scripts/conferir.py` (na pasta do vídeo) até sair `0 erros`.
-   Ele confere que o plano é desta fala, palavra uma vez só e no tempo, tempo de leitura, linhas, posições, cortes no
-   início da palavra, cenas sem buraco, zona segura, travessão e nome de modelo.
+   Ele roda o `scripts/plano.py` (gera o `src/tempos.json`) e confere palavra uma vez só e no tempo, tempo de leitura,
+   linhas, posições, cortes no início da palavra, cenas sem buraco, zona segura, travessão e nome de modelo. Depois, o
+   **teste do clone** (de dentro de `sistema/`): `.venv/Scripts/python.exe tools/clone.py oficina/<v>` até `SEM CLONE`,
+   e `.venv/Scripts/python.exe tools/decupar.py oficina/<v> --conferir`.
 6. **Grão e som** (na pasta do vídeo): `../../.venv/Scripts/python.exe scripts/grao.py` (o grão não vem garantido) e
    `../../.venv/Scripts/python.exe scripts/som.py` (grava `public/efeitos.wav` e `public/trilha.wav` a partir do plano).
 7. **Olhe quadros:** `QUEM=<nome> sh ../../tools/com-trava.sh node scripts/quadros.mjs 1.5 16.5` (na pasta do vídeo;
@@ -231,7 +245,10 @@ Os comandos rodam da raiz do estúdio, menos onde está escrito "na pasta do ví
 
 **Prévias:** `.venv/Scripts/python.exe tools/previa.py <seu-video-pronto.mp4> oficina/<v> 1` (e o mesmo com `2`).
 
-## 10. O plano do vídeo aprovado (para comparar)
+## 10. O plano do vídeo aprovado (exemplo, para comparar; nunca para copiar)
+
+O molde guarda este plano no bloco O PLANO de `scripts/plano.py`, que gera o `src/tempos.json` do aprovado igual, byte
+a byte. Num vídeo novo ele não vem (o `novo-video.py` põe o começo vazio no lugar).
 
 | Tempo | Fala | Cena / transição | Na tela |
 |---|---|---|---|

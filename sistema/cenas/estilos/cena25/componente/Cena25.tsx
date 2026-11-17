@@ -7,17 +7,21 @@ import {loadFont} from '@remotion/google-fonts/InterTight';
 const {fontFamily: IT} = loadFont('normal', {weights: ['600', '700', '800'], subsets: ['latin', 'latin-ext']});
 
 export type Cena25Props = {
-  titulo: [string, string];
+  titulo: string[]; // 1 ou 2 linhas
   subtitulo: string;
-  categorias: string[]; // 6
+  categorias: string[]; // 3 a 8 (o espaço das barras se divide entre elas)
   heroi: number; // índice da categoria herói
-  anos: number[]; // ex.: 2021..2026
-  valores: number[][]; // valores[ano][categoria] em %
-  legendaInicial: [string, string]; // ex.: ['começa', 'em 5º lugar'] (o nome do herói entra na frente, em laranja)
-  palavraPassa?: string; // "passa"
-  legendaLideranca?: [string, string]; // ['assume', 'a liderança']
+  anos: (number | string)[]; // os passos: anos, meses, rodadas (o rótulo gigante rola só o caractere que muda)
+  valores: number[][]; // valores[ano][categoria]
+  unidade?: string; // sufixo do número (ex.: '%', ' mi'); padrão vazio
+  prefixo?: string; // ex.: 'R$ '
+  maximo?: number; // valor que ocupa ~640 px (padrão: o maior valor)
+  grade?: number[]; // linhas da grade; padrão: 4 linhas calculadas do maior valor
+  legendaInicial: [string, string]; // o nome do herói entra na frente, em laranja
+  palavraPassa?: string; // verbo da ultrapassagem (o nome de quem foi passado entra depois)
+  legendaLideranca?: [string, string]; // quando o herói chega ao topo
   legendaFinal: [string, string];
-  chip1?: string; // "1º"
+  chip1?: string; // o chip que salta no herói no topo; sem ele, não salta chip
   passoQuadros?: number; // quadros por ano
   laranja?: string;
   width?: number;
@@ -30,8 +34,8 @@ const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 const MUTED = ['#7F93B5', '#9DB89E', '#84B5B1', '#A7AFBC', '#D3A8AE'];
 
 export const Cena25: React.FC<Cena25Props> = ({
-  titulo, subtitulo, categorias, heroi, anos, valores, legendaInicial, palavraPassa = 'passa',
-  legendaLideranca = ['assume', 'a liderança'], legendaFinal, chip1 = '1º', passoQuadros = 20, laranja = '#FF5A36',
+  titulo, subtitulo, categorias, heroi, anos, valores, unidade = '', prefixo = '', maximo, grade, legendaInicial, palavraPassa = '',
+  legendaLideranca = ['', ''], legendaFinal, chip1, passoQuadros = 20, laranja = '#FF5A36',
   width = W, height = H,
 }) => {
   const frame = useCurrentFrame();
@@ -103,23 +107,31 @@ export const Cena25: React.FC<Cena25Props> = ({
   const incha = tLider !== undefined ? 1 + 0.06 * Math.sin(Math.min(1, (frame - tLider) / 10) * Math.PI) : 1;
 
   const X0 = 256;
-  const PX = 17.2; // px por ponto percentual
+  const maxV = Math.max(...valores.flat());
+  const PX = 640 / (maximo ?? maxV); // a maior barra ocupa ~640 px
   const TOP = 318;
-  const PASSO = 128;
-  const BH = 100;
+  const PASSO = Math.min(150, 768 / n);
+  const BH = PASSO * 0.78125;
+  const passoGrade = (() => {
+    const bruto = maxV / 4;
+    const mag = Math.pow(10, Math.floor(Math.log10(bruto)));
+    return [1, 2, 2.5, 5, 10].map((m) => m * mag).find((m) => m >= bruto) ?? bruto;
+  })();
+  const linhas = grade ?? [1, 2, 3, 4].map((i) => i * passoGrade).filter((g) => g <= maxV * 1.1);
+  const fmt = (v: number) => `${prefixo}${Math.round(v).toLocaleString('pt-BR')}${unidade}`;
 
   return (
     <AbsoluteFill style={{background: 'linear-gradient(180deg, #FFFFFF 0%, #F4F6F9 100%)', fontFamily: IT}}>
       <div style={{position: 'absolute', left: (width - W * s) / 2, top: (height - H * s) / 2, width: W, height: H, transform: `scale(${s})`, transformOrigin: '0 0'}}>
         <div style={{position: 'absolute', left: 88, top: 50, fontWeight: 700, fontSize: 72, lineHeight: 1.0, letterSpacing: -2.4, color: '#111418'}}>
-          {titulo[0]}<br />{titulo[1]}
+          {titulo.map((l, i) => <React.Fragment key={i}>{i > 0 ? <br /> : null}{l}</React.Fragment>)}
         </div>
         <div style={{position: 'absolute', left: 90, top: 210, fontWeight: 600, fontSize: 26, color: '#7B8491'}}>{subtitulo}</div>
         {/* grade e eixo */}
-        {[10, 20, 30, 40].map((g) => (
+        {linhas.map((g) => (
           <React.Fragment key={g}>
             <div style={{position: 'absolute', left: X0 + g * PX, top: TOP - 22, width: 2, height: PASSO * n + 10, background: '#E6E9EE'}} />
-            <div style={{position: 'absolute', left: X0 + g * PX - 40, width: 80, top: TOP - 58, textAlign: 'center', fontWeight: 600, fontSize: 22, color: '#9AA2AE'}}>{g}%</div>
+            <div style={{position: 'absolute', left: X0 + g * PX - 40, width: 80, top: TOP - 58, textAlign: 'center', fontWeight: 600, fontSize: 22, color: '#9AA2AE'}}>{fmt(g)}</div>
           </React.Fragment>
         ))}
         <div style={{position: 'absolute', left: X0, top: TOP - 22, width: 2, height: PASSO * n + 10, background: '#D5DAE1'}} />
@@ -164,11 +176,11 @@ export const Cena25: React.FC<Cena25Props> = ({
             <div key={nome} style={{position: 'absolute', left: 0, top: y, width: W, height: BH, zIndex: subindo ? 10 : 1, opacity: descendo ? 0.55 : 1}}>
               <div style={{position: 'absolute', left: 88, top: 0, height: BH, display: 'flex', alignItems: 'center', fontWeight: h ? 800 : 600, fontSize: 32, color: h ? '#0B0D10' : '#2E3440'}}>{nome}</div>
               <div style={{position: 'absolute', left: X0, top: 0, height: BH, width: v * PX, background: cor, borderRadius: '0 20px 20px 0', transform: h ? `scaleY(${incha})` : undefined, boxShadow: subindo ? '0 10px 24px rgba(17,20,24,0.18)' : 'none'}}>
-                {h && kChip > 0 && (
+                {h && chip1 && kChip > 0 && (
                   <div style={{position: 'absolute', left: 18, top: BH / 2 - 22, height: 44, padding: '0 16px', borderRadius: 22, background: '#fff', color: laranja, fontWeight: 800, fontSize: 24, display: 'flex', alignItems: 'center', transform: `scale(${kChip})`}}>{chip1}</div>
                 )}
               </div>
-              <div style={{position: 'absolute', left: X0 + v * PX + 16, top: 0, height: BH, display: 'flex', alignItems: 'center', fontWeight: 700, fontSize: 38, fontVariantNumeric: 'tabular-nums', color: h ? laranja : '#2E3440'}}>{Math.round(v)}%</div>
+              <div style={{position: 'absolute', left: X0 + v * PX + 16, top: 0, height: BH, display: 'flex', alignItems: 'center', fontWeight: 700, fontSize: 38, fontVariantNumeric: 'tabular-nums', color: h ? laranja : '#2E3440'}}>{fmt(v)}</div>
             </div>
           );
         })}

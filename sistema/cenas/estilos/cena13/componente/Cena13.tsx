@@ -11,9 +11,11 @@ const {fontFamily: GAR} = loadGar('italic', {weights: ['500'], subsets: ['latin'
 export type Cena13Props = {
   width?: number;
   height?: number;
-  titulo?: [string, string]; // duas colunas verticais
-  frase?: string;
-  capitulo?: string;
+  titulo: string[]; // 1 ou 2 colunas verticais, palavras ditas (lidas de cima para baixo, da direita para a esquerda)
+  frase?: string; // a linha itálica calma (vazia: nada)
+  capitulo?: string; // a linha de capítulo em versalete (vazia: nada)
+  barco?: boolean; // o barco no rio (só se a fala pede viagem, rio, travessia)
+  figura?: boolean; // a figura minúscula no penhasco
   papel?: string;
   tinta?: string;
   vermelho?: string;
@@ -40,9 +42,11 @@ const ease = (f: number, a: number, b: number, e = Easing.out(Easing.cubic)) => 
 export const Cena13: React.FC<Cena13Props> = ({
   width = 1080,
   height = 1350,
-  titulo = ['O RIO', 'NÃO TEM NOME'],
-  frase = 'Três dias rio abaixo.',
-  capitulo = 'Dia 01 · Capítulo um',
+  titulo,
+  frase = '',
+  capitulo = '',
+  barco: comBarco = true,
+  figura = true,
   papel = '#EEEAE0',
   tinta = '#1B1A18',
   vermelho = '#B8352A',
@@ -178,7 +182,7 @@ export const Cena13: React.FC<Cena13Props> = ({
             return <line key={i} x1={a.cx} y1={a.cy} x2={a.cx + Math.cos(rad) * a.l * g} y2={a.cy + Math.sin(rad) * a.l * 0.35 * g} stroke={tinta} strokeWidth={2} />;
           })}
           {/* figura minúscula com faixa vermelha */}
-          {frame > 64 && (
+          {figura && frame > 64 && (
             <g transform="translate(902,712)" opacity={1}>
               <path d="M0 -26 L0 0 M-6 0 L6 0" stroke={tinta} strokeWidth={4} />
               <circle cx={0} cy={-30} r={4} fill={tinta} />
@@ -193,23 +197,23 @@ export const Cena13: React.FC<Cena13Props> = ({
             return <line key={i} x1={x} y1={y} x2={x + (60 + rnd(i * 4) * 180) * g} y2={y} stroke={tinta} strokeOpacity={0.5} strokeWidth={1.5} strokeLinecap="round" />;
           })}
           {/* barco */}
-          <g transform={`translate(${410 + deriva * 0.6},1100)`} opacity={barco > 0 ? 1 : 0}>
+          <g transform={`translate(${410 + deriva * 0.6},1100)`} opacity={comBarco && barco > 0 ? 1 : 0}>
             <path d="M-46 0 Q0 16 46 0" stroke={tinta} strokeWidth={6} fill="none" pathLength={1} strokeDasharray={`${barco} 1`} />
             <path d="M-4 -2 L-4 -26 M-12 -18 L-4 -28 L4 -18" stroke={tinta} strokeWidth={3} fill="none" opacity={barco > 0.7 ? 1 : 0} />
             <path d="M8 -6 L60 -30" stroke={tinta} strokeWidth={1.5} opacity={barco > 0.9 ? 1 : 0} />
           </g>
         </svg>
         {/* título vertical em duas colunas, pincelado de cima para baixo */}
-        {[titulo[0], titulo[1]].map((t, i) => {
+        {titulo.slice(0, 2).map((t, i) => {
           const p = i === 0 ? col1 : col2;
           return (
             <div key={i} style={{display: p > 0 ? 'block' : 'none', position: 'absolute', left: i === 0 ? 172 : 104, top: 132, writingMode: 'vertical-rl', fontFamily: SC, fontWeight: 600, fontSize: 40, letterSpacing: 14, color: tinta, WebkitMaskImage: `linear-gradient(to bottom, #000 ${p * 100 - 6}%, transparent ${p * 100 + 4}%)`, maskImage: `linear-gradient(to bottom, #000 ${p * 100 - 6}%, transparent ${p * 100 + 4}%)`}}>{t}</div>
           );
         })}
-        <div style={{position: 'absolute', left: 260, top: 160, display: fr > 0 ? 'flex' : 'none', alignItems: 'center', gap: 14, fontFamily: GAR, fontStyle: 'italic', fontSize: 30, color: tinta, WebkitMaskImage: `linear-gradient(to right, #000 ${fr * 100 - 5}%, transparent ${fr * 100 + 5}%)`, maskImage: `linear-gradient(to right, #000 ${fr * 100 - 5}%, transparent ${fr * 100 + 5}%)`}}>
+        <div style={{position: 'absolute', left: 260, top: 160, display: frase && fr > 0 ? 'flex' : 'none', alignItems: 'center', gap: 14, fontFamily: GAR, fontStyle: 'italic', fontSize: 30, color: tinta, WebkitMaskImage: `linear-gradient(to right, #000 ${fr * 100 - 5}%, transparent ${fr * 100 + 5}%)`, maskImage: `linear-gradient(to right, #000 ${fr * 100 - 5}%, transparent ${fr * 100 + 5}%)`}}>
           <span style={{width: 12, height: 12, background: vermelho, display: 'inline-block'}} />{frase}
         </div>
-        <div style={{display: cap > 0 ? 'block' : 'none', position: 'absolute', left: 286, top: 226, fontFamily: SC, fontWeight: 500, fontSize: 25, letterSpacing: 5, color: '#8a8275', WebkitMaskImage: `linear-gradient(to right, #000 ${cap * 100 - 5}%, transparent ${cap * 100 + 5}%)`, maskImage: `linear-gradient(to right, #000 ${cap * 100 - 5}%, transparent ${cap * 100 + 5}%)`}}>{capitulo}</div>
+        <div style={{display: capitulo && cap > 0 ? 'block' : 'none', position: 'absolute', left: 286, top: 226, fontFamily: SC, fontWeight: 500, fontSize: 25, letterSpacing: 5, color: '#8a8275', WebkitMaskImage: `linear-gradient(to right, #000 ${cap * 100 - 5}%, transparent ${cap * 100 + 5}%)`, maskImage: `linear-gradient(to right, #000 ${cap * 100 - 5}%, transparent ${cap * 100 + 5}%)`}}>{capitulo}</div>
         {/* selo carimbado por último: chega a 112% com inclinação e assenta */}
         {frame >= 100 && (
           <div style={{position: 'absolute', left: 122, top: 640, width: 56, height: 56, background: vermelho, borderRadius: 4, transform: `scale(${1.12 - 0.12 * selo}) rotate(${(1 - selo) * -6}deg)`, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>

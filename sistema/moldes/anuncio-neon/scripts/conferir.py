@@ -41,6 +41,32 @@ def pare(msg):
     sys.exit(1)
 
 
+# ---------------------------------------------------------------- 0. o plano existe? as telas novas estão desenhadas?
+if not T.get('cenas') or not T.get('blocos'):
+    print('PLANO VAZIO: monte as cenas pela fala no bloco "O PLANO" de scripts/plano.py e rode-o (ele grava src/tempos.json).\n'
+          '  Cada cena entra porque a fala nova pediu: uma tela da casa (S1 a S10) só com o mesmo porquê, ou uma tela nova em\n'
+          '  src/telas/ (.claude/skills/anuncio-neon/SKILL.md). Toda palavra dita vai num bloco.')
+    sys.exit(1)
+CASA = set(re.findall(r'^export const (S\d+)\b', (AQUI / 'src' / 'cenas.tsx').read_text(encoding='utf-8'), re.M))
+_reg = AQUI / 'src' / 'telas' / 'index.ts'
+_reg = _reg.read_text(encoding='utf-8') if _reg.exists() else ''
+_novas = []
+for c in T['cenas']:
+    if c['id'] in CASA:
+        continue
+    arq = AQUI / 'src' / 'telas' / f"{c['id']}.tsx"
+    if not arq.exists():
+        pare(f"a cena \"{c['id']}\" não é da casa ({', '.join(sorted(CASA))}) e não existe src/telas/{c['id']}.tsx: desenhe a tela nova com o kit de src/kit.tsx")
+    if not re.search(rf"\b{c['id']}\b", _reg):
+        pare(f"a tela nova {c['id']} não está registrada em src/telas/index.ts (import e entrada em TELAS)")
+    corpo = arq.read_text(encoding='utf-8')
+    for m in re.findall(r"\bmarca\(\s*['\"](\w+)['\"]", corpo):
+        if m not in (T.get('marcas') or {}):
+            pare(f"src/telas/{c['id']}.tsx pede a marca \"{m}\", que não está em \"marcas\" do plano (scripts/plano.py)")
+    if re.search(r"['\"]#[0-9A-Fa-f]{6}['\"]", corpo):
+        pare(f"src/telas/{c['id']}.tsx tem cor escrita em hex: toda cor vem de C (a cor do anúncio, src/tema.ts)")
+    _novas.append(c['id'])
+
 # ---------------------------------------------------------------- 1. o plano é desta fala?
 plano = [w for w in map(limpa, T.get('fala', '').split()) if w]
 fala = [w for w in (limpa(p['text']) for p in PS) if w]
@@ -48,8 +74,8 @@ if plano != fala:
     k = next((i for i, (a, b) in enumerate(zip(plano, fala)) if a != b), min(len(plano), len(fala)))
     pare(f"src/tempos.json foi feito para outra fala (campo \"fala\", linha {onde('fala')}): na palavra {k + 1} o plano tem "
          f"\"{plano[k] if k < len(plano) else '(fim)'}\" e src/palavras.json tem \"{fala[k] if k < len(fala) else '(fim)'}\".\n"
-         f"Refaça o plano sobre a fala nova: \"cenas\" (linha {onde('cenas')}), \"blocos\" (linha {onde('blocos')}), \"marcas\", \"texto\", \"acordes\" e \"duracao_q\" em src/tempos.json e as telas em src/cenas.tsx (modelos/anuncio-neon/anuncio-neon.md §9),\n"
-         f"e cole no campo \"fala\" o texto da fala nova: {' '.join(p['text'] for p in PS)}")
+         f"Refaça o plano sobre a fala nova: \"cenas\" (linha {onde('cenas')}), \"blocos\" (linha {onde('blocos')}), \"marcas\", \"texto\", \"acordes\" e \"duracao_q\" no bloco \"O PLANO\" de scripts/plano.py (que grava src/tempos.json), com as telas novas em src/telas/ (modelos/anuncio-neon/anuncio-neon.md §9);\n"
+         f"tire a linha fala = '...' do bloco (sem ela, o plano.py usa a fala de src/palavras.json) e rode scripts/plano.py de novo.")
 n = len(PS)
 fora = []
 for b in T['blocos']:
@@ -130,6 +156,7 @@ for a, b2 in zip(ev, ev[1:]):
 todo = ' '.join(txt(i) for i in range(len(PS))).lower()
 for nome in ('anunciomotion', 'sofistmotion', 'profissional0', 'modelodinamico', 'superpodcast'):
     if nome in todo: erros.append(f"nome de modelo no texto: {nome}")
+if _novas: print(f"telas novas: {', '.join(_novas)}")
 print(f"{len(erros)} erros | alturas da legenda {sorted(tops)} | pílulas {sorted(pilulas)}")
 for e in erros: print('  ' + e)
 sys.exit(1 if erros else 0)
